@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Seichi Junrei - 帳號與營收管理</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff8c00",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#231a0f",
+                        "neutral-800": "#362817",
+                        "neutral-700": "#4b3820",
+                        "neutral-600": "#6b502e",
+                        "neutral-400": "#ceb18d",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "Noto Sans TC", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-neutral-700 bg-background-dark flex flex-col h-screen sticky top-0">
+<div class="p-6 flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center text-background-dark">
+<span class="material-symbols-outlined font-bold">temple_buddhist</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-bold leading-tight">Seichi Junrei</h1>
+<p class="text-neutral-400 text-xs font-normal">管理後台</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">儀表板</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-neutral-700 text-white" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="text-sm font-medium">帳號與營收</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-sm font-medium">景點管理</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">數據分析</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">系統設定</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-neutral-700">
+<button class="w-full flex items-center justify-center gap-2 rounded-lg h-10 bg-primary text-background-dark text-sm font-bold hover:bg-orange-500 transition-colors">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span>登出系統</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-4 border-b border-neutral-700 bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
+<div class="flex flex-col">
+<h2 class="text-xl font-bold tracking-tight text-slate-100">帳號與營收管理</h2>
+<p class="text-neutral-400 text-sm">監控平台運行狀況與用戶活動數據</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xl">search</span>
+<input class="bg-neutral-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary text-slate-100" placeholder="搜尋用戶或訂單..." type="text"/>
+</div>
+<button class="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+</button>
+<div class="size-10 rounded-full border-2 border-neutral-600 bg-cover bg-center" data-alt="Administrator profile avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUUTy1gTT3eSRCjNIclzcbEbKRvqQsrTLoRLVgxz83nD8zImAihi0VitbwTNQ-MAF2noeaQ4sXUQDiNlLyakkyYL_pge8xx6TpYpD-cKi5JCm_LfyI-aWFBKKwGF86HfTfEjxOoHvKGd_z3J4P5hR6Wdaw-Wz0mPw7alP_8996rrO0BFfc1Gob17sZvHf-l-cpFieDmMaBsHmuOlC6dhpPGjb7xpk7URi-Lbfd3fpzT_husXUTzMyYKhDa2tL14H_LLU0icqDIHdQ')"></div>
+</div>
+</header>
+<div class="p-8 flex flex-col gap-8">
+<!-- Key Metrics -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+<div class="flex items-center justify-between mb-4">
+<span class="text-neutral-400 text-sm font-medium">總營收 (NTD)</span>
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-3xl font-bold text-slate-100">$1,284,500</span>
+<span class="text-green-500 text-sm font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 12.5%
+                        </span>
+</div>
+</div>
+<div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+<div class="flex items-center justify-between mb-4">
+<span class="text-neutral-400 text-sm font-medium">活躍用戶</span>
+<span class="material-symbols-outlined text-primary">group</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-3xl font-bold text-slate-100">42,891</span>
+<span class="text-green-500 text-sm font-bold flex items-center mb-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> 8.2%
+                        </span>
+</div>
+</div>
+<div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+<div class="flex items-center justify-between mb-4">
+<span class="text-neutral-400 text-sm font-medium">本月增長率</span>
+<span class="material-symbols-outlined text-primary">show_chart</span>
+</div>
+<div class="flex items-end gap-3">
+<span class="text-3xl font-bold text-slate-100">+24.8%</span>
+<span class="text-primary text-sm font-bold flex items-center mb-1">
+                            目標達成率 92%
+                        </span>
+</div>
+</div>
+</section>
+<!-- Revenue Chart Section -->
+<section class="bg-neutral-800/30 rounded-xl border border-neutral-700 p-6">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+<span class="material-symbols-outlined">bar_chart</span> 營收統計趨勢 (2024)
+                    </h3>
+<div class="flex bg-neutral-800 rounded-lg p-1">
+<button class="px-4 py-1.5 text-xs font-bold bg-neutral-700 text-white rounded-md">月報</button>
+<button class="px-4 py-1.5 text-xs font-bold text-neutral-400 hover:text-white">季報</button>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-4 px-4">
+<!-- Simple Bar Chart -->
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg" style="height: 40%"></div>
+<span class="text-xs text-neutral-400">1月</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg" style="height: 55%"></div>
+<span class="text-xs text-neutral-400">2月</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg" style="height: 75%"></div>
+<span class="text-xs text-neutral-400">3月</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg" style="height: 60%"></div>
+<span class="text-xs text-neutral-400">4月</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg" style="height: 90%"></div>
+<span class="text-xs text-neutral-400">5月</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2">
+<div class="w-full bg-primary transition-all rounded-t-lg shadow-[0_0_15px_rgba(255,140,0,0.3)]" style="height: 100%"></div>
+<span class="text-xs text-slate-100 font-bold">6月</span>
+</div>
+</div>
+</section>
+<!-- Account Maintenance Table -->
+<section class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+<span class="material-symbols-outlined">person_search</span> 帳號維護管理
+                    </h3>
+<button class="text-sm font-bold text-primary flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-base">add_circle</span> 新增管理員
+                    </button>
+</div>
+<div class="overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800/30">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-neutral-800">
+<th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶 ID</th>
+<th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶名稱</th>
+<th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">註冊日期</th>
+<th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-center">狀態</th>
+<th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-right">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-neutral-700">
+<tr class="hover:bg-neutral-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-2024-001</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-neutral-700 overflow-hidden" data-alt="User profile avatar 1" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuApLVjx-nZBtPLTIXnpbUoVtkxjFaKztErhkl8fznlV7TLUSJtoiSFKjjZ9FI_gcpbdoKly71Zwnbp6ZIRVDN3KUcYYRh0qiblNN0cFxNUrwj5puSduJLLEee8xPLw8dzJ4wB8ruIFWA-LiOoPbOJkVML0JMoZs5hYuckTbfTIOVXXIfpzGAN5UnoPRL45819zZsT7zU5GNEYa0dm_VB0CoHuIWfYc0ZKKXcQSER8pbdClO9Hd27iOJMp_nnUys0FqsXwlfPG1M1ec')"></div>
+<span class="text-sm font-medium text-slate-100">聖地巡禮者 A</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-neutral-400">2023-10-01</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 text-[10px] font-bold bg-green-500/20 text-green-500 rounded uppercase tracking-wider">活躍中</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
+</td>
+</tr>
+<tr class="hover:bg-neutral-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-2024-042</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-neutral-700 overflow-hidden" data-alt="User profile avatar 2" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACGcybqTEAuz6kLizUTLLScif11amHVbG9-bHfkNLRd5tbzcFOSxmq7DisUXSS72SysB0oShUHitXKIBv_EreCfACt14vQiXPY6YnoUtkot3VZqlnh6P8AMPaaA8_43ZaC6QAKfYLPFhcjn_1PGg_uNLj8V0MV-h205cjBnJPhf1HwcBAYuDwlRTZ5B4IfvJJAew0Gpp33aVk2oVJETQQ7XTzzAaCrQOIMitB0hx4cDF1O5LHV8ry8s9Fv3iZhz8t8Mkki6eJvKB8')"></div>
+<span class="text-sm font-medium text-slate-100">動漫迷 B</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-neutral-400">2023-11-15</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 text-[10px] font-bold bg-neutral-600 text-neutral-400 rounded uppercase tracking-wider">停用</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
+</td>
+</tr>
+<tr class="hover:bg-neutral-700/30 transition-colors">
+<td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-2024-108</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-neutral-700 overflow-hidden" data-alt="User profile avatar 3" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC1KeCQe6TEsrbOVk-7mmJ-OoUOYIaw6H6eRlRqM6QToomlj1fPpiVOEggtUH9sOd6orc0yhcpNbzxsrwa5mLtd8gb6QoZkRFXlUwCXbyQ_syWoTjDvBzT_SJeKDi-nGZ80Kaat1c2Jv4qomRdLunihqTBJhLKqDVllr7E239gGtwtLc9PYa7HUAf1Zigv5uxmQrecpCYB_ve6StI7DbxAyM1Fl0hvLczdK2AoYR47DogTGJVrJeZwZqr6YIJ5xpeLpSEktqLrnxs4')"></div>
+<span class="text-sm font-medium text-slate-100">攝影愛好者 C</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-neutral-400">2023-12-20</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 text-[10px] font-bold bg-green-500/20 text-green-500 rounded uppercase tracking-wider">活躍中</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
+<p class="text-xs text-neutral-400">顯示 1 到 3 之 1,248 位用戶</p>
+<div class="flex gap-2">
+<button class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>
