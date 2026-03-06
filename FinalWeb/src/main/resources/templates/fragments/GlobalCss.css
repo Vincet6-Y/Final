@@ -1,0 +1,24 @@
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.theme-toggle-sun {
+    display: block;
+}
+
+.theme-toggle-moon {
+    display: none;
+}
+
+.dark .theme-toggle-sun {
+    display: none;
+}
+
+.dark .theme-toggle-moon {
+    display: block;
+}

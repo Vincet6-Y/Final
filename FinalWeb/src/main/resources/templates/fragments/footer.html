@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <footer th:fragment="myFooter"
+        class="bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/5 py-12 px-6 lg:px-20 transition-colors">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex flex-col items-center md:items-start gap-3">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
+                        <img alt="Seichi Junrei Logo" class="w-full h-full object-contain"
+                            th:src="@{/images/LOGO.png}" />
+                    </div>
+                    <span class="text-primary text-xl font-bold tracking-tight"
+                        style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</span>
+                </div>
+                <p class="text-slate-500 text-sm">© 2026 Sacred Site Pilgrimage. All rights reserved.</p>
+            </div>
+            <div class="flex gap-8 text-slate-500 dark:text-slate-400 text-sm">
+                <a class="hover:text-primary transition-colors" href="#">隱私權政策</a>
+                <a class="hover:text-primary transition-colors" href="#">服務條款</a>
+                <a class="hover:text-primary transition-colors" href="#">常見問題</a>
+            </div>
+            <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+                <span class="material-symbols-outlined text-sm">mail</span>
+                <a class="hover:text-primary transition-colors"
+                    href="mailto:contact@pilgrimage.com">seichi_junrei@gmail.com</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
