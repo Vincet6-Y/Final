@@ -15,7 +15,7 @@ import lombok.Data;
 public class WorkDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int workId;
+    private Integer workId;
 
     private String workName;
     private LocalDate onDate;

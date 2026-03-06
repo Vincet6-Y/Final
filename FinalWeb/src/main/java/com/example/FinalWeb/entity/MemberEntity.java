@@ -15,7 +15,7 @@ import lombok.Data;
 public class MemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int memberId;
+    private Integer memberId;
 
     private String email;
     private String passwd;

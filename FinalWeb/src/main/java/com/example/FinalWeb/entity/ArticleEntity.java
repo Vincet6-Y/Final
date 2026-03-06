@@ -13,7 +13,7 @@ import lombok.Data;
 public class ArticleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int articleId;
+    private Integer articleId;
     
     private String articleClass;
     private String title;
