@@ -8,11 +8,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
     @RequestMapping("/test")
     public String test() {
-        return "info";
+        return "home";
     }
 
     @RequestMapping("/index")
     public String index() {
         return "reactTest";
     }
+
+    @RequestMapping("/news")
+    public String news() {
+        return "news"; 
+    }
+    
+
+    
 }
