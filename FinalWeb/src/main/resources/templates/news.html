@@ -1,158 +1,210 @@
 <!DOCTYPE html>
+＋
+<html class="dark" lang="zh-Hant">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
-<html class="dark" lang="zh-Hant">
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
-<!-- Main Container -->
-<div class="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-<!-- Top Navigation Bar -->
-<header th:replace="~{ fragments/header :: myHeader}"> </header>
-<main class="flex-1 w-full max-w-7xl mx-auto px-6 lg:px-20 py-12">
-<!-- Hero Section Header -->
-<div class="mb-12">
-<h2 class="text-5xl font-black text-white mb-4 tracking-tight">最新消息</h2>
-<p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4">掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。</p>
-</div>
-<!-- Section 1: Website Info (Cards Layout) -->
-<section class="mb-16">
-<div class="flex items-center justify-between mb-8">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary text-3xl">campaign</span>
-<h3 class="text-2xl font-bold text-white">網站情報</h3>
-</div>
-<a class="text-primary text-sm font-medium flex items-center gap-1 hover:underline" href="#">查看更多 <span class="material-symbols-outlined text-xs">arrow_forward</span></a>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-<!-- Card 1 -->
-<div class="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300">
-<div class="aspect-video relative overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Scenic pilgrimage landscape with sunset warm glow" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkLyjBAyr1vRDQoezYyis5KyjAbX-IgF2KKCq5_l-EY5tpE0i9xFAjudXdaY9od1ACIqlFAZ9GzQ59kJ0YShmnqyoIkPRaMCzKgpyjEilSPYJAXd-UMhorqKfjaPTLoNL1Hz4mNRo-TTvgDzil1TAR3pYoIkTIG1gZWBoCsD2bQtD9127t29W19RiPuC1ca0NZPRZ4Hy37_-ev3qGSAkYrkCsgvKgbezutlu_xxa2jRvkZ3EUXDCWI7EIRcWljJKDeLvrixIe8J2w');"></div>
-<div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">活動</div>
-</div>
-<div class="p-6">
-<h4 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">夏季朝聖之旅限定優惠</h4>
-<p class="text-slate-400 text-sm mb-6 line-clamp-2">全線指定行程享 85 折優惠，前 50 名報名者加贈精美朝聖紀念手冊一套。</p>
-<button class="w-full py-3 bg-white/10 hover:bg-primary hover:text-background-dark text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                                了解更多 <span class="material-symbols-outlined text-base">open_in_new</span>
-</button>
-</div>
-</div>
-<!-- Card 2 -->
-<div class="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300">
-<div class="aspect-video relative overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Sacred architecture detail with mystical lighting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBckG2aVYUpA_Bis4ihejDVFJpMyfp5kQjnnWwbN6YVx3uG2jfrMGHILTS-MJ6V85uVbnZjohemnN1gGciIunmMttS7racWu37jDh-IlW8nKjQTtUO3oKuWsgn6uNH5_WAPhSnYMLAxfvH91WaM7XMGE6Y_WCTyrNrrwAa1LPYA4NR1BH8Lto6W1B0ohJQr0T6GTqZ5LNSf1f4EXhmNJGTyP_SmAQF_SEnIa9JoFO75quv3RomOtuZPmyQUlGYx6n7PHvEmi6kdCo');"></div>
-<div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">會員限定</div>
-</div>
-<div class="p-6">
-<h4 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">加入會員領取首航禮包</h4>
-<p class="text-slate-400 text-sm mb-6 line-clamp-2">即刻註冊領取 $500 旅遊購物金，並享有優先預約全球限定導覽行程的資格。</p>
-<button class="w-full py-3 bg-white/10 hover:bg-primary hover:text-background-dark text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                                立即註冊 <span class="material-symbols-outlined text-base">person_add</span>
-</button>
-</div>
-</div>
-<!-- Card 3 -->
-<div class="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300">
-<div class="aspect-video relative overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Photography equipment on a rustic table" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZSYX4nImBSEtU9gRQypjRMAQKpHmhptJOdkFW4tDDTiOJzsYLkhm644W6U87gyz9V3toLqd6WzrXnOBc_li1CrHyDDiDUQM9z_v7bfmvSlPWtHO-8RK7bVkg5ij2RJslC1JRPkp_d7D1ujRWlUJLLdR07_pkejW2xArDh3eqFQsVrA-_hgKuQ0e50lEJSljXvMYa_2R_Gp4zm7g2v56o20BVK0ntUoG7CO6xs39w8bleWnsTjvyBd8_VWehCFokfE7rohtFfCEV4');"></div>
-<div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">比賽</div>
-</div>
-<div class="p-6">
-<h4 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">捕捉聖地之美攝影比賽</h4>
-<p class="text-slate-400 text-sm mb-6 line-clamp-2">分享您的聖地旅程影像，總獎金高達三萬元，優選作品將刊登於官方年度特刊。</p>
-<button class="w-full py-3 bg-white/10 hover:bg-primary hover:text-background-dark text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                                參賽細則 <span class="material-symbols-outlined text-base">photo_camera</span>
-</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Section 2: MOFA Travel Alerts (Safety Focus) -->
-<section class="mb-16 bg-primary/5 border border-primary/20 rounded-2xl p-8">
-<div class="flex items-center gap-3 mb-8">
-<span class="material-symbols-outlined text-primary text-3xl">security</span>
-<h3 class="text-2xl font-bold text-white">外交部旅遊安全資訊</h3>
-</div>
-<div class="space-y-4">
-<div class="flex flex-col md:flex-row md:items-center gap-4 p-5 bg-background-dark/50 border border-white/10 rounded-xl hover:bg-primary/10 transition-colors">
-<span class="px-3 py-1 bg-red-500/20 text-red-500 text-xs font-bold rounded border border-red-500/30 w-fit">警示：紅色</span>
-<div class="flex-1">
-<h5 class="text-white font-bold mb-1">關於近期中東地區安全提醒</h5>
-<p class="text-slate-400 text-sm">外交部提醒國人暫緩前往相關高風險地區，並密切注意當地局勢變化。</p>
-</div>
-<span class="text-slate-500 text-xs">2024.10.24</span>
-</div>
-<div class="flex flex-col md:flex-row md:items-center gap-4 p-5 bg-background-dark/50 border border-white/10 rounded-xl hover:bg-primary/10 transition-colors">
-<span class="px-3 py-1 bg-yellow-500/20 text-yellow-500 text-xs font-bold rounded border border-yellow-500/30 w-fit">警示：黃色</span>
-<div class="flex-1">
-<h5 class="text-white font-bold mb-1">日本關東地區自然災害安全需知</h5>
-<p class="text-slate-400 text-sm">提醒近期計畫前往日本國人，隨時掌握地震預警資訊並配合當地避難引導。</p>
-</div>
-<span class="text-slate-500 text-xs">2024.10.20</span>
-</div>
-<div class="flex flex-col md:flex-row md:items-center gap-4 p-5 bg-background-dark/50 border border-white/10 rounded-xl hover:bg-primary/10 transition-colors">
-<span class="px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded border border-primary/30 w-fit">提醒：一般</span>
-<div class="flex-1">
-<h5 class="text-white font-bold mb-1">歐洲多國申根簽入境新規說明</h5>
-<p class="text-slate-400 text-sm">針對國人赴歐免簽及相關電子登記手續之最新變更說明。</p>
-</div>
-<span class="text-slate-500 text-xs">2024.10.15</span>
-</div>
-</div>
-</section>
-<!-- Section 3: Travel Guides & Tips (Featured Grid) -->
-<section class="mb-20">
-<div class="flex items-center justify-between mb-8">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary text-3xl">auto_stories</span>
-<h3 class="text-2xl font-bold text-white">旅遊攻略</h3>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 md:h-[600px]">
-<!-- Main Feature -->
-<div class="md:col-span-2 md:row-span-2 relative group rounded-2xl overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A backpacker looking at a mountain temple" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgOLpr4QvEP7f3LyciAxVfhtVpsfHOKwNxJdLdB623dGBZ8GoBai0V6LZDDsuwnaLfUJpOxEPdOiDf2KQjAcFWDA5tEaLXCYTOkePjAsRQ0d-9Rh3aOau-xDWPtS_T0Ro2pEXH5YNAazt6mpCSBnC_eJyIRJ0AC87f8TRXYn5LrTsPRvBSZYamapAWWBvSk6xybYgRnufTWMD2ZdNtTciY9H2rSmH-KRfgzXWLXQMyqHPHjr8T8P5FXCIpGLhrTz7EaPpeS1wRUkI');"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/20 to-transparent"></div>
-<div class="absolute bottom-0 left-0 p-8">
-<span class="text-primary text-sm font-bold uppercase tracking-widest mb-3 block">新手必看</span>
-<h4 class="text-3xl font-bold text-white mb-4">第一次聖地巡禮就上手：從打包到心靈準備</h4>
-<p class="text-slate-300 text-sm mb-6 max-w-md">專業領隊整理的十條金律，讓您的第一次朝聖之旅不留遺憾，體驗真正的靈魂洗滌。</p>
-<a class="inline-flex items-center gap-2 bg-primary text-background-dark font-bold px-6 py-2 rounded-lg text-sm" href="#">閱讀全文 <span class="material-symbols-outlined text-sm">arrow_outward</span></a>
-</div>
-</div>
-<!-- Secondary 1 -->
-<div class="md:col-span-2 relative group rounded-2xl overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Various travel documents and a camera" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDZ2B74CxpB3x7cw_puuR-6eIVbZvy-mNnVJtXWSHN2qWrsy8g40j2W1sftNZ1BCXcu7m4K4PlmgA5Q0FI60yx_79st4IbfW3HfEIQWSVE3lMTEIl8bH73ybHGLKJHAugF217v_tAl0icsPnF8pAf71nAr05iM7uBJvVHBaTk2ps8Wpf_NCkn2FEwD2zLgQHrMVzwu6xtVPYO0G1blGhSddlCrndckBVBWPtvJ8zWdtM658VtV8c5PE7G4Ua0bBbZPvccfzwDDLI_g');"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-<div class="absolute bottom-0 left-0 p-6">
-<h5 class="text-xl font-bold text-white mb-2">數位遊牧者的朝聖地指南</h5>
-<p class="text-slate-300 text-xs line-clamp-1">如何在旅途中兼顧工作與朝聖的心靈平靜？</p>
-</div>
-</div>
-<!-- Secondary 2 -->
-<div class="relative group rounded-2xl overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A pair of worn hiking boots" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3tuREDFyqO7Pkm0-zWfa7GzPLq-sqTPXvARuJlblMn5Zc9ozx0TtwcSzlnzVMhLfvhk-r-5-AkJ73cjPpxVBNdEZsJ4qwtp64ozKG8FCFcvEaLoQaqLggZq6OdP1JeDyleJvKF1d-n7YjbAqw7d78cWJIk8CFcgnjgsN6QX43Mx9CmLZ-_7d4nZ1t63NLSUwHZOtkNtPZFCQU_8ZEGRg3HlSJq0Zmghxg7H_92ywsN8gzdGoURBnmvNcS3dLXaElVkTVzgM-TRI');"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-<div class="absolute bottom-0 left-0 p-6">
-<h5 class="text-lg font-bold text-white">裝備推薦：鞋履篇</h5>
-</div>
-</div>
-<!-- Secondary 3 -->
-<div class="relative group rounded-2xl overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Healthy vegetarian meal on a wooden bowl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD4R96Iq9hRBnDvrVQrE_rDee1OYlQqkkLER1BJnvfSA4A4rWitm-ufJI_HHU6lzIklxo8W587OR0JjQtfI5vqGPbOLWtNr4zsDafSfn5pgmytsD9cjxA8b_aofAGw-EHKZ7VtmDLlpjCGK2GNlbARbi6elFoOUDKoifaQ3NcTjlFrSjdJBFk_4JvtfAePRkV-RIZGZCgniQYF7tljlbmt0Hu6EcY5SHUkHxaPmr3_klPaitTVcUMZhaiBcGUIi47ORGBXTCOfgd68');"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
-<div class="absolute bottom-0 left-0 p-6">
-<h5 class="text-lg font-bold text-white">聖地周邊美食地圖</h5>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- MARK:內容頁面結尾 -->
+    <!-- Main Container -->
+    <div class="relative flex flex-col min-h-screen w-full overflow-x-hidden">
+        <!-- Top Navigation Bar -->
+        <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
+        <main class="flex-1 w-full max-w-7xl mx-auto px-6 lg:px-20 py-12">
+            <!-- Hero Section Header -->
+            <div class="mb-12">
+                <h2 class="text-5xl font-black text-white mb-4 tracking-tight">最新消息</h2>
+                <p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4">
+                    掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。</p>
+            </div>
+            <!-- Section 1: Website Info (Cards Layout) -->
+            <section class="mb-16">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-3xl">campaign</span>
+                        <h3 class="text-2xl font-bold text-white">網站情報</h3>
+                    </div>
+                    <a class="text-primary text-sm font-medium flex items-center gap-1 hover:underline" href="#">查看更多
+                        <span class="material-symbols-outlined text-xs">arrow_forward</span></a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Card 1 -->
+                    <div
+                        class="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300">
+                        <div class="aspect-video relative overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Scenic pilgrimage landscape with sunset warm glow"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkLyjBAyr1vRDQoezYyis5KyjAbX-IgF2KKCq5_l-EY5tpE0i9xFAjudXdaY9od1ACIqlFAZ9GzQ59kJ0YShmnqyoIkPRaMCzKgpyjEilSPYJAXd-UMhorqKfjaPTLoNL1Hz4mNRo-TTvgDzil1TAR3pYoIkTIG1gZWBoCsD2bQtD9127t29W19RiPuC1ca0NZPRZ4Hy37_-ev3qGSAkYrkCsgvKgbezutlu_xxa2jRvkZ3EUXDCWI7EIRcWljJKDeLvrixIe8J2w');">
+                            </div>
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">
+                                活動</div>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                                夏季朝聖之旅限定優惠</h4>
+                            <p class="text-slate-400 text-sm mb-6 line-clamp-2">全線指定行程享 85 折優惠，前 50 名報名者加贈精美朝聖紀念手冊一套。
+                            </p>
+                            <button
+                                class="w-full py-3 bg-white/10 hover:bg-primary hover:text-background-dark text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
+                                了解更多 <span class="material-symbols-outlined text-base">open_in_new</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div
+                        class="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300">
+                        <div class="aspect-video relative overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Sacred architecture detail with mystical lighting"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBckG2aVYUpA_Bis4ihejDVFJpMyfp5kQjnnWwbN6YVx3uG2jfrMGHILTS-MJ6V85uVbnZjohemnN1gGciIunmMttS7racWu37jDh-IlW8nKjQTtUO3oKuWsgn6uNH5_WAPhSnYMLAxfvH91WaM7XMGE6Y_WCTyrNrrwAa1LPYA4NR1BH8Lto6W1B0ohJQr0T6GTqZ5LNSf1f4EXhmNJGTyP_SmAQF_SEnIa9JoFO75quv3RomOtuZPmyQUlGYx6n7PHvEmi6kdCo');">
+                            </div>
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">
+                                會員限定</div>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                                加入會員領取首航禮包</h4>
+                            <p class="text-slate-400 text-sm mb-6 line-clamp-2">即刻註冊領取 $500 旅遊購物金，並享有優先預約全球限定導覽行程的資格。
+                            </p>
+                            <button
+                                class="w-full py-3 bg-white/10 hover:bg-primary hover:text-background-dark text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
+                                立即註冊 <span class="material-symbols-outlined text-base">person_add</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div
+                        class="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300">
+                        <div class="aspect-video relative overflow-hidden">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Photography equipment on a rustic table"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZSYX4nImBSEtU9gRQypjRMAQKpHmhptJOdkFW4tDDTiOJzsYLkhm644W6U87gyz9V3toLqd6WzrXnOBc_li1CrHyDDiDUQM9z_v7bfmvSlPWtHO-8RK7bVkg5ij2RJslC1JRPkp_d7D1ujRWlUJLLdR07_pkejW2xArDh3eqFQsVrA-_hgKuQ0e50lEJSljXvMYa_2R_Gp4zm7g2v56o20BVK0ntUoG7CO6xs39w8bleWnsTjvyBd8_VWehCFokfE7rohtFfCEV4');">
+                            </div>
+                            <div
+                                class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">
+                                比賽</div>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                                捕捉聖地之美攝影比賽</h4>
+                            <p class="text-slate-400 text-sm mb-6 line-clamp-2">分享您的聖地旅程影像，總獎金高達三萬元，優選作品將刊登於官方年度特刊。</p>
+                            <button
+                                class="w-full py-3 bg-white/10 hover:bg-primary hover:text-background-dark text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
+                                參賽細則 <span class="material-symbols-outlined text-base">photo_camera</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Section 2: MOFA Travel Alerts (Safety Focus) -->
+            <section class="mb-16 bg-primary/5 border border-primary/20 rounded-2xl p-8">
+                <div class="flex items-center gap-3 mb-8">
+                    <span class="material-symbols-outlined text-primary text-3xl">security</span>
+                    <h3 class="text-2xl font-bold text-white">外交部旅遊安全資訊</h3>
+                </div>
+                <div class="space-y-4">
+                    <div
+                        class="flex flex-col md:flex-row md:items-center gap-4 p-5 bg-background-dark/50 border border-white/10 rounded-xl hover:bg-primary/10 transition-colors">
+                        <span
+                            class="px-3 py-1 bg-red-500/20 text-red-500 text-xs font-bold rounded border border-red-500/30 w-fit">警示：紅色</span>
+                        <div class="flex-1">
+                            <h5 class="text-white font-bold mb-1">關於近期中東地區安全提醒</h5>
+                            <p class="text-slate-400 text-sm">外交部提醒國人暫緩前往相關高風險地區，並密切注意當地局勢變化。</p>
+                        </div>
+                        <span class="text-slate-500 text-xs">2024.10.24</span>
+                    </div>
+                    <div
+                        class="flex flex-col md:flex-row md:items-center gap-4 p-5 bg-background-dark/50 border border-white/10 rounded-xl hover:bg-primary/10 transition-colors">
+                        <span
+                            class="px-3 py-1 bg-yellow-500/20 text-yellow-500 text-xs font-bold rounded border border-yellow-500/30 w-fit">警示：黃色</span>
+                        <div class="flex-1">
+                            <h5 class="text-white font-bold mb-1">日本關東地區自然災害安全需知</h5>
+                            <p class="text-slate-400 text-sm">提醒近期計畫前往日本國人，隨時掌握地震預警資訊並配合當地避難引導。</p>
+                        </div>
+                        <span class="text-slate-500 text-xs">2024.10.20</span>
+                    </div>
+                    <div
+                        class="flex flex-col md:flex-row md:items-center gap-4 p-5 bg-background-dark/50 border border-white/10 rounded-xl hover:bg-primary/10 transition-colors">
+                        <span
+                            class="px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded border border-primary/30 w-fit">提醒：一般</span>
+                        <div class="flex-1">
+                            <h5 class="text-white font-bold mb-1">歐洲多國申根簽入境新規說明</h5>
+                            <p class="text-slate-400 text-sm">針對國人赴歐免簽及相關電子登記手續之最新變更說明。</p>
+                        </div>
+                        <span class="text-slate-500 text-xs">2024.10.15</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Section 3: Travel Guides & Tips (Featured Grid) -->
+            <section class="mb-20">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-3xl">auto_stories</span>
+                        <h3 class="text-2xl font-bold text-white">旅遊攻略</h3>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 md:h-[600px]">
+                    <!-- Main Feature -->
+                    <div class="md:col-span-2 md:row-span-2 relative group rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="A backpacker looking at a mountain temple"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgOLpr4QvEP7f3LyciAxVfhtVpsfHOKwNxJdLdB623dGBZ8GoBai0V6LZDDsuwnaLfUJpOxEPdOiDf2KQjAcFWDA5tEaLXCYTOkePjAsRQ0d-9Rh3aOau-xDWPtS_T0Ro2pEXH5YNAazt6mpCSBnC_eJyIRJ0AC87f8TRXYn5LrTsPRvBSZYamapAWWBvSk6xybYgRnufTWMD2ZdNtTciY9H2rSmH-KRfgzXWLXQMyqHPHjr8T8P5FXCIpGLhrTz7EaPpeS1wRUkI');">
+                        </div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/20 to-transparent">
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-8">
+                            <span
+                                class="text-primary text-sm font-bold uppercase tracking-widest mb-3 block">新手必看</span>
+                            <h4 class="text-3xl font-bold text-white mb-4">第一次聖地巡禮就上手：從打包到心靈準備</h4>
+                            <p class="text-slate-300 text-sm mb-6 max-w-md">專業領隊整理的十條金律，讓您的第一次朝聖之旅不留遺憾，體驗真正的靈魂洗滌。</p>
+                            <a class="inline-flex items-center gap-2 bg-primary text-background-dark font-bold px-6 py-2 rounded-lg text-sm"
+                                href="#">閱讀全文 <span class="material-symbols-outlined text-sm">arrow_outward</span></a>
+                        </div>
+                    </div>
+                    <!-- Secondary 1 -->
+                    <div class="md:col-span-2 relative group rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="Various travel documents and a camera"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDZ2B74CxpB3x7cw_puuR-6eIVbZvy-mNnVJtXWSHN2qWrsy8g40j2W1sftNZ1BCXcu7m4K4PlmgA5Q0FI60yx_79st4IbfW3HfEIQWSVE3lMTEIl8bH73ybHGLKJHAugF217v_tAl0icsPnF8pAf71nAr05iM7uBJvVHBaTk2ps8Wpf_NCkn2FEwD2zLgQHrMVzwu6xtVPYO0G1blGhSddlCrndckBVBWPtvJ8zWdtM658VtV8c5PE7G4Ua0bBbZPvccfzwDDLI_g');">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <h5 class="text-xl font-bold text-white mb-2">數位遊牧者的朝聖地指南</h5>
+                            <p class="text-slate-300 text-xs line-clamp-1">如何在旅途中兼顧工作與朝聖的心靈平靜？</p>
+                        </div>
+                    </div>
+                    <!-- Secondary 2 -->
+                    <div class="relative group rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="A pair of worn hiking boots"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3tuREDFyqO7Pkm0-zWfa7GzPLq-sqTPXvARuJlblMn5Zc9ozx0TtwcSzlnzVMhLfvhk-r-5-AkJ73cjPpxVBNdEZsJ4qwtp64ozKG8FCFcvEaLoQaqLggZq6OdP1JeDyleJvKF1d-n7YjbAqw7d78cWJIk8CFcgnjgsN6QX43Mx9CmLZ-_7d4nZ1t63NLSUwHZOtkNtPZFCQU_8ZEGRg3HlSJq0Zmghxg7H_92ywsN8gzdGoURBnmvNcS3dLXaElVkTVzgM-TRI');">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <h5 class="text-lg font-bold text-white">裝備推薦：鞋履篇</h5>
+                        </div>
+                    </div>
+                    <!-- Secondary 3 -->
+                    <div class="relative group rounded-2xl overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="Healthy vegetarian meal on a wooden bowl"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD4R96Iq9hRBnDvrVQrE_rDee1OYlQqkkLER1BJnvfSA4A4rWitm-ufJI_HHU6lzIklxo8W587OR0JjQtfI5vqGPbOLWtNr4zsDafSfn5pgmytsD9cjxA8b_aofAGw-EHKZ7VtmDLlpjCGK2GNlbARbi6elFoOUDKoifaQ3NcTjlFrSjdJBFk_4JvtfAePRkV-RIZGZCgniQYF7tljlbmt0Hu6EcY5SHUkHxaPmr3_klPaitTVcUMZhaiBcGUIi47ORGBXTCOfgd68');">
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <h5 class="text-lg font-bold text-white">聖地周邊美食地圖</h5>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <!-- Footer -->
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+
     </div>
-  </body>
+</body>
+
 </html>
- 

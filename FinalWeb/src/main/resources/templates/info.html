@@ -1,619 +1,221 @@
 <!doctype html>
 
 <html class="dark" lang="zh-Hant">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>旅遊情報 - 聖地巡禮</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              primary: "#ff8c00",
-              "background-light": "#f8f7f5",
-              "background-dark": "#231a0f",
-            },
-            fontFamily: {
-              display: ["Space Grotesk", "Noto Sans TC", "sans-serif"],
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              full: "9999px",
-            },
-          },
-        },
-      };
-    </script>
-    <style>
-      body {
-        font-family: "Space Grotesk", "Noto Sans TC", sans-serif;
-      }
-      .weather-card {
-        background: rgba(255, 140, 0, 0.05);
-        border: 1px solid rgba(255, 140, 0, 0.1);
-      }
-    </style>
-  </head>
-  <body
-    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen"
-  >
+
+<head th:replace="~{ fragments/head :: myHead}"></head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <!-- Header Section -->
-    <header
-      th:fragment="myHeader"
-      class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center p-0.5 shadow-lg shadow-primary/20"
-        >
-          <img
-            alt="Seichi Junrei Logo"
-            class="w-full h-full object-contain"
-            th:src="@{/images/logo_noname.png}"
-          />
-        </div>
-        <h1
-          class="text-primary text-2xl font-bold tracking-tight"
-          style="
-            font-family:
-              &quot;Noto Sans TC&quot;, &quot;PingFang TC&quot;, sans-serif;
-          "
-        >
-          聖地巡禮
-        </h1>
-      </div>
-      <nav class="hidden md:flex flex-1 justify-center items-center gap-10">
-        <a
-          class="text-slate-600 dark:text-slate-100 hover:text-primary transition-colors text-sm font-medium"
-          href="#"
-          >最新消息</a
-        >
-        <a
-          class="text-slate-600 dark:text-slate-100 hover:text-primary transition-colors text-sm font-medium"
-          href="#"
-          >旅遊情報</a
-        >
-        <div class="relative group">
-          <button
-            class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
-          >
-            聖地作品巡禮
-            <span class="material-symbols-outlined text-sm"
-              >keyboard_arrow_down</span
-            >
-          </button>
-          <div
-            class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50"
-          >
-            <a
-              class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
-              href="#"
-              >電影作品</a
-            >
-            <a
-              class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
-              href="#"
-              >動畫作品</a
-            >
-          </div>
-        </div>
-        <a
-          class="text-slate-600 dark:text-slate-100 hover:text-primary transition-colors text-sm font-medium"
-          href="#"
-          >行程規劃</a
-        >
-      </nav>
-      <div class="flex items-center gap-4">
-        <button
-          aria-label="Toggle theme"
-          class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-          onclick="document.documentElement.classList.toggle('dark')"
-        >
-          <span class="material-symbols-outlined theme-toggle-sun"
-            >light_mode</span
-          >
-          <span class="material-symbols-outlined theme-toggle-moon"
-            >dark_mode</span
-          >
-        </button>
-        <!-- head CSS 不是直接放入而是引用時用這條
-            <button aria-label="Toggle theme"
-                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                onclick="document.documentElement.classList.toggle('dark')">
-
-                <span class="material-symbols-outlined block dark:hidden">light_mode</span>
-
-                <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
-            </button> -->
-        <button
-          class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all"
-        >
-          會員登入
-        </button>
-      </div>
-    </header>
+    <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
     <main class="max-w-7xl mx-auto px-6 lg:px-20 py-10">
-      <!-- Main Title -->
-      <div class="mb-12">
-        <h2
-          class="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-primary/60 bg-clip-text text-transparent"
-        >
-          旅遊情報
-        </h2>
-        <p class="text-slate-400 text-lg">
-          探索日本當地的最新動態、祭典活動與動漫朝聖即時資訊
-        </p>
-      </div>
-      <!-- Local Activity Info Section -->
-      <section class="mb-16">
-        <div class="flex items-center justify-between mb-8">
-          <h3 class="text-2xl font-bold flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary"
-              >event_note</span
-            >
-            日本當地活動情報彙整
-          </h3>
-          <a class="text-primary hover:underline text-sm font-medium" href="#"
-            >查看更多</a
-          >
+        <!-- Main Title -->
+        <div class="mb-12">
+            <h2
+                class="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-primary/60 bg-clip-text text-transparent">
+                旅遊情報</h2>
+            <p class="text-slate-400 text-lg">探索日本當地的最新動態、祭典活動與動漫朝聖即時資訊</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Activity Card 1 -->
-          <div
-            class="group bg-primary/5 rounded-xl overflow-hidden border border-primary/10 hover:border-primary/40 transition-all"
-          >
-            <div class="aspect-video relative overflow-hidden">
-              <div
-                class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                data-alt="Traditional Japanese festival floats at night with lanterns"
-                style="
-                  background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAGB-eWlMfhv5KiNnuRKCjVkcZsuMJ-lTuKgvkTwvIjeZs1M5RFUQiieiuqFmeuYkm8vKqyqM-t8me8CGqdCp-8Y0goxCfsbFY6y935FALL7UiBT71lRXlXC9kYPQ1HWFZ2f-EgUMTI5cnPLDMhYYJ65F4qLsrzrSPTCOzn2DkqiKYEo9G7o5cIxfUka84ER9n-8cm6MdsVdflKurpBWpPcp47lj54P891Y65ZVwAtrS78YlCPNmkg-eqVA7xZaIdE_8p3d-Ueda-KF&quot;);
-                "
-              ></div>
-              <div
-                class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold"
-              >
-                祭典活動
-              </div>
+        <!-- Local Activity Info Section -->
+        <section class="mb-16">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-2xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">event_note</span>
+                    日本當地活動情報彙整
+                </h3>
+                <a class="text-primary hover:underline text-sm font-medium" href="#">查看更多</a>
             </div>
-            <div class="p-5">
-              <h4
-                class="text-lg font-bold mb-2 group-hover:text-primary transition-colors"
-              >
-                秩父神社例大祭 (秩父夜祭)
-              </h4>
-              <div class="flex items-center gap-2 text-slate-400 text-sm">
-                <span class="material-symbols-outlined text-sm"
-                  >calendar_month</span
-                >
-                2024/12/02 - 12/03
-              </div>
-            </div>
-          </div>
-          <!-- Activity Card 2 -->
-          <div
-            class="group bg-primary/5 rounded-xl overflow-hidden border border-primary/10 hover:border-primary/40 transition-all"
-          >
-            <div class="aspect-video relative overflow-hidden">
-              <div
-                class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                data-alt="Crowded streets of Akihabara with neon anime signs"
-                style="
-                  background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuA4bE_ZrdKA_6kRdad7-90XBUwxw850wmmfQZ7lDA--hX21bNpdZixXivQKGzaNz2Dy3o7Y0owKY1MXqA3vU1kJPHZUKulo-NlBqc-Rqy1XkRdJv0wPjaouU9gNzIt93j7SfFlgsjNe7b42ra0IFoCO9cJ-xY1xHDhLWO-J4qI7pWeLO0lOD7WGFH891V5Y-ie7BA11aRbQ_CeUN3lFHenCaaR5D3gJENUMjNVv3eHkwFfb9y3Z-sOZKZGVQMlRt0yRVpE7it5DkywJ&quot;);
-                "
-              ></div>
-              <div
-                class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold"
-              >
-                動漫活動
-              </div>
-            </div>
-            <div class="p-5">
-              <h4
-                class="text-lg font-bold mb-2 group-hover:text-primary transition-colors"
-              >
-                神田祭 × 動漫聯名活動詳情
-              </h4>
-              <div class="flex items-center gap-2 text-slate-400 text-sm">
-                <span class="material-symbols-outlined text-sm"
-                  >calendar_month</span
-                >
-                2024/05/15
-              </div>
-            </div>
-          </div>
-          <!-- Activity Card 3 -->
-          <div
-            class="group bg-primary/5 rounded-xl overflow-hidden border border-primary/10 hover:border-primary/40 transition-all"
-          >
-            <div class="aspect-video relative overflow-hidden">
-              <div
-                class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                data-alt="Kyoto traditional buildings and temples in autumn"
-                style="
-                  background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuD3w-p8ZhQvY97nAvx-JF7abcTr3EqkcxCAKYHpKOpdzwkuUUfBhtEIYcdFyM690vJZXVvuNLcRVOl2ow2-UK6dG7A3XZlogJZf42MIbFqsP8Qq1jrCExiiPVFSVcN8KVSOJVi64aEXypw3RzAZizAHmmh8EQ_YSfK5DhdL2Xqiyo7cgVuHBvQUbk4JuWDJvaenQhvWMHnIhvP3Tr9QWBeUcbqTEE6lhVBeBFTWM3FFuVeRtRuSm78lJOi6sZ4v4XHnHmnahs8nH-cI&quot;);
-                "
-              ></div>
-              <div
-                class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold"
-              >
-                特展
-              </div>
-            </div>
-            <div class="p-5">
-              <h4
-                class="text-lg font-bold mb-2 group-hover:text-primary transition-colors"
-              >
-                京都動漫節 2024 (Kyomaf)
-              </h4>
-              <div class="flex items-center gap-2 text-slate-400 text-sm">
-                <span class="material-symbols-outlined text-sm"
-                  >calendar_month</span
-                >
-                2024/09/21 - 09/22
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Real-time Weather Section -->
-      <section class="mb-16">
-        <div class="flex items-center gap-2 mb-8">
-          <span class="material-symbols-outlined text-primary">wb_sunny</span>
-          <h3 class="text-2xl font-bold">即時天氣資訊</h3>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Tokyo Weather -->
-          <div class="weather-card p-6 rounded-2xl">
-            <div class="flex justify-between items-start mb-6">
-              <div>
-                <h4 class="text-xl font-bold text-white">東京 Tokyo</h4>
-                <p class="text-slate-400 text-sm">聖地巡禮核心區域</p>
-              </div>
-              <div class="text-right">
-                <span class="material-symbols-outlined text-4xl text-yellow-400"
-                  >sunny</span
-                >
-                <div class="text-2xl font-bold text-white">18°C</div>
-              </div>
-            </div>
-            <div class="grid grid-cols-7 gap-1">
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Mon</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">19°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Tue</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">20°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Wed</div>
-                <span class="material-symbols-outlined text-xs text-slate-400"
-                  >cloud</span
-                >
-                <div class="text-[10px]">17°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Thu</div>
-                <span class="material-symbols-outlined text-xs text-blue-400"
-                  >rainy</span
-                >
-                <div class="text-[10px]">14°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Fri</div>
-                <span class="material-symbols-outlined text-xs text-slate-400"
-                  >cloud</span
-                >
-                <div class="text-[10px]">16°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Sat</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">18°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Sun</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">19°</div>
-              </div>
-            </div>
-          </div>
-          <!-- Kyoto Weather -->
-          <div class="weather-card p-6 rounded-2xl">
-            <div class="flex justify-between items-start mb-6">
-              <div>
-                <h4 class="text-xl font-bold text-white">京都 Kyoto</h4>
-                <p class="text-slate-400 text-sm">古都聖地巡禮</p>
-              </div>
-              <div class="text-right">
-                <span class="material-symbols-outlined text-4xl text-slate-300"
-                  >cloud</span
-                >
-                <div class="text-2xl font-bold text-white">15°C</div>
-              </div>
-            </div>
-            <div class="grid grid-cols-7 gap-1">
-              <!-- Simplified Forecast for demo -->
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Mon</div>
-                <span class="material-symbols-outlined text-xs text-slate-300"
-                  >cloud</span
-                >
-                <div class="text-[10px]">16°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Tue</div>
-                <span class="material-symbols-outlined text-xs text-blue-300"
-                  >rainy</span
-                >
-                <div class="text-[10px]">14°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Wed</div>
-                <span class="material-symbols-outlined text-xs text-blue-300"
-                  >rainy</span
-                >
-                <div class="text-[10px]">13°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Thu</div>
-                <span class="material-symbols-outlined text-xs text-slate-300"
-                  >cloud</span
-                >
-                <div class="text-[10px]">15°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Fri</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">18°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Sat</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">19°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Sun</div>
-                <span class="material-symbols-outlined text-xs text-slate-300"
-                  >cloud</span
-                >
-                <div class="text-[10px]">17°</div>
-              </div>
-            </div>
-          </div>
-          <!-- Gifu Weather -->
-          <div class="weather-card p-6 rounded-2xl">
-            <div class="flex justify-between items-start mb-6">
-              <div>
-                <h4 class="text-xl font-bold text-white">岐阜 Gifu</h4>
-                <p class="text-slate-400 text-sm">《你的名字》聖地</p>
-              </div>
-              <div class="text-right">
-                <span class="material-symbols-outlined text-4xl text-blue-400"
-                  >ac_unit</span
-                >
-                <div class="text-2xl font-bold text-white">6°C</div>
-              </div>
-            </div>
-            <div class="grid grid-cols-7 gap-1">
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Mon</div>
-                <span class="material-symbols-outlined text-xs text-blue-400"
-                  >ac_unit</span
-                >
-                <div class="text-[10px]">5°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Tue</div>
-                <span class="material-symbols-outlined text-xs text-blue-400"
-                  >ac_unit</span
-                >
-                <div class="text-[10px]">4°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Wed</div>
-                <span class="material-symbols-outlined text-xs text-slate-300"
-                  >cloud</span
-                >
-                <div class="text-[10px]">8°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Thu</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">10°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Fri</div>
-                <span class="material-symbols-outlined text-xs text-yellow-500"
-                  >sunny</span
-                >
-                <div class="text-[10px]">11°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Sat</div>
-                <span class="material-symbols-outlined text-xs text-slate-300"
-                  >cloud</span
-                >
-                <div class="text-[10px]">9°</div>
-              </div>
-              <div class="text-center">
-                <div class="text-[10px] text-slate-500 mb-1">Sun</div>
-                <span class="material-symbols-outlined text-xs text-blue-400"
-                  >ac_unit</span
-                >
-                <div class="text-[10px]">5°</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Seasonal Special Zone -->
-      <section class="mb-16">
-        <div class="flex items-center gap-2 mb-8">
-          <span class="material-symbols-outlined text-primary"
-            >auto_awesome</span
-          >
-          <h3 class="text-2xl font-bold">季節限定專區</h3>
-        </div>
-        <div class="space-y-6">
-          <!-- Main Featured Seasonal -->
-          <div
-            class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden group"
-          >
-            <div
-              class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              data-alt="Stunning Japanese maple leaves in vibrant red autumn colors"
-              style="
-                background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuAN0VU2dCa2Wc_H25UBRxcCVhuiU-8XynaY60lFsdZpXCov1OQlzRgD0iBExeQsTG-2nojVF9yDG9USfBYVkzH3ij7NGtZso6komRgGe7rJ5n9jyI0n2zHKJzxdfn1QZxuDpLWjdNiHwcnbAY5XYVDr0uca8fYPmlW0N3dDEnPhWH2Uq-aEzH7-EM6DttfwYWf79ZQLBDjVQP3LX_fLKt_GRjBMwd4Yo1Bn9kXbvFIrRvK0be2q_NaMs6BOdkjW3ZW4Btp11TwpQq0H&quot;);
-              "
-            ></div>
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-background-dark/90 via-background-dark/40 to-transparent flex flex-col justify-center px-12"
-            >
-              <span class="text-primary font-bold tracking-widest mb-2"
-                >AUTUMN 2024</span
-              >
-              <h4 class="text-4xl font-black mb-4">紅葉狩り：古都追楓之旅</h4>
-              <p class="max-w-md text-slate-200 mb-6 leading-relaxed">
-                漫步在京都嵐山的竹林小徑，或是前往高山市感受《你的名字》中的深秋景色。現在正是規劃紅葉朝聖的最佳時機。
-              </p>
-              <button
-                class="bg-primary text-background-dark px-8 py-3 rounded-full font-bold w-fit hover:brightness-110 transition-all flex items-center gap-2"
-              >
-                立即探索專題
-                <span class="material-symbols-outlined">arrow_forward</span>
-              </button>
-            </div>
-          </div>
-          <!-- Secondary Seasonal Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="relative aspect-video rounded-xl overflow-hidden group">
-              <div
-                class="absolute inset-0 bg-cover bg-center"
-                data-alt="Pink cherry blossom trees in full bloom with a clear sky"
-                style="
-                  background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuBoqu--afWbkxw90QshgnuxBa1nIVh2KpDeuSqOyEnLwXVqMxQzt4OyZMCqLY1VRL71AtnQ0PKC1iJwMlap7o6Uy4iafPC09UeRniG20LH3PuDhb5MuSavSHe2BBcRDpaHeB2zaRRtVg8f5E0auciUdEBJ7z8lifg7lbabIYqYkVSBfD4LSD8d1V6KFYG9Rpd7y5Ql7tHQbGFIgTzowFudkCESpZPBywyWPQSJIlTDz4TbsvACW2UFxTdymnes9ZYUEjKMzAroQgHij&quot;);
-                "
-              ></div>
-              <div
-                class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6"
-              >
-                <div>
-                  <h5 class="text-xl font-bold">春季：櫻花祭情報預覽</h5>
-                  <p class="text-sm text-slate-200">
-                    2025年預測情報將於1月更新
-                  </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Activity Card 1 -->
+                <div
+                    class="group bg-primary/5 rounded-xl overflow-hidden border border-primary/10 hover:border-primary/40 transition-all">
+                    <div class="aspect-video relative overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            data-alt="Traditional Japanese festival floats at night with lanterns"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGB-eWlMfhv5KiNnuRKCjVkcZsuMJ-lTuKgvkTwvIjeZs1M5RFUQiieiuqFmeuYkm8vKqyqM-t8me8CGqdCp-8Y0goxCfsbFY6y935FALL7UiBT71lRXlXC9kYPQ1HWFZ2f-EgUMTI5cnPLDMhYYJ65F4qLsrzrSPTCOzn2DkqiKYEo9G7o5cIxfUka84ER9n-8cm6MdsVdflKurpBWpPcp47lj54P891Y65ZVwAtrS78YlCPNmkg-eqVA7xZaIdE_8p3d-Ueda-KF')">
+                        </div>
+                        <div
+                            class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold">
+                            祭典活動</div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">秩父神社例大祭 (秩父夜祭)
+                        </h4>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <span class="material-symbols-outlined text-sm">calendar_month</span>
+                            2024/12/02 - 12/03
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="relative aspect-video rounded-xl overflow-hidden group">
-              <div
-                class="absolute inset-0 bg-cover bg-center"
-                data-alt="Snow covered Japanese traditional village houses at night"
-                style="
-                  background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuACNETwBd_GI2_KieAUEdsYte081MBVHwQAIwn0vMZXnNHlY0zg7iRl8LGQRv22uaEykS2MR1Tn-lzaI9qVmzCfA6TnJX2etKGwo_jknoFwDleckoeWuLkROtU3DRlozvb2zS1cHXEQnRtoyXwtMrlgqFwErEJmO8xbojNzvaaTeqsVCyoE_XsdyaCKVUZG3xBnC1lxAzt1GFP9ODcBuojbcAbd4_Auz4sxacT9zspfZZ2qdC-uYrHg-ACAhDXbwQc_0oJd7_NadH9U&quot;);
-                "
-              ></div>
-              <div
-                class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6"
-              >
-                <div>
-                  <h5 class="text-xl font-bold">冬季：雪國聖地之旅</h5>
-                  <p class="text-sm text-slate-200">
-                    白川鄉合掌村與北海道滑雪聖地
-                  </p>
+                <!-- Activity Card 2 -->
+                <div
+                    class="group bg-primary/5 rounded-xl overflow-hidden border border-primary/10 hover:border-primary/40 transition-all">
+                    <div class="aspect-video relative overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            data-alt="Crowded streets of Akihabara with neon anime signs"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA4bE_ZrdKA_6kRdad7-90XBUwxw850wmmfQZ7lDA--hX21bNpdZixXivQKGzaNz2Dy3o7Y0owKY1MXqA3vU1kJPHZUKulo-NlBqc-Rqy1XkRdJv0wPjaouU9gNzIt93j7SfFlgsjNe7b42ra0IFoCO9cJ-xY1xHDhLWO-J4qI7pWeLO0lOD7WGFH891V5Y-ie7BA11aRbQ_CeUN3lFHenCaaR5D3gJENUMjNVv3eHkwFfb9y3Z-sOZKZGVQMlRt0yRVpE7it5DkywJ')">
+                        </div>
+                        <div
+                            class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold">
+                            動漫活動</div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">神田祭 × 動漫聯名活動詳情
+                        </h4>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <span class="material-symbols-outlined text-sm">calendar_month</span>
+                            2024/05/15
+                        </div>
+                    </div>
                 </div>
-              </div>
+                <!-- Activity Card 3 -->
+                <div
+                    class="group bg-primary/5 rounded-xl overflow-hidden border border-primary/10 hover:border-primary/40 transition-all">
+                    <div class="aspect-video relative overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            data-alt="Kyoto traditional buildings and temples in autumn"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD3w-p8ZhQvY97nAvx-JF7abcTr3EqkcxCAKYHpKOpdzwkuUUfBhtEIYcdFyM690vJZXVvuNLcRVOl2ow2-UK6dG7A3XZlogJZf42MIbFqsP8Qq1jrCExiiPVFSVcN8KVSOJVi64aEXypw3RzAZizAHmmh8EQ_YSfK5DhdL2Xqiyo7cgVuHBvQUbk4JuWDJvaenQhvWMHnIhvP3Tr9QWBeUcbqTEE6lhVBeBFTWM3FFuVeRtRuSm78lJOi6sZ4v4XHnHmnahs8nH-cI')">
+                        </div>
+                        <div
+                            class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold">
+                            特展</div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors">京都動漫節 2024
+                            (Kyomaf)</h4>
+                        <div class="flex items-center gap-2 text-slate-400 text-sm">
+                            <span class="material-symbols-outlined text-sm">calendar_month</span>
+                            2024/09/21 - 09/22
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+        </section>
+       <div class="max-w-6xl mx-auto p-4">
+    
+  <section class="mb-16">
+    <div class="flex items-center gap-2 mb-8">
+        <span class="material-symbols-outlined text-primary">cloudy_snowing</span>
+        <h3 class="text-2xl font-bold">日本即時天氣預報</h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:each="cityData : ${allWeather}" 
+             class="bg-primary/5 rounded-xl p-6 border border-primary/10 hover:border-primary/40 transition-all">
+            
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-2xl font-bold text-primary" th:text="${cityData.cityName}">城市</h4>
+                <span class="text-slate-400 text-sm" th:text="${cityData.daily.time[0]}">日期</span>
+            </div>
+
+            <div class="flex items-center gap-4 mb-6">
+                <span class="text-5xl">🌡️</span>
+                <div>
+                    <div class="text-4xl font-black text-white">
+                        <span th:text="${cityData.daily.temperature_2m_max[0]}">20</span>°C
+                    </div>
+                    <p class="text-slate-400 text-sm">今日最高溫</p>
+                </div>
+            </div>
+
+            <div class="bg-background-dark/50 rounded-lg overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-500 uppercase bg-primary/10">
+                        <tr>
+                            <th class="px-3 py-2">日期</th>
+                            <th class="px-3 py-2">最高</th>
+                            <th class="px-3 py-2">最低</th>
+                        </tr>
+                    </thead>
+                   <tbody class="divide-y divide-primary/5">
+    <tr th:each="i : ${#numbers.sequence(0, 6)}" class="hover:bg-primary/5">
+        <td class="px-3 py-2 text-slate-300" th:text="${cityData.daily.time[i].substring(5)}">MM-DD</td>
+        
+        <td class="px-3 py-2 font-bold text-red-400">
+            <span th:text="${cityData.daily.temperature_2m_max[i]}"></span>°
+        </td>
+        
+        <td class="px-3 py-2 font-bold text-blue-400">
+            <span th:text="${cityData.daily.temperature_2m_min[i]}"></span>°
+        </td>
+    </tr>
+</tbody>
+                </table>
+            </div>
         </div>
-      </section>
+    </div>
+</section>
+</div>
+        <section class="mb-16">
+    <div class="flex items-center gap-2 mb-8">
+      
+      
+
+    
+</section>
+    </main>
+    <!-- Seasonal Special Zone -->
+        <section class="mb-16">
+            <div class="flex items-center gap-2 mb-8">
+                <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                <h3 class="text-2xl font-bold">季節限定專區</h3>
+            </div>
+            <div class="space-y-6">
+                <!-- Main Featured Seasonal -->
+                <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden group">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                        data-alt="Stunning Japanese maple leaves in vibrant red autumn colors"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAN0VU2dCa2Wc_H25UBRxcCVhuiU-8XynaY60lFsdZpXCov1OQlzRgD0iBExeQsTG-2nojVF9yDG9USfBYVkzH3ij7NGtZso6komRgGe7rJ5n9jyI0n2zHKJzxdfn1QZxuDpLWjdNiHwcnbAY5XYVDr0uca8fYPmlW0N3dDEnPhWH2Uq-aEzH7-EM6DttfwYWf79ZQLBDjVQP3LX_fLKt_GRjBMwd4Yo1Bn9kXbvFIrRvK0be2q_NaMs6BOdkjW3ZW4Btp11TwpQq0H')">
+                    </div>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-background-dark/90 via-background-dark/40 to-transparent flex flex-col justify-center px-12">
+                        <span class="text-primary font-bold tracking-widest mb-2">AUTUMN 2024</span>
+                        <h4 class="text-4xl font-black mb-4">紅葉狩り：古都追楓之旅</h4>
+                        <p class="max-w-md text-slate-200 mb-6 leading-relaxed">
+                            漫步在京都嵐山的竹林小徑，或是前往高山市感受《你的名字》中的深秋景色。現在正是規劃紅葉朝聖的最佳時機。
+                        </p>
+                        <button
+                            class="bg-primary text-background-dark px-8 py-3 rounded-full font-bold w-fit hover:brightness-110 transition-all flex items-center gap-2">
+                            立即探索專題
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Secondary Seasonal Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="relative aspect-video rounded-xl overflow-hidden group">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            data-alt="Pink cherry blossom trees in full bloom with a clear sky"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoqu--afWbkxw90QshgnuxBa1nIVh2KpDeuSqOyEnLwXVqMxQzt4OyZMCqLY1VRL71AtnQ0PKC1iJwMlap7o6Uy4iafPC09UeRniG20LH3PuDhb5MuSavSHe2BBcRDpaHeB2zaRRtVg8f5E0auciUdEBJ7z8lifg7lbabIYqYkVSBfD4LSD8d1V6KFYG9Rpd7y5Ql7tHQbGFIgTzowFudkCESpZPBywyWPQSJIlTDz4TbsvACW2UFxTdymnes9ZYUEjKMzAroQgHij')">
+                        </div>
+                        <div
+                            class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6">
+                            <div>
+                                <h5 class="text-xl font-bold">春季：櫻花祭情報預覽</h5>
+                                <p class="text-sm text-slate-200">2025年預測情報將於1月更新</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative aspect-video rounded-xl overflow-hidden group">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            data-alt="Snow covered Japanese traditional village houses at night"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACNETwBd_GI2_KieAUEdsYte081MBVHwQAIwn0vMZXnNHlY0zg7iRl8LGQRv22uaEykS2MR1Tn-lzaI9qVmzCfA6TnJX2etKGwo_jknoFwDleckoeWuLkROtU3DRlozvb2zS1cHXEQnRtoyXwtMrlgqFwErEJmO8xbojNzvaaTeqsVCyoE_XsdyaCKVUZG3xBnC1lxAzt1GFP9ODcBuojbcAbd4_Auz4sxacT9zspfZZ2qdC-uYrHg-ACAhDXbwQc_0oJd7_NadH9U')">
+                        </div>
+                        <div
+                            class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6">
+                            <div>
+                                <h5 class="text-xl font-bold">冬季：雪國聖地之旅</h5>
+                                <p class="text-sm text-slate-200">白川鄉合掌村與北海道滑雪聖地</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
     <!-- Footer -->
-    <footer
-      th:fragment="myFooter"
-      class="bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/5 py-12 px-6 lg:px-20 transition-colors"
-    >
-      <div
-        class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8"
-      >
-        <div class="flex flex-col items-center md:items-start gap-3">
-          <div class="flex items-center gap-2">
-            <div
-              class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center p-0.5 shadow-lg shadow-primary/20"
-            >
-              <img
-                alt="Seichi Junrei Logo"
-                class="w-full h-full object-contain"
-                th:src="@{/images/logo_noname.png}"
-              />
-            </div>
-            <span
-              class="text-primary text-xl font-bold tracking-tight"
-              style="
-                font-family:
-                  &quot;Noto Sans TC&quot;, &quot;PingFang TC&quot;, sans-serif;
-              "
-              >聖地巡禮</span
-            >
-          </div>
-          <p class="text-slate-500 text-sm">
-            © 2026 Sacred Site Pilgrimage. All rights reserved.
-          </p>
-        </div>
-        <div class="flex gap-8 text-slate-500 dark:text-slate-400 text-sm">
-          <a class="hover:text-primary transition-colors" href="#"
-            >隱私權政策</a
-          >
-          <a class="hover:text-primary transition-colors" href="#">服務條款</a>
-          <a class="hover:text-primary transition-colors" href="#">常見問題</a>
-        </div>
-        <div
-          class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm"
-        >
-          <span class="material-symbols-outlined text-sm">mail</span>
-          <a
-            class="hover:text-primary transition-colors"
-            href="mailto:contact@pilgrimage.com"
-            >seichi_junrei@gmail.com</a
-          >
-        </div>
-      </div>
-    </footer>
-  </body>
+    <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+
+</body>
+
 </html>
