@@ -1,7 +1,7 @@
 package com.example.FinalWeb.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -38,5 +38,15 @@ public class MemberController {
     @RequestMapping("/login")
     public String login() {
         return "login";
+    }
+
+    @RequestMapping("/news")
+    public String news() {
+        return "news";
+    }
+
+    @RequestMapping("/info")
+    public String info() {
+        return "info";
     }
 }
