@@ -1,340 +1,232 @@
 <!DOCTYPE html>
-<html lang="zh-TW"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Sacred Site Pilgrimage - 結帳付款</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style type="text/tailwindcss">
-        :root {
-            --primary-orange: #f97316;
-            --bg-deep: #120c08;
-            --card-bg: #1a1410;
-            --border-subtle: rgba(249, 115, 22, 0.1);
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-deep);
-            color: var(--text-light);
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        }
-        .section-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-subtle);
-        }
-        .input-field {
-            background-color: #0f0a07 !important;
-            border: 1px solid #2d241d !important;
-            color: #f8fafc !important;
-            border-radius: 0.5rem;
-        }
-        .input-field:focus {
-            border-color: var(--primary-orange) !important;
-            ring: 1px solid var(--primary-orange) !important;
-            outline: none;
-        }
-        .btn-gradient {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-        }
-        ::-webkit-calendar-picker-indicator {
-            filter: invert(1) sepia(100%) saturate(1000%) hue-rotate(0deg);
-            cursor: pointer;
-        }
-        .payment-option input:checked + div {
-            border-color: var(--primary-orange);
-            background-color: rgba(249, 115, 22, 0.05);
-        }
-    </style>
-</head>
-<body class="min-h-screen selection:bg-orange-500/30">
-<header class="sticky top-0 z-50 bg-[#120c08] border-b border-white/5">
-<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-[#120c08] text-2xl font-bold">temple_hindu</span>
-</div>
-<div class="flex flex-col">
-<span class="font-bold text-xl tracking-wider text-orange-500">聖地巡禮</span>
-<span class="text-[9px] uppercase tracking-[0.2em] text-gray-500">Sacred Site Pilgrimage</span>
-</div>
-</div>
-<nav class="hidden md:flex items-center gap-10 text-sm font-medium">
-<a class="text-gray-300 hover:text-orange-500 transition-colors" href="#">最新消息</a>
-<a class="text-gray-300 hover:text-orange-500 transition-colors" href="#">旅遊情報</a>
-<a class="text-gray-300 hover:text-orange-500 transition-colors" href="#">聖地作品巡禮</a>
-<a class="text-gray-300 hover:text-orange-500 transition-colors" href="#">行程規劃</a>
-</nav>
-<div class="flex items-center gap-6">
-<button class="text-gray-400 hover:text-white transition-colors">
-<span class="material-symbols-outlined">dark_mode</span>
-</button>
-<button class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full font-medium text-sm transition-all">
-                會員登入
-            </button>
-</div>
-</div>
-</header>
-<main class="max-w-7xl mx-auto px-6 py-12">
-<div class="mb-12">
-<div class="flex items-center gap-2 text-xs text-gray-500 mb-4 uppercase tracking-widest font-bold">
-<span class="text-orange-500">Step 01</span>
-<span class="w-4 h-[1px] bg-gray-700"></span>
-<span class="text-white">Step 02 確認付款</span>
-</div>
-<h1 class="text-4xl font-bold text-white mb-2">填寫訂單與支付</h1>
-<p class="text-gray-500">請確認您的聖地巡禮行程內容並完成支付程序。</p>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-<div class="lg:col-span-8 space-y-6">
-<section class="section-card rounded-xl p-8">
-<div class="flex items-center gap-3 mb-8">
-<div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-<h2 class="text-xl font-bold text-white">行程摘要</h2>
-</div>
-<div class="flex flex-col md:flex-row gap-8">
-<div class="w-full md:w-56 h-36 rounded-lg overflow-hidden flex-shrink-0">
-<img alt="日本關西行程" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbLcMmZwh16FnfkOoVi8_4skwM34Nq5WaGZXvk9ukM3To6113tQRms_5gn6R1cp_bMdEarK9QJdi9HTuBFlE7Lp_3N3AVMLo6-HZ0Gmkg1k-nM4NLt1-4oRIghTQQ2jqBV-60kdY1UEfhJnGLlqyC7c1-QwdZJT1cAfEXPrm6Ot0HpKXSdZliYJzmgCEB-jtMLTdchDCHR2rVxi7RJxV0XfRPEA_NxzdVjAC35Z62bBhUwrMXxC2pzsL_9nuRcnXrFwL0n9DcSteU"/>
-</div>
-<div class="flex-grow">
-<h3 class="text-xl font-bold text-white mb-3">日本關西必遊路線：京都大阪奈良六天五夜</h3>
-<div class="flex flex-wrap gap-6 text-sm text-gray-400 mb-6">
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-orange-500 text-lg">calendar_today</span>
-<span>6 天 5 夜</span>
-</div>
-<div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-orange-500 text-lg">person</span>
-<span>1 位成人</span>
-</div>
-</div>
-<div class="pt-6 border-t border-white/5">
-<label class="block text-sm font-medium text-gray-400 mb-3">預計出發日期 <span class="text-orange-500/80 ml-1">(需大於今日 3 天)</span></label>
-<div class="relative max-w-xs">
-<input class="input-field w-full px-4 py-3 text-sm" id="travelDate" required="" type="date"/>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section class="section-card rounded-xl p-8">
-<div class="flex items-center gap-3 mb-8">
-<div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-<h2 class="text-xl font-bold text-white">加購付費項目</h2>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-2">景點門票升級</label>
-<select class="input-field w-full px-4 py-3 text-sm">
-<option value="0">不需加購</option>
-<option value="1200">清水寺快速通關 (+NT$1,200)</option>
-<option value="2500">環球影城 VIP 套票 (+NT$2,500)</option>
-</select>
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-2">交通票券加購</label>
-<select class="input-field w-full px-4 py-3 text-sm">
-<option value="0">不需加購</option>
-<option value="800">JR West Pass 1日券 (+NT$800)</option>
-<option value="2400">關西周遊卡 3日券 (+NT$2,400)</option>
-</select>
-</div>
-<div class="md:col-span-2">
-<label class="block text-sm font-medium text-gray-400 mb-2">導覽服務</label>
-<select class="input-field w-full px-4 py-3 text-sm">
-<option value="0">無導覽服務</option>
-<option value="3000">中文私人嚮導 (1日全程) (+NT$3,000)</option>
-<option value="500">多國語言語音導覽機組 (+NT$500)</option>
-</select>
-</div>
-</div>
-</section>
-<section class="section-card rounded-xl p-8">
-<div class="flex items-center gap-3 mb-8">
-<div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-<h2 class="text-xl font-bold text-white">聯絡人資訊</h2>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-2">旅客真實姓名</label>
-<input class="input-field w-full px-4 py-3 text-sm" placeholder="請輸入證件姓名" type="text"/>
-</div>
-<div>
-<label class="block text-sm font-medium text-gray-400 mb-2">電子郵件信箱</label>
-<input class="input-field w-full px-4 py-3 text-sm" placeholder="example@email.com" type="email"/>
-</div>
-<div class="md:col-span-2">
-<label class="block text-sm font-medium text-gray-400 mb-2">手機號碼</label>
-<input class="input-field w-full px-4 py-3 text-sm" placeholder="0912-345-678" type="tel"/>
-</div>
-</div>
-</section>
-<section class="section-card rounded-xl p-8">
-<div class="flex items-center gap-3 mb-8">
-<div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-<h2 class="text-xl font-bold text-white">付款方式</h2>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-<label class="payment-option cursor-pointer">
-<input checked="" class="hidden" name="payment" type="radio"/>
-<div class="border border-white/10 rounded-xl p-5 flex flex-col items-center gap-3 transition-all hover:bg-white/5">
-<span class="material-symbols-outlined text-gray-400">credit_card</span>
-<span class="text-sm font-medium text-white">信用卡 / 簽帳卡</span>
-</div>
-</label>
-<label class="payment-option cursor-pointer">
-<input class="hidden" name="payment" type="radio"/>
-<div class="border border-white/10 rounded-xl p-5 flex flex-col items-center gap-3 transition-all hover:bg-white/5">
-<span class="material-symbols-outlined text-gray-400">account_balance_wallet</span>
-<span class="text-sm font-medium text-white">LINE Pay</span>
-</div>
-</label>
-<label class="payment-option cursor-pointer">
-<input class="hidden" name="payment" type="radio"/>
-<div class="border border-white/10 rounded-xl p-5 flex flex-col items-center gap-3 transition-all hover:bg-white/5">
-<span class="material-symbols-outlined text-gray-400">ios</span>
-<span class="text-sm font-medium text-white">Apple Pay</span>
-</div>
-</label>
-</div>
-</section>
-</div>
-<div class="lg:col-span-4">
-<div class="sticky top-28 space-y-6">
-<div class="section-card rounded-xl p-8">
-<h2 class="text-lg font-bold text-white mb-6">訂單金額明細</h2>
-<div class="space-y-4 mb-8">
-<div class="flex justify-between items-center text-gray-400 text-sm">
-<span>行程基礎費用</span>
-<span class="text-white font-medium">NT$ 18,500</span>
-</div>
-<div class="flex justify-between items-center text-gray-400 text-sm">
-<span>加購項目小計</span>
-<span class="text-white font-medium">NT$ 2,400</span>
-</div>
-<div class="flex justify-between items-center text-gray-400 text-sm">
-<span>平台服務費</span>
-<span class="text-white font-medium">NT$ 0</span>
-</div>
-<div class="pt-6 border-t border-white/5 flex justify-between items-end">
-<span class="text-gray-300 font-medium text-sm">應付總額</span>
-<div class="text-right">
-<span class="block text-[10px] text-orange-500 uppercase font-bold mb-1">Total Amount</span>
-<span class="text-3xl font-bold text-orange-500 tracking-tighter">NT$ 20,900</span>
-</div>
-</div>
-</div>
-<div class="space-y-4 mb-8">
-<label class="flex items-start gap-3 cursor-pointer group">
-<div class="mt-1">
-<input class="w-4 h-4 rounded border-white/20 text-orange-600 focus:ring-orange-600 bg-black/40" type="checkbox"/>
-</div>
-<span class="text-xs text-gray-500 group-hover:text-gray-400 transition-colors leading-normal">
-                                我已確認旅客資訊正確，並同意 <a class="text-orange-500 hover:underline" href="#">服務條款</a> 與 <a class="text-orange-500 hover:underline" href="#">隱私權聲明</a>。
-                            </span>
-</label>
-</div>
-<button class="w-full btn-gradient text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">
-<span>前往付款</span>
-<span class="material-symbols-outlined font-bold">arrow_forward</span>
-</button>
-<div class="mt-8 pt-8 border-t border-white/5 flex flex-col items-center gap-4">
-<p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">Secure Payment</p>
-<div class="flex justify-center gap-6 opacity-30">
-<img alt="Visa" class="h-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ7K69e0xgiFIyvXSbYJ4CVWzhxb2C9VC5PyLyn8NmBSwX2aLIKY8RXfq9mldkpL4ozZiYmA9I-dugU03fy7MY9a7RZLrWyFl0gwLTsvZKMVcwk6OAWddjU4MLDZ4QIKT23_reN1ybQKA9yiHr09CmrxmcmNPg5rjB6FB9YdycK4L7XlUSx2qSJ_mGbWCZZyvqrMJsoyLctIQSvLnXSvTE6Xe2X8l9y7vJj3ABHRmYaj8Jpm9IeoMbGRlZnSDgXUuRqjQvLogLm40"/>
-<img alt="Mastercard" class="h-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlLJybLWt0J3t8MATPuqVl_peUbOIYTkbvuKPltIvbACZNkZ7bZTkOPenE30wUhhjuJYbI576sqU2EPKoDmF4XhSboA1o9r9-lJLNZ4lAj0dQcNxM0EYXu0Cs6Wa3Wl8Q3XS2YovAp7XS6_IKio-PBdjrFJ4x2W6o8vjvVcC8xnPPHovvteUQefih52I0va78rYgU4sBBF_FbLBLJskkRLBJG40cGPQo8_96CV9t8u78EG9ifTuqEOemsRAovRwiD-jQzTlyQ5tcQ"/>
-<img alt="Paypal" class="h-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrdbCfDReLNwklmoS5J4nKq4dnMCkWbB2g1H0vM-ntFkjeGzrvk5g_lRHR7w9iwVwFRGXQEgRBpmF30egHIae6gDgBvaT6NmswOzMW85TuwZIdB5cvMvBwaYZnMWZmwj671pzBynEmdalBgbVUksre6Tlf6tsnBlKVRzSxveAuPKD6eQDImIHzQ1KN2L2qwwCdYVqsO9hKC4KA_BnkGkcdKY5Kv_mH9dy26ImhdO4jfoRkGEfMs_L-oILH5_ADEnSxaRGeP29T2Kk"/>
-</div>
-</div>
-</div>
-<div class="bg-orange-500/5 border border-orange-500/10 p-5 rounded-xl flex gap-4">
-<span class="material-symbols-outlined text-orange-500/60">verified_user</span>
-<div>
-<h4 class="font-bold text-gray-300 text-xs mb-1">256-bit SSL 安全加密</h4>
-<p class="text-[11px] text-gray-500 leading-relaxed">
-                            您的支付資訊將受到銀行等級的加密保護。
-                        </p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-<footer class="mt-24 border-t border-white/5 py-20 bg-[#0c0805]">
-<div class="max-w-7xl mx-auto px-6">
-<div class="flex flex-col md:flex-row justify-between items-start gap-16">
-<div class="space-y-6 max-w-sm">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined text-[#0c0805] text-2xl font-bold">temple_hindu</span>
-</div>
-<div class="flex flex-col">
-<span class="font-bold text-xl tracking-wider text-orange-500">聖地巡禮</span>
-<span class="text-[9px] uppercase tracking-[0.2em] text-gray-500">Sacred Site Pilgrimage</span>
-</div>
-</div>
-<p class="text-sm text-gray-500 leading-relaxed">
-                    致力於為每位朝聖者提供最深刻的靈魂之旅，透過精選的路線與專業的導覽，讓您與神聖之處產生真實的連結。
-                </p>
-</div>
-<div class="grid grid-cols-2 md:grid-cols-3 gap-12 md:gap-24">
-<div>
-<h4 class="text-white font-bold mb-6 text-sm">關於我們</h4>
-<ul class="text-gray-500 text-sm space-y-4">
-<li><a class="hover:text-orange-500 transition-colors" href="#">品牌故事</a></li>
-<li><a class="hover:text-orange-500 transition-colors" href="#">服務據點</a></li>
-<li><a class="hover:text-orange-500 transition-colors" href="#">加入我們</a></li>
-</ul>
-</div>
-<div>
-<h4 class="text-white font-bold mb-6 text-sm">客戶支援</h4>
-<ul class="text-gray-500 text-sm space-y-4">
-<li><a class="hover:text-orange-500 transition-colors" href="#">預約規範</a></li>
-<li><a class="hover:text-orange-500 transition-colors" href="#">常見問題</a></li>
-<li><a class="hover:text-orange-500 transition-colors" href="#">隱私權政策</a></li>
-</ul>
-</div>
-<div>
-<h4 class="text-white font-bold mb-6 text-sm">聯絡我們</h4>
-<ul class="text-gray-500 text-sm space-y-4">
-<li class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-orange-500">mail</span>
-                            contact@sacredsite.travel
-                        </li>
-<li class="flex items-center gap-2">
-<span class="material-symbols-outlined text-xs text-orange-500">phone</span>
-                            +886 2 2345 6789
-                        </li>
-</ul>
-</div>
-</div>
-</div>
-<div class="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-<p class="text-xs text-gray-600">© 2024 Sacred Site Pilgrimage. All rights reserved.</p>
-<div class="flex gap-6">
-<a class="text-gray-600 hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-xl">language</span></a>
-<a class="text-gray-600 hover:text-white transition-colors" href="#"><span class="material-symbols-outlined text-xl">share</span></a>
-</div>
-</div>
-</div>
-</footer>
-<script>
-    const travelDateInput = document.getElementById('travelDate');
-    const today = new Date();
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() + 3);
-    const year = minDate.getFullYear();
-    const month = String(minDate.getMonth() + 1).padStart(2, '0');
-    const day = String(minDate.getDate()).padStart(2, '0');
-    const minDateStr = `${year}-${month}-${day}`;
-    travelDateInput.min = minDateStr;
-    travelDateInput.value = minDateStr;
-</script>
+<html class="dark" lang="zh-TW">
 
-</body></html>
+<head th:replace="~{ fragments/head :: myHead}"></head>
+
+<body
+    class="min-h-screen selection:bg-orange-500/30 bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <header th:replace="~{ fragments/header :: myHeader}"> </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+        <div class="mb-12">
+            <div class="flex items-center gap-2 text-xs text-gray-500 mb-4 uppercase tracking-widest font-bold">
+                <span class="text-orange-500">Step 01</span>
+                <span class="w-4 h-[1px] bg-gray-300 dark:bg-gray-700"></span>
+                <span class="text-gray-800 dark:text-white">Step 02 確認付款</span>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2">填寫訂單與支付</h1>
+            <p class="text-gray-500">請確認您的聖地巡禮行程內容並完成支付程序。</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 space-y-6">
+                <section class="section-card rounded-xl p-8">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">行程摘要</h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="w-full md:w-56 h-36 rounded-lg overflow-hidden flex-shrink-0">
+                            <img alt="日本關西行程" class="w-full h-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbLcMmZwh16FnfkOoVi8_4skwM34Nq5WaGZXvk9ukM3To6113tQRms_5gn6R1cp_bMdEarK9QJdi9HTuBFlE7Lp_3N3AVMLo6-HZ0Gmkg1k-nM4NLt1-4oRIghTQQ2jqBV-60kdY1UEfhJnGLlqyC7c1-QwdZJT1cAfEXPrm6Ot0HpKXSdZliYJzmgCEB-jtMLTdchDCHR2rVxi7RJxV0XfRPEA_NxzdVjAC35Z62bBhUwrMXxC2pzsL_9nuRcnXrFwL0n9DcSteU" />
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">日本關西必遊路線：京都大阪奈良六天五夜</h3>
+                            <div class="flex flex-wrap gap-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="material-symbols-outlined text-orange-500 text-lg">calendar_today</span>
+                                    <span>6 天 5 夜</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-orange-500 text-lg">person</span>
+                                    <span>1 位成人</span>
+                                </div>
+                            </div>
+                            <div class="pt-6 border-t border-gray-200 dark:border-white/5">
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">預計出發日期
+                                    <span class="text-orange-500/80 ml-1">(需大於今日 3 天)</span></label>
+                                <div class="relative max-w-xs">
+                                    <input class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2" id="travelDate" required=""
+                                        type="date" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="section-card rounded-xl p-8">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">加購付費項目</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">景點門票升級</label>
+                            <select class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                                <option value="0">不需加購</option>
+                                <option value="1200">清水寺快速通關 (+NT$1,200)</option>
+                                <option value="2500">環球影城 VIP 套票 (+NT$2,500)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">交通票券加購</label>
+                            <select class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                                <option value="0">不需加購</option>
+                                <option value="800">JR West Pass 1日券 (+NT$800)</option>
+                                <option value="2400">關西周遊卡 3日券 (+NT$2,400)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">導覽服務</label>
+                            <select class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                                <option value="0">無導覽服務</option>
+                                <option value="3000">中文私人嚮導 (1日全程) (+NT$3,000)</option>
+                                <option value="500">多國語言語音導覽機組 (+NT$500)</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+                <section class="section-card rounded-xl p-8">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">聯絡人資訊</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">旅客真實姓名</label>
+                            <input class="input-field w-full px-4 py-3 text-sm" placeholder="請輸入證件姓名" type="text" />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">電子郵件信箱</label>
+                            <input class="input-field w-full px-4 py-3 text-sm" placeholder="example@email.com"
+                                type="email" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">手機號碼</label>
+                            <input class="input-field w-full px-4 py-3 text-sm" placeholder="0912-345-678" type="tel" />
+                        </div>
+                    </div>
+                </section>
+                <section class="section-card rounded-xl p-8">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">付款方式</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label class="payment-option cursor-pointer">
+                            <input checked="" class="hidden" name="payment" type="radio" />
+                            <div class="payment-card rounded-xl p-5 flex flex-col items-center gap-3 transition-all">
+                                <span class="material-symbols-outlined text-gray-400">credit_card</span>
+                                <span class="text-sm font-medium text-gray-800 dark:text-white">信用卡 / 簽帳卡</span>
+                            </div>
+                        </label>
+                        <label class="payment-option cursor-pointer">
+                            <input class="hidden" name="payment" type="radio" />
+                            <div class="payment-card rounded-xl p-5 flex flex-col items-center gap-3 transition-all">
+                                <span class="material-symbols-outlined text-gray-400">account_balance_wallet</span>
+                                <span class="text-sm font-medium text-gray-800 dark:text-white">LINE Pay</span>
+                            </div>
+                        </label>
+                        <label class="payment-option cursor-pointer">
+                            <input class="hidden" name="payment" type="radio" />
+                            <div class="payment-card rounded-xl p-5 flex flex-col items-center gap-3 transition-all">
+                                <span class="material-symbols-outlined text-gray-400">ios</span>
+                                <span class="text-sm font-medium text-gray-800 dark:text-white">Apple Pay</span>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+            </div>
+            <div class="lg:col-span-4">
+                <div class="sticky top-28 space-y-6">
+                    <div class="section-card rounded-xl p-8">
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-6">訂單金額明細</h2>
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm">
+                                <span>行程基礎費用</span>
+                                <span class="text-gray-900 dark:text-white font-medium">NT$ 18,500</span>
+                            </div>
+                            <div class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm">
+                                <span>加購項目小計</span>
+                                <span class="text-gray-900 dark:text-white font-medium">NT$ 2,400</span>
+                            </div>
+                            <div class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm">
+                                <span>平台服務費</span>
+                                <span class="text-gray-900 dark:text-white font-medium">NT$ 0</span>
+                            </div>
+                            <div
+                                class="pt-6 border-t border-gray-200 dark:border-white/5 flex justify-between items-end">
+                                <span class="text-gray-600 dark:text-gray-300 font-medium text-sm">應付總額</span>
+                                <div class="text-right">
+                                    <span class="block text-[10px] text-orange-500 uppercase font-bold mb-1">Total
+                                        Amount</span>
+                                    <span class="text-3xl font-bold text-orange-500 tracking-tighter">NT$ 20,900</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4 mb-8">
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <div class="mt-1">
+                                    <input
+                                        class="w-4 h-4 rounded border-gray-300 dark:border-white/20 text-orange-600 focus:ring-orange-600 bg-white dark:bg-black/40"
+                                        type="checkbox" />
+                                </div>
+                                <span
+                                    class="text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-400 transition-colors leading-normal">
+                                    我已確認旅客資訊正確，並同意 <a class="text-orange-500 hover:underline" href="#">服務條款</a> 與 <a
+                                        class="text-orange-500 hover:underline" href="#">隱私權聲明</a>。
+                                </span>
+                            </label>
+                        </div>
+                        <button
+                            class="w-full btn-gradient text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">
+                            <span>前往付款</span>
+                            <span class="material-symbols-outlined font-bold">arrow_forward</span>
+                        </button>
+                        <div
+                            class="mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col items-center gap-4">
+                            <p class="text-[10px] text-gray-500 dark:text-gray-600 uppercase tracking-widest font-bold">
+                                Secure Payment</p>
+                            <div class="flex justify-center gap-6 opacity-40 dark:opacity-30">
+                                <img alt="Visa" class="h-4"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ7K69e0xgiFIyvXSbYJ4CVWzhxb2C9VC5PyLyn8NmBSwX2aLIKY8RXfq9mldkpL4ozZiYmA9I-dugU03fy7MY9a7RZLrWyFl0gwLTsvZKMVcwk6OAWddjU4MLDZ4QIKT23_reN1ybQKA9yiHr09CmrxmcmNPg5rjB6FB9YdycK4L7XlUSx2qSJ_mGbWCZZyvqrMJsoyLctIQSvLnXSvTE6Xe2X8l9y7vJj3ABHRmYaj8Jpm9IeoMbGRlZnSDgXUuRqjQvLogLm40" />
+                                <img alt="Mastercard" class="h-4"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlLJybLWt0J3t8MATPuqVl_peUbOIYTkbvuKPltIvbACZNkZ7bZTkOPenE30wUhhjuJYbI576sqU2EPKoDmF4XhSboA1o9r9-lJLNZ4lAj0dQcNxM0EYXu0Cs6Wa3Wl8Q3XS2YovAp7XS6_IKio-PBdjrFJ4x2W6o8vjvVcC8xnPPHovvteUQefih52I0va78rYgU4sBBF_FbLBLJskkRLBJG40cGPQo8_96CV9t8u78EG9ifTuqEOemsRAovRwiD-jQzTlyQ5tcQ" />
+                                <img alt="Paypal" class="h-4"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrdbCfDReLNwklmoS5J4nKq4dnMCkWbB2g1H0vM-ntFkjeGzrvk5g_lRHR7w9iwVwFRGXQEgRBpmF30egHIae6gDgBvaT6NmswOzMW85TuwZIdB5cvMvBwaYZnMWZmwj671pzBynEmdalBgbVUksre6Tlf6tsnBlKVRzSxveAuPKD6eQDImIHzQ1KN2L2qwwCdYVqsO9hKC4KA_BnkGkcdKY5Kv_mH9dy26ImhdO4jfoRkGEfMs_L-oILH5_ADEnSxaRGeP29T2Kk" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-orange-500/5 border border-orange-500/10 p-5 rounded-xl flex gap-4 section-card">
+                        <span class="material-symbols-outlined text-orange-500/60">verified_user</span>
+                        <div>
+                            <h4 class="font-bold text-gray-800 dark:text-gray-300 text-xs mb-1">256-bit SSL 安全加密</h4>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">
+                                您的支付資訊將受到銀行等級的加密保護。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+
+    <script>
+        const travelDateInput = document.getElementById('travelDate');
+        const today = new Date();
+        const minDate = new Date(today);
+        minDate.setDate(today.getDate() + 3);
+        const year = minDate.getFullYear();
+        const month = String(minDate.getMonth() + 1).padStart(2, '0');
+        const day = String(minDate.getDate()).padStart(2, '0');
+        const minDateStr = `${year}-${month}-${day}`;
+        travelDateInput.min = minDateStr;
+        travelDateInput.value = minDateStr;
+    </script>
+</body>
+
+</html>
