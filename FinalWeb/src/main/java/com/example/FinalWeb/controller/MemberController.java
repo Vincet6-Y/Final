@@ -15,4 +15,9 @@ public class MemberController {
     public String index() {
         return "reactTest";
     }
+
+    @RequestMapping("/login")
+    public String login() {
+        return "login";
+    }
 }
