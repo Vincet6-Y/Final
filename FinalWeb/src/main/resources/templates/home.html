@@ -1,0 +1,315 @@
+<!doctype html>
+<html class="dark" lang="zh-Hant">
+
+<head th:replace="~{ fragments/head :: myHead}"></head>
+
+  <body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300"
+  >
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <header th:replace="~{ fragments/header :: myHeader}"> </header>
+
+      <!-- MARK:以下內容頁面 -->
+
+      <main class="flex-1">
+        <section
+          class="relative h-[600px] flex items-center justify-center px-4"
+        >
+          <div class="absolute inset-0 z-0">
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 dark:from-background-dark/60 dark:via-background-dark/40 dark:to-background-dark z-10"
+            ></div>
+            <img
+              alt="Japanese temple with autumn leaves"
+              class="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9O2JEbpI-3lWrwR4JoyzlHqQaa6Dl3_5ZMobGvxcAEO_AIDFtPR07tVApC2soAuU5uTOO0XKbXURYOIbpiSqnGi7lyhGVKmgS-mVIH_v6JRH2_SKZKoqamkrubMglcbJS9HBBi69l4ayRPZ1s6HK4IaHY5gdRvrnrSYTBRO3TbFJIQR802BEUIXCz0hSGThQG3YnOQ5Az9XHWOGrS99F786bZllp1jTJcA0sKVFTERnoVCcwCBjtweYlZbj3RVZZD4cbIXolbtfw"
+            />
+          </div>
+          <div
+            class="relative z-20 w-full max-w-4xl text-center flex flex-col items-center gap-8"
+          >
+            <div class="space-y-4">
+              <h2
+                class="text-white text-5xl md:text-7xl font-black tracking-tighter"
+              >
+                探索心中的<span class="text-primary">聖地</span>
+              </h2>
+              <p class="text-slate-200 text-lg md:text-xl font-light">
+                追尋電影與動漫中的經典場景，開啟一場跨越螢幕的旅程
+              </p>
+            </div>
+            <div
+              class="w-full max-w-2xl bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20 flex flex-col md:flex-row gap-2"
+            >
+              <div
+                class="flex-1 flex items-center px-4 gap-3 bg-black/30 dark:bg-background-dark/50 rounded-lg border border-white/10"
+              >
+                <span class="material-symbols-outlined text-primary"
+                  >search</span
+                >
+                <input
+                  class="bg-transparent border-none focus:ring-0 text-white w-full py-4 placeholder-slate-300"
+                  placeholder="搜尋想去的聖地..."
+                  type="text"
+                />
+              </div>
+              <button
+                class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-8 py-4 rounded-lg font-bold transition-all"
+              >
+                搜尋
+              </button>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4">
+              <button
+                class="flex items-center gap-2 bg-primary text-white dark:text-background-dark px-8 py-3 rounded-full font-bold hover:scale-105 transition-transform"
+              >
+                <span class="material-symbols-outlined text-sm">movie</span>
+                電影場景巡禮
+              </button>
+              <button
+                class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors"
+              >
+                <span class="material-symbols-outlined text-sm">animation</span>
+                動漫場景巡禮
+              </button>
+            </div>
+          </div>
+        </section>
+        <section
+          class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors"
+        >
+          <div class="flex items-center justify-between mb-10">
+            <h3
+              class="text-slate-900 dark:text-white text-3xl font-bold border-l-4 border-primary pl-4"
+            >
+              精選作品
+            </h3>
+            <button class="text-primary hover:underline text-sm font-medium">
+              查看更多作品
+            </button>
+          </div>
+          <div class="flex overflow-x-auto gap-6 pb-8 no-scrollbar">
+            <div class="flex-shrink-0 w-80 group">
+              <div class="relative h-48 rounded-xl overflow-hidden mb-4">
+                <img
+                  alt="Your Name stairs"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjxt2R8wPviIqZXYUEi9kNxP_4s_bsJgGLXxREm6BsrEBY81VbhZmDLV__AjCs5HaiGR-fKnRuk2juWzGUdKukFlgsUPkSqgmGqDdATw6XmjORoaIIPhJV2FbRSPk19gcjSYVK3kO0pC0da6QA80hd1pur6hqGBJhoyxzj8pxYEu-1gV2nzuQd4DSsWI0UuXcJSHuPpgVvIOy6wdakbSRHhSdYHEBh8SJxIX8leko5dvVsQYGI9FCfdbxrdUydvgKs6yCTVpIneA"
+                />
+                <span
+                  class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
+                  >動畫</span
+                >
+              </div>
+              <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1">
+                你的名字
+              </h4>
+              <p
+                class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2"
+              >
+                於東京與岐阜縣取景，尋找立花瀧與宮水三葉相遇的神社與街道。
+              </p>
+              <button
+                class="w-full py-2 border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+              >
+                查看詳情
+              </button>
+            </div>
+            <div class="flex-shrink-0 w-80 group">
+              <div class="relative h-48 rounded-xl overflow-hidden mb-4">
+                <img
+                  alt="Slam Dunk railway"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpGsONs1I9jctDoWnD35vPCt7z7Zj2lqxDf3NLwjo8Q2Ec8CBncM5PlrriSjDVfW5ygOUbEip_3XGn1g0sFfGnE2OBBnT0gAQ-iS_zV1SJa_dgFOUf0sg8fDn_8_0UqDt3SlBEv8zGfPYaqDsoO9ljq2g-xGTBanbDLIPVUMjzi-0GBumkE-y6Dn5U2SOriKRsZ52HX0E1UGqOmENlKTp_ESR8DVrTCiN7xOSsya2kOPceej3PgLHdc5s40PX7Y5LY3Uu48mAxIbI"
+                />
+                <span
+                  class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
+                  >動畫</span
+                >
+              </div>
+              <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1">
+                灌籃高手
+              </h4>
+              <p
+                class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2"
+              >
+                鎌倉高校前站平交道，湘南海岸的熱血與回憶，永遠的灌籃高手。
+              </p>
+              <button
+                class="w-full py-2 border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+              >
+                查看詳情
+              </button>
+            </div>
+            <div class="flex-shrink-0 w-80 group">
+              <div class="relative h-48 rounded-xl overflow-hidden mb-4">
+                <img
+                  alt="Spirited Away bathhouse"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP2qwfkNlBZbzxBN8JoxXp6Pebec3WDdmIkWoIG-cePhSG_1bjVTTiNQikqKO8PIsnv1X4JsQfCAWs-3D1fCzEIgtJI0ibN8c5TxrawuSgJ3hDqWxC9rf_TyB6vMpb_Srcfr1_wik4whxX7YduSyyJ546nFqIh0wHdQvTAlr6-nGMRTWugnmE8Ei538Pc_EMAL4HSo7VRHSn7gwEoNAmJA94b2f9UrrMbmSQOZZf9euvGfZJpa9O7g_ngdcguYeaonytLLO-b3w6k"
+                />
+                <span
+                  class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
+                  >動畫</span
+                >
+              </div>
+              <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1">
+                神隱少女
+              </h4>
+              <p
+                class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2"
+              >
+                九份與道後溫泉，探索宮崎駿筆下如夢似幻的神靈世界。
+              </p>
+              <button
+                class="w-full py-2 border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+              >
+                查看詳情
+              </button>
+            </div>
+            <div class="flex-shrink-0 w-80 group">
+              <div class="relative h-48 rounded-xl overflow-hidden mb-4">
+                <img
+                  alt="Lost in Translation Tokyo"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBALblJhVb_NXtBzLX6MxSjNaGiKZiRixGNNNvT3Iexq4PtUq7MJZ6YBrniO_vVwl9RehxGFEy965Ux4thdMt3fLLhMrlNzDKuVyPzJ81AoZVK6QmYjD8xvJJG621BKJ1rsh6q4pracD-0Zqiz5jwguWslxWzymfHpKz6nPHLAmA0x80A1-TOz36ub_FrLy0Ncqu9oXTRHyQCpFY-5ihSv1pNCo3TWlPK1i58KuYab0ZGOAW8WrSM822vPVqLeQ65FJNo-vlotpxoM"
+                />
+                <span
+                  class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
+                  >電影</span
+                >
+              </div>
+              <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1">
+                愛情，不用翻譯
+              </h4>
+              <p
+                class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2"
+              >
+                新宿柏悅酒店與澀谷十字路口，漫步在孤獨與浪漫並存的東京。
+              </p>
+              <button
+                class="w-full py-2 border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+              >
+                查看詳情
+              </button>
+            </div>
+          </div>
+        </section>
+        <section
+          class="py-16 px-6 lg:px-20 bg-slate-50 dark:bg-background-dark transition-colors"
+        >
+          <div class="flex flex-col lg:flex-row gap-8">
+            <div class="flex flex-col gap-4 lg:w-72 w-full">
+              <button
+                class="flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/5 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg dark:shadow-[0_0_20px_rgba(255,140,0,0.15)] group"
+              >
+                <span
+                  class="material-symbols-outlined text-primary text-4xl mb-2"
+                  >map</span
+                >
+                <span class="text-xl font-bold">日本資訊</span>
+              </button>
+              <button
+                class="flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm"
+              >
+                <span
+                  class="material-symbols-outlined text-slate-400 group-hover:text-primary mb-2 text-4xl"
+                  >campaign</span
+                >
+                <span class="text-xl font-bold">外交部最新資訊</span>
+              </button>
+            </div>
+            <div class="flex-1 overflow-x-auto no-scrollbar py-2">
+              <div class="flex gap-5 min-w-max">
+                <div
+                  class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                >
+                  <div
+                    class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >event</span
+                    >
+                  </div>
+                  <span
+                    class="text-slate-900 dark:text-white text-xl font-bold leading-relaxed tracking-widest"
+                    >日本景點<br />活動情報</span
+                  >
+                </div>
+                <div
+                  class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                >
+                  <div
+                    class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >restaurant</span
+                    >
+                  </div>
+                  <span
+                    class="text-slate-900 dark:text-white text-xl font-bold leading-relaxed tracking-widest"
+                    >日本美食<br />活動情報</span
+                  >
+                </div>
+                <div
+                  class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                >
+                  <div
+                    class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >train</span
+                    >
+                  </div>
+                  <span
+                    class="text-slate-900 dark:text-white text-xl font-bold leading-relaxed tracking-widest"
+                    >交通運輸<br />活動情報</span
+                  >
+                </div>
+                <div
+                  class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                >
+                  <div
+                    class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >festival</span
+                    >
+                  </div>
+                  <span
+                    class="text-slate-900 dark:text-white text-xl font-bold leading-relaxed tracking-widest"
+                    >祭典節慶<br />活動情報</span
+                  >
+                </div>
+                <div
+                  class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm dark:shadow-none"
+                >
+                  <div
+                    class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                  >
+                    <span
+                      class="material-symbols-outlined text-primary text-3xl"
+                      >shopping_bag</span
+                    >
+                  </div>
+                  <span
+                    class="text-slate-900 dark:text-white text-xl font-bold leading-relaxed tracking-widest"
+                    >購物折扣<br />活動情報</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- MARK:內容頁面結尾 -->
+
+        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+    </div>
+  </body>
+</html>
