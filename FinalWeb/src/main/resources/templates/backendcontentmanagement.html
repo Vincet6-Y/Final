@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="zh-Hant"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>聖地巡禮 - 作品與行程管理</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="dark" lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>聖地巡禮 - 作品與行程管理</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -21,278 +29,321 @@
                     fontFamily: {
                         "display": ["Space Grotesk", "Noto Sans TC", "sans-serif"]
                     },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
                 },
             },
         }
     </script>
-<style>
+    <style>
         body {
             font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
         }
+
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 </head>
+
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
-<div class="flex h-screen overflow-hidden">
-<!-- Sidebar Navigation -->
-<aside class="w-64 flex flex-col bg-background-dark border-r border-primary/10">
-<div class="p-6 flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-background-dark">
-<span class="material-symbols-outlined font-bold">temple_buddhist</span>
-</div>
-<div class="flex flex-col">
-<h1 class="text-slate-100 text-base font-bold leading-tight">聖地巡禮</h1>
-<p class="text-primary text-xs font-medium uppercase tracking-wider">Admin Panel</p>
-</div>
-</div>
-<nav class="flex-1 px-4 space-y-2 overflow-y-auto">
-<div class="text-primary/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2">主要功能</div>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group" href="#">
-<span class="material-symbols-outlined text-primary/70 group-hover:text-primary">dashboard</span>
-<span class="text-sm font-medium">工作台概覽</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary transition-colors" href="#">
-<span class="material-symbols-outlined">movie_edit</span>
-<span class="text-sm font-medium">作品管理</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group" href="#">
-<span class="material-symbols-outlined text-primary/70 group-hover:text-primary">package_2</span>
-<span class="text-sm font-medium">行程套裝管理</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group" href="#">
-<span class="material-symbols-outlined text-primary/70 group-hover:text-primary">edit_note</span>
-<span class="text-sm font-medium">文章發布</span>
-</a>
-<div class="text-primary/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 mt-6">系統設定</div>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group" href="#">
-<span class="material-symbols-outlined text-primary/70 group-hover:text-primary">group</span>
-<span class="text-sm font-medium">用戶權限</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group" href="#">
-<span class="material-symbols-outlined text-primary/70 group-hover:text-primary">settings</span>
-<span class="text-sm font-medium">系統配置</span>
-</a>
-</nav>
-<div class="p-4 mt-auto border-t border-primary/10">
-<button class="flex w-full items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors">
-<span class="material-symbols-outlined">logout</span>
-<span class="text-sm font-medium">登出系統</span>
-</button>
-</div>
-</aside>
-<!-- Main Content Area -->
-<main class="flex-1 flex flex-col overflow-hidden bg-background-light dark:bg-background-dark">
-<!-- Header -->
-<header class="h-16 flex items-center justify-between px-8 border-b border-primary/10 bg-background-dark/50 backdrop-blur-md">
-<div class="flex items-center gap-4 flex-1 max-w-xl">
-<div class="relative w-full">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/50 text-sm">search</span>
-<input class="w-full bg-primary/5 border-primary/20 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-primary focus:border-primary text-slate-100" placeholder="搜尋作品、行程或關鍵字..." type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-6">
-<div class="flex items-center gap-3">
-<button class="relative p-2 text-primary/70 hover:text-primary transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-background-dark"></span>
-</button>
-<button class="p-2 text-primary/70 hover:text-primary transition-colors">
-<span class="material-symbols-outlined">help</span>
-</button>
-</div>
-<div class="h-8 w-[1px] bg-primary/10"></div>
-<div class="flex items-center gap-3">
-<div class="text-right hidden sm:block">
-<p class="text-sm font-bold text-slate-100 leading-tight">管理員 A</p>
-<p class="text-[10px] text-primary font-medium">超級管理員</p>
-</div>
-<div class="w-10 h-10 rounded-full border-2 border-primary/30 overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Admin profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA99jWhlocCaAn7iaZj_RukavvzxPzD81bIqV4MFdmXpWH1yT-kv9Uc6InF0p7LU1WqjoUTz4iu4a6d6cSP5XJqI083HWUD9PeTR8A9Wb7GFeWea-y8pdbMy8-hcZQq14HoDxARIiwhFAUFa2akS2Gd_oagD-bU18nOhyg2y9kseQjyn03mp3wUK-U1AHKOyMeNwLWRfK5rYcGjiYY3aDtEoUJOWdib5CplzCoW4qz38vh_vyf1EukxyxB7j7UJcxDJgVcms5OEPl8"/>
-</div>
-</div>
-</div>
-</header>
-<!-- Dashboard Content -->
-<div class="flex-1 overflow-y-auto p-8 space-y-8">
-<!-- Welcome Section -->
-<div>
-<h2 class="text-3xl font-bold text-slate-100">作品與行程管理</h2>
-<p class="text-slate-400 mt-1">即時監控、編輯與優化您的聖地巡禮內容資源。</p>
-</div>
-<!-- Stats Overview -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-<div class="bg-primary/5 border border-primary/10 p-6 rounded-xl flex items-center gap-5">
-<div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-3xl">movie</span>
-</div>
-<div>
-<p class="text-slate-400 text-xs font-bold uppercase tracking-wider">總計作品</p>
-<p class="text-2xl font-bold text-slate-100">142</p>
-</div>
-</div>
-<div class="bg-primary/5 border border-primary/10 p-6 rounded-xl flex items-center gap-5">
-<div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-3xl">explore</span>
-</div>
-<div>
-<p class="text-slate-400 text-xs font-bold uppercase tracking-wider">上架行程</p>
-<p class="text-2xl font-bold text-slate-100">38</p>
-</div>
-</div>
-<div class="bg-primary/5 border border-primary/10 p-6 rounded-xl flex items-center gap-5">
-<div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-3xl">article</span>
-</div>
-<div>
-<p class="text-slate-400 text-xs font-bold uppercase tracking-wider">本月發布</p>
-<p class="text-2xl font-bold text-slate-100">12</p>
-</div>
-</div>
-</div>
-<!-- Management Modules -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-<!-- 作品管理 (Manage Works) -->
-<div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
-<div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary">movie_edit</span>
-<h3 class="font-bold text-lg">作品管理</h3>
-</div>
-<button class="text-primary text-sm font-bold hover:underline">查看全部</button>
-</div>
-<div class="p-6">
-<div class="space-y-4">
-<div class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
-<div class="w-16 h-10 rounded overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Anime scenery illustration" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9BWxbaibJZTYG7xX5w9Oc7L4K1vRJtLCut1Qqhq46iI216MK4xZ2_cDimSgD76HUShjKi_GBcpBwUVVh2LSz7jMc8ZAVil6Z4kgSZJMnkHTnvFOhKR0Qagl5Y83mFowBnKSltQZy4-jE0CZ_ojaTEalywSYPqL_bsAoWEKNR0RqemNpyqjAjL96JPy3xXHZpKzNfPjNs376JlA9-cIEFX1qoe5FYm2IOasLkR46OIFK2wNC1UsztoRRTOwpPFeesmb9rwAvZyTcE"/>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold">鈴芽之旅 (Suzume)</h4>
-<p class="text-xs text-slate-500">更新於: 2023-11-20</p>
-</div>
-<span class="px-2 py-0.5 rounded bg-green-500/20 text-green-500 text-[10px] font-bold">已上架</span>
-<button class="p-1 hover:bg-primary/20 rounded transition-colors">
-<span class="material-symbols-outlined text-sm">edit</span>
-</button>
-</div>
-<div class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
-<div class="w-16 h-10 rounded overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Urban Tokyo nighttime street" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5W6dgRG3vPtX_pgjM6UBnLaQT5q6Wv5wK0DWTbgNsNDE9GjH_awXmj2kRPgMA2Rph6AXAtvc3voepnVnpzgEaXv8s3qtLVs2-p9tU1lVhEy4i7GGqv11Q7o6u_OyLwmBQYOHCXYT9lGu3MonkuVpUE-9Z1iShkm7GnMkTfXoFf4vfWWuuZSWCGEHjN1CDra1zO2FWDG4DxFZeKfSo0j587jver-DNS4YAfMFG7oBEVPUzQ0Yueg70hO3hVC-NqcNmKso1lCvgsfk"/>
-</div>
-<div class="flex-1">
-<h4 class="text-sm font-bold">孤獨搖滾！</h4>
-<p class="text-xs text-slate-500">更新於: 2023-11-18</p>
-</div>
-<span class="px-2 py-0.5 rounded bg-green-500/20 text-green-500 text-[10px] font-bold">已上架</span>
-<button class="p-1 hover:bg-primary/20 rounded transition-colors">
-<span class="material-symbols-outlined text-sm">edit</span>
-</button>
-</div>
-</div>
-<button class="w-full mt-6 py-2 border border-dashed border-primary/30 rounded-lg text-primary text-sm font-bold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-<span class="material-symbols-outlined text-base">add_circle</span>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 flex flex-col bg-background-dark border-r border-primary/10">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-background-dark">
+                    <span class="material-symbols-outlined font-bold">temple_buddhist</span>
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-slate-100 text-base font-bold leading-tight">聖地巡禮</h1>
+                    <p class="text-primary text-xs font-medium uppercase tracking-wider">Admin Panel</p>
+                </div>
+            </div>
+            <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
+                <div class="text-primary/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2">主要功能</div>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">dashboard</span>
+                    <span class="text-sm font-medium">工作台概覽</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined">movie_edit</span>
+                    <span class="text-sm font-medium">作品管理</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">package_2</span>
+                    <span class="text-sm font-medium">行程套裝管理</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">edit_note</span>
+                    <span class="text-sm font-medium">文章發布</span>
+                </a>
+                <div class="text-primary/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 mt-6">系統設定</div>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">group</span>
+                    <span class="text-sm font-medium">用戶權限</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                    href="#">
+                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">settings</span>
+                    <span class="text-sm font-medium">系統配置</span>
+                </a>
+            </nav>
+            <div class="p-4 mt-auto border-t border-primary/10">
+                <button
+                    class="flex w-full items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-sm font-medium">登出系統</span>
+                </button>
+            </div>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-background-light dark:bg-background-dark">
+            <!-- Header -->
+            <header
+                class="h-16 flex items-center justify-between px-8 border-b border-primary/10 bg-background-dark/50 backdrop-blur-md">
+                <div class="flex items-center gap-4 flex-1 max-w-xl">
+                    <div class="relative w-full">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary/50 text-sm">search</span>
+                        <input
+                            class="w-full bg-primary/5 border-primary/20 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-primary focus:border-primary text-slate-100"
+                            placeholder="搜尋作品、行程或關鍵字..." type="text" />
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-3">
+                        <button class="relative p-2 text-primary/70 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <span
+                                class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-background-dark"></span>
+                        </button>
+                        <button class="p-2 text-primary/70 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">help</span>
+                        </button>
+                    </div>
+                    <div class="h-8 w-[1px] bg-primary/10"></div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-bold text-slate-100 leading-tight">管理員 A</p>
+                            <p class="text-[10px] text-primary font-medium">超級管理員</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full border-2 border-primary/30 overflow-hidden">
+                            <img class="w-full h-full object-cover" data-alt="Admin profile picture"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA99jWhlocCaAn7iaZj_RukavvzxPzD81bIqV4MFdmXpWH1yT-kv9Uc6InF0p7LU1WqjoUTz4iu4a6d6cSP5XJqI083HWUD9PeTR8A9Wb7GFeWea-y8pdbMy8-hcZQq14HoDxARIiwhFAUFa2akS2Gd_oagD-bU18nOhyg2y9kseQjyn03mp3wUK-U1AHKOyMeNwLWRfK5rYcGjiYY3aDtEoUJOWdib5CplzCoW4qz38vh_vyf1EukxyxB7j7UJcxDJgVcms5OEPl8" />
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- Dashboard Content -->
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <!-- Welcome Section -->
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-100">作品與行程管理</h2>
+                    <p class="text-slate-400 mt-1">即時監控、編輯與優化您的聖地巡禮內容資源。</p>
+                </div>
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-primary/5 border border-primary/10 p-6 rounded-xl flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-3xl">movie</span>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">總計作品</p>
+                            <p class="text-2xl font-bold text-slate-100">142</p>
+                        </div>
+                    </div>
+                    <div class="bg-primary/5 border border-primary/10 p-6 rounded-xl flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-3xl">explore</span>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">上架行程</p>
+                            <p class="text-2xl font-bold text-slate-100">38</p>
+                        </div>
+                    </div>
+                    <div class="bg-primary/5 border border-primary/10 p-6 rounded-xl flex items-center gap-5">
+                        <div class="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-3xl">article</span>
+                        </div>
+                        <div>
+                            <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">本月發布</p>
+                            <p class="text-2xl font-bold text-slate-100">12</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Management Modules -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- 作品管理 (Manage Works) -->
+                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
+                        <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">movie_edit</span>
+                                <h3 class="font-bold text-lg">作品管理</h3>
+                            </div>
+                            <button class="text-primary text-sm font-bold hover:underline">查看全部</button>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div
+                                    class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
+                                    <div class="w-16 h-10 rounded overflow-hidden">
+                                        <img class="w-full h-full object-cover" data-alt="Anime scenery illustration"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9BWxbaibJZTYG7xX5w9Oc7L4K1vRJtLCut1Qqhq46iI216MK4xZ2_cDimSgD76HUShjKi_GBcpBwUVVh2LSz7jMc8ZAVil6Z4kgSZJMnkHTnvFOhKR0Qagl5Y83mFowBnKSltQZy4-jE0CZ_ojaTEalywSYPqL_bsAoWEKNR0RqemNpyqjAjL96JPy3xXHZpKzNfPjNs376JlA9-cIEFX1qoe5FYm2IOasLkR46OIFK2wNC1UsztoRRTOwpPFeesmb9rwAvZyTcE" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold">鈴芽之旅 (Suzume)</h4>
+                                        <p class="text-xs text-slate-500">更新於: 2023-11-20</p>
+                                    </div>
+                                    <span
+                                        class="px-2 py-0.5 rounded bg-green-500/20 text-green-500 text-[10px] font-bold">已上架</span>
+                                    <button class="p-1 hover:bg-primary/20 rounded transition-colors">
+                                        <span class="material-symbols-outlined text-sm">edit</span>
+                                    </button>
+                                </div>
+                                <div
+                                    class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
+                                    <div class="w-16 h-10 rounded overflow-hidden">
+                                        <img class="w-full h-full object-cover" data-alt="Urban Tokyo nighttime street"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5W6dgRG3vPtX_pgjM6UBnLaQT5q6Wv5wK0DWTbgNsNDE9GjH_awXmj2kRPgMA2Rph6AXAtvc3voepnVnpzgEaXv8s3qtLVs2-p9tU1lVhEy4i7GGqv11Q7o6u_OyLwmBQYOHCXYT9lGu3MonkuVpUE-9Z1iShkm7GnMkTfXoFf4vfWWuuZSWCGEHjN1CDra1zO2FWDG4DxFZeKfSo0j587jver-DNS4YAfMFG7oBEVPUzQ0Yueg70hO3hVC-NqcNmKso1lCvgsfk" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold">孤獨搖滾！</h4>
+                                        <p class="text-xs text-slate-500">更新於: 2023-11-18</p>
+                                    </div>
+                                    <span
+                                        class="px-2 py-0.5 rounded bg-green-500/20 text-green-500 text-[10px] font-bold">已上架</span>
+                                    <button class="p-1 hover:bg-primary/20 rounded transition-colors">
+                                        <span class="material-symbols-outlined text-sm">edit</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <button
+                                class="w-full mt-6 py-2 border border-dashed border-primary/30 rounded-lg text-primary text-sm font-bold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined text-base">add_circle</span>
                                 新增作品資料
                             </button>
-</div>
-</div>
-<!-- 套裝行程管理 (Itinerary Packages) -->
-<div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
-<div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary">package_2</span>
-<h3 class="font-bold text-lg">行程套裝上下架</h3>
-</div>
-<button class="text-primary text-sm font-bold hover:underline">查看行程庫</button>
-</div>
-<div class="p-6">
-<div class="space-y-4">
-<div class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
-<div class="flex-1">
-<h4 class="text-sm font-bold">鎌倉江之島・灌籃高手朝聖 5日遊</h4>
-<p class="text-xs text-slate-500 mt-1">價格: $32,800起 | 目前庫存: 12</p>
-</div>
-<div class="flex items-center gap-3">
-<span class="text-xs text-slate-400">狀態</span>
-<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
-<div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full"></div>
-</div>
-</div>
-</div>
-<div class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
-<div class="flex-1">
-<h4 class="text-sm font-bold">飛驒高山・你的名字景點巡覽 4日遊</h4>
-<p class="text-xs text-slate-500 mt-1">價格: $28,500起 | 目前庫存: 0</p>
-</div>
-<div class="flex items-center gap-3">
-<span class="text-xs text-slate-400">狀態</span>
-<div class="w-10 h-5 bg-slate-700 rounded-full relative cursor-pointer">
-<div class="absolute left-0.5 top-0.5 w-4 h-4 bg-slate-400 rounded-full"></div>
-</div>
-</div>
-</div>
-</div>
-<div class="mt-6 flex gap-3">
-<button class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 transition-all">快速上架新行程</button>
-<button class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 text-sm font-bold rounded-lg hover:bg-primary/20 transition-all">批次管理</button>
-</div>
-</div>
-</div>
-<!-- 文章發布 (Article Publishing) -->
-<div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden lg:col-span-2">
-<div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary">edit_note</span>
-<h3 class="font-bold text-lg">文章發布與管理</h3>
-</div>
-<div class="flex gap-2">
-<button class="px-4 py-1.5 bg-primary text-background-dark text-xs font-bold rounded-full">撰寫新文章</button>
-</div>
-</div>
-<div class="overflow-x-auto">
-<table class="w-full text-left">
-<thead class="bg-background-dark/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-<tr>
-<th class="px-6 py-4">文章標題</th>
-<th class="px-6 py-4">關聯作品</th>
-<th class="px-6 py-4">作者</th>
-<th class="px-6 py-4">狀態</th>
-<th class="px-6 py-4 text-right">操作</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-primary/5">
-<tr class="hover:bg-primary/5 transition-colors">
-<td class="px-6 py-4">
-<p class="text-sm font-medium">2024 夏季新番聖地預測指南</p>
-<p class="text-[10px] text-slate-500 mt-0.5">發布於 2 小時前</p>
-</td>
-<td class="px-6 py-4"><span class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">多項關聯</span></td>
-<td class="px-6 py-4 text-sm">編輯室 A</td>
-<td class="px-6 py-4"><span class="flex items-center gap-1.5 text-xs text-green-500"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 已發布</span></td>
-<td class="px-6 py-4 text-right">
-<button class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">more_horiz</button>
-</td>
-</tr>
-<tr class="hover:bg-primary/5 transition-colors">
-<td class="px-6 py-4">
-<p class="text-sm font-medium">【專訪】跟著導演細田守走進富山縣的現實世界</p>
-<p class="text-[10px] text-slate-500 mt-0.5">最後編輯: 昨天</p>
-</td>
-<td class="px-6 py-4"><span class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">狼的孩子雨和雪</span></td>
-<td class="px-6 py-4 text-sm">特約記者 B</td>
-<td class="px-6 py-4"><span class="flex items-center gap-1.5 text-xs text-amber-500"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> 草稿</span></td>
-<td class="px-6 py-4 text-right">
-<button class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">more_horiz</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-</body></html>
+                        </div>
+                    </div>
+                    <!-- 套裝行程管理 (Itinerary Packages) -->
+                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
+                        <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">package_2</span>
+                                <h3 class="font-bold text-lg">行程套裝上下架</h3>
+                            </div>
+                            <button class="text-primary text-sm font-bold hover:underline">查看行程庫</button>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div
+                                    class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold">鎌倉江之島・灌籃高手朝聖 5日遊</h4>
+                                        <p class="text-xs text-slate-500 mt-1">價格: $32,800起 | 目前庫存: 12</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs text-slate-400">狀態</span>
+                                        <div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
+                                            <div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-bold">飛驒高山・你的名字景點巡覽 4日遊</h4>
+                                        <p class="text-xs text-slate-500 mt-1">價格: $28,500起 | 目前庫存: 0</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs text-slate-400">狀態</span>
+                                        <div class="w-10 h-5 bg-slate-700 rounded-full relative cursor-pointer">
+                                            <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-slate-400 rounded-full">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex gap-3">
+                                <button
+                                    class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 transition-all">快速上架新行程</button>
+                                <button
+                                    class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 text-sm font-bold rounded-lg hover:bg-primary/20 transition-all">批次管理</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 文章發布 (Article Publishing) -->
+                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden lg:col-span-2">
+                        <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">edit_note</span>
+                                <h3 class="font-bold text-lg">文章發布與管理</h3>
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="px-4 py-1.5 bg-primary text-background-dark text-xs font-bold rounded-full">撰寫新文章</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead
+                                    class="bg-background-dark/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4">文章標題</th>
+                                        <th class="px-6 py-4">關聯作品</th>
+                                        <th class="px-6 py-4">作者</th>
+                                        <th class="px-6 py-4">狀態</th>
+                                        <th class="px-6 py-4 text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-primary/5">
+                                    <tr class="hover:bg-primary/5 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <p class="text-sm font-medium">2024 夏季新番聖地預測指南</p>
+                                            <p class="text-[10px] text-slate-500 mt-0.5">發布於 2 小時前</p>
+                                        </td>
+                                        <td class="px-6 py-4"><span
+                                                class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">多項關聯</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">編輯室 A</td>
+                                        <td class="px-6 py-4"><span
+                                                class="flex items-center gap-1.5 text-xs text-green-500"><span
+                                                    class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 已發布</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">more_horiz</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-primary/5 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <p class="text-sm font-medium">【專訪】跟著導演細田守走進富山縣的現實世界</p>
+                                            <p class="text-[10px] text-slate-500 mt-0.5">最後編輯: 昨天</p>
+                                        </td>
+                                        <td class="px-6 py-4"><span
+                                                class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">狼的孩子雨和雪</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">特約記者 B</td>
+                                        <td class="px-6 py-4"><span
+                                                class="flex items-center gap-1.5 text-xs text-amber-500"><span
+                                                    class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> 草稿</span></td>
+                                        <td class="px-6 py-4 text-right">
+                                            <button
+                                                class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">more_horiz</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
