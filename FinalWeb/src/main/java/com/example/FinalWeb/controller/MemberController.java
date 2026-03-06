@@ -16,11 +16,8 @@ public class MemberController {
         return "reactTest";
     }
 
-    @RequestMapping("/news")
-    public String news() {
-        return "news"; 
+    @RequestMapping("/login")
+    public String login() {
+        return "login";
     }
-    
-
-    
 }
