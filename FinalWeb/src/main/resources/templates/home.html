@@ -1,101 +1,12 @@
 <!DOCTYPE html>
 <html class="dark" lang="zh-Hant">
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#ff8c00",
-                        "background-light": "#ffffff",
-                        "background-dark": "#231a0f",
-                        "surface-light": "#f3f4f6",
-                        "surface-dark": "rgba(255, 255, 255, 0.05)",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <title>聖地巡禮 | Sacred Site Pilgrimage</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&amp;display=swap" rel="stylesheet" />
-    <style type="text/tailwindcss">
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .theme-toggle-sun { display: block; }
-        .theme-toggle-moon { display: none; }
-        .dark .theme-toggle-sun { display: none; }
-        .dark .theme-toggle-moon { display: block; }
-    </style>
-</head>
+<head th:replace="~{ fragments/head :: myHead}"></head>
 
 <body
     class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <header
-            class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
-                    <img alt="Seichi Junrei Logo" class="w-full h-full object-contain"
-                        src="../static/images/LOGO.png" />
-                </div>
-                <h1 class="text-primary text-2xl font-bold tracking-tight"
-                    style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</h1>
-            </div>
-            <nav class="hidden md:flex flex-1 justify-center items-center gap-10">
-                <a class="text-slate-600 dark:text-slate-100 hover:text-primary transition-colors text-sm font-medium"
-                    href="#">最新消息</a>
-                <a class="text-slate-600 dark:text-slate-100 hover:text-primary transition-colors text-sm font-medium"
-                    href="#">旅遊情報</a>
-                <div class="relative group">
-                    <button
-                        class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2">
-                        聖地作品巡禮
-                        <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
-                    </button>
-                    <div
-                        class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
-                            href="#">電影作品</a>
-                        <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
-                            href="#">動畫作品</a>
-                    </div>
-                </div>
-                <a class="text-slate-600 dark:text-slate-100 hover:text-primary transition-colors text-sm font-medium"
-                    href="#">行程規劃</a>
-            </nav>
-            <div class="flex items-center gap-4">
-                <button aria-label="Toggle theme"
-                    class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                    onclick="document.documentElement.classList.toggle('dark')">
-                    <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
-                    <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
-                </button>
-                <button
-                    class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
-                    會員登入
-                </button>
-            </div>
-        </header>
+        <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
         <!-- MARK:以下內容頁面 -->
 
@@ -286,33 +197,7 @@
 
         <!-- MARK:內容頁面結尾 -->
 
-        <footer
-            class="bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/5 py-12 px-6 lg:px-20 transition-colors">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                <div class="flex flex-col items-center md:items-start gap-3">
-                    <div class="flex items-center gap-2">
-                        <div
-                            class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
-                            <img alt="Seichi Junrei Logo" class="w-full h-full object-contain"
-                                src="../static/images/LOGO.png" />
-                        </div>
-                        <span class="text-primary text-xl font-bold tracking-tight"
-                            style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</span>
-                    </div>
-                    <p class="text-slate-500 text-sm">© 2026 Sacred Site Pilgrimage. All rights reserved.</p>
-                </div>
-                <div class="flex gap-8 text-slate-500 dark:text-slate-400 text-sm">
-                    <a class="hover:text-primary transition-colors" href="#">隱私權政策</a>
-                    <a class="hover:text-primary transition-colors" href="#">服務條款</a>
-                    <a class="hover:text-primary transition-colors" href="#">常見問題</a>
-                </div>
-                <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
-                    <span class="material-symbols-outlined text-sm">mail</span>
-                    <a class="hover:text-primary transition-colors"
-                        href="mailto:contact@pilgrimage.com">seichi_junrei@gmail.com</a>
-                </div>
-            </div>
-        </footer>
+        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
     </div>
 
 </body>
