@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDateTime;
 
@@ -15,13 +15,13 @@ import lombok.Data;
 public class OrdersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderId;
+    private Integer orderId;
 
-    private int memberId;
+    private Integer memberId;
 
-    private int myPlanId;
+    private Integer myPlanId;
 
-    private int total;
+    private Integer total;
 
     private String payStatus;
 

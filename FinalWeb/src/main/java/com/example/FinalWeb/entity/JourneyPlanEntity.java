@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,11 +13,11 @@ import lombok.Data;
 public class JourneyPlanEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int planId;
+    private Integer planId;
 
-    private int workId;
+    private Integer workId;
 
-    private int daysCount;
+    private Integer daysCount;
 
     private String planName;
 }

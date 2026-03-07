@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import lombok.Data;
 public class ArticleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int articleId;
+    private Integer articleId;
 
     private String articleClass;
 

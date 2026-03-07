@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,9 +13,9 @@ import lombok.Data;
 public class FavoritesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    private int memberId;
+    private Integer memberId;
 
-    private int planId;
+    private Integer planId;
 }

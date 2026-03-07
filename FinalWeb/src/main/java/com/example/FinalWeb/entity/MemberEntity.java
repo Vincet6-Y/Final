@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDate;
 
@@ -15,7 +15,7 @@ import lombok.Data;
 public class MemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int memberId;
+    private Integer memberId;
 
     private String email;
 

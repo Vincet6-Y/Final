@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import java.math.BigDecimal;
 
@@ -15,13 +15,13 @@ import lombok.Data;
 public class MyMapEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int spotId;
+    private Integer spotId;
 
-    private int myPlanId;
+    private Integer myPlanId;
 
-    private int dayNumber;
+    private Integer dayNumber;
 
-    private int visitOrder;
+    private Integer visitOrder;
 
     private String locationName;
 

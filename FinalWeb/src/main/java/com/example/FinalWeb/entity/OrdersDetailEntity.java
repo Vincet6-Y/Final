@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,15 +13,15 @@ import lombok.Data;
 public class OrdersDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderDetailId;
+    private Integer orderDetailId;
 
-    private int orderId;
+    private Integer orderId;
 
-    private int spotId;
+    private Integer spotId;
 
     private String ticketType;
 
-    private int ticketPrice;
+    private Integer ticketPrice;
 
-    private int count;
+    private Integer count;
 }

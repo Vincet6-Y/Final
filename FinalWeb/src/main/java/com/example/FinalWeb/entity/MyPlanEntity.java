@@ -1,4 +1,4 @@
-package com.example.FinalWeb.entity;
+﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDate;
 
@@ -15,11 +15,11 @@ import lombok.Data;
 public class MyPlanEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int myPlanId;
+    private Integer myPlanId;
 
-    private int memberId;
+    private Integer memberId;
 
-    private int planId;
+    private Integer planId;
 
     private String myPlanName;
 
