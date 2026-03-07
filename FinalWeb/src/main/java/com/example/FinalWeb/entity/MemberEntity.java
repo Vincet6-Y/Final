@@ -41,5 +41,11 @@ public class MemberEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<MyPlanEntity> myPlan = new ArrayList<>();
+    
+    // --------------------------------------------------
+    // 一個 member 對應多個訂單
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<OrdersEntity> orders = new ArrayList<>();
 
 }
