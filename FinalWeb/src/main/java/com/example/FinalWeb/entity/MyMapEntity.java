@@ -11,6 +11,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -23,7 +25,6 @@ public class MyMapEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer spotId;
 
-    private Integer myPlanId;
     private Integer dayNumber;
     private Integer visitOrder;
     private String locationName;
@@ -32,11 +33,15 @@ public class MyMapEntity {
     private String GooglePlaceID;
 
     // --------------------------------------------------
+    // 很多景點可以出現在同一個 myPlan
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "myPlanId")
+    private MyPlanEntity myPlan;
+
+    // --------------------------------------------------
     // 一個景點可以被很多訂單明細引用
     @JsonIgnore
     @OneToMany(mappedBy = "myMap", fetch = FetchType.LAZY)
     private List<OrdersDetailEntity> orderDetails = new ArrayList<>();
-
-
 
 }

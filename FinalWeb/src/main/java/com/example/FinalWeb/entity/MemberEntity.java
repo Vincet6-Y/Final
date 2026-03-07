@@ -36,6 +36,10 @@ public class MemberEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<FavoritesEntity> favorites = new ArrayList<>();
 
-
+    // --------------------------------------------------
+    // 一個 member 對應多個 myPlan 紀錄
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<MyPlanEntity> myPlan = new ArrayList<>();
 
 }
