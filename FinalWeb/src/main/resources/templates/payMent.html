@@ -46,8 +46,9 @@
                                 <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">預計出發日期
                                     <span class="text-orange-500/80 ml-1">(需大於今日 3 天)</span></label>
                                 <div class="relative max-w-xs">
-                                    <input class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2" id="travelDate" required=""
-                                        type="date" />
+                                    <input
+                                        class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2"
+                                        id="travelDate" required="" type="date" />
                                 </div>
                             </div>
                         </div>
@@ -62,7 +63,8 @@
                         <div>
                             <label
                                 class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">景點門票升級</label>
-                            <select class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                            <select
+                                class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                                 <option value="0">不需加購</option>
                                 <option value="1200">清水寺快速通關 (+NT$1,200)</option>
                                 <option value="2500">環球影城 VIP 套票 (+NT$2,500)</option>
@@ -71,7 +73,8 @@
                         <div>
                             <label
                                 class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">交通票券加購</label>
-                            <select class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                            <select
+                                class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                                 <option value="0">不需加購</option>
                                 <option value="800">JR West Pass 1日券 (+NT$800)</option>
                                 <option value="2400">關西周遊卡 3日券 (+NT$2,400)</option>
@@ -79,7 +82,8 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">導覽服務</label>
-                            <select class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                            <select
+                                class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                                 <option value="0">無導覽服務</option>
                                 <option value="3000">中文私人嚮導 (1日全程) (+NT$3,000)</option>
                                 <option value="500">多國語言語音導覽機組 (+NT$500)</option>
@@ -108,35 +112,6 @@
                             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">手機號碼</label>
                             <input class="input-field w-full px-4 py-3 text-sm" placeholder="0912-345-678" type="tel" />
                         </div>
-                    </div>
-                </section>
-                <section class="section-card rounded-xl p-8">
-                    <div class="flex items-center gap-3 mb-8">
-                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">付款方式</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <label class="payment-option cursor-pointer">
-                            <input checked="" class="hidden" name="payment" type="radio" />
-                            <div class="payment-card rounded-xl p-5 flex flex-col items-center gap-3 transition-all">
-                                <span class="material-symbols-outlined text-gray-400">credit_card</span>
-                                <span class="text-sm font-medium text-gray-800 dark:text-white">信用卡 / 簽帳卡</span>
-                            </div>
-                        </label>
-                        <label class="payment-option cursor-pointer">
-                            <input class="hidden" name="payment" type="radio" />
-                            <div class="payment-card rounded-xl p-5 flex flex-col items-center gap-3 transition-all">
-                                <span class="material-symbols-outlined text-gray-400">account_balance_wallet</span>
-                                <span class="text-sm font-medium text-gray-800 dark:text-white">LINE Pay</span>
-                            </div>
-                        </label>
-                        <label class="payment-option cursor-pointer">
-                            <input class="hidden" name="payment" type="radio" />
-                            <div class="payment-card rounded-xl p-5 flex flex-col items-center gap-3 transition-all">
-                                <span class="material-symbols-outlined text-gray-400">ios</span>
-                                <span class="text-sm font-medium text-gray-800 dark:text-white">Apple Pay</span>
-                            </div>
-                        </label>
                     </div>
                 </section>
             </div>
@@ -181,24 +156,13 @@
                                 </span>
                             </label>
                         </div>
-                        <button
-                            class="w-full btn-gradient text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">
-                            <span>前往付款</span>
-                            <span class="material-symbols-outlined font-bold">arrow_forward</span>
-                        </button>
-                        <div
-                            class="mt-8 pt-8 border-t border-gray-200 dark:border-white/5 flex flex-col items-center gap-4">
-                            <p class="text-[10px] text-gray-500 dark:text-gray-600 uppercase tracking-widest font-bold">
-                                Secure Payment</p>
-                            <div class="flex justify-center gap-6 opacity-40 dark:opacity-30">
-                                <img alt="Visa" class="h-4"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ7K69e0xgiFIyvXSbYJ4CVWzhxb2C9VC5PyLyn8NmBSwX2aLIKY8RXfq9mldkpL4ozZiYmA9I-dugU03fy7MY9a7RZLrWyFl0gwLTsvZKMVcwk6OAWddjU4MLDZ4QIKT23_reN1ybQKA9yiHr09CmrxmcmNPg5rjB6FB9YdycK4L7XlUSx2qSJ_mGbWCZZyvqrMJsoyLctIQSvLnXSvTE6Xe2X8l9y7vJj3ABHRmYaj8Jpm9IeoMbGRlZnSDgXUuRqjQvLogLm40" />
-                                <img alt="Mastercard" class="h-4"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlLJybLWt0J3t8MATPuqVl_peUbOIYTkbvuKPltIvbACZNkZ7bZTkOPenE30wUhhjuJYbI576sqU2EPKoDmF4XhSboA1o9r9-lJLNZ4lAj0dQcNxM0EYXu0Cs6Wa3Wl8Q3XS2YovAp7XS6_IKio-PBdjrFJ4x2W6o8vjvVcC8xnPPHovvteUQefih52I0va78rYgU4sBBF_FbLBLJskkRLBJG40cGPQo8_96CV9t8u78EG9ifTuqEOemsRAovRwiD-jQzTlyQ5tcQ" />
-                                <img alt="Paypal" class="h-4"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrdbCfDReLNwklmoS5J4nKq4dnMCkWbB2g1H0vM-ntFkjeGzrvk5g_lRHR7w9iwVwFRGXQEgRBpmF30egHIae6gDgBvaT6NmswOzMW85TuwZIdB5cvMvBwaYZnMWZmwj671pzBynEmdalBgbVUksre6Tlf6tsnBlKVRzSxveAuPKD6eQDImIHzQ1KN2L2qwwCdYVqsO9hKC4KA_BnkGkcdKY5Kv_mH9dy26ImhdO4jfoRkGEfMs_L-oILH5_ADEnSxaRGeP29T2Kk" />
-                            </div>
-                        </div>
+                        <form th:action="@{/payment/checkout}" method="POST" class="w-full">
+                            <button type="submit"
+                                class="w-full btn-gradient text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">
+                                <span>前往付款</span>
+                                <span class="material-symbols-outlined font-bold">arrow_forward</span>
+                            </button>
+                        </form>
                     </div>
                     <div class="bg-orange-500/5 border border-orange-500/10 p-5 rounded-xl flex gap-4 section-card">
                         <span class="material-symbols-outlined text-orange-500/60">verified_user</span>
