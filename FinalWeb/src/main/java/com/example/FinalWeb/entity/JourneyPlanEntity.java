@@ -24,7 +24,6 @@ public class JourneyPlanEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer planId;
 
-    private Integer workId;
     private Integer daysCount;
     private String planName;
 
@@ -38,6 +37,7 @@ public class JourneyPlanEntity {
     // 很多 journeyplan 都可以有同一個作品
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workId")
+    private WorkDetailEntity workDetail;
 
     // --------------------------------------------------
     // 一個 journeyplan 底下會有很多景點

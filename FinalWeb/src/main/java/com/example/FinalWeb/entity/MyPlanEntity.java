@@ -25,7 +25,6 @@ public class MyPlanEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer myPlanId;
 
-    private Integer planId;
     private String myPlanName;
     private LocalDate startDate;
 
@@ -40,5 +39,10 @@ public class MyPlanEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "myPlan", fetch = FetchType.LAZY)
     private List<MyMapEntity> myMap = new ArrayList<>();
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "planId")
+    private JourneyPlanEntity journeyPlan;
 
 }
