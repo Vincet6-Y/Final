@@ -23,14 +23,14 @@ public class OrdersDetailEntity {
     private Integer count;
 
     // --------------------------------------------------
-    // ordersdetail 為 orders 和 map 多對多關聯的中介表
+    // ordersdetail 為 orders 和 mymap 多對多關聯的中介表
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId")
     private OrdersEntity order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spotId")
-    private MapEntity map;
+    private MyMapEntity myMap;
 
 
 }

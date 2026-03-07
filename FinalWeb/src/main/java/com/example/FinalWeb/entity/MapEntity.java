@@ -31,12 +31,6 @@ public class MapEntity {
     private BigDecimal longitude;
     private BigDecimal latitude;
     private String GooglePlaceID;
-
-    // --------------------------------------------------
-    // 一個景點可以被很多訂單明細引用
-    @JsonIgnore
-    @OneToMany(mappedBy = "map", fetch = FetchType.LAZY)
-    private List<OrdersDetailEntity> orderDetails = new ArrayList<>();
     
     // --------------------------------------------------
     // 很多景點可以出現同一個 journeyplan
