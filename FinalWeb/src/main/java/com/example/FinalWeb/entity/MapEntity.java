@@ -2,7 +2,6 @@
 
 import java.math.BigDecimal;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +19,7 @@ public class MapEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer spotId;
-
+    
     private Integer dayNumber;
     private Integer visitOrder;
     private String locationName;
@@ -28,11 +27,9 @@ public class MapEntity {
     private BigDecimal latitude;
     private String GooglePlaceID;
     
-    // --------------------------------------------------
-    // 很多景點可以出現同一個 journeyplan
+    // 拉關連線到 journeyPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planId")
     private JourneyPlanEntity journeyPlan;
-
-
+    
 }

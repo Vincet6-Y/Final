@@ -17,9 +17,9 @@ public class ArticleEntity {
     private Integer articleId;
 
     private String articleClass;
-
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
 }

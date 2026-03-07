@@ -1,10 +1,6 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -30,18 +25,11 @@ public class MyMapEntity {
     private String locationName;
     private BigDecimal longitude;
     private BigDecimal latitude;
-    private String GooglePlaceID;
-
-    // --------------------------------------------------
-    // 很多景點可以出現在同一個 myPlan
+    private String GooglePlaceId;
+    
+    // 拉關連線到 myPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "myPlanId")
     private MyPlanEntity myPlan;
-
-    // --------------------------------------------------
-    // 一個景點可以被很多訂單明細引用
-    @JsonIgnore
-    @OneToMany(mappedBy = "myMap", fetch = FetchType.LAZY)
-    private List<OrdersDetailEntity> orderDetails = new ArrayList<>();
-
+    
 }

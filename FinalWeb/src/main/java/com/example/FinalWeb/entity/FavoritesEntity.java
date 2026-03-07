@@ -17,13 +17,14 @@ public class FavoritesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    // --------------------------------------------------
-    // favorites 為 member 和 journeyplan 多對多關聯的中介表
+    
+    
+    // 拉關連線到 member
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private MemberEntity member;
-
+    
+    // 拉關連線到 journeyPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planId")
     private JourneyPlanEntity journeyPlan;

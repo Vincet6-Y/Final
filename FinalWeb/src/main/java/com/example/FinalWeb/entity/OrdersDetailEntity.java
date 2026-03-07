@@ -17,20 +17,19 @@ public class OrdersDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderDetailId;
-
+    
     private String ticketType;
     private Integer ticketPrice;
     private Integer count;
-
-    // --------------------------------------------------
-    // ordersdetail 為 orders 和 mymap 多對多關聯的中介表
+    
+    // 拉關連線到 orders
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId")
-    private OrdersEntity order;
-
+    private OrdersEntity orders;
+    
+    // 拉關連線到 myMap
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spotId")
     private MyMapEntity myMap;
-
-
+    
 }
