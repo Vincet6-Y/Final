@@ -31,5 +31,11 @@ public class JourneyPlanEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "journeyPlan", fetch = FetchType.LAZY)
     private List<FavoritesEntity> favorites = new ArrayList<>();
+    
+    // --------------------------------------------------
+    // 很多 journeyplan 都可以有同一個作品
+    @JsonIgnore
+    @OneToMany(mappedBy = "journeyPlan", fetch = FetchType.LAZY)
+    private List<MapEntity> map = new ArrayList<>();
 
 }
