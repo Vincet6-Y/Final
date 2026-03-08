@@ -18,21 +18,58 @@ public class MemberController {
         // // 我們請小弟去執行一句最廢話的 SQL：「SELECT 1」
         // // 它的邏輯是：如果 TiDB 有乖乖連上且醒著，它就一定會回傳數字 1
         // Integer dbAnswer = jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-
         // // 如果沒報錯走到這行，我們就在下方的 Console (終端機) 印出超大聲的慶祝訊息！
         // System.out.println("=========================================");
         // System.out.println("🎉 太神啦！成功連線到 TiDB 雲端資料庫！");
         // System.out.println("📡 資料庫平安回應了數字：" + dbAnswer);
         // System.out.println("=========================================");
-
         // } catch (Exception e) {
         // // 如果密碼打錯、網路斷掉，就會跳到這裡，印出失敗原因
         // System.out.println("🚨 糟糕，資料庫連線失敗了！");
         // System.out.println("👉 失敗原因：" + e.getMessage());
         // }
-
         // 🌟 步驟三：照常把網頁端給客人
         return "backendcontentmanagement";
+    }
+
+    @RequestMapping("/home")
+    public String home() {
+        return "home";
+    }
+
+    @RequestMapping("/workList")
+    public String workList() {
+        return "workList";
+    }
+
+    @RequestMapping("/workListDetail")
+    public String workListDetail() {
+        return "workListDetail";
+    }
+
+    @RequestMapping("/packageTour")
+    public String packageTour() {
+        return "packageTour";
+    }
+
+    @RequestMapping("/packagetourdetail")
+    public String packagetourdetail() {
+        return "packagetourdetail";
+    }
+
+    @RequestMapping("/packageTourMap")
+    public String packageTourMap() {
+        return "packageTourMap";
+    }
+
+    @RequestMapping("/register")
+    public String register() {
+        return "register";
+    }
+
+    @RequestMapping("/member")
+    public String member() {
+        return "member";
     }
 
     @RequestMapping("/login")
@@ -59,4 +96,25 @@ public class MemberController {
     public String paymentsuccess() {
         return "paymentsuccess";
     }
+
+    @RequestMapping("/backendhome")
+    public String backendhome() {
+        return "backendhome";
+    }
+
+    @RequestMapping("/backendorder")
+    public String backendorder() {
+        return "backendorder";
+    }
+
+    @RequestMapping("/backendoperation")
+    public String backendoperation() {
+        return "backendoperation";
+    }
+
+    @RequestMapping("/backendcontentmanagement")
+    public String backendcontentmanagement() {
+        return "backendcontentmanagement";
+    }
+
 }

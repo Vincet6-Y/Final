@@ -2,104 +2,12 @@
 
 <html class="dark" lang="zh-Hant">
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>聖地巡禮 - 作品與行程管理</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#ff8c00",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#231a0f",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk", "Noto Sans TC", "sans-serif"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
-        }
-
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-</head>
+<head th:replace="~{ fragments/backendhead :: backHead}"></head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
-        <aside class="w-64 flex flex-col bg-background-dark border-r border-primary/10">
-            <div class="p-6 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-background-dark">
-                    <span class="material-symbols-outlined font-bold">temple_buddhist</span>
-                </div>
-                <div class="flex flex-col">
-                    <h1 class="text-slate-100 text-base font-bold leading-tight">聖地巡禮</h1>
-                    <p class="text-primary text-xs font-medium uppercase tracking-wider">Admin Panel</p>
-                </div>
-            </div>
-            <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
-                <div class="text-primary/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2">主要功能</div>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
-                    href="#">
-                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">dashboard</span>
-                    <span class="text-sm font-medium">工作台概覽</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary transition-colors"
-                    href="#">
-                    <span class="material-symbols-outlined">movie_edit</span>
-                    <span class="text-sm font-medium">作品管理</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
-                    href="#">
-                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">package_2</span>
-                    <span class="text-sm font-medium">行程套裝管理</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
-                    href="#">
-                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">edit_note</span>
-                    <span class="text-sm font-medium">文章發布</span>
-                </a>
-                <div class="text-primary/50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 mt-6">系統設定</div>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
-                    href="#">
-                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">group</span>
-                    <span class="text-sm font-medium">用戶權限</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors group"
-                    href="#">
-                    <span class="material-symbols-outlined text-primary/70 group-hover:text-primary">settings</span>
-                    <span class="text-sm font-medium">系統配置</span>
-                </a>
-            </nav>
-            <div class="p-4 mt-auto border-t border-primary/10">
-                <button
-                    class="flex w-full items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 text-slate-400 hover:text-red-500 transition-colors">
-                    <span class="material-symbols-outlined">logout</span>
-                    <span class="text-sm font-medium">登出系統</span>
-                </button>
-            </div>
-        </aside>
+        <aside th:replace="~{ fragments/backendaside :: backaside}"> </aside>
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-hidden bg-background-light dark:bg-background-dark">
             <!-- Header -->

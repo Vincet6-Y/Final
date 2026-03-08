@@ -1,233 +1,186 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="zh-Hant"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#ff8c00",
-                        "background-light": "#f8f7f5",
-                        "background-dark": "#231a0f",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk", "Noto Sans TC", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-<style>
-        body {
-            font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .active-link {
-            background-color: rgba(255, 140, 0, 0.1);
-            border-left: 4px solid #ff8c00;
-        }
-    </style>
-</head>
+<html class="dark" lang="zh-Hant">
+
+<head th:replace="~{ fragments/backendhead :: backHead}"></head>
+
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
-<div class="flex h-screen overflow-hidden">
-<!-- Sidebar -->
-<aside class="w-72 flex-shrink-0 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-primary/20 flex flex-col justify-between">
-<div class="flex flex-col gap-8 p-6">
-<!-- Logo & Branding -->
-<div class="flex items-center gap-3">
-<div class="size-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
-<img alt="聖地圖鑑 Logo" class="w-full h-full object-cover" data-alt="Circular orange and black abstract logo for Seichi Junrei" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADe05v3mOWj_0h4KB97MjcbsMjhEBC4EpDI44jod9Dle2IDIm5xpu5VBqMc0IpjJfhI93LlzodEsYTdMQbNqSzMxq2E1brX3wm3DUwjUEnv33wxBNkG7gSaT7GLzkijHQ7-wIHGV0pkx6r-4eFJxl_n6B99YpGPfiwuniWsbASuhpNBUIgDdsc4cVRi_K7zpCva7v7d-yaL4IvJmy1u7vZVPLBzBAsNjCMj2-UEC4ZtutlO7Sf2f1zIX-VsGq1hXegUENZ3I0rxCw"/>
-</div>
-<div>
-<h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">聖地圖鑑 Admin</h1>
-<p class="text-xs text-primary font-medium uppercase tracking-wider">管理系統</p>
-</div>
-</div>
-<!-- Navigation -->
-<nav class="flex flex-col gap-2">
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-medium">資訊主頁</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg active-link text-primary bg-primary/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
-<span class="font-medium">內容管理</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
-<span class="material-symbols-outlined">business_center</span>
-<span class="font-medium">營運管理</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" href="#">
-<span class="material-symbols-outlined">shopping_cart</span>
-<span class="font-medium">訂單處理</span>
-</a>
-</nav>
-</div>
-<!-- Sidebar Footer -->
-<div class="p-6 border-t border-slate-200 dark:border-primary/20 flex flex-col gap-4">
-<div class="flex items-center gap-3 px-2">
-<div class="size-10 rounded-full bg-slate-200 dark:bg-primary/20 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">person</span>
-</div>
-<div class="flex flex-col">
-<span class="text-sm font-semibold text-slate-900 dark:text-white">管理員 A</span>
-<span class="text-xs text-slate-500 dark:text-slate-400">系統管理權限</span>
-</div>
-</div>
-<button class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors w-full">
-<span class="material-symbols-outlined">logout</span>
-<span class="font-medium">登出系統</span>
-</button>
-</div>
-</aside>
-<!-- Main Content Area -->
-<main class="flex-1 flex flex-col overflow-y-auto">
-<!-- Header / Top Bar -->
-<header class="h-16 flex-shrink-0 border-b border-slate-200 dark:border-primary/20 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
-<div class="w-96">
-<div class="relative group">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-<input class="w-full bg-slate-100 dark:bg-primary/5 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 dark:text-slate-100" placeholder="搜尋功能、內容或訂單..." type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<button class="size-10 flex items-center justify-center rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors relative">
-<span class="material-symbols-outlined text-[22px]">notifications</span>
-<span class="absolute top-2 right-2 size-2 bg-primary rounded-full ring-2 ring-white dark:ring-background-dark"></span>
-</button>
-<button class="size-10 flex items-center justify-center rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors">
-<span class="material-symbols-outlined text-[22px]">settings</span>
-</button>
-<div class="h-8 w-[1px] bg-slate-200 dark:bg-primary/20 mx-2"></div>
-<div class="size-8 rounded-full bg-primary overflow-hidden">
-<img alt="User Profile" class="w-full h-full object-cover" data-alt="Small avatar image for the logged in admin user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCunkiehP8ZIv8ZiyJK_KlmiAvLfk5kq97YCmOupS5TahnPBq4NY9jhNa6LK0Ik5eW3rk94ZbITBoZvcntUZdiB6eOeCjkqF6YeZBpYdxzJc3JDRU5IJFifv6RWKalCf_50FsdcfFctGUWjzztq5o-1dRvVvposldwtGeaGKIvMQrOoLSZlzDi_7avorFAmh4OYVSLzjNyUMub7ampxSyGxSIKGdqHO1pYtlUJ5lYVkjABL-O23Q_Fy1eHQm-Ne8Z-W4JWr-DE6SE8"/>
-</div>
-</div>
-</header>
-<!-- Dashboard Content -->
-<div class="p-8 max-w-7xl mx-auto w-full">
-<div class="mb-10">
-<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">管理後台總覽</h2>
-<p class="text-slate-500 dark:text-slate-400">歡迎回來，今天有 12 個新預約需要處理。</p>
-</div>
-<!-- Navigation Cards Grid -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-<!-- Card 1: Content -->
-<div class="group relative overflow-hidden bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl p-8 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-primary/5 cursor-pointer">
-<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
-<div class="relative z-10">
-<div class="size-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-3xl">map</span>
-</div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">內容管理</h3>
-<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside th:replace="~{ fragments/backendaside :: backaside}">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg active-link text-primary bg-primary/10 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-medium">資訊主頁</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors"
+                href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+                <span class="font-medium">內容管理</span>
+            </a>
+        </aside>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Header / Top Bar -->
+            <header
+                class="h-16 flex-shrink-0 border-b border-slate-200 dark:border-primary/20 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
+                <div class="w-96">
+                    <div class="relative group">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                        <input
+                            class="w-full bg-slate-100 dark:bg-primary/5 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 dark:text-slate-100"
+                            placeholder="搜尋功能、內容或訂單..." type="text" />
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button
+                        class="size-10 flex items-center justify-center rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors relative">
+                        <span class="material-symbols-outlined text-[22px]">notifications</span>
+                        <span
+                            class="absolute top-2 right-2 size-2 bg-primary rounded-full ring-2 ring-white dark:ring-background-dark"></span>
+                    </button>
+                    <button
+                        class="size-10 flex items-center justify-center rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors">
+                        <span class="material-symbols-outlined text-[22px]">settings</span>
+                    </button>
+                    <div class="h-8 w-[1px] bg-slate-200 dark:bg-primary/20 mx-2"></div>
+                    <div class="size-8 rounded-full bg-primary overflow-hidden">
+                        <img alt="User Profile" class="w-full h-full object-cover"
+                            data-alt="Small avatar image for the logged in admin user"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCunkiehP8ZIv8ZiyJK_KlmiAvLfk5kq97YCmOupS5TahnPBq4NY9jhNa6LK0Ik5eW3rk94ZbITBoZvcntUZdiB6eOeCjkqF6YeZBpYdxzJc3JDRU5IJFifv6RWKalCf_50FsdcfFctGUWjzztq5o-1dRvVvposldwtGeaGKIvMQrOoLSZlzDi_7avorFAmh4OYVSLzjNyUMub7ampxSyGxSIKGdqHO1pYtlUJ5lYVkjABL-O23Q_Fy1eHQm-Ne8Z-W4JWr-DE6SE8" />
+                    </div>
+                </div>
+            </header>
+            <!-- Dashboard Content -->
+            <div class="p-8 max-w-7xl mx-auto w-full">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">管理後台總覽</h2>
+                    <p class="text-slate-500 dark:text-slate-400">歡迎回來，今天有 12 個新預約需要處理。</p>
+                </div>
+                <!-- Navigation Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <!-- Card 1: Content -->
+                    <div
+                        class="group relative overflow-hidden bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl p-8 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-primary/5 cursor-pointer">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors">
+                        </div>
+                        <div class="relative z-10">
+                            <div
+                                class="size-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+                                <span class="material-symbols-outlined text-3xl">map</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">內容管理</h3>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
                                 管理全台聖地景點、攝影文章、精選媒體與用戶投稿。
                             </p>
-<div class="flex items-center text-primary font-semibold text-sm">
+                            <div class="flex items-center text-primary font-semibold text-sm">
                                 進入管理介面
-                                <span class="material-symbols-outlined ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</div>
-</div>
-</div>
-<!-- Card 2: Business -->
-<div class="group relative overflow-hidden bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl p-8 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-primary/5 cursor-pointer">
-<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
-<div class="relative z-10">
-<div class="size-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-3xl">analytics</span>
-</div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">營運管理</h3>
-<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                                <span
+                                    class="material-symbols-outlined ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2: Business -->
+                    <div
+                        class="group relative overflow-hidden bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl p-8 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-primary/5 cursor-pointer">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors">
+                        </div>
+                        <div class="relative z-10">
+                            <div
+                                class="size-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+                                <span class="material-symbols-outlined text-3xl">analytics</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">營運管理</h3>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
                                 監控網站流量數據、廣告投放狀態與進階系統設定。
                             </p>
-<div class="flex items-center text-primary font-semibold text-sm">
+                            <div class="flex items-center text-primary font-semibold text-sm">
                                 查看數據分析
-                                <span class="material-symbols-outlined ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</div>
-</div>
-</div>
-<!-- Card 3: Orders -->
-<div class="group relative overflow-hidden bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl p-8 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-primary/5 cursor-pointer">
-<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
-<div class="relative z-10">
-<div class="size-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-3xl">receipt_long</span>
-</div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">訂單處理</h3>
-<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                                <span
+                                    class="material-symbols-outlined ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3: Orders -->
+                    <div
+                        class="group relative overflow-hidden bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl p-8 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-primary/5 cursor-pointer">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors">
+                        </div>
+                        <div class="relative z-10">
+                            <div
+                                class="size-14 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+                                <span class="material-symbols-outlined text-3xl">receipt_long</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">訂單處理</h3>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6">
                                 處理攝影導覽預約、商城訂單以及退款售後服務。
                             </p>
-<div class="flex items-center text-primary font-semibold text-sm">
+                            <div class="flex items-center text-primary font-semibold text-sm">
                                 處理待辦訂單
-                                <span class="material-symbols-outlined ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Recent Activity Section -->
-<div>
-<div class="flex items-center justify-between mb-6">
-<h3 class="text-xl font-bold text-slate-900 dark:text-white">最近活動</h3>
-<button class="text-primary text-sm font-medium hover:underline">查看全部記錄</button>
-</div>
-<div class="bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden">
-<table class="w-full text-left text-sm">
-<thead class="bg-slate-50 dark:bg-primary/5 border-b border-slate-200 dark:border-primary/10">
-<tr>
-<th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">活動類型</th>
-<th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">描述</th>
-<th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">執行人</th>
-<th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300 text-right">時間</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-slate-100 dark:divide-primary/5">
-<tr class="hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
-<td class="px-6 py-4 flex items-center gap-2">
-<span class="size-2 rounded-full bg-green-500"></span>
+                                <span
+                                    class="material-symbols-outlined ml-1 text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent Activity Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">最近活動</h3>
+                        <button class="text-primary text-sm font-medium hover:underline">查看全部記錄</button>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-background-dark border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead
+                                class="bg-slate-50 dark:bg-primary/5 border-b border-slate-200 dark:border-primary/10">
+                                <tr>
+                                    <th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">活動類型</th>
+                                    <th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">描述</th>
+                                    <th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">執行人</th>
+                                    <th class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300 text-right">時間
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-primary/5">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                                    <td class="px-6 py-4 flex items-center gap-2">
+                                        <span class="size-2 rounded-full bg-green-500"></span>
                                         內容更新
                                     </td>
-<td class="px-6 py-4 text-slate-600 dark:text-slate-400">新增景點：九份阿妹茶樓 - 千與千尋場景</td>
-<td class="px-6 py-4">管理員 B</td>
-<td class="px-6 py-4 text-right text-slate-400">10 分鐘前</td>
-</tr>
-<tr class="hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
-<td class="px-6 py-4 flex items-center gap-2">
-<span class="size-2 rounded-full bg-blue-500"></span>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">新增景點：九份阿妹茶樓 - 千與千尋場景</td>
+                                    <td class="px-6 py-4">管理員 B</td>
+                                    <td class="px-6 py-4 text-right text-slate-400">10 分鐘前</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                                    <td class="px-6 py-4 flex items-center gap-2">
+                                        <span class="size-2 rounded-full bg-blue-500"></span>
                                         訂單處理
                                     </td>
-<td class="px-6 py-4 text-slate-600 dark:text-slate-400">確認預約 #OR-2023052401</td>
-<td class="px-6 py-4">管理員 A</td>
-<td class="px-6 py-4 text-right text-slate-400">45 分鐘前</td>
-</tr>
-<tr class="hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
-<td class="px-6 py-4 flex items-center gap-2">
-<span class="size-2 rounded-full bg-orange-500"></span>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">確認預約 #OR-2023052401</td>
+                                    <td class="px-6 py-4">管理員 A</td>
+                                    <td class="px-6 py-4 text-right text-slate-400">45 分鐘前</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-primary/5 transition-colors">
+                                    <td class="px-6 py-4 flex items-center gap-2">
+                                        <span class="size-2 rounded-full bg-orange-500"></span>
                                         系統提醒
                                     </td>
-<td class="px-6 py-4 text-slate-600 dark:text-slate-400">伺服器自動備份完成</td>
-<td class="px-6 py-4">系統服務</td>
-<td class="px-6 py-4 text-right text-slate-400">2 小時前</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</main>
-</div>
-</body></html>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">伺服器自動備份完成</td>
+                                    <td class="px-6 py-4">系統服務</td>
+                                    <td class="px-6 py-4 text-right text-slate-400">2 小時前</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
