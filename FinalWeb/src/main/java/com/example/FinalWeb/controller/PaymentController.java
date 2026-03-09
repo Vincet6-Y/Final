@@ -14,26 +14,27 @@ public class PaymentController {
     @Autowired
     private ECPayService ecpayService;
 
-    // 前端 payment.html 將 Form 送來的地方
+    // 前端送出帶有實體 orderId 的 POST 請求來結帳
     @PostMapping("/checkout")
-    public String checkout(@RequestParam(required = false, defaultValue = "20900") int amount) {
-        String orderId = "ORDER" + System.currentTimeMillis();
-        String itemName = "日本關西必遊路線_京都大阪奈良六天五夜";
-        return ecpayService.ecpayCheckout(orderId, amount, itemName);
+    public String checkout(@RequestParam("orderId") Integer orderId) {
+        // 利用真實資料庫裡的訂單 ID 進行綠界結帳
+        return ecpayService.ecpayCheckout(orderId);
     }
 
     // 綠界 Server TO Server 背景回傳付款結果
     @PostMapping("/callback")
     public String ecpayCallback(@RequestParam Map<String, String> params) {
-        if (ecpayService.verifyCheckMacValue(params)) {
+        try {
+            ecpayService.processCallback(params);
             if ("1".equals(params.get("RtnCode"))) {
-                // TODO: 將該筆 orderId 的 payStatus 狀態改為 'success'
-                String orderId = params.get("MerchantTradeNo");
-                System.out.println("背景回傳付款成功, 訂單編號: " + orderId);
+                System.out.println("背景回傳付款成功, 綠界訂單編號: " + params.get("MerchantTradeNo") + ", 內部訂單 ID: "
+                        + params.get("CustomField1"));
             }
             return "1|OK";
+        } catch (Exception e) {
+            System.err.println("綠界背景回傳處理失敗: " + e.getMessage());
+            return "0|Fail";
         }
-        return "0|Fail";
     }
 
     // 將綠界轉跳回來的 POST 請求接住作驗證
@@ -43,7 +44,16 @@ public class PaymentController {
             // "1" 代表付款成功
             if ("1".equals(params.get("RtnCode"))) {
                 String orderId = params.get("MerchantTradeNo");
-                System.out.println("前端綠界轉跳回來！付款成功, 訂單編號: " + orderId);
+                System.out.println("前端綠界轉跳回來！付款成功, 綠界訂單編號: " + orderId);
+
+                // 【關鍵修改】在 localhost 開發環境下，綠界伺服器無法打到你的 /callback
+                // 所以我們直接在前端轉跳 /success 時，也去呼叫更新資料庫的邏輯！
+                try {
+                    ecpayService.processCallback(params);
+                } catch (Exception e) {
+                    System.err.println("前端轉跳更新資料庫失敗: " + e.getMessage());
+                }
+
                 return new RedirectView("/paymentsuccess");
             } else {
                 System.out.println("前端綠界轉跳回來！付款失敗或取消: " + params.get("RtnMsg"));

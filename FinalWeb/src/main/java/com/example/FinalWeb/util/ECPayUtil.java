@@ -13,8 +13,15 @@ public class ECPayUtil {
 
     public static boolean verifyCheckMacValue(Map<String, String> params) {
         String receiveCheckMacValue = params.get("CheckMacValue");
-        params.remove("CheckMacValue");
-        String calculateCheckMacValue = generateCheckMacValue(params);
+        if (receiveCheckMacValue == null) {
+            return false;
+        }
+
+        // 必須將參數按字母排序 (A-Z) 來計算 CheckMacValue，並且不能修改原始的 params
+        Map<String, String> treeMap = new java.util.TreeMap<>(params);
+        treeMap.remove("CheckMacValue");
+
+        String calculateCheckMacValue = generateCheckMacValue(treeMap);
         return calculateCheckMacValue.equals(receiveCheckMacValue);
     }
 

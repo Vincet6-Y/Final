@@ -33,7 +33,7 @@
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">日本關西必遊路線：京都大阪奈良六天五夜
                                 <div class="material-symbols-outlined text-orange-500 text-lg">border_color</div>
                             </h3>
-                            
+
                             <div class="flex flex-wrap gap-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
                                 <div class="flex items-center gap-2">
                                     <span
@@ -152,6 +152,7 @@
                             </label>
                         </div>
                         <form th:action="@{/payment/checkout}" method="POST" class="w-full">
+                            <input type="hidden" name="orderId" th:value="${order.orderId}" />
                             <button type="submit"
                                 class="w-full btn-gradient py-4 rounded-xl font-bold text-lg shadow-xl text-gray-800 dark:text-gray-300 shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">
                                 <span>前往付款</span>

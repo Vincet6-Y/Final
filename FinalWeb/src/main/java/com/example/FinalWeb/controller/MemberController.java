@@ -1,13 +1,20 @@
 package com.example.FinalWeb.controller;
 
-//import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.FinalWeb.repo.OrdersRepo;
 
 @RequestMapping("/")
 @Controller
 public class MemberController {
+
+    @Autowired
+    private OrdersRepo ordersRepo;
 
     // @Autowired
     // private JdbcTemplate jdbcTemplate;
@@ -92,10 +99,16 @@ public class MemberController {
         return "info";
     }
 
-    @RequestMapping("/payment")
-    public String payment() {
-        return "payment";
-    }
+    // @RequestMapping("/payment")
+    // public String payment(@RequestParam(required = false) Integer orderId, Model
+    // model) {
+    // // 真實的情境下，可能是由購物車那邊建立好訂單，並將 orderId 帶過來
+    // if (orderId != null) {
+    // ordersRepo.findById(orderId).ifPresent(order -> model.addAttribute("order",
+    // order));
+    // }
+    // return "payMent";
+    // }
 
     @RequestMapping("/paymentsuccess")
     public String paymentsuccess() {
