@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="zh-TW">
+<html class="dark" lang="zh-TW" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
@@ -32,10 +32,12 @@
                         <p class="text-white text-accent-tan text-lg font-normal mb-8 leading-relaxed">
                             開啟您的專屬朝聖之旅，紀錄每一個感悟瞬間，與志同道合的旅人分享感動。
                         </p>
-                        <button
-                            class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-lg h-14 px-6 bg-primary text-background-dark text-lg font-bold shadow-lg shadow-primary/20 hover:translate-y-[-2px] transition-all">
-                            <span class="truncate">點我登入會員</span>
-                        </button>
+                        <a th:href="@{/login}">
+                            <button
+                                class="flex min-w-[180px] cursor-pointer items-center justify-center rounded-lg h-14 px-6 bg-primary text-background-dark text-lg font-bold shadow-lg shadow-primary/20 hover:translate-y-[-2px] transition-all">
+                                <span class="truncate">點我登入會員</span>
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>

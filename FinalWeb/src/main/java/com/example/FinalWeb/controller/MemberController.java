@@ -57,6 +57,11 @@ public class MemberController {
         return "packagetourdetail";
     }
 
+    @RequestMapping("/article")
+    public String article() {
+        return "article";
+    }
+
     @RequestMapping("/packageTourMap")
     public String packageTourMap() {
         return "packageTourMap";
