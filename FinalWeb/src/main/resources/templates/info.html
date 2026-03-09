@@ -12,7 +12,7 @@
         <!-- Main Title -->
         <div class="mb-12">
             <h2
-                class="text-4xl lg:text-5xl font-black mb-4 bg-gradient-to-r from-white to-primary/60 bg-clip-text text-transparent">
+                class="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
                 旅遊情報</h2>
             <p class="text-slate-400 text-lg">探索日本當地的最新動態、祭典活動與動漫朝聖即時資訊</p>
         </div>
@@ -111,14 +111,14 @@
             <div class="flex items-center gap-4 mb-6">
                 <span class="text-5xl">🌡️</span>
                 <div>
-                    <div class="text-4xl font-black text-white">
+                    <div class="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
                         <span th:text="${cityData.daily.temperature_2m_max[0]}">20</span>°C
                     </div>
                     <p class="text-slate-400 text-sm">今日最高溫</p>
                 </div>
             </div>
 
-            <div class="bg-background-dark/50 rounded-lg overflow-hidden">
+            <div class="dark:bg-slate-800/40 rounded-lg overflow-hidden">
                 <table class="w-full text-sm text-left">
                     <thead class="text-xs text-slate-500 uppercase bg-primary/10">
                         <tr>
@@ -129,7 +129,7 @@
                     </thead>
                    <tbody class="divide-y divide-primary/5">
     <tr th:each="i : ${#numbers.sequence(0, 6)}" class="hover:bg-primary/5">
-        <td class="px-3 py-2 text-slate-300" th:text="${cityData.daily.time[i].substring(5)}">MM-DD</td>
+        <td class="px-3 py-2 text-slate-500" th:text="${cityData.daily.time[i].substring(5)}">MM-DD</td>
         
         <td class="px-3 py-2 font-bold text-red-400">
             <span th:text="${cityData.daily.temperature_2m_max[i]}"></span>°
@@ -155,7 +155,7 @@
 </section>
     </main>
     <!-- Seasonal Special Zone -->
-        <section class="mb-16">
+        <section class="max-w-7xl mx-auto px-6 lg:px-20 py-10">
             <div class="flex items-center gap-2 mb-8">
                 <span class="material-symbols-outlined text-primary">auto_awesome</span>
                 <h3 class="text-2xl font-bold">季節限定專區</h3>
