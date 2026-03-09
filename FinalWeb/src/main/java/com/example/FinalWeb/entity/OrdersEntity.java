@@ -29,6 +29,10 @@ public class OrdersEntity {
     private Integer total;
     private String payStatus;
     private LocalDateTime orderTime;
+
+    // 綠界相關欄位
+    private String tradeNo, paymentType;
+    private LocalDateTime payTime;
     
     // 拉關連線到 member
     @ManyToOne(fetch = FetchType.LAZY)
