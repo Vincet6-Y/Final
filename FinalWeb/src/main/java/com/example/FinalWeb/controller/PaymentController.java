@@ -39,11 +39,17 @@ public class PaymentController {
     @PostMapping("/success")
     public RedirectView paymentSuccess(@RequestParam Map<String, String> params) {
         if (params != null && !params.isEmpty() && ecpayService.verifyCheckMacValue(params)) {
+            // "1" 代表付款成功
             if ("1".equals(params.get("RtnCode"))) {
                 String orderId = params.get("MerchantTradeNo");
                 System.out.println("前端綠界轉跳回來！付款成功, 訂單編號: " + orderId);
+                return new RedirectView("/paymentsuccess");
+            } else {
+                System.out.println("前端綠界轉跳回來！付款失敗或取消: " + params.get("RtnMsg"));
             }
         }
-        return new RedirectView("/paymentsuccess");
+        // 反之 (包含點選取消)，全部跳回結帳頁面
+        return new RedirectView("/payment");
     }
+
 }
