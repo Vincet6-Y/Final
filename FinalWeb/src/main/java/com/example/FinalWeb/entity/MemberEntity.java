@@ -1,7 +1,10 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDate;
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+>>>>>>> dev
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,6 +17,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name = "member")
@@ -30,19 +35,26 @@ public class MemberEntity {
     private LocalDate birthday;
     private String role;
 
-    // 有會員收藏列表，要從 member 反向查詢 favorites
+    // 一對多關聯
+    // 會員擁有多個收藏
+    @OneToMany(mappedBy = "member")
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<FavoritesEntity> favorites = new ArrayList<>();
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<FavoritesEntity> favorites;
 
-    // 有我的行程列表，要從 member 反向查詢 myplan
+    // 會員擁有多個行程
+    @OneToMany(mappedBy = "member")
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<MyPlanEntity> myPlan = new ArrayList<>();
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<MyPlanEntity> myPlans;
 
-    // 會員會查詢自己的訂單紀錄，要從 member 反向查詢 orders
+    // 會員擁有多筆訂單
+    @OneToMany(mappedBy = "member")
     @JsonIgnore
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    private List<OrdersEntity> orders = new ArrayList<>();
-    
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<OrdersEntity> orders;
+
 }

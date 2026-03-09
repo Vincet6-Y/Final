@@ -1,7 +1,10 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDate;
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+>>>>>>> dev
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,6 +19,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name = "myplan")
@@ -38,9 +43,12 @@ public class MyPlanEntity {
     @JoinColumn(name = "planId")
     private JourneyPlanEntity journeyPlan;
 
-    // 顯示我的行程時，需要取得該行程底下所有景點
+    // 一對多關聯
+    // 我的行程包含多個我的地圖景點
+    @OneToMany(mappedBy = "myPlan")
     @JsonIgnore
-    @OneToMany(mappedBy = "myPlan", fetch = FetchType.LAZY)
-    private List<MyMapEntity> myMap = new ArrayList<>();
-    
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<MyMapEntity> myMaps;
+
 }

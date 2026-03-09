@@ -1,7 +1,10 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDateTime;
+<<<<<<< HEAD
 import java.util.ArrayList;
+=======
+>>>>>>> dev
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,6 +19,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name = "orders")
@@ -39,9 +44,12 @@ public class OrdersEntity {
     @JoinColumn(name = "myPlanId")
     private MyPlanEntity myPlan;
 
-    // 顯示訂單時，要列出該訂單的所有明細
+    // 一對多關聯
+    // 訂單包含多筆訂單明細
+    @OneToMany(mappedBy = "orders")
     @JsonIgnore
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
-    private List<OrdersDetailEntity> orderDetails = new ArrayList<>();
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<OrdersDetailEntity> orderDetails;
 
 }
