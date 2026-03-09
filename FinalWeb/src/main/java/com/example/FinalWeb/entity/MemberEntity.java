@@ -1,16 +1,11 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.time.LocalDate;
-<<<<<<< HEAD
-import java.util.ArrayList;
-=======
->>>>>>> dev
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
