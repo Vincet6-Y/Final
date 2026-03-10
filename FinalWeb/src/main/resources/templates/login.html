@@ -39,12 +39,14 @@
                             <span
                                 class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary transition-colors">lock</span>
                             <input
+                                id="passwd"
                                 class="w-full bg-background-dark border border-neutral-border rounded-lg py-4 pl-12 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-neutral-muted/50"
                                 placeholder="請輸入您的密碼" type="password" />
                             <button
+                                id="togglePasswdBtn"
                                 class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-muted hover:text-primary"
                                 type="button">
-                                <span class="material-symbols-outlined">visibility</span>
+                                <span id="eyeIcon" class="material-symbols-outlined">visibility_off</span>
                             </button>
                         </div>
                     </div>
@@ -136,7 +138,23 @@
     </main>
     <!-- Footer -->
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(function () {
+            $("#togglePasswdBtn").click(function () {
+                const input = $("#passwd");
+                const icon = $("#eyeIcon");
 
+                if (input.attr("type") === "password") {
+                    input.attr("type", "text");
+                    icon.text("visibility");
+                } else {
+                    input.attr("type", "password");
+                    icon.text("visibility_off");
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
