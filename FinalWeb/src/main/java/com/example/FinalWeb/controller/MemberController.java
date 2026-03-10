@@ -52,9 +52,9 @@ public class MemberController {
         return "packageTour";
     }
 
-    @RequestMapping("/packagetourdetail")
-    public String packagetourdetail() {
-        return "packagetourdetail";
+    @RequestMapping("/packageTourDetail")
+    public String packageTourDetail() {
+        return "packageTourDetail";
     }
 
     @RequestMapping("/article")
