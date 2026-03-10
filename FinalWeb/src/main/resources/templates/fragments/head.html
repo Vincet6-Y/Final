@@ -46,6 +46,19 @@
         .dark .theme-toggle-sun { display: none; }
         .dark .theme-toggle-moon { display: block; }
     </style>
+    
+    <script>
+    // 立即執行的匿名函式，避免畫面閃爍 (Flash of unstyled content)
+    (function() {
+        const savedTheme = localStorage.getItem('theme');
+        // 檢查記憶：如果是 dark，或者是第一次進來（沒記憶）且使用者電腦偏好深色
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    })();
+</script>
 </head>
 
 <body>

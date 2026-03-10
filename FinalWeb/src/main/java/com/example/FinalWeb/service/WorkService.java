@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalWeb.entity.WorkDetailEntity;
@@ -23,9 +24,12 @@ public class WorkService {
         return repo.findAll();
     }
 
-    public Page<WorkDetailEntity> getWorkList(int page, int size) {
+    public Page<WorkDetailEntity> getWorkList(int page, int size, String sortDir) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc")? Sort.Direction.DESC:Sort.Direction.ASC;
 
-        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = Sort.by(direction, "onDate");
+
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<WorkDetailEntity> workPage = repo.findAll(pageable);
 
         return workPage;

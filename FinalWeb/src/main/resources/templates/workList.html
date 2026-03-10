@@ -10,8 +10,13 @@
 
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
             <div class="flex gap-4 mb-8">
-                <button
+                <!-- <button  有一個是被選擇的高亮樣式
                     class="flex-1 py-6 text-xl font-bold rounded-xl bg-primary text-white dark:text-background-dark shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
+                    style="">
+                    電影作品
+                </button> -->
+                <button
+                    class="flex-1 py-6 text-xl font-bold rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all hover:scale-[1.02]"
                     style="">
                     電影作品
                 </button>
@@ -22,16 +27,20 @@
                 </button>
             </div>
             <div class="flex justify-end gap-3 mb-10">
-                <button
+                <a th:href="@{/workList?page=0&size=4&sortDir=DESC}"
                     class="px-6 py-2 rounded-full bg-primary/10 text-primary border border-primary/30 text-sm font-bold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
-                    style="">
+                    th:classappend="${sortNow == 'DESC'} 
+                      ? 'bg-primary/10 text-primary border-primary/30' 
+                      : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:border-primary/50 hover:text-primary'">
                     上映日期 - 近
-                </button>
-                <button
-                    class="px-6 py-2 rounded-full bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 text-sm font-bold hover:border-primary/50 hover:text-primary transition-all"
-                    style="">
+                </a>
+                <a th:href="@{/workList?page=0&size=4&sortDir=ASC}"
+                    class="px-6 py-2 rounded-full bg-primary/10 text-primary border border-primary/30 text-sm font-bold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+                    th:classappend="${sortNow == 'ASC'} 
+                      ? 'bg-primary/10 text-primary border-primary/30' 
+                      : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:border-primary/50 hover:text-primary'">
                     上映日期 - 遠
-                </button>
+                </a>
             </div>
             <div class="flex flex-col gap-8">
                 <div th:each="work : ${works.content}"
@@ -63,39 +72,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div
-                    class="flex flex-col lg:flex-row gap-6 p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-primary/40 transition-all group">
-                    <div class="w-full lg:w-[450px] h-64 lg:h-72 rounded-xl overflow-hidden shrink-0">
-                        <img alt="Lost in Translation"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBALblJhVb_NXtBzLX6MxSjNaGiKZiRixGNNNvT3Iexq4PtUq7MJZ6YBrniO_vVwl9RehxGFEy965Ux4thdMt3fLLhMrlNzDKuVyPzJ81AoZVK6QmYjD8xvJJG621BKJ1rsh6q4pracD-0Zqiz5jwguWslxWzymfHpKz6nPHLAmA0x80A1-TOz36ub_FrLy0Ncqu9oXTRHyQCpFY-5ihSv1pNCo3TWlPK1i58KuYab0ZGOAW8WrSM822vPVqLeQ65FJNo-vlotpxoM"
-                            style="">
-                    </div>
-                    <div class="flex flex-col justify-between py-2 flex-1">
-                        <div>
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded" style="">電影
-                                    / 劇情</span>
-                                <span class="text-slate-400 text-xs" style="">2003-08-29 上映</span>
-                            </div>
-                            <h3 class="text-primary text-3xl font-black mb-4" style="">愛情，不用翻譯 (Lost in Translation)
-                            </h3>
-                            <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-lg mb-6" style="">
-                                以東京新宿柏悅酒店 (Park Hyatt Tokyo)
-                                為核心，電影捕捉了新宿與澀谷的迷離夜景。著名的澀谷十字路口、代官山的時尚街道，以及主角們深夜高唱卡拉OK的新宿歌舞伎町，共同交織出一場屬於孤獨靈魂的東京漫步。
-                            </p>
-                        </div>
-                        <div>
-                            <button
-                                class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-8 py-3 rounded-lg font-bold transition-all w-fit shadow-lg shadow-primary/10"
-                                style="">作品詳細介紹</button>
-                        </div>
-                    </div>
-                </div> -->
             </div>
             <div class="mt-16 flex justify-center">
                 <nav class="flex items-center gap-2">
-                    <a th:if="${page > 0}" th:href="@{/work/workListTest(page=${page-1}, size=4)}"
+                    <a th:if="${page > 0}" th:href="@{/workList(page=${page-1}, size=4, sortDir=${sortNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_left</span>
@@ -107,7 +87,7 @@
                             class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white dark:text-background-dark font-bold">
                         </div>
 
-                        <a th:unless="${i == works.number}" th:href="@{/work/workListTest(page=${i}, size=4)}"
+                        <a th:unless="${i == works.number}" th:href="@{/workList(page=${i}, size=4, sortDir=${sortNow})}"
                             th:text="${i + 1}"
                             class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
                         </a>
@@ -115,7 +95,7 @@
                     </th:block>
                     <!-- <span th:text="${page + 1}"></span> / <span th:text="${works.totalPages}"></span> -->
 
-                    <a th:if="${page+1 < works.totalPages}" th:href="@{/work/workListTest(page=${page+1}, size=4)}"
+                    <a th:if="${page+1 < works.totalPages}" th:href="@{/workList(page=${page+1}, size=4, sortDir=${sortNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_right</span>

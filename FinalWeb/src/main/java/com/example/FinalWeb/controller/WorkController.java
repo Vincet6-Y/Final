@@ -15,7 +15,7 @@ import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.WorkService;
 
 @Controller
-@RequestMapping("/work")
+@RequestMapping("/")
 public class WorkController {
 
     @Autowired
@@ -28,22 +28,14 @@ public class WorkController {
     // }
 
     @GetMapping("/workList")
-    public String getWork(Model model) {
-        List<WorkDetailEntity> workList = service.getWork();
-
-        model.addAttribute("works", workList);
-
-        return "workList";
-    }
-
-    @GetMapping("/workListTest")
     public String getWorkPage(Model model, @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size) {
-        Page<WorkDetailEntity> workPage = service.getWorkList(page,size);
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "DESC") String sortDir) {
+        Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir);
 
         model.addAttribute("works", workPage);
         model.addAttribute("page", page);
-
+        model.addAttribute("sortNow", sortDir);
 
         return "workList";
     }
