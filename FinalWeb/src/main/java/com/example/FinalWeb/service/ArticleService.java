@@ -28,8 +28,8 @@ public class ArticleService {
     public void initData() {
         try {
             // 第一步：強制重置資料表，這會讓 Auto Increment 回到 1
-            // articleRepo.truncateTable();
-            // System.out.println(">>> [ArticleService] 資料庫已清空，ID 計數器已重置為 1");
+            articleRepo.truncateTable();
+            System.out.println(">>> [ArticleService] 資料庫已清空，ID 計數器已重置為 1");
 
             // 第二步：因為剛清空，count() 必定為 0，直接執行匯入
             System.out.println(">>> [ArticleService] 開始從 JSON 匯入初始資料...");
