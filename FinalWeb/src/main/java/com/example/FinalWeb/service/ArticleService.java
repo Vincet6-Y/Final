@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.FinalWeb.entity.ArticleEntity;
 import com.example.FinalWeb.repo.ArticleRepo;
@@ -63,19 +65,27 @@ public class ArticleService {
 
     // --- 以下為查詢邏輯 ---
 
-    // 根據分類拿資料 (用於 News 列表頁)
+    // 根據 ID 拿資料
+    public ArticleEntity findById(Integer articleId) {
+        return articleRepo.findById(articleId).orElse(null);
+    }
+
+    // 分頁或單一分類頁面備用
     public List<ArticleEntity> findByCategory(String category) {
         return articleRepo.findByArticleClassOrderByArticleIdDesc(category);
     }
 
-    // 根據 ID 拿資料 (用於 Article 詳細頁)
-    public ArticleEntity findById(Integer articleId) {
-        // 使用 orElse(null) 處理找不到 ID 的狀況，避免 NullPointerException
-        return articleRepo.findById(articleId).orElse(null);
+    // --- 高階查詢 ---
+    // 邏輯：先排序再分組，保證最新的文章在 List 的最前面
+    public Map<String, List<ArticleEntity>> getAllArticlesGrouped() {
+        return articleRepo.findAll().stream()
+                .sorted((a1, a2) -> a2.getArticleId().compareTo(a1.getArticleId())) // 降冪排序
+                .collect(Collectors.groupingBy(ArticleEntity::getArticleClass));
     }
 
-    // 拿取所有文章 (用於 News 首頁初始化顯示)
+    // 「後端管理列表（不分分類顯示所有文章）
     public List<ArticleEntity> findAll() {
         return articleRepo.findAll();
     }
+
 }

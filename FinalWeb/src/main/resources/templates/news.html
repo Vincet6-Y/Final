@@ -18,87 +18,42 @@
                 <p whitespace-nowrap> 掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。</p>
             </div>
             <!-- Section 1: Website Info (Cards Layout) -->
-            <section class="mb-16">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-primary text-3xl">campaign</span>
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white">網站情報</h3>
-                    </div>
-                    <a class="text-primary text-sm font-medium flex items-center gap-1 hover:underline" href="#">查看更多
-                        <span class="material-symbols-outlined text-xs">arrow_forward</span></a>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div
-                        class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none">
-                        <div class="aspect-video relative overflow-hidden">
-                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkLyjBAyr1vRDQoezYyis5KyjAbX-IgF2KKCq5_l-EY5tpE0i9xFAjudXdaY9od1ACIqlFAZ9GzQ59kJ0YShmnqyoIkPRaMCzKgpyjEilSPYJAXd-UMhorqKfjaPTLoNL1Hz4mNRo-TTvgDzil1TAR3pYoIkTIG1gZWBoCsD2bQtD9127t29W19RiPuC1ca0NZPRZ4Hy37_-ev3qGSAkYrkCsgvKgbezutlu_xxa2jRvkZ3EUXDCWI7EIRcWljJKDeLvrixIe8J2w');">
-                            </div>
-                            <div
-                                class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">
-                                活動</div>
+                <div th:each="info, iterStat : ${newSection}"
+                    class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none flex flex-col">
+
+                    <div class="aspect-video relative overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            th:style="'background-image: url(' + 
+                    (${iterStat.index == 0} ? @{/article_img/news_discount.png} : 
+                    (${iterStat.index == 1} ? @{/article_img/news_member.png} : @{/article_img/news_photo.png})) 
+                    + ');'">
                         </div>
-                        <div class="p-6">
-                            <h4
-                                class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
-                                夏季朝聖之旅限定優惠</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2">全線指定行程享 85 折優惠，前 50
-                                名報名者加贈精美朝聖紀念手冊一套。</p>
-                            <button
-                                class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                                了解更多 <span class="material-symbols-outlined text-base">open_in_new</span>
-                            </button>
-                        </div>
+
+                        <div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded"
+                            th:text="${info.articleClass}">分類</div>
                     </div>
 
-                    <div
-                        class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none">
-                        <div class="aspect-video relative overflow-hidden">
-                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBckG2aVYUpA_Bis4ihejDVFJpMyfp5kQjnnWwbN6YVx3uG2jfrMGHILTS-MJ6V85uVbnZjohemnN1gGciIunmMttS7racWu37jDh-IlW8nKjQTtUO3oKuWsgn6uNH5_WAPhSnYMLAxfvH91WaM7XMGE6Y_WCTyrNrrwAa1LPYA4NR1BH8Lto6W1B0ohJQr0T6GTqZ5LNSf1f4EXhmNJGTyP_SmAQF_SEnIa9JoFO75quv3RomOtuZPmyQUlGYx6n7PHvEmi6kdCo');">
-                            </div>
-                            <div
-                                class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">
-                                會員限定</div>
-                        </div>
-                        <div class="p-6">
-                            <h4
-                                class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
-                                加入會員領取首航禮包</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2">即刻註冊領取 $500
-                                旅遊購物金，並享有優先預約全球限定導覽行程的資格。</p>
-                            <button
-                                class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                                立即註冊 <span class="material-symbols-outlined text-base">person_add</span>
-                            </button>
-                        </div>
-                    </div>
+                    <div class="p-6 flex flex-col flex-1">
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors"
+                            th:text="${info.title}">標題</h4>
 
-                    <div
-                        class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none">
-                        <div class="aspect-video relative overflow-hidden">
-                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZSYX4nImBSEtU9gRQypjRMAQKpHmhptJOdkFW4tDDTiOJzsYLkhm644W6U87gyz9V3toLqd6WzrXnOBc_li1CrHyDDiDUQM9z_v7bfmvSlPWtHO-8RK7bVkg5ij2RJslC1JRPkp_d7D1ujRWlUJLLdR07_pkejW2xArDh3eqFQsVrA-_hgKuQ0e50lEJSljXvMYa_2R_Gp4zm7g2v56o20BVK0ntUoG7CO6xs39w8bleWnsTjvyBd8_VWehCFokfE7rohtFfCEV4');">
-                            </div>
-                            <div
-                                class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded">
-                                比賽</div>
-                        </div>
-                        <div class="p-6">
-                            <h4
-                                class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">
-                                捕捉聖地之美攝影比賽</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2">
-                                分享您的聖地旅程影像，總獎金高達三萬元，優選作品將刊登於官方年度特刊。</p>
-                            <button
-                                class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
-                                參賽細則 <span class="material-symbols-outlined text-base">photo_camera</span>
-                            </button>
-                        </div>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2"
+                            th:text="${info.content}">內文簡介</p>
+
+                        <a th:href="@{/article/{id}(id=${info.articleId})}"
+                            class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2 mt-auto">
+
+                            <span th:text="${info.articleClass == '活動'} ? '了解更多' : 
+                            (${info.articleClass == '會員限定'} ? '註冊優惠' : '參賽細則')">了解更多</span>
+
+                            <span class="material-symbols-outlined text-base" th:text="${info.articleClass == '活動'} ? 'open_in_new' : 
+                             (${info.articleClass == '會員限定'} ? 'person_add' : 'photo_camera')"></span>
+                        </a>
                     </div>
                 </div>
-            </section>
+            </div>
             <!-- Section 2: MOFA Travel Alerts (Safety Focus) -->
             <section class="mb-16 bg-primary/5 border border-primary/20 rounded-2xl p-8">
                 <div class="flex items-center gap-3 mb-8">
@@ -154,7 +109,6 @@
                 </div>
             </section>
             <!-- Section 3: Travel Guides & Tips (Featured Grid) -->
-
             <section class="mb-20">
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center gap-3">
@@ -163,19 +117,21 @@
                     </div>
                 </div>
 
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:h-[600px]">
 
-                    <a th:each="art, iterStat : ${articles}"
+                    <a th:each="art, iterStat :${travelGuides}" th:if="${iterStat.index < 4}"
                         class="relative group rounded-2xl overflow-hidden shadow-md transition-all duration-300"
-                        th:classappend="${iterStat.index == 0} ? 'md:col-span-2 md:row-span-2 shadow-lg' : 
-                           (${iterStat.index == 1} ? 'md:col-span-2' : 'md:col-span-1')"
-                        th:href="@{/news/article/{id}(id=${art.articleId})}" aria-label="閱讀文章詳細內容">
+                        th:classappend="${iterStat.index == 0} ? 'h-[400px] md:h-full md:col-span-2 md:row-span-2 shadow-lg' : 
+                                        (${iterStat.index == 1} ? 'h-[250px] md:h-full md:col-span-2' : 'h-[250px] md:h-full md:col-span-1')"
+                        th:href="@{/article/{id}(id=${art.articleId})}" aria-label="閱讀文章詳細內容">
 
                         <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                            th:style="${iterStat.index == 0} ? 'background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDgOLpr4QvEP7f3LyciAxVfhtVpsfHOKwNxJdLdB623dGBZ8GoBai0V6LZDDsuwnaLfUJpOxEPdOiDf2KQjAcFWDA5tEaLXCYTOkePjAsRQ0d-9Rh3aOau-xDWPtS_T0Ro2pEXH5YNAazt6mpCSBnC_eJyIRJ0AC87f8TRXYn5LrTsPRvBSZYamapAWWBvSk6xybYgRnufTWMD2ZdNtTciY9H2rSmH-KRfgzXWLXQMyqHPHjr8T8P5FXCIpGLhrTz7EaPpeS1wRUkI);' : 
-                          (${iterStat.index == 1} ? 'background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDZ2B74CxpB3x7cw_puuR-6eIVbZvy-mNnVJtXWSHN2qWrsy8g40j2W1sftNZ1BCXcu7m4K4PlmgA5Q0FI60yx_79st4IbfW3HfEIQWSVE3lMTEIl8bH73ybHGLKJHAugF217v_tAl0icsPnF8pAf71nAr05iM7uBJvVHBaTk2ps8Wpf_NCkn2FEwD2zLgQHrMVzwu6xtVPYO0G1blGhSddlCrndckBVBWPtvJ8zWdtM658VtV8c5PE7G4Ua0bBbZPvccfzwDDLI_g);' : 
-                          (${iterStat.index == 2} ? 'background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3tuREDFyqO7Pkm0-zWfa7GzPLq-sqTPXvARuJlblMn5Zc9ozx0TtwcSzlnzVMhLfvhk-r-5-AkJ73cjPpxVBNdEZsJ4qwtp64ozKG8FCFcvEaLoQaqLggZq6OdP1JeDyleJvKF1d-n7YjbAqw7d78cWJIk8CFcgnjgsN6QX43Mx9CmLZ-_7d4nZ1t63NLSUwHZOtkNtPZFCQU_8ZEGRg3HlSJq0Zmghxg7H_92ywsN8gzdGoURBnmvNcS3dLXaElVkTVzgM-TRI);' : 
-                          'background-image: url(https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1800&auto=format&fit=crop);'))">
+                            th:style="'background-image: url(' + 
+                                        (${iterStat.index == 0} ? @{/article_img/news_travel.png} : 
+                                        (${iterStat.index == 1} ? @{/article_img/news_ticket.png} : 
+                                        (${iterStat.index == 2} ? @{/article_img/news_shoes.png} : @{/article_img/news_food.png}))) 
+                                        + ');'">
                         </div>
 
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
@@ -191,14 +147,8 @@
                                 th:text="${art.title}">標題</h4>
                             <h5 th:unless="${iterStat.index == 0}"
                                 class="text-lg font-bold text-white mb-2 line-clamp-2" th:text="${art.title}">標題</h5>
-
-                            <p th:if="${iterStat.index == 0}" class="text-slate-200 text-sm mb-6 max-w-md line-clamp-2">
-                                專業領隊整理的十條金律，讓您的第一次朝聖之旅不留遺憾。
-                            </p>
-
                         </div>
                     </a>
-
                 </div>
             </section>
         </main>
