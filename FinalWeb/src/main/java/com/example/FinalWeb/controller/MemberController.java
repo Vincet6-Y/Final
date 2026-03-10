@@ -1,8 +1,8 @@
 package com.example.FinalWeb.controller;
 
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping("/")
@@ -62,8 +62,15 @@ public class MemberController {
         return "article";
     }
 
+    // 1. 注入 application.properties 裡設定的金鑰變數
+    @Value("${google.maps.api-key:NONE}")
+    private String googleMapsApiKey;
+
+    // 2. 修改原本的 packageTourMap 方法
     @RequestMapping("/packageTourMap")
-    public String packageTourMap() {
+    public String packageTourMap(Model model) {
+        // 將金鑰存入 model，這樣前端 Thymeleaf 才能抓到
+        model.addAttribute("apiKey", googleMapsApiKey);
         return "packageTourMap";
     }
 

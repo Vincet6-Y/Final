@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "weather",
+            "request": "launch",
+            "mainClass": "weather",
+            "projectName": "FinalWeb"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-FinalWebApplication<FinalWeb>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.FinalWeb.FinalWebApplication",
+            "projectName": "FinalWeb",
+            "args": "",
+            "envFile": "${workspaceFolder}/FinalWeb/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=51276 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=FinalWeb"
+        }
+    ]
+}
