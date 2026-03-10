@@ -22,17 +22,21 @@ public class ArticleService {
 
     /**
      * 思考邏輯：系統啟動後自動執行。
-     * 參考 https://docs.oracle.com/javase/8/docs/api/ 關於 PostConstruct 的生命週期。
+     * 因為呼叫了 truncateTable()，資料庫會被清空且 ID 計數器歸零。
      */
     @PostConstruct
     public void initData() {
-        // 1. 檢查資料庫筆數：這是為了配合你手動 TRUNCATE 指令。
-        // 當你清空資料表，count 就會是 0，從而觸發重新匯入 JSON 裡的指定 ID。
-        if (articleRepo.count() == 0) {
-            System.out.println(">>> [ArticleService] 檢測到資料庫為空，開始從 JSON 指定 ID 匯入資料...");
+        try {
+            // 第一步：強制重置資料表，這會讓 Auto Increment 回到 1
+            // articleRepo.truncateTable();
+            // System.out.println(">>> [ArticleService] 資料庫已清空，ID 計數器已重置為 1");
+
+            // 第二步：因為剛清空，count() 必定為 0，直接執行匯入
+            System.out.println(">>> [ArticleService] 開始從 JSON 匯入初始資料...");
             importFromJson();
-        } else {
-            System.out.println(">>> [ArticleService] 資料庫已有 " + articleRepo.count() + " 筆資料，跳過自動匯入。");
+
+        } catch (Exception e) {
+            System.err.println(">>> [ArticleService] 初始化失敗：" + e.getMessage());
         }
     }
 
@@ -41,24 +45,19 @@ public class ArticleService {
      */
     private void importFromJson() {
         try {
-            // 2. 建立 ObjectMapper：Jackson 核心工具，負責 JSON 與 Java 物件的轉換。
             ObjectMapper mapper = new ObjectMapper();
-
-            // 3. 讀取資源：使用 ClassPathResource 確保打包成 JAR 後依然能讀到檔案。
+            // 使用 ClassPathResource 讀取資源檔案
             InputStream jsonFile = new ClassPathResource("articles.json").getInputStream();
-
-            // 4. 反序列化：利用 TypeReference 處理 List 泛型丟失問題。
-            // 這裡 JSON 裡的 "articleId": 1 會透過 Jackson 自動塞入 ArticleEntity 的 articleId 欄位。
             List<ArticleEntity> articles = mapper.readValue(jsonFile, new TypeReference<List<ArticleEntity>>() {
             });
 
-            // 5. 存入資料庫：因為資料庫剛清空，ID 計數器歸零，它會優先接受 JSON 裡的 1, 2, 3, 4。
+            // 保存所有文章，此時資料庫會從 ID 1 開始分配
             articleRepo.saveAll(articles);
-            System.out.println(">>> [ArticleService] 成功匯入 " + articles.size() + " 篇指定 ID 的文章！");
+            System.out.println(">>> [ArticleService] 成功匯入 " + articles.size() + " 篇文章！");
 
         } catch (Exception e) {
-            // 萬一 JSON 格式寫錯（例如少了逗號），這裡會抓到具體錯誤訊息。
-            System.err.println(">>> [ArticleService] 匯入失敗，請檢查 articles.json 格式：" + e.getMessage());
+            e.printStackTrace();
+            System.err.println(">>> [ArticleService] 匯入失敗：" + e.getMessage());
         }
     }
 

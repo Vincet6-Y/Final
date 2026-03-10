@@ -143,18 +143,18 @@
                                     Japan Web</span>
                                 <p class="text-slate-500 dark:text-slate-400 text-xs">建議先行完成線上申報。</p>
                             </a>
-                            <<<<<<< Updated upstream=======<a href="https://www.japan.travel/tw/tw/" target="_blank"
+                            <a href="https://www.japan.travel/tw/tw/" target="_blank"
                                 class="group p-4 bg-white dark:bg-background-dark/50 border border-slate-200 dark:border-white/10 rounded-xl hover:border-primary/50 transition-all shadow-sm dark:shadow-none">
                                 <span
                                     class="text-slate-900 dark:text-white font-bold group-hover:text-primary transition-colors text-sm block mb-1">日本旅遊官方指南</span>
                                 <p class="text-slate-500 dark:text-slate-400 text-xs">提供最詳盡的景點介紹、交通路線與季節限定活動</p>
-                                </a>
-                                >>>>>>> Stashed changes
+                            </a>
                         </div>
                     </div>
                 </div>
             </section>
             <!-- Section 3: Travel Guides & Tips (Featured Grid) -->
+
             <section class="mb-20">
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center gap-3">
@@ -163,54 +163,42 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 md:h-[600px]">
-                    <div class="md:col-span-2 md:row-span-2 relative group rounded-2xl overflow-hidden shadow-lg">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgOLpr4QvEP7f3LyciAxVfhtVpsfHOKwNxJdLdB623dGBZ8GoBai0V6LZDDsuwnaLfUJpOxEPdOiDf2KQjAcFWDA5tEaLXCYTOkePjAsRQ0d-9Rh3aOau-xDWPtS_T0Ro2pEXH5YNAazt6mpCSBnC_eJyIRJ0AC87f8TRXYn5LrTsPRvBSZYamapAWWBvSk6xybYgRnufTWMD2ZdNtTciY9H2rSmH-KRfgzXWLXQMyqHPHjr8T8P5FXCIpGLhrTz7EaPpeS1wRUkI');">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:h-[600px]">
+
+                    <a th:each="art, iterStat : ${articles}"
+                        class="relative group rounded-2xl overflow-hidden shadow-md transition-all duration-300"
+                        th:classappend="${iterStat.index == 0} ? 'md:col-span-2 md:row-span-2 shadow-lg' : 
+                           (${iterStat.index == 1} ? 'md:col-span-2' : 'md:col-span-1')"
+                        th:href="@{/news/article/{id}(id=${art.articleId})}" aria-label="閱讀文章詳細內容">
+
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            th:style="${iterStat.index == 0} ? 'background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDgOLpr4QvEP7f3LyciAxVfhtVpsfHOKwNxJdLdB623dGBZ8GoBai0V6LZDDsuwnaLfUJpOxEPdOiDf2KQjAcFWDA5tEaLXCYTOkePjAsRQ0d-9Rh3aOau-xDWPtS_T0Ro2pEXH5YNAazt6mpCSBnC_eJyIRJ0AC87f8TRXYn5LrTsPRvBSZYamapAWWBvSk6xybYgRnufTWMD2ZdNtTciY9H2rSmH-KRfgzXWLXQMyqHPHjr8T8P5FXCIpGLhrTz7EaPpeS1wRUkI);' : 
+                          (${iterStat.index == 1} ? 'background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDZ2B74CxpB3x7cw_puuR-6eIVbZvy-mNnVJtXWSHN2qWrsy8g40j2W1sftNZ1BCXcu7m4K4PlmgA5Q0FI60yx_79st4IbfW3HfEIQWSVE3lMTEIl8bH73ybHGLKJHAugF217v_tAl0icsPnF8pAf71nAr05iM7uBJvVHBaTk2ps8Wpf_NCkn2FEwD2zLgQHrMVzwu6xtVPYO0G1blGhSddlCrndckBVBWPtvJ8zWdtM658VtV8c5PE7G4Ua0bBbZPvccfzwDDLI_g);' : 
+                          (${iterStat.index == 2} ? 'background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3tuREDFyqO7Pkm0-zWfa7GzPLq-sqTPXvARuJlblMn5Zc9ozx0TtwcSzlnzVMhLfvhk-r-5-AkJ73cjPpxVBNdEZsJ4qwtp64ozKG8FCFcvEaLoQaqLggZq6OdP1JeDyleJvKF1d-n7YjbAqw7d78cWJIk8CFcgnjgsN6QX43Mx9CmLZ-_7d4nZ1t63NLSUwHZOtkNtPZFCQU_8ZEGRg3HlSJq0Zmghxg7H_92ywsN8gzdGoURBnmvNcS3dLXaElVkTVzgM-TRI);' : 
+                          'background-image: url(https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1800&auto=format&fit=crop);'))">
                         </div>
+
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
 
-                        <div class="absolute bottom-0 left-0 p-8">
-                            <span
-                                class="text-primary text-sm font-bold uppercase tracking-widest mb-3 block">新手必看</span>
-                            <h4 class="text-3xl font-bold text-white mb-4">第一次聖地巡禮就上手：從打包到心靈準備</h4>
-                            <p class="text-slate-200 text-sm mb-6 max-w-md">專業領隊整理的十條金律，讓您的第一次朝聖之旅不留遺憾，體驗真正的靈魂洗滌。</p>
-                            <a class="inline-flex items-center gap-2 bg-primary text-background-dark font-bold px-6 py-2 rounded-lg text-sm hover:brightness-110 transition-all"
-                                href="#">閱讀全文 <span class="material-symbols-outlined text-sm">arrow_outward</span></a>
-                        </div>
-                    </div>
+                        <div class="absolute bottom-0 left-0 w-full p-6"
+                            th:classappend="${iterStat.index == 0} ? 'p-8' : ''">
 
-                    <div class="md:col-span-2 relative group rounded-2xl overflow-hidden shadow-md">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDZ2B74CxpB3x7cw_puuR-6eIVbZvy-mNnVJtXWSHN2qWrsy8g40j2W1sftNZ1BCXcu7m4K4PlmgA5Q0FI60yx_79st4IbfW3HfEIQWSVE3lMTEIl8bH73ybHGLKJHAugF217v_tAl0icsPnF8pAf71nAr05iM7uBJvVHBaTk2ps8Wpf_NCkn2FEwD2zLgQHrMVzwu6xtVPYO0G1blGhSddlCrndckBVBWPtvJ8zWdtM658VtV8c5PE7G4Ua0bBbZPvccfzwDDLI_g');">
-                        </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent">
-                        </div>
-                        <div class="absolute bottom-0 left-0 p-6">
-                            <h5 class="text-xl font-bold text-white mb-2">數位遊牧者的朝聖地指南</h5>
-                            <p class="text-slate-200 text-xs line-clamp-1">如何在旅途中兼顧工作與朝聖的心靈平靜？</p>
-                        </div>
-                    </div>
+                            <span class="text-primary font-bold uppercase tracking-widest mb-2 block"
+                                th:classappend="${iterStat.index == 0} ? 'text-sm' : 'text-[10px]'"
+                                th:text="${art.articleClass}">分類</span>
 
-                    <div class="relative group rounded-2xl overflow-hidden shadow-md">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ3tuREDFyqO7Pkm0-zWfa7GzPLq-sqTPXvARuJlblMn5Zc9ozx0TtwcSzlnzVMhLfvhk-r-5-AkJ73cjPpxVBNdEZsJ4qwtp64ozKG8FCFcvEaLoQaqLggZq6OdP1JeDyleJvKF1d-n7YjbAqw7d78cWJIk8CFcgnjgsN6QX43Mx9CmLZ-_7d4nZ1t63NLSUwHZOtkNtPZFCQU_8ZEGRg3HlSJq0Zmghxg7H_92ywsN8gzdGoURBnmvNcS3dLXaElVkTVzgM-TRI');">
-                        </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-6">
-                            <h5 class="text-lg font-bold text-white">裝備推薦：鞋履篇</h5>
-                        </div>
-                    </div>
+                            <h4 th:if="${iterStat.index == 0}" class="text-3xl font-bold text-white mb-4"
+                                th:text="${art.title}">標題</h4>
+                            <h5 th:unless="${iterStat.index == 0}"
+                                class="text-lg font-bold text-white mb-2 line-clamp-2" th:text="${art.title}">標題</h5>
 
-                    <div class="relative group rounded-2xl overflow-hidden shadow-md">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD4R96Iq9hRBnDvrVQrE_rDee1OYlQqkkLER1BJnvfSA4A4rWitm-ufJI_HHU6lzIklxo8W587OR0JjQtfI5vqGPbOLWtNr4zsDafSfn5pgmytsD9cjxA8b_aofAGw-EHKZ7VtmDLlpjCGK2GNlbARbi6elFoOUDKoifaQ3NcTjlFrSjdJBFk_4JvtfAePRkV-RIZGZCgniQYF7tljlbmt0Hu6EcY5SHUkHxaPmr3_klPaitTVcUMZhaiBcGUIi47ORGBXTCOfgd68');">
+                            <p th:if="${iterStat.index == 0}" class="text-slate-200 text-sm mb-6 max-w-md line-clamp-2">
+                                專業領隊整理的十條金律，讓您的第一次朝聖之旅不留遺憾。
+                            </p>
+
                         </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 p-6">
-                            <h5 class="text-lg font-bold text-white">聖地周邊美食地圖</h5>
-                        </div>
-                    </div>
+                    </a>
+
                 </div>
             </section>
         </main>
@@ -218,6 +206,8 @@
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 
     </div>
+
+    <!-- 日本旅遊即時資訊  -->
     <script>
         const UPDATE_INTERVAL = 300000;
 
@@ -264,6 +254,8 @@
             }
         }
     </script>
+
+
 </body>
 
 </html>

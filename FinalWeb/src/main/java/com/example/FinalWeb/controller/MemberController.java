@@ -89,10 +89,10 @@ public class MemberController {
         return "login";
     }
 
-    @RequestMapping("/news")
-    public String news() {
-        return "news";
-    }
+    // @RequestMapping("/news")
+    // public String news() {
+    // return "news";
+    // }
 
     @RequestMapping("/info")
     public String info() {
