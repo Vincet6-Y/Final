@@ -43,16 +43,6 @@ public class MemberController {
         return "home";
     }
 
-    @RequestMapping("/workList")
-    public String workList() {
-        return "workList";
-    }
-
-    @RequestMapping("/workListDetail")
-    public String workListDetail() {
-        return "workListDetail";
-    }
-
     @RequestMapping("/packageTour")
     public String packageTour() {
         return "packageTour";

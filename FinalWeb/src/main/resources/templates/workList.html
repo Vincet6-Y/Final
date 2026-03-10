@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html class="dark" lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
@@ -34,23 +34,25 @@
                 </button>
             </div>
             <div class="flex flex-col gap-8">
-                <div
+                <div th:each="work : ${works.content}"
                     class="flex flex-col lg:flex-row gap-6 p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-primary/40 transition-all group">
                     <div class="w-full lg:w-[450px] h-64 lg:h-72 rounded-xl overflow-hidden shrink-0">
-                        <img alt="Your Name"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjxt2R8wPviIqZXYUEi9kNxP_4s_bsJgGLXxREm6BsrEBY81VbhZmDLV__AjCs5HaiGR-fKnRuk2juWzGUdKukFlgsUPkSqgmGqDdATw6XmjORoaIIPhJV2FbRSPk19gcjSYVK3kO0pC0da6QA80hd1pur6hqGBJhoyxzj8pxYEu-1gV2nzuQd4DSsWI0UuXcJSHuPpgVvIOy6wdakbSRHhSdYHEBh8SJxIX8leko5dvVsQYGI9FCfdbxrdUydvgKs6yCTVpIneA"
-                            style="">
+                        <img alt="IMAGE"
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" 
+                            th:src="${work.workImg}">
                     </div>
                     <div class="flex flex-col justify-between py-2 flex-1">
                         <div>
                             <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded" style="">電影
-                                    / 動畫</span>
-                                <span class="text-slate-400 text-xs" style="">2016-08-26 上映</span>
+                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded" style=""
+                                    th:text="${work.workClass}">動畫 / 電影</span>
+                                <span class="text-slate-400 text-xs" style=""
+                                    th:text="${work.onDate} + ' ' + 上映">2016-08-26 上映</span>
                             </div>
-                            <h3 class="text-primary text-3xl font-black mb-4" style="">你的名字 (君の名は。)</h3>
-                            <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-lg mb-6" style="">
+                            <h3 class="text-primary text-3xl font-black mb-4" th:text="${work.workName}">你的名字 (君の名は。)
+                            </h3>
+                            <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-lg mb-6"
+                                th:text="${work.description}">
                                 故事背景主要取景於東京與岐阜縣飛驒市。其中最著名的巡禮地莫過於東京新宿的「須賀神社前階梯」，是片尾男女主角重逢的經典場景。此外，信濃町站前的天橋、國立新美術館以及飛驒市圖書館也是粉絲必訪的聖地。
                             </p>
                         </div>
@@ -61,34 +63,7 @@
                         </div>
                     </div>
                 </div>
-                <div
-                    class="flex flex-col lg:flex-row gap-6 p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-primary/40 transition-all group">
-                    <div class="w-full lg:w-[450px] h-64 lg:h-72 rounded-xl overflow-hidden shrink-0">
-                        <img alt="Slam Dunk"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpGsONs1I9jctDoWnD35vPCt7z7Zj2lqxDf3NLwjo8Q2Ec8CBncM5PlrriSjDVfW5ygOUbEip_3XGn1g0sFfGnE2OBBnT0gAQ-iS_zV1SJa_dgFOUf0sg8fDn_8_0UqDt3SlBEv8zGfPYaqDsoO9ljq2g-xGTBanbDLIPVUMjzi-0GBumkE-y6Dn5U2SOriKRsZ52HX0E1UGqOmENlKTp_ESR8DVrTCiN7xOSsya2kOPceej3PgLHdc5s40PX7Y5LY3Uu48mAxIbI"
-                            style="">
-                    </div>
-                    <div class="flex flex-col justify-between py-2 flex-1">
-                        <div>
-                            <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded" style="">動畫
-                                    / 體育</span>
-                                <span class="text-slate-400 text-xs" style="">1993-10-16 上映</span>
-                            </div>
-                            <h3 class="text-primary text-3xl font-black mb-4" style="">灌籃高手 (SLAM DUNK)</h3>
-                            <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-lg mb-6" style="">
-                                鎌倉高校前站平交道是所有籃球迷心目中的不滅聖地。在那裡，江之電緩緩駛過，背後是閃耀著陽光的湘南海岸，彷彿能看見櫻木花道揮手的身影。此外，平塚綜合體育館也是動畫中全國大賽預選賽的重要原型地。
-                            </p>
-                        </div>
-                        <div>
-                            <button
-                                class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-8 py-3 rounded-lg font-bold transition-all w-fit shadow-lg shadow-primary/10"
-                                style="">作品詳細介紹</button>
-                        </div>
-                    </div>
-                </div>
-                <div
+                <!-- <div
                     class="flex flex-col lg:flex-row gap-6 p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-primary/40 transition-all group">
                     <div class="w-full lg:w-[450px] h-64 lg:h-72 rounded-xl overflow-hidden shrink-0">
                         <img alt="Lost in Translation"
@@ -116,29 +91,35 @@
                                 style="">作品詳細介紹</button>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <div class="mt-16 flex justify-center">
                 <nav class="flex items-center gap-2">
-                    <button
+                    <a th:if="${page > 0}" th:href="@{/work/workListTest(page=${page-1}, size=4)}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_left</span>
-                    </button>
-                    <button
-                        class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white dark:text-background-dark font-bold"
-                        style="">1</button>
-                    <button
-                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-primary/50 hover:text-primary transition-all"
-                        style="">2</button>
-                    <button
-                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-primary/50 hover:text-primary transition-all"
-                        style="">3</button>
-                    <button
+                    </a>
+
+                    <th:block th:each="i : ${#numbers.sequence(0, works.totalPages - 1)}">
+
+                        <div th:if="${i == works.number}" th:text="${i + 1}"
+                            class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white dark:text-background-dark font-bold">
+                        </div>
+
+                        <a th:unless="${i == works.number}" th:href="@{/work/workListTest(page=${i}, size=4)}"
+                            th:text="${i + 1}"
+                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                        </a>
+
+                    </th:block>
+                    <!-- <span th:text="${page + 1}"></span> / <span th:text="${works.totalPages}"></span> -->
+
+                    <a th:if="${page+1 < works.totalPages}" th:href="@{/work/workListTest(page=${page+1}, size=4)}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_right</span>
-                    </button>
+                    </a>
                 </nav>
             </div>
         </main>

@@ -74,15 +74,18 @@
                                 Station)</h4>
                             <p class="text-slate-600 dark:text-slate-400 text-sm">於東口廣場與導遊會合，領取專屬紀念護照。</p>
                         </div>
-                        <div class="relative pl-10">
+                        <div class="relative pl-10 hover:bg-slate-50 transition-colors p-2 rounded-lg"
+                            style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#kamakuraModal">
+
                             <div
                                 class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-blue-500 flex items-center justify-center text-blue-500">
                                 <span class="material-symbols-outlined text-sm">photo_camera</span>
                             </div>
+
                             <div class="mb-1 text-blue-500 font-bold">10:00</div>
                             <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">鎌倉高校前平交道</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-4">經典片頭曲場景！捕捉電車經過的瞬間（黃金攝影時段）。</p>
-                            
+                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-0">經典片頭曲場景！捕捉電車經過的瞬間（點擊查看詳情）。</p>
+
                         </div>
                         <div class="relative pl-10">
                             <div
@@ -150,6 +153,32 @@
         </main>
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 
+    </div>
+
+    <div class="modal fade" id="kamakuraModal" tabindex="-1" aria-labelledby="kamakuraModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title font-bold text-xl" id="kamakuraModalLabel">鎌倉高校前平交道 - 景點詳情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <img src="https://via.placeholder.com/800x400" alt="鎌倉平交道實景" class="w-100 mb-3 rounded">
+                    <p class="text-slate-700">
+                        這裡是灌籃高手粉絲必訪的聖地！建議拍攝時間為上午，光線順光。
+                        <br><br>
+                        <strong>交通方式：</strong>搭乘江之島電鐵至「鎌倉高校前站」，出站步行約 1 分鐘即可抵達。
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                </div>
+
+            </div>
+        </div>
     </div>
 </body>
 
