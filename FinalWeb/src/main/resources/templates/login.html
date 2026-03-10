@@ -13,9 +13,10 @@
         <div
             class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none">
         </div>
-        <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 bg-neutral-dark rounded-xl overflow-hidden shadow-2xl border border-neutral-border relative z-10">
+        <div id="authCard" 
+        class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 bg-neutral-dark rounded-xl overflow-hidden shadow-2xl border border-neutral-border relative z-10">
             <!-- Left Side: Login Form -->
-            <div class="p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-neutral-border">
+            <div id="loginFormPanel" class="p-10 lg:p-16 border-b lg:border-b-0 lg:border-r border-neutral-border">
                 <div class="mb-10">
                     <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">會員登入</h2>
                     <p class="text-neutral-muted">歡迎回來，開啟您的聖地探索之旅</p>
@@ -79,7 +80,7 @@
                 </form>
             </div>
             <!-- Right Side: Register Section -->
-            <div class="relative overflow-hidden flex flex-col justify-center items-center text-center p-10 lg:p-16">
+            <div id="loginImagePanel" class="relative overflow-hidden flex flex-col justify-center items-center text-center p-10 lg:p-16">
                 <div class="absolute inset-0 z-0">
                     <img alt="Cinematic background" class="w-full h-full object-cover opacity-40"
                         data-alt="Cinematic background image showing a Japanese shrine at sunset"
@@ -100,7 +101,7 @@
                         </p>
                     </div>
                     <br>
-                    <a th:href="@{/register}">
+                    <a id="goRegisterBtn" th:href="@{/register}">
                         <button
                             class="bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md text-white px-10 py-4 rounded-lg font-bold transition-all hover:scale-105 active:scale-95">
                             點我註冊會員

@@ -26,3 +26,49 @@ $(function () {
     });
 
 });
+
+
+$(function () {
+    const $goRegisterBtn = $("#goRegisterBtn");
+    const $authCard = $("#authCard");
+    const $loginFormPanel = $("#loginFormPanel");
+    const $loginImagePanel = $("#loginImagePanel");
+
+    if ($goRegisterBtn.length) {
+        $goRegisterBtn.on("click", function (e) {
+            e.preventDefault();
+
+            const targetUrl = $(this).attr("href");
+
+            $authCard.addClass("card-animate card-fade");
+            $loginFormPanel.addClass("panel-animate slide-out-right");
+            $loginImagePanel.addClass("panel-animate slide-out-left");
+
+            setTimeout(function () {
+                window.location.href = targetUrl;
+            }, 600);
+        });
+    }
+    
+    const $goLoginBtn = $("#goLoginBtn");
+    const $registerFormPanel = $("#registerFormPanel");
+    const $registerImagePanel = $("#registerImagePanel");
+
+    if ($goLoginBtn.length) {
+        $goLoginBtn.on("click", function (e) {
+            e.preventDefault();
+
+            const targetUrl = $(this).attr("href");
+
+            $authCard.addClass("card-animate card-fade");
+            $registerImagePanel.addClass("panel-animate slide-out-right");
+            $registerFormPanel.addClass("panel-animate slide-out-left");
+
+            setTimeout(function () {
+                window.location.href = targetUrl;
+            }, 600);
+        });
+    }
+});
+
+
