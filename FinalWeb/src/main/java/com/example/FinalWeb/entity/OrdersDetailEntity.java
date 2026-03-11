@@ -17,19 +17,18 @@ public class OrdersDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer orderDetailId;
-    
+
     private String ticketType;
     private Integer ticketPrice;
-    private Integer count;
-    
+
     // 拉關連線到 orders
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId")
     private OrdersEntity orders;
-    
+
     // 拉關連線到 myMap
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spotId")
     private MyMapEntity myMap;
-    
+
 }
