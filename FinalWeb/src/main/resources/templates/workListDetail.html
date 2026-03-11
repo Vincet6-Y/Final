@@ -11,33 +11,59 @@
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
             <section class="mb-20">
                 <div class="relative rounded-3xl overflow-hidden aspect-[21/9] group mb-10 shadow-2xl">
-                    <img alt="Your Name Iconic Stairs" class="w-full h-full object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjxt2R8wPviIqZXYUEi9kNxP_4s_bsJgGLXxREm6BsrEBY81VbhZmDLV__AjCs5HaiGR-fKnRuk2juWzGUdKukFlgsUPkSqgmGqDdATw6XmjORoaIIPhJV2FbRSPk19gcjSYVK3kO0pC0da6QA80hd1pur6hqGBJhoyxzj8pxYEu-1gV2nzuQd4DSsWI0UuXcJSHuPpgVvIOy6wdakbSRHhSdYHEBh8SJxIX8leko5dvVsQYGI9FCfdbxrdUydvgKs6yCTVpIneA" />
+                    <img alt="Background Image" class="w-full h-full object-cover opacity-80"
+                        th:src="${idNow.workImg}" />
+
                     <div
-                        class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent">
+                        class="absolute top-8 right-8 lg:top-1 lg:right-12 bg-black/50 backdrop-blur-lg border border-white/10 p-6 rounded-2xl shadow-2xl min-w-[220px]">
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center justify-between gap-6 border-b border-white/10 pb-2">
+                                <span class="text-primary font-bold text-sm tracking-widest">導演</span>
+                                <span class="text-white font-medium text-right" th:text="${idNow.director}">新海誠</span>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-6 border-b border-white/10 pb-2">
+                                <span class="text-primary font-bold text-sm tracking-widest">編劇</span>
+                                <span class="text-white font-medium text-right" th:text="${idNow.writer}">新海誠</span>
+                            </div>
+
+                            <div th:if="${idNow.workClass == '電影'}" class="flex items-center justify-between gap-6">
+                                <span class="text-primary font-bold text-sm tracking-widest">片長</span>
+                                <span class="text-white font-medium text-right" th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
+                            </div>
+
+                            <div th:if="${idNow.workClass == '動畫'}" class="flex items-center justify-between gap-6">
+                                <span class="text-primary font-bold text-sm tracking-widest">總集數</span>
+                                <span class="text-white font-medium text-right" th:text="${idNow.episodes} + ' 集'">12 集</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="absolute bottom-0 left-0 p-8 lg:p-12 w-full">
+
+
+                    <div
+                        class="absolute bottom-0 left-0 p-8 lg:p-12 w-full bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent">
                         <div class="flex items-center gap-4 mb-4">
-                            <span
+                            <span th:text="${idNow.workClass}"
                                 class="bg-primary text-white dark:text-background-dark text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">電影
                                 / 動畫</span>
-                            <span class="text-slate-200 text-sm font-medium">上映日期：2016-08-26</span>
+                            <span class="text-slate-200 text-sm font-medium"
+                                th:text="${idNow.onDate}">上映日期：2016-08-26</span>
                         </div>
-                        <h2 class="text-4xl lg:text-6xl font-black text-white mb-6 drop-shadow-lg">你的名字 (君の名は。)</h2>
+
+                        <h2 class="text-4xl lg:text-6xl font-black text-white mb-6 drop-shadow-lg"
+                            th:text="${idNow.workName}">你的名字 (君の名は。)</h2>
+
                         <div class="grid lg:grid-cols-3 gap-8 items-end">
                             <div class="lg:col-span-2">
-                                <p class="text-slate-200 text-lg leading-relaxed max-w-3xl drop-shadow">
+                                <p class="text-slate-200 text-lg leading-relaxed max-w-3xl drop-shadow"
+                                    th:text="${idNow.description}">
                                     故事背景主要取景於東京與岐阜縣飛驒市。講述了高中生立花瀧和宮水三葉在夢中交換身體的奇幻故事。其中最著名的巡禮地莫過於東京新宿的「須賀神社前階梯」，是片尾男女主角重逢的經典場景。此外，信濃町站前的天橋、國立新美術館以及飛驒市圖書館也是粉絲必訪的聖地。
                                 </p>
                             </div>
                             <div class="flex flex-col gap-2 border-l-4 border-primary pl-6">
-                                <h4 class="text-primary font-bold text-sm uppercase tracking-widest">核心巡禮聖地</h4>
+                                <h4 class="text-primary font-bold text-sm uppercase tracking-widest">巡禮區域</h4>
                                 <ul class="text-slate-300 text-sm flex flex-wrap gap-x-4 gap-y-1">
-                                    <li>• 須賀神社前階梯</li>
-                                    <li>• 飛驒市圖書館</li>
-                                    <li>• 信濃町站天橋</li>
-                                    <li>• 國立新美術館</li>
-                                    <li>• 諏訪湖 (糸守町原型)</li>
+                                    <li th:text="${idNow.location}">• 須賀神社前階梯</li>
                                 </ul>
                             </div>
                         </div>

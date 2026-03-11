@@ -31,8 +31,7 @@ public class WorkController {
     public String getWorkPage(Model model, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
             @RequestParam(defaultValue = "DESC") String sortDir,
-            @RequestParam(required = false) String workClass
-        ) {
+            @RequestParam(required = false) String workClass) {
         Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass);
 
         model.addAttribute("works", workPage);
@@ -41,6 +40,17 @@ public class WorkController {
         model.addAttribute("classNow", workClass);
 
         return "workList";
+    }
+
+    @RequestMapping("/workListDetail")
+    public String workListDetail(Model model,
+            @RequestParam(value = "workId") int workId) {
+
+        WorkDetailEntity gEntity = service.getWorkId(workId);
+
+        model.addAttribute("idNow", gEntity);
+
+        return "workListDetail";
     }
 
 }

@@ -18,7 +18,7 @@ public class WorkService {
     @Autowired
     private WorkDetailRepo repo;
 
-    // 抓資料
+    // 抓列表資料
     public List<WorkDetailEntity> getWork() {
 
         return repo.findAll();
@@ -37,7 +37,11 @@ public class WorkService {
             Page<WorkDetailEntity> workPage = repo.findAll(pageable);
             return workPage;
         }
+    }
 
+    // Detail 使用
+    public WorkDetailEntity getWorkId(int workId) {
+        return repo.findById(workId).orElse(null);
     }
 
 }

@@ -21,6 +21,7 @@ public class WorkDetailEntity {
     private LocalDate onDate;
     private String workClass;
     private String workImg;
-    private String description;
+    private String description, director, writer, location;
+    private Integer movielength, episodes;
     
 }
