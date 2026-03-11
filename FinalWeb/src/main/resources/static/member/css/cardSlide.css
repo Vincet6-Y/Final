@@ -5,7 +5,7 @@
     height: var(--auth-stage-height, 640px);
     margin: 0 auto;
     perspective: 1200px;
-    transition: height 0.35s ease;
+    transition: height 0.4s ease;
 }
 
 .auth-card {
@@ -16,7 +16,8 @@
     overflow: hidden;
     transition:
         left 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-        right 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        right 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     box-shadow: 0 20px 40px rgba(0,0,0,0.25);
 }
 
@@ -54,7 +55,9 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+        opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
     transform: scale(0.98);
 }
@@ -96,7 +99,6 @@
     position: relative;
     z-index: 2;
     height: auto;
-    min-height: 100%;
     padding: 2.5rem 4rem;
     overflow-y: visible;
 }
@@ -132,16 +134,12 @@
         left: auto !important;
         right: auto !important;
         border-radius: 16px;
-        overflow: visible;
-    }
-
-    .mobile-only {
-        display: flex;
+        overflow: hidden;
     }
 
     .auth-switch {
-        gap: 0.5rem;
-        padding: 1rem 1rem 0;
+        gap: 0.75rem;
+        padding: 0.875rem 0.875rem 0;
     }
 
     .auth-switch-btn {
@@ -161,28 +159,37 @@
     }
 
     .form-content {
-        padding: 1rem 1rem 1.25rem;
+        padding: 1.25rem 1.25rem 1.5rem;
         overflow: visible;
         height: auto;
     }
 
+    .form-content .mb-10 {
+        margin-bottom: 1.5rem;
+    }
+
     .form-card .card-face {
-        position: absolute;
-        inset: auto 0 0 0;
-        top: 56px;
+        position: relative;
+        inset: auto;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
         transform: translateY(8px);
+        max-height: 0;
+        overflow: hidden;
+        transition:
+            opacity 0.35s ease,
+            transform 0.35s ease,
+            max-height 0.35s ease,
+            visibility 0.35s ease;
     }
 
     .form-card .card-face.active {
-        position: relative;
-        top: auto;
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
         transform: translateY(0);
+        max-height: 2000px;
     }
 }
 

@@ -13,7 +13,7 @@ $(function () {
             return;
         }
 
-        const $activeForm = $(".card-face.active .form-content");
+        const $activeForm = $(".form-card .card-face.active .form-content");
 
         if ($activeForm.length) {
             const height = $activeForm.outerHeight(true);
@@ -31,7 +31,7 @@ $(function () {
                 $("#registerFormFace, #registerHeroFace").addClass("active");
                 updateAuthStageHeight();
                 window.scrollTo(0, currentScrollY);
-            }, 250);
+            }, 220);
         } else {
             $("#registerFormFace, #registerHeroFace").removeClass("active");
             setTimeout(function () {
@@ -39,7 +39,7 @@ $(function () {
                 $("#loginFormFace, #loginHeroFace").addClass("active");
                 updateAuthStageHeight();
                 window.scrollTo(0, currentScrollY);
-            }, 250);
+            }, 220);
         }
     }
 
@@ -53,6 +53,10 @@ $(function () {
         }
 
         setSwitchState(isRegister);
+
+        requestAnimationFrame(function () {
+            updateAuthStageHeight();
+        });
     }
 
     function switchAuthMode(isRegister) {
