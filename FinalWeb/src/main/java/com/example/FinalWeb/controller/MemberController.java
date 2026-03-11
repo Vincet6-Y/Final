@@ -84,6 +84,11 @@ public class MemberController {
         return "login";
     }
 
+    @RequestMapping("/auth")
+    public String authPage() {
+        return "auth";
+    }
+
     // @RequestMapping("/news")
     // public String news() {
     // return "news";
