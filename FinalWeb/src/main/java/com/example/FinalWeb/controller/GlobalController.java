@@ -12,7 +12,7 @@ import com.example.FinalWeb.repo.OrdersRepo;
 
 @RequestMapping("/")
 @Controller
-public class MemberController {
+public class GlobalController {
 
     @Autowired
     private OrdersRepo ordersRepo;
