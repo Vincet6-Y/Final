@@ -24,15 +24,20 @@ public class WorkService {
         return repo.findAll();
     }
 
-    public Page<WorkDetailEntity> getWorkList(int page, int size, String sortDir) {
-        Sort.Direction direction = sortDir.equalsIgnoreCase("desc")? Sort.Direction.DESC:Sort.Direction.ASC;
+    public Page<WorkDetailEntity> getWorkList(int page, int size, String sortDir, String workClass) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
 
         Sort sort = Sort.by(direction, "onDate");
 
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<WorkDetailEntity> workPage = repo.findAll(pageable);
 
-        return workPage;
+        if (workClass != null && !workClass.isEmpty()) {
+            return repo.findByWorkClass(workClass, pageable);
+        } else {
+            Page<WorkDetailEntity> workPage = repo.findAll(pageable);
+            return workPage;
+        }
+
     }
 
 }
