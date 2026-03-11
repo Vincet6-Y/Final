@@ -15,39 +15,45 @@
                     style="">
                     電影作品
                 </button> -->
-                <button
-                    class="flex-1 py-6 text-xl font-bold rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all hover:scale-[1.02]"
-                    style="">
+                <a th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='電影')}"
+                    class="flex flex-1 items-center justify-center py-6 text-xl font-bold rounded-xl"
+                    th:classappend="${classNow == '電影'}
+                                    ?'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary'
+                                    :'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all hover:scale-[1.02]'">
                     電影作品
-                </button>
-                <button
-                    class="flex-1 py-6 text-xl font-bold rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all hover:scale-[1.02]"
-                    style="">
+                </a>
+                <a th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='動畫')}"
+                    class="flex flex-1 items-center justify-center py-6 text-xl font-bold rounded-xl"
+                    th:classappend="${classNow == '動畫'}
+                                    ?'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary'
+                                    :'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-primary/50 transition-all hover:scale-[1.02]'">
+
                     動畫作品
-                </button>
+                </a>
             </div>
             <div class="flex justify-end gap-3 mb-10">
-                <a th:href="@{/workList?page=0&size=4&sortDir=DESC}"
-                    class="px-6 py-2 rounded-full bg-primary/10 text-primary border border-primary/30 text-sm font-bold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+                <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow})}"
+                    class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
                     th:classappend="${sortNow == 'DESC'} 
-                      ? 'bg-primary/10 text-primary border-primary/30' 
-                      : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:border-primary/50 hover:text-primary'">
+                                    ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                                    : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                     上映日期 - 近
                 </a>
-                <a th:href="@{/workList?page=0&size=4&sortDir=ASC}"
-                    class="px-6 py-2 rounded-full bg-primary/10 text-primary border border-primary/30 text-sm font-bold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all"
+                <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow})}"
+                    class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
                     th:classappend="${sortNow == 'ASC'} 
-                      ? 'bg-primary/10 text-primary border-primary/30' 
-                      : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:border-primary/50 hover:text-primary'">
+                                    ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                                    : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                     上映日期 - 遠
                 </a>
+
             </div>
             <div class="flex flex-col gap-8">
                 <div th:each="work : ${works.content}"
                     class="flex flex-col lg:flex-row gap-6 p-6 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-primary/40 transition-all group">
                     <div class="w-full lg:w-[450px] h-64 lg:h-72 rounded-xl overflow-hidden shrink-0">
                         <img alt="IMAGE"
-                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" 
+                            class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
                             th:src="${work.workImg}">
                     </div>
                     <div class="flex flex-col justify-between py-2 flex-1">
@@ -75,7 +81,8 @@
             </div>
             <div class="mt-16 flex justify-center">
                 <nav class="flex items-center gap-2">
-                    <a th:if="${page > 0}" th:href="@{/workList(page=${page-1}, size=4, sortDir=${sortNow})}"
+                    <a th:if="${page > 0}"
+                        th:href="@{/workList(page=${page-1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_left</span>
@@ -87,7 +94,8 @@
                             class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white dark:text-background-dark font-bold">
                         </div>
 
-                        <a th:unless="${i == works.number}" th:href="@{/workList(page=${i}, size=4, sortDir=${sortNow})}"
+                        <a th:unless="${i == works.number}"
+                            th:href="@{/workList(page=${i}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
                             th:text="${i + 1}"
                             class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
                         </a>
@@ -95,7 +103,8 @@
                     </th:block>
                     <!-- <span th:text="${page + 1}"></span> / <span th:text="${works.totalPages}"></span> -->
 
-                    <a th:if="${page+1 < works.totalPages}" th:href="@{/workList(page=${page+1}, size=4, sortDir=${sortNow})}"
+                    <a th:if="${page+1 < works.totalPages}"
+                        th:href="@{/workList(page=${page+1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_right</span>
