@@ -47,7 +47,7 @@ public class ArticleService {
         try {
             ObjectMapper mapper = new ObjectMapper();
             // 使用 ClassPathResource 讀取資源檔案
-            InputStream jsonFile = new ClassPathResource("articles.json").getInputStream();
+            InputStream jsonFile = new ClassPathResource("news.json").getInputStream();
             List<ArticleEntity> articles = mapper.readValue(jsonFile, new TypeReference<List<ArticleEntity>>() {
             });
 
