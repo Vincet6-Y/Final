@@ -25,8 +25,11 @@ public class WorkService {
     }
 
     public Page<WorkDetailEntity> getWorkList(int page, int size, String sortDir) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc")? Sort.Direction.DESC:Sort.Direction.ASC;
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDir));
+        Sort sort = Sort.by(direction, "onDate");
+
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<WorkDetailEntity> workPage = repo.findAll(pageable);
 
         return workPage;

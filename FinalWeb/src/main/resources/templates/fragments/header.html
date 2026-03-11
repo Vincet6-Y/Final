@@ -45,7 +45,7 @@
         <div class="flex items-center gap-4">
             <button aria-label="Toggle theme"
                 class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                onclick="document.documentElement.classList.toggle('dark')">
+                onclick="toggleTheme()">
                 <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
                 <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
             </button>
@@ -63,6 +63,17 @@
                     會員登入
                 </button></a>
         </div>
+
+        <script>
+            function toggleTheme() {
+                // 1. 執行切換
+                const isDark = document.documentElement.classList.toggle('dark');
+
+                // 2. 存入瀏覽器記憶體 (LocalStorage)
+                // 如果現在是 dark 模式，就存 'dark'，否則存 'light'
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+        </script>
     </header>
 </body>
 
