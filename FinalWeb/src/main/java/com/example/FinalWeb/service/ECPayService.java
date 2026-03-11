@@ -36,21 +36,30 @@ public class ECPayService {
         order.setTradeNo(merchantTradeNo);
         ordersRepo.save(order);
 
+        int totalAmount = 0;
+        if (order.getOrderDetails() != null) {
+            totalAmount = order.getOrderDetails().stream()
+                    .mapToInt(detail -> detail.getTicketPrice() != null ? detail.getTicketPrice() : 0)
+                    .sum();
+        }
+        if (totalAmount <= 0)
+            totalAmount = 1;
+
         params.put("MerchantID", "3002607");
         params.put("MerchantTradeNo", merchantTradeNo);
         params.put("MerchantTradeDate", time);
         params.put("PaymentType", "aio");
-        params.put("TotalAmount", String.valueOf(order.getTotal()));
+        params.put("TotalAmount", String.valueOf(totalAmount));
         params.put("TradeDesc", "聖地巡禮行程訂單");
 
         // 利用 CustomField 欄位傳遞實際 orderId，讓回傳 Callback 時方便存取
         params.put("CustomField1", String.valueOf(order.getOrderId()));
 
-        // 如果明細不為空，則組合字串為商品名稱 (例: 票券A x 2#票券B x 1)
+        // 如果明細不為空，則組合字串為商品名稱
         String itemName = "聖地巡禮行程";
         if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
             itemName = order.getOrderDetails().stream()
-                    .map(detail -> detail.getTicketType() + " x " + detail.getCount())
+                    .map(detail -> detail.getTicketType() != null ? detail.getTicketType() : "未定義票券")
                     .collect(Collectors.joining("#"));
             // 綠界限制 ItemName 不能過長
             if (itemName.length() > 100) {
@@ -58,7 +67,6 @@ public class ECPayService {
             }
         }
         params.put("ItemName", itemName);
-
         params.put("ReturnURL", "http://localhost:8080/payment/callback"); // 綠界 Server-to-Server 背景回傳
         params.put("ClientBackURL", "http://localhost:8080"); // 綠界付款畫面上的「返回商店」會導回首頁
         params.put("OrderResultURL", "http://localhost:8080/payment/success"); // 綠界付款完成後轉跳頁面

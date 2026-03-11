@@ -8,14 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.FinalWeb.repo.JourneyPlanRepo;
-import com.example.FinalWeb.repo.OrdersRepo;
 
 @RequestMapping("/")
 @Controller
 public class GlobalController {
-
-    @Autowired
-    private OrdersRepo ordersRepo;
 
     @Autowired
     private JourneyPlanRepo journeyPlanRepo;
@@ -95,26 +91,21 @@ public class GlobalController {
         return "auth";
     }
 
-    @RequestMapping("/news")
-    public String news() {
-        return "news";
-    }
+    // 保持路徑，已寫在ArticleWebController
+    // @RequestMapping("/news")
+    // public String news() {
+    // return "news";
+    // }
 
     @RequestMapping("/info")
     public String info() {
         return "info";
     }
 
-    // @RequestMapping("/payment")
-    // public String payment(@RequestParam(required = false) Integer orderId, Model
-    // model) {
-    // // 真實的情境下，可能是由購物車那邊建立好訂單，並將 orderId 帶過來
-    // if (orderId != null) {
-    // ordersRepo.findById(orderId).ifPresent(order -> model.addAttribute("order",
-    // order));
-    // }
-    // return "payMent";
-    // }
+    @RequestMapping("/payment")
+    public String payment() {
+        return "payment";
+    }
 
     @RequestMapping("/paymentsuccess")
     public String paymentsuccess() {
