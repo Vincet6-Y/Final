@@ -22,20 +22,19 @@ public class ArticleService {
     @Autowired
     private ArticleRepo articleRepo;
 
-    /**
-     * 思考邏輯：系統啟動後自動執行。
-     * 因為呼叫了 truncateTable()，資料庫會被清空且 ID 計數器歸零。
-     */
     @PostConstruct
     public void initData() {
         try {
-            // 第一步：強制重置資料表，這會讓 Auto Increment 回到 1
-            articleRepo.truncateTable();
-            System.out.println(">>> [ArticleService] 資料庫已清空，ID 計數器已重置為 1");
+            // 關鍵修改：先檢查資料庫有沒有東西
+            long count = articleRepo.count();
 
-            // 第二步：因為剛清空，count() 必定為 0，直接執行匯入
-            System.out.println(">>> [ArticleService] 開始從 JSON 匯入初始資料...");
-            importFromJson();
+            if (count == 0) {
+                System.out.println(">>> [ArticleService] 偵測到資料庫為空，開始匯入初始 JSON 資料...");
+                importFromJson();
+            } else {
+                // 如果已經有資料，就不執行 truncate 和 import
+                System.out.println(">>> [ArticleService] 資料庫已有 " + count + " 筆資料，跳過初始化。");
+            }
 
         } catch (Exception e) {
             System.err.println(">>> [ArticleService] 初始化失敗：" + e.getMessage());
