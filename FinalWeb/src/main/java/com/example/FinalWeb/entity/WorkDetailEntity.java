@@ -21,5 +21,6 @@ public class WorkDetailEntity {
     private LocalDate onDate;
     private String workClass;
     private String workImg;
+    private String description;
     
 }

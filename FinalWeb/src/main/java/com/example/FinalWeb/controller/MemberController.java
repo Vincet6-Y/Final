@@ -1,7 +1,7 @@
 package com.example.FinalWeb.controller;
 
-//import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -42,24 +42,14 @@ public class MemberController {
         return "home";
     }
 
-    @RequestMapping("/workList")
-    public String workList() {
-        return "workList";
-    }
-
-    @RequestMapping("/workListDetail")
-    public String workListDetail() {
-        return "workListDetail";
-    }
-
     @RequestMapping("/packageTour")
     public String packageTour() {
         return "packageTour";
     }
 
-    @RequestMapping("/packagetourdetail")
-    public String packagetourdetail() {
-        return "packagetourdetail";
+    @RequestMapping("/packageTourDetail")
+    public String packageTourDetail() {
+        return "packageTourDetail";
     }
 
     @RequestMapping("/article")
@@ -67,8 +57,15 @@ public class MemberController {
         return "article";
     }
 
+    // 1. 注入 application.properties 裡設定的金鑰變數
+    @Value("${google.maps.api-key:NONE}")
+    private String googleMapsApiKey;
+
+    // 2. 修改原本的 packageTourMap 方法
     @RequestMapping("/packageTourMap")
-    public String packageTourMap() {
+    public String packageTourMap(Model model) {
+        // 將金鑰存入 model，這樣前端 Thymeleaf 才能抓到
+        model.addAttribute("apiKey", googleMapsApiKey);
         return "packageTourMap";
     }
 
@@ -87,10 +84,10 @@ public class MemberController {
         return "login";
     }
 
-    @RequestMapping("/news")
-    public String news() {
-        return "news";
-    }
+    // @RequestMapping("/news")
+    // public String news() {
+    // return "news";
+    // }
 
     @RequestMapping("/info")
     public String info() {
