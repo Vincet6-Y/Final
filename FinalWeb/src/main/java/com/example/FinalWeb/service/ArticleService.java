@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.example.FinalWeb.dto.ArticleDTO;
 import com.example.FinalWeb.entity.ArticleEntity;
 import com.example.FinalWeb.repo.ArticleRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,6 @@ public class ArticleService {
         try {
             // 關鍵修改：先檢查資料庫有沒有東西
             long count = articleRepo.count();
-
             if (count == 0) {
                 System.out.println(">>> [ArticleService] 偵測到資料庫為空，開始匯入初始 JSON 資料...");
                 importFromJson();
@@ -35,7 +35,6 @@ public class ArticleService {
                 // 如果已經有資料，就不執行 truncate 和 import
                 System.out.println(">>> [ArticleService] 資料庫已有 " + count + " 筆資料，跳過初始化。");
             }
-
         } catch (Exception e) {
             System.err.println(">>> [ArticleService] 初始化失敗：" + e.getMessage());
         }
@@ -65,9 +64,9 @@ public class ArticleService {
     // --- 以下為查詢邏輯 ---
 
     // 根據 ID 拿資料
-    public ArticleEntity findById(Integer articleId) {
-        return articleRepo.findById(articleId).orElse(null);
-    }
+    // public ArticleEntity findById(Integer articleId) {
+    // return articleRepo.findById(articleId).orElse(null);
+    // }
 
     // 分頁或單一分類頁面備用
     public List<ArticleEntity> findByCategory(String category) {
@@ -75,11 +74,16 @@ public class ArticleService {
     }
 
     // --- 高階查詢 ---
-    // 邏輯：先排序再分組，保證最新的文章在 List 的最前面
-    public Map<String, List<ArticleEntity>> getAllArticlesGrouped() {
+    // --- 將 Entity 轉為 DTO ---
+    public Map<String, List<ArticleDTO>> getAllArticlesGrouped() {
         return articleRepo.findAll().stream()
-                .sorted((a1, a2) -> a2.getArticleId().compareTo(a1.getArticleId())) // 降冪排序
-                .collect(Collectors.groupingBy(ArticleEntity::getArticleClass));
+                .sorted((a1, a2) -> a2.getArticleId().compareTo(a1.getArticleId()))
+                .map(ArticleDTO::new) // 關鍵：在這裡進行「脫殼」處理
+                .collect(Collectors.groupingBy(ArticleDTO::getArticleClass));
+    }
+
+    public ArticleDTO findById(Integer articleId) {
+        return articleRepo.findById(articleId).map(ArticleDTO::new).orElse(null);
     }
 
     // 「後端管理列表（不分分類顯示所有文章）
