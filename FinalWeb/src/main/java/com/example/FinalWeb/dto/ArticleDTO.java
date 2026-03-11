@@ -20,8 +20,11 @@ public class ArticleDTO {
 
         // 核心邏輯：清洗 Markdown 符號，讓卡片顯示純文字
         if (entity.getContent() != null) {
-            // regex 說明：去掉 #, *, >, ` 等符號
-            String clean = entity.getContent().replaceAll("[#*>`\\-]", "").trim();
+            String clean = entity.getContent()
+                    .replaceAll("[#*>`\\-]", "")
+                    .replaceAll("\\n+", " ") // 把換行合併成空格
+                    .replaceAll("\\s{2,}", " ") // 合併連續空格
+                    .trim();
             this.purePreview = clean.length() > 65 ? clean.substring(0, 65) + "..." : clean;
         }
     }
