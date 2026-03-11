@@ -7,7 +7,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/paymentT")
 public class PaymentController {
 
     @Autowired

@@ -72,9 +72,8 @@
                             </p>
                         </div>
                         <div>
-                            <button
-                                class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-8 py-3 rounded-lg font-bold transition-all w-fit shadow-lg shadow-primary/10"
-                                style="">作品詳細介紹</button>
+                            <a class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-8 py-3 rounded-lg font-bold transition-all w-fit shadow-lg shadow-primary/10"
+                                th:href="@{/workListDetail(workId=${work.workId})}">作品詳細介紹</a>
                         </div>
                     </div>
                 </div>
