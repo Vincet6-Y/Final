@@ -102,6 +102,7 @@ public class GlobalController {
         return "auth";
     }
 
+    // 保持路徑，已寫在ArticleWebController
     // @RequestMapping("/news")
     // public String news() {
     // return "news";
