@@ -26,7 +26,7 @@ public class ArticleWebController {
 
     // 最新消息首頁 (列表頁)
     @GetMapping("/news")
-    public String showNewsHome(Model model) {
+    public String showNews(Model model) {
         // 1. 拿到已經分類並排好序的 Map
         Map<String, List<ArticleEntity>> grouped = articleService.getAllArticlesGrouped();
 

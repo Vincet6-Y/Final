@@ -18,7 +18,7 @@
                 <p whitespace-nowrap> 掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。</p>
             </div>
             <!-- Section 1: Website Info (Cards Layout) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
 
                 <div th:each="info, iterStat : ${newSection}"
                     class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none flex flex-col">
@@ -26,9 +26,9 @@
                     <div class="aspect-video relative overflow-hidden">
                         <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                             th:style="'background-image: url(' + 
-                    (${iterStat.index == 0} ? @{/article_img/news_discount.png} : 
-                    (${iterStat.index == 1} ? @{/article_img/news_member.png} : @{/article_img/news_photo.png})) 
-                    + ');'">
+                                    (${iterStat.index == 0} ? @{/article_img/news_discount.png} : 
+                                    (${iterStat.index == 1} ? @{/article_img/news_member.png} : @{/article_img/news_photo.png})) 
+                                    + ');'">
                         </div>
 
                         <div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded"
