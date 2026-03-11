@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.FinalWeb.repo.JourneyPlanRepo;
 import com.example.FinalWeb.repo.OrdersRepo;
 
 @RequestMapping("/")
@@ -14,6 +16,9 @@ public class MemberController {
 
     @Autowired
     private OrdersRepo ordersRepo;
+
+    @Autowired
+    private JourneyPlanRepo journeyPlanRepo;
 
     // @Autowired
     // private JdbcTemplate jdbcTemplate;
@@ -44,12 +49,22 @@ public class MemberController {
     }
 
     @RequestMapping("/packageTour")
-    public String packageTour() {
+    public String packageTour(Model model) {
+        // 透過 JourneyPlanRepo 撈出所有官方行程方案，並傳給前端渲染卡片
+        model.addAttribute("journeyPlans", journeyPlanRepo.findAll());
         return "packageTour";
     }
 
     @RequestMapping("/packageTourDetail")
-    public String packageTourDetail() {
+    public String packageTourDetail(@RequestParam(name = "planId", required = false) Integer planId, Model model) {
+        model.addAttribute("apiKey", googleMapsApiKey);
+
+        // 🌟 根據傳進來的 planId 去資料庫撈取行程，並放進 Model 中
+        if (planId != null) {
+            journeyPlanRepo.findById(planId).ifPresent(plan -> {
+                model.addAttribute("plan", plan);
+            });
+        }
         return "packageTourDetail";
     }
 
