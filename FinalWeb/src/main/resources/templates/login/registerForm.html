@@ -1,0 +1,130 @@
+<div th:fragment="registerForm" id="registerFormFace" class="card-face">
+    <div class="form-content">
+
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold text-white mb-2">註冊新會員</h2>
+            <p class="text-neutral-muted">請填寫以下資訊以完成您的帳戶註冊</p>
+        </div>
+
+        <form class="space-y-6">
+
+            <!-- 名字 -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-neutral-muted ml-1">名字</label>
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
+                        badge
+                    </span>
+
+                    <input
+                        class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                        placeholder="請輸入真實姓名"
+                        type="text">
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-neutral-muted ml-1">Email</label>
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
+                        mail
+                    </span>
+
+                    <input
+                        class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                        placeholder="example@mail.com"
+                        type="email">
+                </div>
+            </div>
+
+            <!-- 電話 + 生日 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-neutral-muted ml-1">電話</label>
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
+                            phone
+                        </span>
+
+                        <input
+                            class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                            placeholder="0900-000-000"
+                            type="tel">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-neutral-muted ml-1">出生日期</label>
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
+                            calendar_today
+                        </span>
+
+                        <input
+                            class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                            type="date">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 密碼 -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-neutral-muted ml-1">密碼</label>
+                <div class="relative group">
+
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
+                        lock
+                    </span>
+
+                    <input
+                        id="registerPasswd"
+                        class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                        placeholder="請輸入密碼"
+                        type="password">
+
+                    <button id="toggleRegisterPasswd"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-muted hover:text-primary"
+                        type="button">
+                        <span id="registerEyeIcon" class="material-symbols-outlined">visibility</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- 確認密碼 -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-neutral-muted ml-1">確認密碼</label>
+
+                <div class="relative group">
+
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
+                        verified_user
+                    </span>
+
+                    <input
+                        id="registerConfirmPasswd"
+                        class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                        placeholder="請再次輸入密碼"
+                        type="password">
+
+                    <button id="toggleRegisterConfirmPasswd"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-muted hover:text-primary"
+                        type="button">
+                        <span id="registerConfirmEyeIcon" class="material-symbols-outlined">visibility</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <button
+                class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-4 rounded-lg shadow-lg shadow-primary/20 transition-all">
+                註冊帳號
+            </button>
+
+        </form>
+        
+    </div>
+</div>

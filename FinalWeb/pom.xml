@@ -109,8 +109,8 @@
 
 		<!-- Jackson 預設「看不懂」Java 8 的時間格式（如 LocalDate）。Jackson 需要一個「翻譯插件」才能處理 java.time。 -->
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
 		<!--編碼（Encoding）與解碼（Decoding）-->
