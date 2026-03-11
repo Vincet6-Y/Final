@@ -81,38 +81,17 @@
                         </div>
                     </div>
                 </section>
-                <section class="section-card rounded-xl p-8">
-                    <div class="flex items-center gap-3 mb-8">
-                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">聯絡人資訊</h2>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">旅客真實姓名</label>
-                            <input class="input-field w-full px-4 py-3 text-sm" placeholder="請輸入證件姓名" type="text" />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">電子郵件信箱</label>
-                            <input class="input-field w-full px-4 py-3 text-sm" placeholder="example@email.com"
-                                type="email" />
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">手機號碼</label>
-                            <input class="input-field w-full px-4 py-3 text-sm" placeholder="0912-345-678" type="tel" />
-                        </div>
-                    </div>
-                </section>
             </div>
             <div class="lg:col-span-4">
                 <div class="sticky top-28 space-y-6">
                     <div class="section-card rounded-xl p-8">
                         <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-6">訂單金額明細</h2>
                         <div class="space-y-4 mb-8">
-                            <div class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm">
-                                <span>加購項目小計</span>
-                                <span class="text-gray-900 dark:text-white font-medium">NT$ 3,200</span>
+                            <div th:each="detail : ${order.orderDetails}"
+                                class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm mb-2">
+                                <span th:text="${detail.ticketType}">加購項目</span>
+                                <span class="text-gray-900 dark:text-white font-medium"
+                                    th:text="'NT$ ' + ${detail.ticketPrice}">NT$ 0</span>
                             </div>
                             <div
                                 class="pt-6 border-t border-gray-200 dark:border-white/5 flex justify-between items-end">
@@ -120,7 +99,8 @@
                                 <div class="text-right">
                                     <span class="block text-[10px] text-orange-500 uppercase font-bold mb-1">Total
                                         Amount</span>
-                                    <span class="text-3xl font-bold text-orange-500 tracking-tighter">NT$ 3,200</span>
+                                    <span class="text-3xl font-bold text-orange-500 tracking-tighter"
+                                        th:text="'NT$ ' + ${totalAmount}">NT$ 0</span>
                                 </div>
                             </div>
                         </div>

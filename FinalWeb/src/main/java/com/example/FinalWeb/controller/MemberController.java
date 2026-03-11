@@ -15,9 +15,6 @@ import com.example.FinalWeb.repo.OrdersRepo;
 public class MemberController {
 
     @Autowired
-    private OrdersRepo ordersRepo;
-
-    @Autowired
     private JourneyPlanRepo journeyPlanRepo;
 
     // @Autowired
@@ -115,16 +112,10 @@ public class MemberController {
         return "info";
     }
 
-    // @RequestMapping("/payment")
-    // public String payment(@RequestParam(required = false) Integer orderId, Model
-    // model) {
-    // // 真實的情境下，可能是由購物車那邊建立好訂單，並將 orderId 帶過來
-    // if (orderId != null) {
-    // ordersRepo.findById(orderId).ifPresent(order -> model.addAttribute("order",
-    // order));
-    // }
-    // return "payMent";
-    // }
+    @RequestMapping("/payment")
+    public String payment() {
+        return "payment";
+    }
 
     @RequestMapping("/paymentsuccess")
     public String paymentsuccess() {
