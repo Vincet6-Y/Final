@@ -10,10 +10,14 @@
 
         <main class="flex-grow flex items-center justify-center py-16 px-6 relative overflow-hidden">
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-
+            
             <div id="authStage" class="auth-stage relative z-10">
                 <!-- 左邊/右邊會互換位置的 表單卡 -->
                 <div class="auth-card form-card">
+                    <div class="auth-switch mobile-only">
+                        <button type="button" id="mobileShowLoginBtn" class="auth-switch-btn active">登入</button>
+                        <button type="button" id="mobileShowRegisterBtn" class="auth-switch-btn">註冊</button>
+                    </div>
                     <div th:replace="~{login/loginForm :: loginForm}"></div>
                     <div th:replace="~{login/registerForm :: registerForm}"></div>
                 </div>
