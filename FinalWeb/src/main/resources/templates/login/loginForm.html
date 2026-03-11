@@ -5,7 +5,7 @@
             <p class="text-white/80">歡迎回來，開啟您的聖地探索之旅</p>
         </div>
 
-        <form class="space-y-6">
+        <form class="space-y-6" action="/member/login" method="post">
             <div class="space-y-2">
                 <label class="text-sm font-medium text-white/80 ml-1">Email</label>
                 <div class="relative group">
@@ -14,9 +14,11 @@
                     </span>
 
                     <input
+                        name="email"
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-muted/50"
                         placeholder="請輸入 Email"
-                        type="email" />
+                        type="email"
+                        required />
                 </div>
             </div>
 
@@ -30,9 +32,11 @@
 
                     <input
                         id="passwd"
+                        name="passwd"
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-muted/50"
                         placeholder="請輸入您的密碼"
-                        type="password" />
+                        type="password"
+                        required />
 
                     <button
                         id="togglePasswdBtn"
