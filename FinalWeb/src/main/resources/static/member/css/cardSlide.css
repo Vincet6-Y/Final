@@ -111,7 +111,7 @@
     filter: invert(1);
 }
 
-/* ===== 手機：表單優先，hero 縮小 ===== */
+/* ===== 手機：表單優先，註冊登入切換改到表單上方 ===== */
 @media (max-width: 767px) {
     .mobile-only {
         display: flex;
