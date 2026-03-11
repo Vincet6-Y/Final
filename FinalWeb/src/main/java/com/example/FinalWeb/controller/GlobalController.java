@@ -85,19 +85,9 @@ public class GlobalController {
         return "packageTourMap";
     }
 
-    @RequestMapping("/register")
-    public String register() {
-        return "register";
-    }
-
     @RequestMapping("/member")
     public String member() {
         return "member";
-    }
-
-    @RequestMapping("/login")
-    public String login() {
-        return "login";
     }
 
     @RequestMapping("/auth")
