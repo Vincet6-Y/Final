@@ -102,10 +102,10 @@ public class MemberController {
         return "auth";
     }
 
-    @RequestMapping("/news")
-    public String news() {
-        return "news";
-    }
+    // @RequestMapping("/news")
+    // public String news() {
+    // return "news";
+    // }
 
     @RequestMapping("/info")
     public String info() {
