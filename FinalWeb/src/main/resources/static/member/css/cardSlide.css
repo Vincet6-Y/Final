@@ -2,9 +2,10 @@
     position: relative;
     width: 100%;
     max-width: 1120px;
-    height: 640px;
+    height: var(--auth-stage-height, 640px);
     margin: 0 auto;
     perspective: 1200px;
+    transition: height 0.4s ease;
 }
 
 .auth-card {
@@ -15,7 +16,8 @@
     overflow: hidden;
     transition:
         left 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-        right 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        right 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     box-shadow: 0 20px 40px rgba(0,0,0,0.25);
 }
 
@@ -25,6 +27,7 @@
     background: #231a0f;
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px 0 0 16px;
+    overflow: visible;
 }
 
 .hero-card {
@@ -33,6 +36,7 @@
     background: #231a0f;
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 0 16px 16px 0;
+    overflow: hidden;
 }
 
 .auth-stage.register-mode .form-card {
@@ -51,7 +55,9 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition:
+        opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     pointer-events: none;
     transform: scale(0.98);
 }
@@ -92,18 +98,112 @@
 .form-content {
     position: relative;
     z-index: 2;
-    height: 100%;
+    height: auto;
     padding: 2.5rem 4rem;
-    overflow-y: auto;
+    overflow-y: visible;
 }
 
+.mobile-only {
+    display: none;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator{
+    filter: invert(1);
+}
+
+/* ===== 手機：表單優先，註冊登入切換改到表單上方 ===== */
+@media (max-width: 767px) {
+    .mobile-only {
+        display: flex;
+    }
+
+    .hero-card {
+        display: none;
+    }
+
+    .auth-stage {
+        display: block;
+        height: auto;
+        max-width: 420px;
+    }
+
+    .form-card {
+        position: relative;
+        width: 100%;
+        height: auto;
+        left: auto !important;
+        right: auto !important;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .auth-switch {
+        gap: 0.75rem;
+        padding: 0.875rem 0.875rem 0;
+    }
+
+    .auth-switch-btn {
+        flex: 1;
+        height: 44px;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+
+    .auth-switch-btn.active {
+        background: rgba(255,255,255,0.18);
+        border-color: rgba(255,255,255,0.24);
+    }
+
+    .form-content {
+        padding: 1.25rem 1.25rem 1.5rem;
+        overflow: visible;
+        height: auto;
+    }
+
+    .form-content .mb-10 {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-card .card-face {
+        position: relative;
+        inset: auto;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(8px);
+        max-height: 0;
+        overflow: hidden;
+        transition:
+            opacity 0.35s ease,
+            transform 0.35s ease,
+            max-height 0.35s ease,
+            visibility 0.35s ease;
+    }
+
+    .form-card .card-face.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+        max-height: 2000px;
+    }
+}
+
+/* ===== 平板以下：改成上下排列 ===== */
 @media (max-width: 1023px) {
+
+
     .auth-stage {
         height: auto;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
         perspective: none;
+        max-width: 680px;
     }
 
     .auth-card {
@@ -113,6 +213,13 @@
         left: auto !important;
         right: auto !important;
         transform: none !important;
+        border-radius: 16px;
+    }
+
+    .form-card,
+    .hero-card,
+    .auth-stage.register-mode .form-card,
+    .auth-stage.register-mode .hero-card {
         border-radius: 16px;
     }
 
@@ -129,8 +236,14 @@
         display: block;
     }
 
+    .hero-card {
+        min-height: 220px;
+    }
+
     .hero-content,
     .form-content {
-        padding: 2.5rem;
+        padding: 2rem;
     }
 }
+
+
