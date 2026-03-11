@@ -1,0 +1,136 @@
+.auth-stage {
+    position: relative;
+    width: 100%;
+    max-width: 1120px;
+    height: 640px;
+    margin: 0 auto;
+    perspective: 1200px;
+}
+
+.auth-card {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition:
+        left 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+        right 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.form-card {
+    left: 0;
+    z-index: 2;
+    background: #231a0f;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px 0 0 16px;
+}
+
+.hero-card {
+    right: 0;
+    z-index: 1;
+    background: #231a0f;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 0 16px 16px 0;
+}
+
+.auth-stage.register-mode .form-card {
+    left: 50%;
+    z-index: 1;
+    border-radius: 0 16px 16px 0;
+}
+
+.auth-stage.register-mode .hero-card {
+    right: 50%;
+    z-index: 2;
+    border-radius: 16px 0 0 16px;
+}
+
+.card-face {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    transform: scale(0.98);
+}
+
+.card-face.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #231a0f, rgba(35,26,15,0.6), transparent);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 4rem;
+}
+
+.form-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    padding: 2.5rem 4rem;
+    overflow-y: auto;
+}
+
+@media (max-width: 1023px) {
+    .auth-stage {
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        perspective: none;
+    }
+
+    .auth-card {
+        position: relative;
+        width: 100%;
+        height: auto;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+        border-radius: 16px;
+    }
+
+    .card-face {
+        position: relative;
+        inset: auto;
+        display: none;
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+    }
+
+    .card-face.active {
+        display: block;
+    }
+
+    .hero-content,
+    .form-content {
+        padding: 2.5rem;
+    }
+}

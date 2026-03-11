@@ -3,7 +3,6 @@ package com.example.FinalWeb.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.FinalWeb.repo.OrdersRepo;
@@ -48,9 +47,9 @@ public class MemberController {
         return "packageTour";
     }
 
-    @RequestMapping("/packagetourdetail")
-    public String packagetourdetail() {
-        return "packagetourdetail";
+    @RequestMapping("/packageTourDetail")
+    public String packageTourDetail() {
+        return "packageTourDetail";
     }
 
     @RequestMapping("/article")
@@ -85,10 +84,15 @@ public class MemberController {
         return "login";
     }
 
-    @RequestMapping("/news")
-    public String news() {
-        return "news";
+    @RequestMapping("/auth")
+    public String authPage() {
+        return "auth";
     }
+
+    // @RequestMapping("/news")
+    // public String news() {
+    // return "news";
+    // }
 
     @RequestMapping("/info")
     public String info() {

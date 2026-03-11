@@ -1,37 +1,38 @@
 <!doctype html>
 <html class="dark" lang="zh-Hant">
+
 <head>
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>行程規劃 - 聖地巡禮</title>
-  
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
-  
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#ff8c00",
-            "background-light": "#ffffff",
-            "background-dark": "#121212",
-            "surface-light": "#f8fafc",
-            "surface-dark": "#1e1e1e",
-          },
-          fontFamily: {
-            display: ["Space Grotesk", "Noto Sans TC", "sans-serif"],
-          },
-        },
-      },
-    };
-  </script>
-  
-  <style type="text/tailwindcss">
-    ::-webkit-scrollbar { width: 6px; }
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>行程規劃 - 聖地巡禮</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ff8c00",
+                        "background-light": "#ffffff",
+                        "background-dark": "#121212",
+                        "surface-light": "#f8fafc",
+                        "surface-dark": "#1e1e1e",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "Noto Sans TC", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style type="text/tailwindcss">
+        ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
     ::-webkit-scrollbar-thumb { background: #ff8c00; border-radius: 10px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -53,84 +54,81 @@
 
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
 
-  <div id="rich-place-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fade-in">
-    <div class="bg-white dark:bg-surface-dark w-full max-w-4xl max-h-[95vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up">
-        
-        <div class="flex justify-between items-start p-5 md:p-6 border-b border-slate-200 dark:border-white/10 shrink-0">
-            <div class="flex-1 pr-4">
-                <div class="flex items-center gap-2 text-sm text-primary font-bold mb-1.5">
-                    <span class="material-symbols-outlined text-base">location_on</span> 地點資訊
+    <div id="rich-place-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
+
+            <button onclick="closeRichModal()" class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+
+            <div class="h-56 sm:h-72 flex gap-1 bg-black shrink-0 overflow-x-auto no-scrollbar relative">
+                <img id="modal-img-main" src="" class="h-full w-2/3 md:w-1/2 object-cover flex-shrink-0">
+                <img id="modal-img-sub1" src="" class="h-full w-1/3 md:w-1/4 object-cover flex-shrink-0">
+                <img id="modal-img-sub2" src="" class="h-full w-1/3 md:w-1/4 object-cover flex-shrink-0">
+                <div class="absolute right-4 bottom-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-bold cursor-pointer hover:bg-black transition border border-white/20">
+                    +多張圖片
                 </div>
-                <h1 id="modal-place-name" class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-1">載入中...</h1>
-                <div class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-                    <span class="flex items-center gap-1 text-primary font-bold">
-                        <span class="material-symbols-outlined text-base">star</span> 
+            </div>
+
+            <div class="p-6 md:p-8 overflow-y-auto no-scrollbar flex-1 relative">
+
+                <button onclick="confirmAddToItinerary()" class="absolute top-6 right-6 bg-[#008ccf] hover:bg-[#007ab8] text-white px-5 py-2 rounded-full font-bold shadow-lg transition flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">add_circle</span>
+                    <span id="modal-btn-text">加入 Day1 行程</span>
+                </button>
+
+                <h1 id="modal-place-name" class="text-3xl md:text-4xl font-bold text-white mb-3 pr-36">載入中...</h1>
+                <div class="flex items-center gap-3 text-sm text-slate-400 mb-8 border-b border-white/10 pb-6">
+                    <span class="flex items-center gap-1 text-yellow-500 font-bold">
+                        <span class="material-symbols-outlined text-base">star</span>
                         <span id="modal-place-rating">0.0</span>
                     </span>
                     <span id="modal-place-reviews">(0 則評論)</span>
+                    <span class="w-1 h-1 rounded-full bg-slate-600 hidden md:block"></span>
+                    <span id="modal-place-type" class="hidden md:block">景點</span>
                 </div>
-            </div>
-            <button onclick="closeRichModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-background-dark rounded-full transition shrink-0">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
 
-        <div class="p-5 md:p-6 overflow-y-auto no-scrollbar flex-1">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-8 h-56 md:h-80">
-                <div class="md:col-span-2 rounded-xl overflow-hidden relative bg-slate-200 dark:bg-background-dark">
-                    <img id="modal-img-main" src="https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80" alt="主要圖片" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                </div>
-                <div class="hidden md:flex flex-col gap-3 md:gap-4">
-                    <div class="flex-1 rounded-xl overflow-hidden bg-slate-200 dark:bg-background-dark">
-                        <img id="modal-img-sub1" src="https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?auto=format&fit=crop&q=80" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <p id="modal-place-desc" class="text-base text-slate-300 leading-relaxed">
+                            此地點暫無詳細簡介...
+                        </p>
                     </div>
-                    <div class="flex-1 rounded-xl overflow-hidden bg-slate-200 dark:bg-background-dark relative">
-                        <img id="modal-img-sub2" src="https://images.unsplash.com/photo-1570459027562-4a916cc6113f?auto=format&fit=crop&q=80" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
-                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer hover:bg-black/50 transition">
-                            <span class="text-white font-medium">+多張圖片</span>
-                        </div>
+
+                    <div class="bg-white/5 p-5 rounded-xl border border-white/10 h-fit">
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-start gap-3 text-slate-300">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">location_on</span>
+                                <span id="modal-place-address" class="leading-relaxed">載入中...</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-300">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">language</span>
+                                <a id="modal-place-website" href="#" target="_blank" class="text-blue-400 hover:underline truncate">無網站資訊</a>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-300">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">call</span>
+                                <span id="modal-place-phone">無電話資訊</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-slate-300 pt-3 border-t border-white/10 mt-3">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">schedule</span>
+                                <div class="w-full">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-bold text-white">營業時間</span>
+                                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                                    </div>
+                                    <div id="modal-place-hours" class="space-y-1 text-slate-400 text-xs">
+                                        營業時間載入中...
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-                <div class="lg:col-span-2">
-                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-3 md:mb-4">景點介紹</h2>
-                    <p id="modal-place-desc" class="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-                        載入中...
-                    </p>
-                </div>
-                <div class="bg-slate-50 dark:bg-background-dark p-5 md:p-6 rounded-xl border border-slate-200 dark:border-white/10 h-fit shadow-sm">
-                    <h3 class="font-bold text-slate-900 dark:text-white mb-4">實用資訊</h3>
-                    <ul class="space-y-4 text-sm">
-                        <li class="flex items-start gap-3 text-slate-600 dark:text-slate-300">
-                            <span class="material-symbols-outlined text-slate-400 shrink-0">location_on</span>
-                            <span id="modal-place-address" class="leading-relaxed">載入中...</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-slate-600 dark:text-slate-300">
-                            <span class="material-symbols-outlined text-slate-400 shrink-0">schedule</span>
-                            <span id="modal-place-hours">營業時間載入中...</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-slate-600 dark:text-slate-300">
-                            <span class="material-symbols-outlined text-slate-400 shrink-0">call</span>
-                            <span id="modal-place-phone">無電話資訊</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="p-5 md:p-6 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-surface-dark flex justify-between items-center shrink-0">
-            <span class="hidden md:inline-block text-sm text-slate-500 dark:text-slate-400">系統將自動計算兩點間的交通時間</span>
-            <button onclick="confirmAddToItinerary()" class="w-full md:w-auto bg-primary hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/30 transition flex justify-center items-center gap-2">
-                <span class="material-symbols-outlined">add_circle</span>
-                <span id="modal-btn-text">加入 Day 1 行程</span>
-            </button>
         </div>
     </div>
-  </div>
 
-      <header th:fragment="myHeader"
+    <header th:fragment="myHeader"
         class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
         <a th:href="@{/home}">
             <div class="flex items-center gap-3">
@@ -187,634 +185,80 @@
         </div>
     </header>
 
-  <main class="flex-1 relative flex w-full h-full overflow-hidden">
-    
-    <div id="map" class="absolute inset-0 z-0 h-full w-full bg-slate-100 dark:bg-[#1a140d]"></div>
-    
-    <div class="flex-1 relative pointer-events-none z-10 h-full">
-        <div class="hidden md:flex flex-col gap-2 absolute top-6 right-6 w-full max-w-sm pointer-events-auto items-end">
-          <div class="relative flex items-center w-full h-12 rounded-full focus-within:shadow-xl bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border border-slate-300 dark:border-white/10 overflow-hidden shadow-lg transition-all">
-            <div class="grid place-items-center h-full w-12 text-slate-400"><span class="material-symbols-outlined">search</span></div>
-            <input class="peer h-full w-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400" type="text" id="pac-input-desktop" placeholder="輸入關鍵字或點擊下方分類..." /> 
-          </div>
-          <div class="flex items-center justify-end gap-2 px-1 mt-1 w-full">
-              <button onclick="searchNearby('tourist_attraction')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition shadow-md">
-                  <span class="material-symbols-outlined text-sm text-primary">attractions</span> 景點
-              </button>
-              <button onclick="searchNearby('lodging')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-500 hover:text-white transition shadow-md">
-                  <span class="material-symbols-outlined text-sm text-blue-500">hotel</span> 住宿
-              </button>
-              <button onclick="searchNearby('restaurant')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white transition shadow-md">
-                  <span class="material-symbols-outlined text-sm text-red-400">restaurant</span> 美食
-              </button>
-          </div>
-        </div>
-    </div>
+    <main class="flex-1 relative flex w-full h-full overflow-hidden">
 
-    <div id="itinerary-panel" class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
-      
-      <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between sticky top-0 z-20 bg-white dark:bg-background-dark shadow-sm shrink-0">
-        <div class="flex items-center gap-2">
-          <h1 class="text-lg font-bold text-primary tracking-tight">詳細行程</h1>
-        </div>
-        <a th:href="@{/payment}" class="flex items-center gap-1 md:gap-2 bg-primary hover:bg-orange-600 text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
-          <span class="material-symbols-outlined text-base">shopping_cart_checkout</span>前往付款
-        </a>
-      </div>
+        <div id="map" class="absolute inset-0 z-0 h-full w-full bg-slate-100 dark:bg-[#1a140d]"></div>
 
-      <div class="relative w-full h-[180px] shrink-0 bg-slate-800 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-          <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-              <div>
-                  <span class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本, 關西</span>
-                  <h1 class="text-xl font-bold text-white tracking-wide shadow-sm">大阪京都5天4夜鐵腿之旅</h1>
-              </div>
-          </div>
-      </div>
-      
-      <div class="p-4 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-white/10 shrink-0">
-          <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
-      </div>
-
-      <div class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark overflow-x-auto border-b border-slate-200 dark:border-white/10 no-scrollbar shrink-0">
-        <button onclick="selectDay(1)" id="btn-day-1" class="px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md">Day 1</button>
-        <button onclick="selectDay(2)" id="btn-day-2" class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition">Day 2</button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto no-scrollbar relative" id="itinerary-scroll-area">
-          <div class="md:hidden m-4 relative flex items-center w-[calc(100%-2rem)] h-12 rounded-full bg-slate-100 dark:bg-surface-dark border border-slate-300 dark:border-white/10 overflow-hidden shadow-sm">
-              <div class="grid place-items-center h-full w-12 text-slate-400"><span class="material-symbols-outlined">search</span></div>
-              <input class="w-full h-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400" type="text" id="pac-input-mobile" placeholder="搜尋並加入景點..." /> 
-          </div>
-
-          <div id="list-day-1" class="day-list p-4 flex flex-col pb-24 pt-0">
-              <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
-                  <div class="w-1.5 h-full bg-slate-400 dark:bg-slate-600 absolute left-0 top-0"></div>
-                  <div class="ml-2">
-                      <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">關西國際機場 (起點)</h3>
-                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">預計抵達：09:00</p>
-                  </div>
-              </div>
-          </div>
-
-          <div id="list-day-2" class="day-list p-4 flex flex-col pb-24 pt-0 hidden">
-              <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
-                  <div class="w-1.5 h-full bg-blue-400 dark:bg-blue-600 absolute left-0 top-0"></div>
-                  <div class="ml-2">
-                      <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">京都車站飯店 (出發)</h3>
-                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">預計出發：08:30</p>
-                  </div>
-              </div>
-          </div>
-      </div>
-    </div>
-
-    <button id="mobile-toggle-btn" onclick="toggleMobileView()" class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
-        <span class="material-symbols-outlined" id="toggle-icon">map</span>
-        <span id="toggle-text">展開地圖</span>
-    </button>
-
-  </main>
-
-  <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" async defer></script>
-  
-<script>
-    let map, directionsService, directionsRenderer, placesService;
-    let markers = [];
-    let currentDay = 1; 
-    let tempSelectedPlace = null; 
-    let isMapView = false; 
-
-    const WALK_THRESHOLD_KM = 1.0; // 距離大於 1km 選擇大眾運輸，小於等於 1km 走路
-
-    // 初始化行程數據結構
-    let itineraryData = {
-        1: [{ 
-            lat: 34.4320, lng: 135.2303, 
-            name: "關西國際機場 (起點)", arrivals: "09:00", duration: "起點", hasTicketOffer: false 
-        }], 
-        2: [{ 
-            lat: 34.9858, lng: 135.7587, 
-            name: "京都車站飯店 (出發)", arrivals: "08:30", duration: "出發", hasTicketOffer: false 
-        }]  
-    };
-
-    let routeLegs = {}; 
-    let draggedItemInfo = null; // 用於追蹤正在拖曳的項目
-
-    function initMap() {
-      const darkMapStyle = [
-        { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-        { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] }
-      ];
-
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 34.6937, lng: 135.5023 }, 
-        zoom: 11,
-        disableDefaultUI: true,
-        zoomControl: true,
-        zoomControlOptions: { position: google.maps.ControlPosition.LEFT_BOTTOM },
-        styles: document.documentElement.classList.contains('dark') ? darkMapStyle : []
-      });
-
-      directionsService = new google.maps.DirectionsService();
-      directionsRenderer = new google.maps.DirectionsRenderer({
-          map: map, suppressMarkers: false, polylineOptions: { strokeColor: "#ff8c00", strokeWeight: 5 }
-      });
-      placesService = new google.maps.places.PlacesService(map);
-      
-      setupAutocomplete("pac-input-desktop");
-      setupAutocomplete("pac-input-mobile");
-      calculateAndDisplayRoute(1);
-
-      map.addListener("click", (event) => {
-          if (event.placeId) {
-              event.stop(); 
-              fetchAndShowDetails(event.placeId);
-          }
-      });
-    }
-
-    function selectDay(day) {
-        currentDay = day;
-        document.querySelectorAll('[id^="btn-day-"]').forEach(btn => {
-            btn.className = "px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition";
-        });
-        const activeBtn = document.getElementById(`btn-day-${day}`);
-        activeBtn.className = "px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md";
-
-        document.querySelectorAll('.day-list').forEach(list => list.classList.add('hidden'));
-        document.getElementById(`list-day-${day}`).classList.remove('hidden');
-
-        document.getElementById('modal-btn-text').innerText = `加入 Day ${day} 行程`;
-        calculateAndDisplayRoute(day);
-    }
-
-    function searchNearby(type) {
-        if (!placesService) return;
-        placesService.nearbySearch({ bounds: map.getBounds(), type: [type] }, (results, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                clearMarkers();
-                results.forEach(createMarker);
-            }
-        });
-    }
-
-    function setupAutocomplete(inputId) {
-      const input = document.getElementById(inputId);
-      if(!input) return;
-      const autocomplete = new google.maps.places.Autocomplete(input);
-      autocomplete.bindTo("bounds", map);
-      
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (!place.place_id) return;
-        
-        if (place.geometry && place.geometry.viewport) map.fitBounds(place.geometry.viewport);
-        else if (place.geometry) { map.setCenter(place.geometry.location); map.setZoom(17); }
-        
-        clearMarkers();
-        fetchAndShowDetails(place.place_id);
-        
-        if(window.innerWidth <= 768 && isMapView === false) {
-            toggleMobileView();
-        }
-        input.value = ''; 
-      });
-    }
-
-    function createMarker(basicPlace) {
-      const marker = new google.maps.Marker({
-        map, position: basicPlace.geometry.location, title: basicPlace.name, animation: google.maps.Animation.DROP
-      });
-      markers.push(marker);
-      marker.addListener("click", () => {
-          fetchAndShowDetails(basicPlace.place_id);
-      });
-    }
-
-    function clearMarkers() { markers.forEach(m => m.setMap(null)); markers = []; }
-
-    function fetchAndShowDetails(placeId) {
-        placesService.getDetails({
-            placeId: placeId,
-            fields: ['name', 'formatted_address', 'geometry', 'rating', 'photos', 'formatted_phone_number', 'opening_hours', 'editorial_summary', 'user_ratings_total']
-        }, (place, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK) {
-                showRichModal(place);
-            } else {
-                alert('無法取得該地點的詳細資訊');
-            }
-        });
-    }
-
-    function showRichModal(place) {
-      tempSelectedPlace = place; 
-      
-      document.getElementById('modal-place-name').innerText = place.name;
-      document.getElementById('modal-place-address').innerText = place.formatted_address || '無詳細地址資訊';
-      document.getElementById('modal-place-rating').innerText = place.rating || '無評分';
-      document.getElementById('modal-place-reviews').innerText = `(${place.user_ratings_total || 0} 則評論)`;
-      document.getElementById('modal-place-phone').innerText = place.formatted_phone_number || '無電話資訊';
-
-      let hoursText = '無營業時間資訊';
-      if (place.opening_hours) {
-          hoursText = place.opening_hours.isOpen() ? '營業中' : '休息中';
-      }
-      document.getElementById('modal-place-hours').innerText = hoursText;
-
-      const descElement = document.getElementById('modal-place-desc');
-      if (place.editorial_summary && place.editorial_summary.overview) {
-          descElement.innerText = place.editorial_summary.overview;
-      } else {
-          descElement.innerText = '此地點暫無詳細的官方簡介。這是一處值得您親自探索的地方，建議將其加入行程親身體驗！';
-      }
-      
-      if (place.photos && place.photos.length > 0) {
-          document.getElementById('modal-img-main').src = place.photos[0].getUrl({ maxWidth: 800 });
-          document.getElementById('modal-img-sub1').src = place.photos[1] ? place.photos[1].getUrl({ maxWidth: 400 }) : 'https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80';
-          document.getElementById('modal-img-sub2').src = place.photos[2] ? place.photos[2].getUrl({ maxWidth: 400 }) : 'https://images.unsplash.com/photo-1570459027562-4a916cc6113f?auto=format&fit=crop&q=80';
-      }
-
-      document.getElementById('modal-btn-text').innerText = `加入 Day ${currentDay} 行程`;
-      document.getElementById('rich-place-modal').classList.remove('hidden');
-    }
-
-    function closeRichModal() {
-      document.getElementById('rich-place-modal').classList.add('hidden');
-    }
-
-    function confirmAddToItinerary() {
-        if(!tempSelectedPlace) return;
-        
-        itineraryData[currentDay].push({
-            lat: tempSelectedPlace.geometry.location.lat(),
-            lng: tempSelectedPlace.geometry.location.lng(),
-            name: tempSelectedPlace.name,
-            arrivals: "10:30",
-            duration: "2",
-            hasTicketOffer: Math.random() > 0.5
-        });
-
-        calculateAndDisplayRoute(currentDay);
-        
-        const scrollArea = document.getElementById('itinerary-scroll-area');
-        scrollArea.scrollTop = scrollArea.scrollHeight;
-        
-        closeRichModal();
-        
-        if(window.innerWidth <= 768 && isMapView) {
-            toggleMobileView();
-        }
-    }
-
-    function calculateAndDisplayRoute(dayToCalculate) {
-        const places = itineraryData[dayToCalculate];
-        if(!places || places.length < 2) {
-            directionsRenderer.setDirections({routes: []}); 
-            if(places && places.length === 1) renderItineraryPanel(dayToCalculate);
-            return;
-        }
-
-        const origin = { lat: places[0].lat, lng: places[0].lng };
-        const destination = { lat: places[places.length - 1].lat, lng: places[places.length - 1].lng };
-        const waypoints = places.slice(1, -1).map(p => ({ location: { lat: p.lat, lng: p.lng }, stopover: true }));
-
-        directionsService.route({
-            origin: origin,
-            destination: destination,
-            waypoints: waypoints,
-            travelMode: google.maps.TravelMode.TRANSIT 
-        }, (response, status) => {
-            if (status === "OK") {
-                directionsRenderer.setDirections(response);
-                routeLegs[dayToCalculate] = response.routes[0].legs;
-                renderItineraryPanel(dayToCalculate);
-            }
-        });
-    }
-
-    // ==========================================
-    // 🌟 拖曳事件處理函數 (Drag and Drop Logic)
-    // ==========================================
-    function handleDragStart(e, day, index) {
-        draggedItemInfo = { day, index };
-        e.dataTransfer.effectAllowed = 'move';
-        // 加上半透明與縮小效果，提升視覺回饋
-        setTimeout(() => e.target.classList.add('opacity-50', 'scale-95', 'z-50'), 0);
-    }
-
-    function handleDragOver(e) {
-        e.preventDefault(); // 必須阻止預設行為才能允許放置 (Drop)
-        e.dataTransfer.dropEffect = 'move';
-        return false;
-    }
-
-    function handleDragEnter(e) {
-        e.preventDefault();
-        // 拖曳經過時，目標卡片顯示橘色虛線邊框提示
-        const target = e.currentTarget;
-        target.classList.remove('border-slate-200', 'dark:border-white/10');
-        target.classList.add('border-primary', 'border-2', 'border-dashed');
-    }
-
-    function handleDragLeave(e) {
-        const target = e.currentTarget;
-        // 離開時恢復原狀
-        target.classList.add('border-slate-200', 'dark:border-white/10');
-        target.classList.remove('border-primary', 'border-2', 'border-dashed');
-    }
-
-    function handleDrop(e, day, dropIndex) {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        const target = e.currentTarget;
-        target.classList.add('border-slate-200', 'dark:border-white/10');
-        target.classList.remove('border-primary', 'border-2', 'border-dashed');
-
-        // 確保在同一天內拖曳，且不是拖回原位
-        if (!draggedItemInfo || draggedItemInfo.day !== day || draggedItemInfo.index === dropIndex) {
-            return false;
-        }
-
-        const dragIndex = draggedItemInfo.index;
-
-        // 核心：在資料陣列中交換元素位置
-        const list = itineraryData[day];
-        const draggedItem = list.splice(dragIndex, 1)[0];
-        list.splice(dropIndex, 0, draggedItem);
-
-        // 重新計算路線與渲染列表
-        calculateAndDisplayRoute(day);
-        draggedItemInfo = null;
-        return false;
-    }
-
-    function handleDragEnd(e) {
-        e.target.classList.remove('opacity-50', 'scale-95', 'z-50');
-    }
-
-    // ==========================================
-    // 🌟 渲染整個行程面板 (加入 draggable 屬性)
-    // ==========================================
-    function renderItineraryPanel(day) {
-        const listContainer = document.getElementById(`list-day-${day}`);
-        if(!listContainer) return;
-        listContainer.innerHTML = ''; 
-
-        const places = itineraryData[day];
-        const legs = routeLegs[day] || [];
-
-        // 1. 渲染天數起點 (加入了可拖曳設定)
-        const dayStartPlace = places[0];
-        const isDay1 = day === 1;
-        const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
-        
-        const dayStartHTML = `
-          <div draggable="true" ondragstart="handleDragStart(event, ${day}, 0)" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, 0)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm cursor-move transition-all duration-200 hover:shadow-md">
-              <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
-              <div class="ml-2 flex justify-between items-center">
-                  <div>
-                      <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">${dayStartPlace.name}</h3>
-                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${isDay1 ? '預計抵達' : '預計出發'}：${dayStartPlace.arrivals}</p>
-                  </div>
-                  <span class="material-symbols-outlined text-slate-300 dark:text-slate-600">drag_indicator</span>
-              </div>
-          </div>
-        `;
-        listContainer.insertAdjacentHTML('beforeend', dayStartHTML);
-
-        // 2. 遍歷渲染交通與目的地
-        for (let i = 0; i < legs.length; i++) {
-            const leg = legs[i];
-            const destinationPlace = places[i + 1];
-
-            const distanceKm = leg.distance.value / 1000;
-            let travelMode, travelIcon;
-
-            if (distanceKm > WALK_THRESHOLD_KM) {
-                travelMode = '大眾運輸'; travelIcon = 'directions_subway';
-            } else {
-                travelMode = '走路'; travelIcon = 'directions_walk';
-            }
-
-            const transportHTML = `
-              <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-sm ml-6 my-1 border-l-2 border-dashed border-slate-300 dark:border-slate-600 pl-4 py-3 animate-fade-in-up">
-                  <span class="material-symbols-outlined text-base bg-white dark:bg-background-dark p-1 rounded-full border border-slate-200 dark:border-slate-700">${travelIcon}</span>
-                  <span>${travelMode}約 ${leg.duration.text}</span>
-              </div>
-            `;
-
-            let ticketHTML = destinationPlace.hasTicketOffer ? `
-                <div onclick="window.location.href='payment.html'" class="mt-4 bg-[#ff8c00]/10 border border-[#ff8c00]/30 rounded-lg p-2.5 flex items-center justify-between hover:bg-[#ff8c00]/20 transition cursor-pointer group">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-sm">local_activity</span>
-                        <span class="text-primary text-sm font-bold">Klook 專屬門票優惠</span>
-                    </div>
-                    <span class="text-primary text-xs font-bold group-hover:translate-x-1 transition-transform">前往加購 ></span>
+        <div class="flex-1 relative pointer-events-none z-10 h-full">
+            <div class="hidden md:flex flex-col gap-2 absolute top-6 right-6 w-full max-w-sm pointer-events-auto items-end">
+                <div class="relative flex items-center w-full h-12 rounded-full focus-within:shadow-xl bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border border-slate-300 dark:border-white/10 overflow-hidden shadow-lg transition-all">
+                    <div class="grid place-items-center h-full w-12 text-slate-400"><span class="material-symbols-outlined">search</span></div>
+                    <input class="peer h-full w-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400" type="text" id="pac-input-desktop" placeholder="輸入關鍵字或點擊下方分類..." />
                 </div>
-            ` : '';
-
-            // 目的地 HTML (加入了可拖曳設定與右側拖拉圖示)
-            const destinationHTML = `
-              <div draggable="true" ondragstart="handleDragStart(event, ${day}, ${i + 1})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, ${i + 1})" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm animate-fade-in-up cursor-move transition-all duration-200 hover:shadow-md">
-                <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
-                <div class="flex justify-between items-start ml-2">
-                  <div>
-                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">${destinationPlace.name}</h3>
-                    <div class="flex items-center gap-4 mt-2 text-xs text-slate-500 dark:text-slate-400">
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>抵達 ${destinationPlace.arrivals}</span>
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">hourglass_empty</span>停留 ${destinationPlace.duration}小時</span>
-                    </div>
-                  </div>
-                  <div class="flex flex-col items-end gap-2 shrink-0">
-                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600">drag_indicator</span>
-                    <button onclick="removeItineraryItem(${day}, ${i + 1})" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
-                      <span class="material-symbols-outlined text-lg">delete</span>
+                <div class="flex items-center justify-end gap-2 px-1 mt-1 w-full">
+                    <button onclick="searchNearby('tourist_attraction')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition shadow-md">
+                        <span class="material-symbols-outlined text-sm text-primary">attractions</span> 景點
                     </button>
-                  </div>
+                    <button onclick="searchNearby('lodging')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-500 hover:text-white transition shadow-md">
+                        <span class="material-symbols-outlined text-sm text-blue-500">hotel</span> 住宿
+                    </button>
+                    <button onclick="searchNearby('restaurant')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white transition shadow-md">
+                        <span class="material-symbols-outlined text-sm text-red-400">restaurant</span> 美食
+                    </button>
                 </div>
-                ${ticketHTML}
-              </div>
-            `;
+            </div>
+        </div>
 
-            listContainer.insertAdjacentHTML('beforeend', transportHTML + destinationHTML);
-        }
-    }
+        <div id="itinerary-panel" class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
 
-    function removeItineraryItem(day, index) {
-        itineraryData[day].splice(index, 1);
-        calculateAndDisplayRoute(day);
-    }
+            <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-30 bg-white dark:bg-background-dark shadow-sm shrink-0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-lg font-bold text-primary tracking-tight">詳細行程</h1>
+                </div>
+                <a th:href="@{/payment}" class="flex items-center gap-1 md:gap-2 bg-primary hover:bg-orange-600 text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
+                    <span class="material-symbols-outlined text-base">shopping_cart_checkout</span>前往付款
+                </a>
+            </div>
 
-    function toggleMobileView() {
-        const panel = document.getElementById('itinerary-panel');
-        const icon = document.getElementById('toggle-icon');
-        const text = document.getElementById('toggle-text');
-        
-        isMapView = !isMapView;
+            <div class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col" id="itinerary-scroll-area">
 
-        if (isMapView) {
-            panel.classList.add('translate-y-full'); 
-            icon.innerText = "view_list";
-            text.innerText = "查看行程";
-        } else {
-            panel.classList.remove('translate-y-full'); 
-            icon.innerText = "map";
-            text.innerText = "展開地圖";
-        }
-    }
+                <div class="relative w-full h-[180px] shrink-0 bg-slate-800 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                        <div>
+                            <span class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本, 關西</span>
+                            <h1 class="text-xl font-bold text-white tracking-wide shadow-sm">大阪京都5天4夜鐵腿之旅</h1>
+                        </div>
+                    </div>
+                </div>
 
-    // ==========================================
-    // 🌟 新增功能：動態加入「出發日期選擇器」+ Day 按鈕左右滑動箭頭
-    // ==========================================
-    document.addEventListener("DOMContentLoaded", () => {
-        const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
+                <div class="p-4 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-white/10 shrink-0">
+                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
+                </div>
 
-        const totalDays = 5; 
-        const daysToAdd = totalDays - 1; 
+                <div class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark overflow-x-auto border-b border-slate-200 dark:border-white/10 no-scrollbar shrink-0">
+                    <button onclick="selectDay(1)" id="btn-day-1" class="px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md">Day 1</button>
+                    <button onclick="selectDay(2)" id="btn-day-2" class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition">Day 2</button>
+                </div>
 
-        const today = new Date();
-        const defaultStart = new Date(today);
-        defaultStart.setDate(today.getDate() + 3);
-        const defaultEnd = new Date(defaultStart);
-        defaultEnd.setDate(defaultStart.getDate() + daysToAdd); 
-
-        const formatYMD = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-        const formatMD = (d) => String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
-
-        // 1. 日期選擇器 UI 建立
-        const datePickerWrapper = document.createElement('div');
-        datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative group hover:border-primary/50 transition-colors shrink-0";
-        
-        const calendarIcon = document.createElement('span');
-        calendarIcon.className = "material-symbols-outlined text-[14px] text-slate-400 group-hover:text-primary transition-colors";
-        calendarIcon.innerText = "calendar_today";
-
-        const dateDisplay = document.createElement('span');
-        dateDisplay.className = "text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors tracking-wider";
-        dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(defaultEnd)}`;
-
-        const dateInput = document.createElement('input');
-        dateInput.type = "date";
-        dateInput.value = formatYMD(defaultStart);
-        dateInput.className = "absolute top-full left-0 w-0 h-0 opacity-0 pointer-events-none";
-
-        datePickerWrapper.addEventListener('click', () => {
-            try { dateInput.showPicker(); } catch (error) { dateInput.focus(); }
-        });
-
-        datePickerWrapper.appendChild(calendarIcon);
-        datePickerWrapper.appendChild(dateDisplay);
-        datePickerWrapper.appendChild(dateInput);
-        titleContainer.appendChild(datePickerWrapper);
-
-        // ==========================================
-        // ✨ 左右滑動箭頭 UI 注入 (DOM 包裝魔法)
-        // ==========================================
-        const buttonContainer = document.getElementById('btn-day-1').parentElement;
-        
-        // 建立外層 Wrapper (讓箭頭可以浮動對齊)
-        const tabsWrapper = document.createElement('div');
-        tabsWrapper.className = 'relative flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden';
-        
-        // 把原本的按鈕區塊塞進 Wrapper 裡
-        buttonContainer.parentNode.insertBefore(tabsWrapper, buttonContainer);
-        tabsWrapper.appendChild(buttonContainer);
-        
-        // 移除原本的底線，避免雙重邊框，並加上平滑滾動
-        buttonContainer.classList.remove('border-b', 'border-slate-200', 'dark:border-white/10', 'shrink-0');
-        buttonContainer.classList.add('w-full', 'scroll-smooth');
-
-        // 建立左邊箭頭 (有漂亮陰影的圓形按鈕)
-        const leftBtn = document.createElement('button');
-        leftBtn.className = "absolute left-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
-        leftBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_left</span>';
-        
-        // 建立右邊箭頭
-        const rightBtn = document.createElement('button');
-        rightBtn.className = "absolute right-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
-        rightBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_right</span>';
-
-        tabsWrapper.appendChild(leftBtn);
-        tabsWrapper.appendChild(rightBtn);
-
-        // 點擊箭頭滑動事件 (每次滑動約 200px)
-        leftBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: -200, behavior: 'smooth' }));
-        rightBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: 200, behavior: 'smooth' }));
-
-        // 判斷箭頭是否該顯示 (如果滑到最左邊就隱藏左箭頭，最右邊就隱藏右箭頭)
-        const checkArrows = () => {
-            if (buttonContainer.scrollWidth > buttonContainer.clientWidth) {
-                leftBtn.classList.toggle('hidden', buttonContainer.scrollLeft <= 0);
-                rightBtn.classList.toggle('hidden', buttonContainer.scrollLeft + buttonContainer.clientWidth >= buttonContainer.scrollWidth - 2);
-            } else {
-                leftBtn.classList.add('hidden');
-                rightBtn.classList.add('hidden');
-            }
-        };
-
-        buttonContainer.addEventListener('scroll', checkArrows);
-        window.addEventListener('resize', checkArrows);
-
-        // ==========================================
-        // ✨ 動態生成 Day 按鈕與列表
-        // ==========================================
-        function updateDayButtonsAndLists(startDate) {
-            const scrollArea = document.getElementById('itinerary-scroll-area');
-            buttonContainer.innerHTML = '';
-
-            for (let i = 1; i <= totalDays; i++) {
-                const currentDayDate = new Date(startDate);
-                currentDayDate.setDate(startDate.getDate() + (i - 1));
+                <div class="md:hidden m-4 relative flex items-center w-[calc(100%-2rem)] h-12 rounded-full bg-slate-100 dark:bg-surface-dark border border-slate-300 dark:border-white/10 overflow-hidden shadow-sm shrink-0">
+                    <div class="grid place-items-center h-full w-12 text-slate-400"><span class="material-symbols-outlined">search</span></div>
+                    <input class="w-full h-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400" type="text" id="pac-input-mobile" placeholder="搜尋並加入景點..." />
+                </div>
                 
-                const btn = document.createElement('button');
-                btn.id = `btn-day-${i}`;
-                btn.setAttribute('onclick', `selectDay(${i})`);
-                btn.className = (i === currentDay) 
-                    ? "px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md shrink-0"
-                    : "px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0";
-                
-                btn.innerText = `Day ${i} (${formatMD(currentDayDate)})`;
-                buttonContainer.appendChild(btn);
+            </div>
+        </div>
 
-                let listContainer = document.getElementById(`list-day-${i}`);
-                if (!listContainer) {
-                    listContainer = document.createElement('div');
-                    listContainer.id = `list-day-${i}`;
-                    listContainer.className = "day-list p-4 flex flex-col pb-24 pt-0 hidden";
-                    listContainer.innerHTML = `
-                        <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
-                            <div class="w-1.5 h-full bg-slate-300 dark:bg-slate-600 absolute left-0 top-0"></div>
-                            <div class="ml-2">
-                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Day ${i} 行程尚未安排</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">請從地圖點擊景點加入</p>
-                            </div>
-                        </div>`;
-                    scrollArea.appendChild(listContainer);
-                }
-                if (!itineraryData[i]) itineraryData[i] = [];
-            }
-            // 每次重新產生按鈕後，等畫面算好寬度，重新檢查要不要出現箭頭
-            setTimeout(checkArrows, 100); 
-        }
+        <button id="mobile-toggle-btn" onclick="toggleMobileView()" class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
+            <span class="material-symbols-outlined" id="toggle-icon">map</span>
+            <span id="toggle-text">展開地圖</span>
+        </button>
 
-        updateDayButtonsAndLists(defaultStart);
+    </main>
 
-        dateInput.addEventListener('change', (e) => {
-            if(!e.target.value) return; 
-            const newStart = new Date(e.target.value);
-            const newEnd = new Date(newStart);
-            newEnd.setDate(newStart.getDate() + daysToAdd); 
-            dateDisplay.innerText = `${formatMD(newStart)} - ${formatMD(newEnd)}`;
-            updateDayButtonsAndLists(newStart);
-        });
-    });
-
-  </script>
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" async defer></script>
+    <script th:src="@{/js/packageTourMap.js}"></script>
 </body>
+
 </html>

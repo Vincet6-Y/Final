@@ -3,129 +3,145 @@
 <html class="dark" lang="zh-TW">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
+<style>
+    /* 思考邏輯：既然 Tailwind 插件沒動，我們手動定義 Markdown 渲染後的標籤樣式 */
+    #markdown-content h3 {
+        color: #fb923c;
+        /* 橘色 (Primary) */
+        font-size: 1.875rem;
+        font-weight: 900;
+        margin-top: 2.5rem;
+        margin-bottom: 1.25rem;
+        border-left: 6px solid #fb923c;
+        padding-left: 1rem;
+        line-height: 1.2;
+    }
+
+    #markdown-content p {
+        color: #cbd5e1;
+        /* 淺灰色 text-slate-300 */
+        font-size: 1.125rem;
+        line-height: 2;
+        /* 讓行距拉開，才不會擠在一起 */
+        margin-bottom: 1.5rem;
+        text-align: justify;
+        /* 左右對齊，像雜誌一樣 */
+    }
+
+    #markdown-content strong {
+        color: #ffffff;
+        /* 粗體字變純白，產生強烈對比 */
+        font-weight: 700;
+        background: rgba(251, 146, 60, 0.1);
+        /* 淡淡的橘色底色 */
+        padding: 0 4px;
+    }
+
+    #markdown-content blockquote {
+        border-left: 4px solid #fb923c;
+        background: rgba(251, 146, 60, 0.05);
+        padding: 1.5rem 2rem;
+        margin: 2rem 0;
+        font-style: italic;
+        border-radius: 0 0.75rem 0.75rem 0;
+    }
+
+    #markdown-content ol,
+    #markdown-content ul {
+        margin: 1.5rem 0;
+        padding-left: 1.5rem;
+    }
+
+    #markdown-content li {
+        margin-bottom: 0.75rem;
+        color: #cbd5e1;
+        list-style-type: decimal;
+        /* 讓 1. 2. 3. 顯示出來 */
+    }
+
+    /* 針對清單做加強 */
+    #markdown-content li strong {
+        color: #fb923c;
+        /* 清單裡的重點變橘色 */
+        background: none;
+    }
+</style>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden font-display">
         <div class="layout-container flex h-full grow flex-col">
             <!-- Header -->
             <header th:replace="~{ fragments/header :: myHeader}"> </header>
+
             <!-- Main Content Container -->
-            <main class="flex-1 flex flex-col items-center">
-                <article class="w-full max-w-[960px] px-6 py-10 md:py-16">
-                    <!-- Article Header -->
-                    <div class="mb-8 border-l-4 border-primary pl-6">
-                        <h1
-                            class="text-slate-900 dark:text-white text-4xl md:text-5xl font-black leading-tight tracking-tight mb-4">
-                            2026 年度聖地巡禮指南：從東京出發的夢幻之旅
-                        </h1>
-                        <div class="flex flex-wrap items-center gap-4 text-slate-500 dark:text-slate-400 text-sm">
-                            <div class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[18px]">calendar_today</span>
-                                <span>發布日期: 2026/04/01</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[18px]">edit_note</span>
-                                <span>來源: Sacred Site 編輯團隊</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[18px]">visibility</span>
-                                <span>12,450 觀看次數</span>
+            <main class="flex-1 w-full bg-background-dark">
+                <div class="relative w-full h-[50vh] md:h-[65vh] overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+                        style="background-image: url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop');">
+                    </div>
+
+                    <div class="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/40 to-transparent"></div>
+
+                    <div class="absolute inset-0 flex items-end pb-16">
+                        <div class="w-full max-w-7xl mx-auto px-6 lg:px-20">
+                            <div class="border-l-[12px] border-primary pl-8 md:pl-12">
+                                <span
+                                    class="text-primary font-bold tracking-[0.2em] text-sm md:text-base uppercase mb-4 block"
+                                    th:text="${article.articleClass}">分類名稱</span>
+
+                                <h1 class="text-white text-4xl md:text-7xl font-black leading-[1.1] tracking-tighter max-w-4xl"
+                                    th:text="${article.title}">
+                                    文章標題載入中...
+                                </h1>
                             </div>
                         </div>
                     </div>
-                    <!-- Featured Image -->
-                    <div class="mb-10 group overflow-hidden rounded-xl border border-primary/10 shadow-2xl">
-                        <div class="w-full aspect-video bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105"
-                            data-alt="Beautiful sunset over a traditional Japanese temple gate in Kyoto"
-                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBknEWxpw7NMiQQThZ_qNdWJYMstCn_y7RZbF5rswdHd4q8cKGEOU933-TiiK6H1GCLuWyNd5DWD67iGcWQvaka_yYOUSY_VeJcy9mVjcjFq7C_Vfcx_mG-JDgRLccbbomCuPTHz5sevfOIia0heonPlh33p27NMeqX1IJ2plrKkrQEkjep8NJEHt6CYS97lfX6JGbaAYFHIytwzYau-QpH0OMlK5nrvJoOLpm46Dxctb7DCc6GiDk75P2kGOswwujZGL1TOcKlXTs");'>
+                </div>
+
+                <div class="max-w-4xl mx-auto px-6 lg:px-20 py-16">
+                    <div class="flex items-center gap-6 mb-12 text-slate-500 text-sm border-b border-white/10 pb-8">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">calendar_today</span>
+                            <span>2026-03-10</span>
                         </div>
-                        <div
-                            class="p-4 bg-background-light dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 text-xs italic text-center">
-                            圖：位於京都的經典動畫取景地，落日餘暉下的朱紅鳥居。
-                        </div>
-                    </div>
-                    <!-- Article Body -->
-                    <div
-                        class="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 space-y-6 text-lg leading-relaxed">
-                        <p>
-                            「聖地巡禮」（Seichijunrei）一詞，原指信徒前往宗教聖地朝拜的行為。但在當代流行文化中，它已被賦予了全新的意義：粉絲們踏出家門，親身走訪動畫、漫畫、遊戲或影視作品中所描繪的現實原型地。這不僅是一次單純的旅遊，更是一場跨越二次元與三次元邊界的靈魂對話。
-                        </p>
-                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white pt-4 flex items-center gap-2">
-                            <span class="w-2 h-8 bg-primary rounded-full"></span>
-                            為何 2026 是巡禮的最佳契機？
-                        </h2>
-                        <p>
-                            隨著 2026
-                            年多部現象級作品的十週年紀念，以及許多新興聖地的開放，今年成為了巡禮愛好者不容錯過的一年。從《你的名字》中標誌性的東京須賀神社階梯，到《搖曳露營△》所展現的山梨縣壯闊山景，這些地點不僅承載著劇情的回憶，更因當地社區的積極參與而煥發新生。
-                        </p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
-                            <div
-                                class="rounded-xl overflow-hidden border border-primary/20 bg-background-light dark:bg-slate-800/40 p-4">
-                                <div class="aspect-square rounded-lg mb-4 bg-cover bg-center"
-                                    data-alt="Crowded Shibuya Crossing at night with neon lights"
-                                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtIH9SzVR561nocSGAiMulQT7dH3g0eviWg870PK51NuJp8tDbZZae20MKtQA63e4Df1wNPjVe2Y1X3-q8Oa2zXWEkLrxwNO3N_lWf6DZDdNJVmNbq4ei0-Bb-9_bPx3gEtpic6OytGXoPGuLpWwjnaDPEjpQaLCjekvnoB4YeM_HXnWcwutA1dYZvCW-P9SWTfYY1gEcUakGWszWGWUzsQIjJU1ZHuFidAs1jPV_5sAC-ZkhEApbHzJV5M-cz0_NF-esK6wI-dvs')">
-                                </div>
-                                <h3 class="font-bold text-lg mb-2 text-primary">東京：都市傳說的發源地</h3>
-                                <p class="text-sm opacity-80">探索澀谷十字路口、秋葉原電器街等經典場景，感受繁華與幻想的交織。</p>
-                            </div>
-                            <div
-                                class="rounded-xl overflow-hidden border border-primary/20 bg-background-light dark:bg-slate-800/40 p-4">
-                                <div class="aspect-square rounded-lg mb-4 bg-cover bg-center"
-                                    data-alt="Peaceful rural landscape in Japan with green rice fields"
-                                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDyD1fugzaTeiuNF6xpN4L3HJZ1kihA6Y-8ltXT67C0mDN6ZcmZ1qrFm5VcpTw37Z8OCc6f3uqw2PTfXGUBZTyBFiMLoTzkZUVjLFiqAUaBlYUY4naPoDekUoc__x0XQED-3o7uWtLmqrgUOrlH6IyZqyJFVx49Z3cNKFXfR2V1ptShxJY8Me9b5miKu2b08YH8GkNRXNN0_C3qHb4CQijbo2Xl8Yov0nK8gvrH7ps94DyuN6TGMTaSL5Df5XdeEXvjqPRloKFs0xs')">
-                                </div>
-                                <h3 class="font-bold text-lg mb-2 text-primary">岐阜：鄉間的寧靜時光</h3>
-                                <p class="text-sm opacity-80">前往飛驒市感受古老街道的魅力，體驗動畫中所描繪的那份純粹與寧靜。</p>
-                            </div>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-900 dark:text-white pt-4 flex items-center gap-2">
-                            <span class="w-2 h-8 bg-primary rounded-full"></span>
-                            巡禮者的守則：尊重與連結
-                        </h2>
-                        <p>
-                            在享受巡禮樂趣的同時，我們也必須銘記：這些聖地往往是當地居民的日常生活空間。保持安靜、不隨意進入私有地、支持當地經濟（如購買特產、在當地用餐），是每位優秀「巡禮者」應盡的責任。
-                        </p>
-                        <blockquote class="border-l-4 border-primary bg-primary/5 p-6 rounded-r-xl italic my-8">
-                            「聖地巡禮不只是拍照打卡，更是為了尋找那份曾經感動過自己的初心，並將這份感動轉化為對現實世界的熱愛。」
-                        </blockquote>
-                        <p>
-                            在接下來的篇幅中，我們將詳細拆解 2026 年推薦的五條精品路線，包括交通接駁、最佳攝影時機以及獨家的周邊店家推薦。無論你是資深「御宅族」還是剛入坑的影視迷，這裡都有屬於你的冒險地圖。
-                        </p>
-                    </div>
-                    <!-- Article Tags -->
-                    <div class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
-                        <div class="flex flex-wrap gap-2">
-                            <span
-                                class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">#聖地巡禮</span>
-                            <span
-                                class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">#日本旅遊</span>
-                            <span
-                                class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">#動漫文化</span>
-                            <span
-                                class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">#2026指南</span>
-                            <span
-                                class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">#東京</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">visibility</span>
+                            <span>1,250 Views</span>
                         </div>
                     </div>
-                    <!-- Share Section -->
-                    <div
-                        class="mt-8 flex items-center justify-between p-6 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
-                        <span class="font-bold">覺得這篇文章有幫助嗎？分享給好友吧！</span>
-                        <div class="flex gap-4">
-                            <button
-                                class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-[20px]">share</span>
-                            </button>
-                            <button
-                                class="size-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center hover:text-primary transition-colors">
-                                <span class="material-symbols-outlined text-[20px]">favorite</span>
-                            </button>
-                        </div>
+
+                    <div id="markdown-content" th:attr="data-markdown=${article.content}" class="prose prose-lg prose-slate dark:prose-invert max-w-none 
+                        prose-headings:text-primary prose-headings:font-black prose-headings:mt-12 prose-headings:mb-6
+                        prose-p:text-slate-300 prose-p:leading-loose prose-p:mb-6
+                        
+                        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-4 prose-blockquote:px-8
+                        text-slate-300">
                     </div>
-                </article>
+
+                    <div class="mt-20 pt-10 border-t border-white/10">
+                        <a href="/news"
+                            class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
+                            <span
+                                class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
+                            返回最新消息
+                        </a>
+                    </div>
+                </div>
             </main>
             <!-- Footer -->
             <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+
+            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const contentEl = document.getElementById('markdown-content');
+                    // 思考邏輯：從 data-markdown 屬性拿資料，這比直接從 innerText 拿更穩定
+                    const rawMarkdown = contentEl.getAttribute('data-markdown');
+                    if (rawMarkdown) {
+                        contentEl.innerHTML = marked.parse(rawMarkdown);
+                    }
+                });
+            </script>
         </div>
     </div>
 </body>
