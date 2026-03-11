@@ -37,116 +37,38 @@
                 </aside>
                 <div class="flex-1">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div
-                            class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all flex flex-col">
-                            <div class="p-4 flex items-center justify-between">
-                                <h4 class="text-slate-900 dark:text-white font-bold text-lg truncate">你的名字 - 5日行程路線</h4>
-                                <button class="text-primary hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined"
-                                        style="font-variation-settings: 'FILL' 1">favorite</span>
+
+                        <a th:each="plan : ${journeyPlans}"
+                            th:href="@{/packageTourDetail(planId=${plan.planId})}"
+                            class="group bg-[#2a2621] rounded-2xl overflow-hidden border border-slate-700/50 hover:border-primary/50 transition-all flex flex-col cursor-pointer block shadow-lg">
+
+                            <div class="p-4 flex items-center justify-between z-10 bg-[#25201b]">
+                                <h4 class="text-white font-bold text-[17px] truncate tracking-wide" th:text="${plan.planName}">行程名稱</h4>
+
+                                <button th:onclick="'event.preventDefault(); toggleFavorite(this, ' + ${plan.planId} + ')'"
+                                    class="text-primary hover:scale-110 transition-transform shrink-0">
+                                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
                                 </button>
                             </div>
-                            <div class="relative aspect-[3/4] w-full bg-slate-100 dark:bg-white/5">
-                                <img alt="Your Name Pilgrim" class="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjxt2R8wPviIqZXYUEi9kNxP_4s_bsJgGLXxREm6BsrEBY81VbhZmDLV__AjCs5HaiGR-fKnRuk2juWzGUdKukFlgsUPkSqgmGqDdATw6XmjORoaIIPhJV2FbRSPk19gcjSYVK3kO0pC0da6QA80hd1pur6hqGBJhoyxzj8pxYEu-1gV2nzuQd4DSsWI0UuXcJSHuPpgVvIOy6wdakbSRHhSdYHEBh8SJxIX8leko5dvVsQYGI9FCfdbxrdUydvgKs6yCTVpIneA" />
-                                <div class="absolute bottom-4 left-4">
-                                    <span
-                                        class="bg-primary text-white dark:text-background-dark px-3 py-1 rounded-full text-xs font-bold shadow-lg">東京</span>
+
+                            <div class="relative aspect-square w-full bg-slate-800">
+
+                                <img th:if="${plan.workDetail != null && plan.workDetail.workImg != null}"
+                                    th:src="${plan.workDetail.workImg}"
+                                    class="w-full h-full object-cover" alt="行程劇照" />
+
+                                <div th:unless="${plan.workDetail != null && plan.workDetail.workImg != null}"
+                                    class="w-full h-full bg-slate-700 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white/20 text-6xl">image</span>
+                                </div>
+
+                                <div class="absolute bottom-3 left-3">
+                                    <span class="bg-[#ff7b00] text-black px-3 py-1 rounded-md text-sm font-bold shadow-md tracking-wider"
+                                        th:text="${plan.workDetail != null ? plan.workDetail.workClass : '福岡'}">城市</span>
                                 </div>
                             </div>
-                        </div>
-                        <div
-                            class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all flex flex-col">
-                            <div class="p-4 flex items-center justify-between">
-                                <h4 class="text-slate-900 dark:text-white font-bold text-lg truncate">灌籃高手 - 5日行程路線</h4>
-                                <button class="text-slate-400 hover:text-primary hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined">favorite</span>
-                                </button>
-                            </div>
-                            <div class="relative aspect-[3/4] w-full bg-slate-100 dark:bg-white/5">
-                                <img alt="Slam Dunk Pilgrim" class="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpGsONs1I9jctDoWnD35vPCt7z7Zj2lqxDf3NLwjo8Q2Ec8CBncM5PlrriSjDVfW5ygOUbEip_3XGn1g0sFfGnE2OBBnT0gAQ-iS_zV1SJa_dgFOUf0sg8fDn_8_0UqDt3SlBEv8zGfPYaqDsoO9ljq2g-xGTBanbDLIPVUMjzi-0GBumkE-y6Dn5U2SOriKRsZ52HX0E1UGqOmENlKTp_ESR8DVrTCiN7xOSsya2kOPceej3PgLHdc5s40PX7Y5LY3Uu48mAxIbI" />
-                                <div class="absolute bottom-4 left-4">
-                                    <span
-                                        class="bg-primary text-white dark:text-background-dark px-3 py-1 rounded-full text-xs font-bold shadow-lg">鎌倉</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all flex flex-col">
-                            <div class="p-4 flex items-center justify-between">
-                                <h4 class="text-slate-900 dark:text-white font-bold text-lg truncate">神隱少女 - 10日行程路線
-                                </h4>
-                                <button class="text-primary hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined"
-                                        style="font-variation-settings: 'FILL' 1">favorite</span>
-                                </button>
-                            </div>
-                            <div class="relative aspect-[3/4] w-full bg-slate-100 dark:bg-white/5">
-                                <img alt="Spirited Away Pilgrim" class="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP2qwfkNlBZbzxBN8JoxXp6Pebec3WDdmIkWoIG-cePhSG_1bjVTTiNQikqKO8PIsnv1X4JsQfCAWs-3D1fCzEIgtJI0ibN8c5TxrawuSgJ3hDqWxC9rf_TyB6vMpb_Srcfr1_wik4whxX7YduSyyJ546nFqIh0wHdQvTAlr6-nGMRTWugnmE8Ei538Pc_EMAL4HSo7VRHSn7gwEoNAmJA94b2f9UrrMbmSQOZZf9euvGfZJpa9O7g_ngdcguYeaonytLLO-b3w6k" />
-                                <div class="absolute bottom-4 left-4">
-                                    <span
-                                        class="bg-primary text-white dark:text-background-dark px-3 py-1 rounded-full text-xs font-bold shadow-lg">山形</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all flex flex-col">
-                            <div class="p-4 flex items-center justify-between">
-                                <h4 class="text-slate-900 dark:text-white font-bold text-lg truncate">愛情不用翻譯 - 5日行程</h4>
-                                <button class="text-slate-400 hover:text-primary hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined">favorite</span>
-                                </button>
-                            </div>
-                            <div class="relative aspect-[3/4] w-full bg-slate-100 dark:bg-white/5">
-                                <img alt="Tokyo Pilgrim" class="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBALblJhVb_NXtBzLX6MxSjNaGiKZiRixGNNNvT3Iexq4PtUq7MJZ6YBrniO_vVwl9RehxGFEy965Ux4thdMt3fLLhMrlNzDKuVyPzJ81AoZVK6QmYjD8xvJJG621BKJ1rsh6q4pracD-0Zqiz5jwguWslxWzymfHpKz6nPHLAmA0x80A1-TOz36ub_FrLy0Ncqu9oXTRHyQCpFY-5ihSv1pNCo3TWlPK1i58KuYab0ZGOAW8WrSM822vPVqLeQ65FJNo-vlotpxoM" />
-                                <div class="absolute bottom-4 left-4">
-                                    <span
-                                        class="bg-primary text-white dark:text-background-dark px-3 py-1 rounded-full text-xs font-bold shadow-lg">東京</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all flex flex-col">
-                            <div class="p-4 flex items-center justify-between">
-                                <h4 class="text-slate-900 dark:text-white font-bold text-lg truncate">京都古剎巡禮 - 10日行程
-                                </h4>
-                                <button class="text-slate-400 hover:text-primary hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined">favorite</span>
-                                </button>
-                            </div>
-                            <div class="relative aspect-[3/4] w-full bg-slate-100 dark:bg-white/5">
-                                <img alt="Kyoto Pilgrim" class="w-full h-full object-cover"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9O2JEbpI-3lWrwR4JoyzlHqQaa6Dl3_5ZMobGvxcAEO_AIDFtPR07tVApC2soAuU5uTOO0XKbXURYOIbpiSqnGi7lyhGVKmgS-mVIH_v6JRH2_SKZKoqamkrubMglcbJS9HBBi69l4ayRPZ1s6HK4IaHY5gdRvrnrSYTBRO3TbFJIQR802BEUIXCz0hSGThQG3YnOQ5Az9XHWOGrS99F786bZllp1jTJcA0sKVFTERnoVCcwCBjtweYlZbj3RVZZD4cbIXolbtfw" />
-                                <div class="absolute bottom-4 left-4">
-                                    <span
-                                        class="bg-primary text-white dark:text-background-dark px-3 py-1 rounded-full text-xs font-bold shadow-lg">京都</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div
-                            class="group bg-white dark:bg-white/5 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-primary/50 transition-all flex flex-col">
-                            <div class="p-4 flex items-center justify-between">
-                                <h4 class="text-slate-900 dark:text-white font-bold text-lg truncate">作品F - 10日行程路線</h4>
-                                <button class="text-primary hover:scale-110 transition-transform">
-                                    <span class="material-symbols-outlined"
-                                        style="font-variation-settings: 'FILL' 1">favorite</span>
-                                </button>
-                            </div>
-                            <div class="relative aspect-[3/4] w-full bg-slate-100 dark:bg-white/5">
-                                <div
-                                    class="w-full h-full bg-slate-200 dark:bg-white/10 flex items-center justify-center">
-                                    <span
-                                        class="material-symbols-outlined text-slate-400 dark:text-white/20 text-6xl">image</span>
-                                </div>
-                                <div class="absolute bottom-4 left-4">
-                                    <span
-                                        class="bg-primary text-white dark:text-background-dark px-3 py-1 rounded-full text-xs font-bold shadow-lg">大阪</span>
-                                </div>
-                            </div>
-                        </div>
+                        </a>
+
                     </div>
                 </div>
             </div>

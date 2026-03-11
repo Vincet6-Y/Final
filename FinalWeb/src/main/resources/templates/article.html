@@ -3,69 +3,7 @@
 <html class="dark" lang="zh-TW">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
-<style>
-    /* 思考邏輯：既然 Tailwind 插件沒動，我們手動定義 Markdown 渲染後的標籤樣式 */
-    #markdown-content h3 {
-        color: #fb923c;
-        /* 橘色 (Primary) */
-        font-size: 1.875rem;
-        font-weight: 900;
-        margin-top: 2.5rem;
-        margin-bottom: 1.25rem;
-        border-left: 6px solid #fb923c;
-        padding-left: 1rem;
-        line-height: 1.2;
-    }
-
-    #markdown-content p {
-        color: #cbd5e1;
-        /* 淺灰色 text-slate-300 */
-        font-size: 1.125rem;
-        line-height: 2;
-        /* 讓行距拉開，才不會擠在一起 */
-        margin-bottom: 1.5rem;
-        text-align: justify;
-        /* 左右對齊，像雜誌一樣 */
-    }
-
-    #markdown-content strong {
-        color: #ffffff;
-        /* 粗體字變純白，產生強烈對比 */
-        font-weight: 700;
-        background: rgba(251, 146, 60, 0.1);
-        /* 淡淡的橘色底色 */
-        padding: 0 4px;
-    }
-
-    #markdown-content blockquote {
-        border-left: 4px solid #fb923c;
-        background: rgba(251, 146, 60, 0.05);
-        padding: 1.5rem 2rem;
-        margin: 2rem 0;
-        font-style: italic;
-        border-radius: 0 0.75rem 0.75rem 0;
-    }
-
-    #markdown-content ol,
-    #markdown-content ul {
-        margin: 1.5rem 0;
-        padding-left: 1.5rem;
-    }
-
-    #markdown-content li {
-        margin-bottom: 0.75rem;
-        color: #cbd5e1;
-        list-style-type: decimal;
-        /* 讓 1. 2. 3. 顯示出來 */
-    }
-
-    /* 針對清單做加強 */
-    #markdown-content li strong {
-        color: #fb923c;
-        /* 清單裡的重點變橘色 */
-        background: none;
-    }
-</style>
+<link rel="stylesheet" th:href="@{/article/css/artilcle.css}">
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden font-display">
@@ -74,7 +12,7 @@
             <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
             <!-- Main Content Container -->
-            <main class="flex-1 w-full bg-background-dark">
+            <main class="flex-1 w-full bg-white dark:bg-background-dark transition-colors duration-300">
                 <div class="relative w-full h-[50vh] md:h-[65vh] overflow-hidden">
                     <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
                         style="background-image: url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop');">

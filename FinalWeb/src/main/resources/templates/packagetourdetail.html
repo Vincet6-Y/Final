@@ -1,228 +1,242 @@
-<!DOCTYPE html>
+<!doctype html>
 <html class="dark" lang="zh-Hant">
 
-<head th:replace="~{ fragments/head :: myHead}"></head>
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>行程規劃 - 聖地巡禮</title>
 
-<body
-    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden">
-    <div class="relative flex h-screen w-full flex-col">
-        <header th:replace="~{ fragments/header :: myHeader}"> </header>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
 
-        <main class="flex-1 flex overflow-hidden relative">
-            <div class="flex-1 relative bg-[#242424] overflow-hidden h-full" id="map-content">
-                <div class="absolute inset-0 opacity-40 mix-blend-overlay pointer-events-none">
-                    <div
-                        class="w-full h-full bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px]">
-                    </div>
-                </div>
-                <svg class="absolute inset-0 w-full h-full pointer-events-none">
-                    <path class="marker-line" d="M 100 150 L 300 250 L 250 450 L 100 550" stroke-dasharray="8 4"></path>
-                </svg>
-                <div class="absolute top-[20%] left-[20%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                    <div
-                        class="w-8 h-8 rounded-full bg-white text-background-dark font-bold flex items-center justify-center border-2 border-primary shadow-lg z-10">
-                        1</div>
-                    <div
-                        class="mt-2 bg-white/10 backdrop-blur-md px-2 py-1 rounded text-xs text-white border border-white/20 whitespace-nowrap">
-                        關西機場</div>
-                </div>
-                <div class="absolute top-[35%] left-[60%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                    <div
-                        class="w-8 h-8 rounded-full bg-white text-background-dark font-bold flex items-center justify-center border-2 border-primary shadow-lg z-10">
-                        2</div>
-                    <div
-                        class="mt-2 bg-white/10 backdrop-blur-md px-2 py-1 rounded text-xs text-white border border-white/20 whitespace-nowrap">
-                        京都清水寺</div>
-                </div>
-                <div class="absolute top-[65%] left-[45%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                    <div
-                        class="w-8 h-8 rounded-full bg-white text-background-dark font-bold flex items-center justify-center border-2 border-primary shadow-lg z-10">
-                        3</div>
-                    <div
-                        class="mt-2 bg-white/10 backdrop-blur-md px-2 py-1 rounded text-xs text-white border border-white/20 whitespace-nowrap">
-                        奈良公園</div>
-                </div>
-                <div class="absolute top-[80%] left-[25%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                    <div
-                        class="w-8 h-8 rounded-full bg-white text-background-dark font-bold flex items-center justify-center border-2 border-primary shadow-lg z-10">
-                        4</div>
-                    <div
-                        class="mt-2 bg-white/10 backdrop-blur-md px-2 py-1 rounded text-xs text-white border border-white/20 whitespace-nowrap">
-                        道頓堀</div>
-                </div>
-                <div class="absolute bottom-6 left-6 flex flex-col gap-2">
-                    <button
-                        class="w-10 h-10 bg-white dark:bg-zinc-800 text-slate-800 dark:text-white backdrop-blur-md rounded shadow-lg flex items-center justify-center hover:bg-primary transition-colors">
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
-                    <button
-                        class="w-10 h-10 bg-white dark:bg-zinc-800 text-slate-800 dark:text-white backdrop-blur-md rounded shadow-lg flex items-center justify-center hover:bg-primary transition-colors">
-                        <span class="material-symbols-outlined">remove</span>
-                    </button>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ff8c00",
+                        "background-light": "#ffffff",
+                        "background-dark": "#121212",
+                        "surface-light": "#f8fafc",
+                        "surface-dark": "#1e1e1e",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "Noto Sans TC", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style type="text/tailwindcss">
+        ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+    ::-webkit-scrollbar-thumb { background: #ff8c00; border-radius: 10px; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .gm-style-cc { display: none; }
+    a[href^="http://maps.google.com/maps"]{display:none !important}
+    a[href^="https://maps.google.com/maps"]{display:none !important}
+    .gmnoprint a, .gmnoprint span, .gm-style-cc { display:none; }
+    .gmnoprint div { background:none !important; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+    @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInSlideUp 0.4s ease-out forwards; }
+  </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
+
+    <div id="rich-place-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+        <div class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
+
+            <button onclick="closeRichModal()" class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+
+            <div class="h-56 sm:h-72 flex gap-1 bg-black shrink-0 overflow-x-auto no-scrollbar relative">
+                <img id="modal-img-main" src="" class="h-full w-2/3 md:w-1/2 object-cover flex-shrink-0">
+                <img id="modal-img-sub1" src="" class="h-full w-1/3 md:w-1/4 object-cover flex-shrink-0">
+                <img id="modal-img-sub2" src="" class="h-full w-1/3 md:w-1/4 object-cover flex-shrink-0">
+                <div class="absolute right-4 bottom-4 bg-black/70 text-white px-3 py-1.5 rounded-full text-sm font-bold cursor-pointer hover:bg-black transition border border-white/20">
+                    +多張圖片
                 </div>
             </div>
-            <div class="w-full lg:w-[500px] bg-white dark:bg-zinc-900 border-l border-slate-200 dark:border-white/10 flex flex-col h-full absolute lg:relative inset-0 lg:inset-auto z-40"
-                id="itinerary-content">
-                <div
-                    class="p-4 flex items-center justify-between border-b border-slate-100 dark:border-white/5 bg-white dark:bg-zinc-900 sticky top-0 z-30">
-                    <button class="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <div class="flex items-center gap-2 md:gap-4">
-                        <button
-                            class="flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors py-1 px-2 rounded-lg hover:bg-primary/5">
-                            <span class="material-symbols-outlined"
-                                style="font-variation-settings: 'FILL' 1;">favorite</span>
-                            <span class="whitespace-nowrap">已收藏</span>
-                        </button>
-                        <button
-                            class="bg-white/5 border border-slate-300 dark:border-white/20 px-3 md:px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold hover:bg-white/10 whitespace-nowrap">
-                            <span>完善行程</span>
-                        </button>
-                    </div>
+
+            <div class="p-6 md:p-8 overflow-y-auto no-scrollbar flex-1 relative">
+
+                <button onclick="confirmAddToItinerary()" class="absolute top-6 right-6 bg-[#008ccf] hover:bg-[#007ab8] text-white px-5 py-2 rounded-full font-bold shadow-lg transition flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">add_circle</span>
+                    <span id="modal-btn-text">加入 Day1 行程</span>
+                </button>
+
+                <h1 id="modal-place-name" class="text-3xl md:text-4xl font-bold text-white mb-3 pr-36">載入中...</h1>
+                <div class="flex items-center gap-3 text-sm text-slate-400 mb-8 border-b border-white/10 pb-6">
+                    <span class="flex items-center gap-1 text-yellow-500 font-bold">
+                        <span class="material-symbols-outlined text-base">star</span>
+                        <span id="modal-place-rating">0.0</span>
+                    </span>
+                    <span id="modal-place-reviews">(0 則評論)</span>
+                    <span class="w-1 h-1 rounded-full bg-slate-600 hidden md:block"></span>
+                    <span id="modal-place-type" class="hidden md:block">景點</span>
                 </div>
-                <div class="flex-1 overflow-y-auto">
-                    <div class="relative h-48 md:h-56 w-full overflow-hidden">
-                        <img alt="Kansai View" class="w-full h-full object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9O2JEbpI-3lWrwR4JoyzlHqQaa6Dl3_5ZMobGvxcAEO_AIDFtPR07tVApC2soAuU5uTOO0XKbXURYOIbpiSqnGi7lyhGVKmgS-mVIH_v6JRH2_SKZKoqamkrubMglcbJS9HBBi69l4ayRPZ1s6HK4IaHY5gdRvrnrSYTBRO3TbFJIQR802BEUIXCz0hSGThQG3YnOQ5Az9XHWOGrS99F786bZllp1jTJcA0sKVFTERnoVCcwCBjtweYlZbj3RVZZD4cbIXolbtfw" />
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                        <div class="absolute bottom-4 left-4 right-4 md:left-6 md:right-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="bg-primary/90 text-white text-[10px] px-2 py-0.5 rounded">官方合作</span>
-                            </div>
-                            <h2 class="text-white text-lg md:text-xl font-bold leading-tight">日本關西必遊路線：京都大阪奈良六天五夜</h2>
-                            <div class="flex items-center gap-4 mt-2 text-white/60 text-[10px] md:text-xs">
-                                <span>2024/05/10 發佈</span>
-                                <span class="flex items-center gap-1"><span
-                                        class="material-symbols-outlined text-xs">visibility</span> 15.2K 人都在用</span>
-                            </div>
-                        </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <p id="modal-place-desc" class="text-base text-slate-300 leading-relaxed">
+                            此地點暫無詳細簡介...
+                        </p>
                     </div>
-                    <div
-                        class="flex border-b border-slate-100 dark:border-white/5 px-4 overflow-x-auto whitespace-nowrap no-scrollbar sticky top-0 bg-white dark:bg-zinc-900 z-20">
-                        <button class="px-4 py-4 text-sm font-bold text-primary border-b-2 border-primary">總覽頁</button>
-                        <button
-                            class="px-4 py-4 text-sm font-medium text-slate-500 dark:text-white/40 hover:text-primary">第1天</button>
-                        <button
-                            class="px-4 py-4 text-sm font-medium text-slate-500 dark:text-white/40 hover:text-primary">第2天</button>
-                        <button
-                            class="px-4 py-4 text-sm font-medium text-slate-500 dark:text-white/40 hover:text-primary">第3天</button>
-                        <button
-                            class="px-4 py-4 text-sm font-medium text-slate-500 dark:text-white/40 hover:text-primary">第4天</button>
-                        <button
-                            class="px-4 py-4 text-sm font-medium text-slate-500 dark:text-white/40 hover:text-primary">第5天</button>
-                    </div>
-                    <div class="p-6 grid grid-cols-3 gap-4 border-b border-slate-100 dark:border-white/5">
-                        <div class="text-center">
-                            <div class="text-slate-500 dark:text-white/40 text-[10px] mb-1">行程</div>
-                            <div class="font-bold text-lg">6天</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-slate-500 dark:text-white/40 text-[10px] mb-1">出遊時間</div>
-                            <div class="font-bold text-lg">1-12月</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-slate-500 dark:text-white/40 text-[10px] mb-1">目的地</div>
-                            <div class="font-bold text-lg">日本</div>
-                        </div>
-                    </div>
-                    <div class="p-4 md:p-6 space-y-8">
-                        <h3 class="font-bold text-lg flex items-center gap-2">第1天</h3>
-                        <div class="relative pl-8 border-l-2 border-primary/30 space-y-3">
-                            <div
-                                class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-zinc-900">
-                            </div>
-                            <div
-                                class="bg-white dark:bg-white/5 p-4 rounded-xl border border-slate-100 dark:border-white/10 shadow-sm">
-                                <div class="flex gap-4">
-                                    <img alt="Spot" class="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhjxt2R8wPviIqZXYUEi9kNxP_4s_bsJgGLXxREm6BsrEBY81VbhZmDLV__AjCs5HaiGR-fKnRuk2juWzGUdKukFlgsUPkSqgmGqDdATw6XmjORoaIIPhJV2FbRSPk19gcjSYVK3kO0pC0da6QA80hd1pur6hqGBJhoyxzj8pxYEu-1gV2nzuQd4DSsWI0UuXcJSHuPpgVvIOy6wdakbSRHhSdYHEBh8SJxIX8leko5dvVsQYGI9FCfdbxrdUydvgKs6yCTVpIneA" />
-                                    <div class="flex-1">
-                                        <div class="flex justify-between items-start">
-                                            <div>
-                                                <div
-                                                    class="flex items-center gap-2 text-[10px] text-primary font-bold mb-1">
-                                                    <span class="material-symbols-outlined text-sm">schedule</span>
-                                                    08:00
-                                                </div>
-                                                <h4 class="font-bold text-sm md:text-base">心齋橋</h4>
-                                            </div>
-                                            <button class="text-slate-400 hover:text-primary transition-colors"><span
-                                                    class="material-symbols-outlined text-lg">favorite</span></button>
-                                        </div>
-                                        <p class="text-xs text-slate-500 dark:text-white/40 mt-1">停留 1 小時</p>
+
+                    <div class="bg-white/5 p-5 rounded-xl border border-white/10 h-fit">
+                        <ul class="space-y-4 text-sm">
+                            <li class="flex items-start gap-3 text-slate-300">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">location_on</span>
+                                <span id="modal-place-address" class="leading-relaxed">載入中...</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-300">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">language</span>
+                                <a id="modal-place-website" href="#" target="_blank" class="text-blue-400 hover:underline truncate">無網站資訊</a>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-300">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">call</span>
+                                <span id="modal-place-phone">無電話資訊</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-slate-300 pt-3 border-t border-white/10 mt-3">
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0">schedule</span>
+                                <div class="w-full">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-bold text-white">營業時間</span>
+                                        <span class="material-symbols-outlined text-sm">expand_more</span>
+                                    </div>
+                                    <div id="modal-place-hours" class="space-y-1 text-slate-400 text-xs">
+                                        營業時間載入中...
                                     </div>
                                 </div>
-                                <div
-                                    class="mt-3 flex items-center justify-between bg-orange-50 dark:bg-primary/10 border border-primary/20 p-2 rounded-lg">
-                                    <span
-                                        class="text-[10px] text-primary font-bold truncate pr-2">優惠【琵琶湖一日遊】大阪京都出發...</span>
-                                    <span class="text-[10px] text-primary font-bold whitespace-nowrap">NT$2,467
-                                        &gt;</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 text-[10px] text-slate-500 dark:text-white/40 pl-2">
-                                <span class="material-symbols-outlined text-sm">directions_walk</span> 6 分
-                            </div>
-                        </div>
-                        <div class="relative pl-8 border-l-2 border-primary/30 space-y-3">
-                            <div
-                                class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-zinc-900">
-                            </div>
-                            <div
-                                class="bg-white dark:bg-white/5 p-4 rounded-xl border border-slate-100 dark:border-white/10 shadow-sm">
-                                <div class="flex gap-4">
-                                    <img alt="Spot" class="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBALblJhVb_NXtBzLX6MxSjNaGiKZiRixGNNNvT3Iexq4PtUq7MJZ6YBrniO_vVwl9RehxGFEy965Ux4thdMt3fLLhMrlNzDKuVyPzJ81AoZVK6QmYjD8xvJJG621BKJ1rsh6q4pracD-0Zqiz5jwguWslxWzymfHpKz6nPHLAmA0x80A1-TOz36ub_FrLy0Ncqu9oXTRHyQCpFY-5ihSv1pNCo3TWlPK1i58KuYab0ZGOAW8WrSM822vPVqLeQ65FJNo-vlotpxoM" />
-                                    <div class="flex-1">
-                                        <div class="flex justify-between items-start">
-                                            <div>
-                                                <div
-                                                    class="flex items-center gap-2 text-[10px] text-primary font-bold mb-1">
-                                                    <span class="material-symbols-outlined text-sm">schedule</span>
-                                                    09:06
-                                                </div>
-                                                <h4 class="font-bold text-sm md:text-base">鈍屋拉麵 心齋橋店</h4>
-                                            </div>
-                                            <button class="text-slate-400 hover:text-primary transition-colors"><span
-                                                    class="material-symbols-outlined text-lg">favorite</span></button>
-                                        </div>
-                                        <p class="text-xs text-slate-500 dark:text-white/40 mt-1">停留 1 小時</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="h-10"></div>
+                            </li>
+                        </ul>
                     </div>
-                </div>
-                <div
-                    class="p-4 md:p-6 bg-white dark:bg-zinc-900 border-t border-slate-100 dark:border-white/10 sticky bottom-0">
-                    <button
-                        class="w-full bg-[#0095f6] hover:bg-[#0081d6] text-white py-3 md:py-4 rounded-full font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 text-sm md:text-base transition-colors">
-                        <span class="material-symbols-outlined text-xl">content_copy</span>
-                        複製整個行程
-                    </button>
                 </div>
             </div>
-        </main>
-        <div
-            class="mobile-view-toggle fixed bottom-24 left-1/2 -translate-x-1/2 bg-white dark:bg-zinc-800 rounded-full shadow-2xl border border-slate-200 dark:border-white/10 flex p-1 z-50 lg:hidden scale-110">
-            <button
-                class="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold transition-all toggle-active"
-                onclick="document.getElementById('itinerary-content').style.display='flex'; document.getElementById('map-content').style.display='none'; this.classList.add('toggle-active'); this.nextElementSibling.classList.remove('toggle-active');">
-                <span class="material-symbols-outlined text-sm">list_alt</span>
-                列表
-            </button>
-            <button class="flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold transition-all"
-                onclick="document.getElementById('itinerary-content').style.display='none'; document.getElementById('map-content').style.display='block'; this.classList.add('toggle-active'); this.previousElementSibling.classList.remove('toggle-active');">
-                <span class="material-symbols-outlined text-sm">map</span>
-                地圖
-            </button>
         </div>
-        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-
     </div>
 
+    <header th:fragment="myHeader"
+        class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
+        <a th:href="@{/home}">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
+                    <img alt="Seichi Junrei Logo" class="w-full h-full object-contain" th:src="@{/images/LOGO.png}" />
+                </div>
+                <h1 class="text-primary text-2xl font-bold tracking-tight"
+                    style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</h1>
+            </div>
+        </a>
+        <nav class="hidden md:flex flex-1 justify-center items-center gap-10">
+            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                th:href="@{/news}">最新消息</a>
+            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                th:href="@{/info}">旅遊情報</a>
+            <div class="relative group">
+                <a class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
+                    th:href="@{/workList}">
+                    聖地作品巡禮
+                    <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+                </a>
+                <div
+                    class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
+                        href="#">電影作品</a>
+                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
+                        href="#">動畫作品</a>
+                </div>
+            </div>
+            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                th:href="@{/packageTour}">行程規劃</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button aria-label="Toggle theme"
+                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
+                onclick="document.documentElement.classList.toggle('dark')">
+                <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
+                <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
+            </button>
+            <!-- head CSS 不是直接放入而是引用時用這條
+            <button aria-label="Toggle theme"
+                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
+                onclick="document.documentElement.classList.toggle('dark')">
+
+                <span class="material-symbols-outlined block dark:hidden">light_mode</span>
+
+                <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
+            </button> -->
+            <a th:href="@{/login}"><button
+                    class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
+                    會員登入
+                </button></a>
+        </div>
+    </header>
+
+    <main class="flex-1 relative flex w-full h-full overflow-hidden">
+
+        <div id="map" class="absolute inset-0 z-0 h-full w-full bg-slate-100 dark:bg-[#1a140d]"></div>
+
+        <div class="flex-1 relative pointer-events-none z-10 h-full">
+        </div>
+
+        <div id="itinerary-panel" class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
+
+            <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-30 bg-white dark:bg-background-dark shadow-sm shrink-0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-lg font-bold text-primary tracking-tight">官方行程總覽</h1>
+                </div>
+                <button th:onclick="'copyToMyPlan(' + ${plan?.planId} + ')'" class="flex items-center gap-1 md:gap-2 bg-[#008ccf] hover:bg-[#007ab8] text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
+                    <span class="material-symbols-outlined text-base">edit_document</span>完善規劃
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col" id="itinerary-scroll-area">
+
+                <div class="relative w-full h-[180px] shrink-0 bg-slate-800 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                        <div>
+                            <span class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本, 關西</span>
+                            <h1 class="text-xl font-bold text-white tracking-wide shadow-sm">大阪京都5天4夜鐵腿之旅</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-white/10 shrink-0">
+                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
+                </div>
+
+                <div class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark overflow-x-auto border-b border-slate-200 dark:border-white/10 no-scrollbar shrink-0">
+                    <button onclick="selectDay(1)" id="btn-day-1" class="px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md">Day 1</button>
+                    <button onclick="selectDay(2)" id="btn-day-2" class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition">Day 2</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button id="mobile-toggle-btn" onclick="toggleMobileView()" class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
+            <span class="material-symbols-outlined" id="toggle-icon">map</span>
+            <span id="toggle-text">展開地圖</span>
+        </button>
+
+    </main>
+
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" async defer></script>
+    <script th:src="@{/js/packageTourDetail.js}"></script>
 </body>
 
 </html>

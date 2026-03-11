@@ -18,17 +18,16 @@
                 <p whitespace-nowrap> 掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。</p>
             </div>
             <!-- Section 1: Website Info (Cards Layout) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
                 <div th:each="info, iterStat : ${newSection}"
                     class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none flex flex-col">
 
                     <div class="aspect-video relative overflow-hidden">
                         <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                             th:style="'background-image: url(' + 
-                    (${iterStat.index == 0} ? @{/article_img/news_discount.png} : 
-                    (${iterStat.index == 1} ? @{/article_img/news_member.png} : @{/article_img/news_photo.png})) 
-                    + ');'">
+                                    (${iterStat.index == 0} ? @{/news/news_discount.png} : 
+                                    (${iterStat.index == 1} ? @{/news/news_member.png} : @{/news/news_photo.png})) 
+                                    + ');'">
                         </div>
 
                         <div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded"
@@ -117,7 +116,6 @@
                     </div>
                 </div>
 
-
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:h-[600px]">
 
                     <a th:each="art, iterStat :${travelGuides}" th:if="${iterStat.index < 4}"
@@ -128,9 +126,9 @@
 
                         <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                             th:style="'background-image: url(' + 
-                                        (${iterStat.index == 0} ? @{/article_img/news_travel.png} : 
-                                        (${iterStat.index == 1} ? @{/article_img/news_ticket.png} : 
-                                        (${iterStat.index == 2} ? @{/article_img/news_shoes.png} : @{/article_img/news_food.png}))) 
+                                        (${iterStat.index == 0} ? @{/news/news_travel.png} : 
+                                        (${iterStat.index == 1} ? @{/news/news_ticket.png} : 
+                                        (${iterStat.index == 2} ? @{/news/news_shoes.png} : @{/news/news_food.png}))) 
                                         + ');'">
                         </div>
 
@@ -158,52 +156,8 @@
     </div>
 
     <!-- 日本旅遊即時資訊  -->
-    <script>
-        const UPDATE_INTERVAL = 300000;
+    <script th:src="@{/news/js/news.js}"></script>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchJapanAlerts();
-            setInterval(fetchJapanAlerts, UPDATE_INTERVAL);
-        });
-
-        async function fetchJapanAlerts() {
-            const container = document.getElementById('alert-container');
-            try {
-                const response = await fetch('/api/travel/japan');
-                if (!response.ok) throw new Error();
-                const data = await response.json();
-
-                if (!Array.isArray(data) || data.length === 0) {
-                    container.innerHTML = '<p class="text-slate-500 text-sm italic">目前無最新警示</p>';
-                    return;
-                }
-
-                let html = '';
-                data.forEach(item => {
-                    html += `
-                    <div class="p-6 bg-background-dark/5 dark:bg-background-dark/50 border border-slate-200 dark:border-white/10 rounded-xl transition-all hover:border-primary/30 mb-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <div class="flex items-center gap-2">
-                                <span class="text-primary text-[10px] font-bold px-2 py-0.5 bg-primary/10 rounded">最新動態</span>
-                                <h5 class="text-slate-900 dark:text-white font-bold text-sm m-0">${item.title}</h5>
-                            </div>
-                            <span class="text-slate-500 text-[10px]">${item.pubDate || ''}</span>
-                        </div>
-                        <div class="text-slate-600 dark:text-slate-400 text-xs leading-normal m-0 p-0">
-                            ${item.description}
-                        </div>
-                    </div>
-                `;
-                });
-
-                if (container.innerHTML !== html) {
-                    container.innerHTML = html;
-                }
-            } catch (err) {
-                console.error("更新失敗", err);
-            }
-        }
-    </script>
 
 
 </body>

@@ -30,12 +30,15 @@ public class WorkController {
     @GetMapping("/workList")
     public String getWorkPage(Model model, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
-            @RequestParam(defaultValue = "DESC") String sortDir) {
-        Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir);
+            @RequestParam(defaultValue = "DESC") String sortDir,
+            @RequestParam(required = false) String workClass
+        ) {
+        Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass);
 
         model.addAttribute("works", workPage);
         model.addAttribute("page", page);
         model.addAttribute("sortNow", sortDir);
+        model.addAttribute("classNow", workClass);
 
         return "workList";
     }
