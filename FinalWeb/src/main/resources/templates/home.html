@@ -216,6 +216,20 @@
 
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
   </div>
+    <div id="toast"
+      th:if="${param.msg}"
+      th:data-msg="${param.msg[0]}"
+      class="fixed top-24 right-6 z-[9999] hidden min-w-[260px] max-w-[360px]
+              rounded-xl border px-4 py-3 shadow-lg
+              transition-all duration-300 opacity-0 translate-y-[-8px]">
+      <div class="flex items-start gap-3">
+          <span id="toastIcon" class="material-symbols-outlined text-xl">info</span>
+          <div>
+              <p id="toastTitle" class="font-bold text-sm"></p>
+              <p id="toastText" class="text-sm mt-1 opacity-90"></p>
+          </div>
+      </div>
+  </div>
 
   <script>
     function showContent(tab) {

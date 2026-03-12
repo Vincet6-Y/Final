@@ -27,19 +27,19 @@ public class MemberController {
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
         if(member == null){
-            return "redirect:/auth?error";
+            return "redirect:/auth?msg=loginError";
         }
 
         session.setAttribute("loginMember", member);
 
-        return "redirect:/home";
+        return "redirect:/home?msg=loginSuccess";
     }
 
     // 處理登出
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/home";
+        return "redirect:/home?msg=logoutSuccess";
     }
 
     // 處理註冊
