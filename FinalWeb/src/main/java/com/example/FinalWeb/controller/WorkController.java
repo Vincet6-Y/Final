@@ -12,12 +12,13 @@ import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.WorkService;
 
 @Controller
+@RequestMapping("/")
 public class WorkController {
 
     @Autowired
     private WorkService service;
 
-    // 首頁邏輯
+     // 首頁邏輯
     @GetMapping("/home")
     public String home(Model model) {
         System.out.println("=== 偵測到訪問首頁 ===");
@@ -29,24 +30,36 @@ public class WorkController {
         return "home";
     }
 
-    // 列表頁邏輯
+    // 測試抓 TiDB 的資料用 RestController，需要強制轉 JSON
+    // @GetMapping(value = "/test", produces = "application/json")
+    // public List<WorkDetailEntity> getWord() {
+    // return service.getWork();
+    // }
+
     @GetMapping("/workList")
-    public String getWorkPage(Model model, 
-            @RequestParam(defaultValue = "0") int page,
+    public String getWorkPage(Model model, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
             @RequestParam(defaultValue = "DESC") String sortDir,
             @RequestParam(required = false) String workClass) {
         Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass);
+
         model.addAttribute("works", workPage);
         model.addAttribute("page", page);
+        model.addAttribute("sortNow", sortDir);
+        model.addAttribute("classNow", workClass);
+
         return "workList";
     }
 
-    // 詳情頁邏輯
-    @GetMapping("/workListDetail")
-    public String workListDetail(Model model, @RequestParam int workId) {
+    @RequestMapping("/workListDetail")
+    public String workListDetail(Model model,
+            @RequestParam(value = "workId") int workId) {
+
         WorkDetailEntity gEntity = service.getWorkId(workId);
+
         model.addAttribute("idNow", gEntity);
+
         return "workListDetail";
     }
+
 }
