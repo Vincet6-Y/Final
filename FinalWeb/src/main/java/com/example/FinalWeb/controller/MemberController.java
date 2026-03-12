@@ -35,6 +35,7 @@ public class MemberController {
         return "redirect:/home";
     }
 
+    // 處理登出
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
@@ -45,9 +46,19 @@ public class MemberController {
     @PostMapping("/register")
     public String register(MemberRegisterDTO register) {
 
-        String email = register.email();
-        String passwd = register.passwd();
+        String result = memberService.register(register);
 
+        if ("註冊成功".equals(result)) {
+            return "redirect:/auth?registerSuccess";
+        }
+
+        if ("Email已註冊".equals(result)) {
+            return "redirect:/auth?registerError=emailExists";
+        }
+
+        if ("密碼不一致".equals(result)) {
+            return "redirect:/auth?registerError=passwdNotMatch";
+        }
 
         return "redirect:/auth";
     }

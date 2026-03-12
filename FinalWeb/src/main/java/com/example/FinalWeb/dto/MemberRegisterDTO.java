@@ -1,10 +1,12 @@
 package com.example.FinalWeb.dto;
 
+import java.time.LocalDate;
+
 public record MemberRegisterDTO(
         String name,
         String email,
         String phone,
-        String birthday,
+        LocalDate birthday,
         String passwd,
         String confirmPasswd
 ) {}

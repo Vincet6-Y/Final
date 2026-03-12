@@ -66,12 +66,14 @@
             </div>
 
             <div th:if="${session.loginMember != null}" class="flex items-center gap-3">
-                <span class="text-sm text-white">
-                    歡迎，<span th:text="${session.loginMember.name}"></span>
+                <span class="text-sm font-medium text-neutral-800 dark:text-white">
+                    <span th:text="${session.loginMember.name}"></span>
                 </span>
 
                 <a th:href="@{/auth/logout}"
-                class="inline-block border border-white/20 hover:border-white/40 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all">
+                class="bg-primary hover:bg-orange-600
+                        text-white dark:text-background-dark
+                        px-4 py-1.5 rounded-lg text-sm font-bold transition-all">
                     登出
                 </a>
             </div>
