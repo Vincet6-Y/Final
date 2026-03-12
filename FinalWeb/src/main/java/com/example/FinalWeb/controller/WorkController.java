@@ -38,6 +38,7 @@ public class WorkController {
             @RequestParam(required = false) String workClass) {
         Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass);
         model.addAttribute("works", workPage);
+        model.addAttribute("page", page);
         return "workList";
     }
 
