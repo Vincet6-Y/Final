@@ -211,12 +211,16 @@
                     <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
                 </div>
 
-                <div class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark overflow-x-auto border-b border-slate-200 dark:border-white/10 no-scrollbar shrink-0">
-                    <button onclick="selectDay(1)" id="btn-day-1" class="px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md">Day 1</button>
-                    <button onclick="selectDay(2)" id="btn-day-2" class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition">Day 2</button>
+                <div class="flex items-center gap-2 p-3 ... shrink-0" id="day-buttons-container">
+                    <button onclick="selectDay(1)" id="btn-day-1" ...>Day 1</button>
+                </div>
+
+                <div id="itinerary-lists-container" class="flex-1 overflow-y-auto relative w-full">
                 </div>
 
             </div>
+
+        </div>
         </div>
 
         <button id="mobile-toggle-btn" onclick="toggleMobileView()" class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
@@ -227,7 +231,11 @@
     </main>
 
     <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" async defer></script>
-    <script th:src="@{/js/packageTourDetail.js}"></script>
+
+    <script th:src="@{/tour/Detail/tourGlobals.js}"></script>
+    <script th:src="@{/tour/Detail/tourApi.js}"></script>
+    <script th:src="@{/tour/Detail/tourMap.js}"></script>
+    <script th:src="@{/tour/Detail/tourUi.js}"></script>
 </body>
 
 </html>
