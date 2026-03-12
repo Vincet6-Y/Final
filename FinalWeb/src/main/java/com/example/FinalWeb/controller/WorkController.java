@@ -31,13 +31,18 @@ public class WorkController {
     public String getWorkPage(Model model, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
             @RequestParam(defaultValue = "DESC") String sortDir,
-            @RequestParam(required = false) String workClass) {
-        Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass);
+            @RequestParam(required = false) String workClass,
+            @RequestParam(defaultValue = "1980") String minYear,
+            @RequestParam(defaultValue = "2026") String maxYear) {
+                
+        Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass, minYear, maxYear);
 
         model.addAttribute("works", workPage);
         model.addAttribute("page", page);
         model.addAttribute("sortNow", sortDir);
         model.addAttribute("classNow", workClass);
+        model.addAttribute("minYearNow", minYear);
+        model.addAttribute("maxYearNow", maxYear);
 
         return "workList";
     }
