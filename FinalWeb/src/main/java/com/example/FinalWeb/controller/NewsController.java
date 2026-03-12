@@ -18,7 +18,7 @@ import com.example.FinalWeb.service.ArticleService;
 
 @Controller
 @RequestMapping("/")
-public class ArticleWebController {
+public class NewsController {
 
     @Autowired
     private ArticleService articleService;
