@@ -86,8 +86,7 @@
                                         th:data-place-id="${spot.googlePlaceId}"
                                         th:data-day="${entry.key}"
                                         th:data-order="${spot.visitOrder}"
-                                        th:data-has-ticket="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}"
-                                        onclick="openSpotModal(this)">
+                                        th:data-has-ticket="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}">
 
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center gap-3">

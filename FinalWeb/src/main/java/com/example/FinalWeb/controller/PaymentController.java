@@ -30,13 +30,24 @@ public class PaymentController {
     private OrdersDetailRepo ordersDetailRepo;
 
     // 利用 @ModelAttribute 攔截 /payment 請求，主動將訂單資料塞入 Model
-    // 這樣 MemberController 的 return "payment" 就能順利拿到資料，前端就不會因為 null 報錯沒畫面了！
+    // orderId 必須由上游頁面（行程規劃頁）透過 URL 帶入，例如 /payment?orderId=123
     @ModelAttribute
     public void addPaymentDataIfNecessary(HttpServletRequest request,
-            @RequestParam(name = "orderId", required = false, defaultValue = "1001") Integer orderId,
+            @RequestParam(name = "orderId", required = false) Integer orderId,
             Model model) {
         if ("/payment".equals(request.getRequestURI())) {
-            OrdersEntity order = ordersRepo.findById(orderId).orElse(new OrdersEntity());
+            OrdersEntity order = null;
+
+            if (orderId != null) {
+                // ✅ 從 DB 用上游帶入的 orderId 查詢訂單
+                order = ordersRepo.findById(orderId).orElse(null);
+            }
+
+            if (order == null) {
+                // 如果沒帶 orderId 或查不到，給空物件避免前端報錯
+                order = new OrdersEntity();
+            }
+
             model.addAttribute("order", order);
 
             int totalAmount = 0;

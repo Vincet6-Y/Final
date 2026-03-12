@@ -770,3 +770,20 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDayButtonsAndLists(newStart);
     });
 });
+
+// ==========================================
+// 💳 前往付款 (串接用的暫時函數)
+// 負責行程的同學在儲存行程與訂單後，會取得一個 orderId。
+// 這裡將那個 orderId 附加在 URL 上，傳遞給 /payment 進行結帳。
+// ==========================================
+function goToPayment() {
+    // TODO: 這裡未來要替換成負責行程同學 API 回傳的真實 orderId
+    // 假設行程儲存後會把 orderId 存在 window 變數或 sessionStorage
+    const orderId = window.currentOrderId || sessionStorage.getItem('currentOrderId') || 1001;
+    
+    // 將 orderId 帶入網址跳轉
+    window.location.href = '/payment?orderId=' + orderId;
+    
+    // return false 阻止 <a> 標籤的預設行為
+    return false;
+}
