@@ -43,10 +43,46 @@ function initMap() {
     });
     placesService = new google.maps.places.PlacesService(map);
 
-    setupAutocomplete("pac-input-desktop");
-    setupAutocomplete("pac-input-mobile");
-    calculateAndDisplayRoute(1);
+    // 🌟 關鍵新增：取得 URL 上的 planId，並向後端 API 請求資料
+    const urlParams = new URLSearchParams(window.location.search);
+    const planId = urlParams.get('planId');
 
+    if (planId) {
+        // 呼叫 PlanRestController
+        fetch(`/api/plan/officialPlanNodes/${planId}`)
+            .then(res => res.json())
+            .then(data => {
+                // 清空原本的行程資料結構
+                itineraryData = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+                // 將資料庫的景點塞入 itineraryData
+                data.forEach(node => {
+                    if (!itineraryData[node.dayNumber]) itineraryData[node.dayNumber] = [];
+                    itineraryData[node.dayNumber].push({
+                        place_id: node.googlePlaceID,
+                        lat: node.latitude,
+                        lng: node.longitude,
+                        name: node.locationName,
+                        arrivals: "08:00", // 預設 8 點出發，系統會自動推算
+                        duration: "1",     // 預設停留 1 小時
+                        hasTicketOffer: false
+                    });
+                });
+
+                // 如果有資料，將地圖中心移動到第一天的第一個景點
+                if (data.length > 0 && itineraryData[1].length > 0) {
+                    const first = itineraryData[1][0];
+                    map.setCenter({ lat: first.lat, lng: first.lng });
+                }
+
+                // 畫出路線並更新左側面板 UI
+                calculateAndDisplayRoute(1);
+                selectDay(1);
+            })
+            .catch(err => console.error("無法取得行程資料:", err));
+    }
+
+    // 點擊地圖景點時顯示詳細資訊卡
     map.addListener("click", (event) => {
         if (event.placeId) {
             event.stop();
@@ -777,22 +813,22 @@ function copyToMyPlan(officialPlanId) {
             // 如果有 Spring Security，記得帶上 CSRF token 或 JWT
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('未登入或系統錯誤');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // data.newMyPlanId 是後端複製成功後，回傳的「新自訂行程 ID」
-        if (data.success) {
-            // 成功！跳轉到「編輯模式」的 packageTourMap.html，並帶上專屬的 myPlanId
-            window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('請先登入會員，才能將官方行程加入您的專屬規劃中！');
-        window.location.href = '/login'; // 引導登入
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('未登入或系統錯誤');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // data.newMyPlanId 是後端複製成功後，回傳的「新自訂行程 ID」
+            if (data.success) {
+                // 成功！跳轉到「編輯模式」的 packageTourMap.html，並帶上專屬的 myPlanId
+                window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('請先登入會員，才能將官方行程加入您的專屬規劃中！');
+            window.location.href = '/login'; // 引導登入
+        });
 }

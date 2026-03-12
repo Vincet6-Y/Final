@@ -14,8 +14,9 @@
             <!-- Hero Section Header -->
             <div class="mb-12">
                 <h2 class="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight ">最新消息</h2>
-                <p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4">
-                <p whitespace-nowrap> 掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。</p>
+                <p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4 whitespace-nowrap">
+                    掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。
+                </p>
             </div>
             <!-- Section 1: Website Info (Cards Layout) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
@@ -39,7 +40,7 @@
                             th:text="${info.title}">標題</h4>
 
                         <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2"
-                            th:text="${info.content}">內文簡介</p>
+                            th:text="${info.purePreview}">內文簡介</p>
 
                         <a th:href="@{/article/{id}(id=${info.articleId})}"
                             class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2 mt-auto">
