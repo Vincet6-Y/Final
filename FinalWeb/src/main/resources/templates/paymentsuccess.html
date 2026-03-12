@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-Hant">
+<html class="dark" lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
@@ -9,177 +9,415 @@
         <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
-            <div class="text-center mb-16 flex flex-col items-center">
-                <h2 class="text-4xl lg:text-5xl font-black text-slate-800 dark:text-white mb-4">預訂成功！</h2>
-                <h3 class="text-2xl font-bold text-slate-600 dark:text-slate-300 mb-8">自訂的行程標題：鎌倉・江之島 青春巡禮</h3>
+
+            <!-- ==================== 頂部：行程標題 + 預訂成功 + 日期 ==================== -->
+            <div class="text-center mb-10 flex flex-col items-center">
+                <!-- 行程標題 -->
                 <div
-                    class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-10 py-4 rounded-xl text-2xl font-bold border border-slate-200 dark:border-white/10 shadow-xl inline-block">
-                    2024 3/2 ~ 3/7
+                    class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-12 py-4 rounded-xl text-xl font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block mb-6"
+                    th:text="${myPlan != null && myPlan.myPlanName != null} ? ${myPlan.myPlanName} : '聖地巡禮行程'">
+                    自訂的行程標題
+                </div>
+
+                <!-- 預訂成功 -->
+                <h2 class="text-4xl lg:text-5xl font-black text-slate-800 dark:text-white mb-6 italic"
+                    style="font-style: italic;">預訂成功！</h2>
+
+                <!-- 行程日期 -->
+                <div
+                    class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-10 py-4 rounded-xl text-lg font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block"
+                    th:if="${myPlan != null && myPlan.startDate != null}">
+                    完善規劃抓到的行程日期：<span class="text-primary" th:text="${myPlan.startDate}">e.g. 3/2~3/7</span>
                 </div>
             </div>
-            <div class="flex flex-col lg:flex-row gap-10">
-                <div class="flex-1">
-                    <div class="w-full flex items-center justify-center gap-4 mb-10">
-                        <button
-                            class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-primary opacity-50 cursor-not-allowed transition-colors shrink-0">
-                            <span class="material-symbols-outlined">chevron_left</span>
-                        </button>
-                        <div class="max-w-[648px] overflow-hidden">
-                            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2 snap-x">
-                                <button
-                                    class="snap-start shrink-0 bg-primary text-white px-8 py-3 rounded-xl font-bold min-w-[120px] text-center shadow-lg shadow-primary/30">Day
-                                    1</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    2</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    3</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    4</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    5</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    6</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    7</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    8</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    9</button>
-                                <button
-                                    class="snap-start shrink-0 bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center hover:border-primary/50 transition-colors">Day
-                                    10</button>
-                            </div>
-                        </div>
-                        <button
-                            class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-primary hover:bg-primary/10 transition-colors shrink-0">
-                            <span class="material-symbols-outlined">chevron_right</span>
-                        </button>
-                    </div>
-                    <div class="relative border-l-2 border-primary/40 ml-4 lg:ml-6 space-y-12 pb-8">
-                        <div class="relative pl-10">
-                            <div
-                                class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-blue-500 flex items-center justify-center text-blue-500">
-                                <span class="material-symbols-outlined text-sm">train</span>
-                            </div>
-                            <div class="mb-1 text-blue-500 font-bold">09:00</div>
-                            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">鎌倉站集合 (Kamakura
-                                Station)</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm">於東口廣場與導遊會合，領取專屬紀念護照。</p>
-                        </div>
-                        <div class="relative pl-10 hover:bg-slate-50 transition-colors p-2 rounded-lg"
-                            style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#kamakuraModal">
 
-                            <div
-                                class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-blue-500 flex items-center justify-center text-blue-500">
-                                <span class="material-symbols-outlined text-sm">photo_camera</span>
-                            </div>
-
-                            <div class="mb-1 text-blue-500 font-bold">10:00</div>
-                            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">鎌倉高校前平交道</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm mb-0">經典片頭曲場景！捕捉電車經過的瞬間（點擊查看詳情）。</p>
-
-                        </div>
-                        <div class="relative pl-10">
-                            <div
-                                class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-blue-500 flex items-center justify-center text-blue-500">
-                                <span class="material-symbols-outlined text-sm">directions_walk</span>
-                            </div>
-                            <div class="mb-1 text-blue-500 font-bold">11:30</div>
-                            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">湘南海岸漫步</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm">漫步在櫻木與流川楓曾騎車經過的海堤，遠眺江之島。</p>
-                        </div>
-                        <div class="relative pl-10">
-                            <div
-                                class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-blue-500 flex items-center justify-center text-blue-500">
-                                <span class="material-symbols-outlined text-sm">restaurant</span>
-                            </div>
-                            <div class="mb-1 text-blue-500 font-bold">13:00</div>
-                            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Pacific Drive-in 午餐
-                            </h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm">一邊享用美式餐點，一邊欣賞壯闊的相模灣美景。</p>
-                        </div>
-                        <div class="relative pl-10">
-                            <div
-                                class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-blue-500 flex items-center justify-center text-blue-500">
-                                <span class="material-symbols-outlined text-sm">temple_buddhist</span>
-                            </div>
-                            <div class="mb-1 text-blue-500 font-bold">15:00</div>
-                            <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">高德院 (鎌倉大佛)</h4>
-                            <p class="text-slate-600 dark:text-slate-400 text-sm">參觀標誌性的國寶大佛，為旅程畫下圓滿句點。</p>
-                        </div>
+            <!-- ==================== Day 分頁按鈕列 ==================== -->
+            <div class="w-full flex items-center justify-center gap-4 mb-10"
+                th:if="${groupedByDay != null && !groupedByDay.isEmpty()}">
+                <button id="day-scroll-left"
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-primary hover:bg-primary/10 transition-colors shrink-0">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <div class="max-w-[648px] overflow-hidden">
+                    <div id="day-tabs" class="flex gap-3 overflow-x-auto no-scrollbar pb-2 snap-x">
+                        <button th:each="entry : ${groupedByDay}" th:data-day="${entry.key}"
+                            th:classappend="${entry.key == 1} ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-primary/50'"
+                            class="day-tab snap-start shrink-0 px-8 py-3 rounded-xl font-bold min-w-[120px] text-center transition-colors"
+                            th:text="'Day ' + ${entry.key}">Day 1</button>
                     </div>
                 </div>
+                <button id="day-scroll-right"
+                    class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-primary hover:bg-primary/10 transition-colors shrink-0">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+
+            <!-- ==================== 主要內容：行程 (左) + 提醒 (右) ==================== -->
+            <div class="flex flex-col lg:flex-row gap-10">
+
+                <!-- ========== 左側：行程時間軸 (分 Day 切換) ========== -->
+                <div class="flex-1">
+
+                    <!-- 有行程資料時 -->
+                    <div th:if="${groupedByDay != null && !groupedByDay.isEmpty()}">
+                        <!-- 每個 Day 的景點列表 (用 data-day-panel 標記) -->
+                        <div th:each="entry : ${groupedByDay}" th:data-day-panel="${entry.key}"
+                            th:classappend="${entry.key != 1} ? 'hidden' : ''"
+                            class="day-panel">
+
+                            <div class="flex items-center gap-2 mb-6">
+                                <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200"
+                                    th:text="'當日行程總覽'">當日行程總覽</h3>
+                            </div>
+
+                            <div class="relative border-l-2 border-primary/40 ml-4 lg:ml-6 space-y-8 pb-8">
+                                <div th:each="spot, iterStat : ${entry.value}" class="relative pl-10">
+                                    <!-- 左側圓形標記 -->
+                                    <div
+                                        class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-primary flex items-center justify-center shadow-md">
+                                        <span class="material-symbols-outlined text-primary text-sm">place</span>
+                                    </div>
+
+                                    <!-- 景點行 (可點擊 → 開啟 Modal) -->
+                                    <div class="spot-card cursor-pointer group bg-white dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-4 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all"
+                                        th:data-spot-id="${spot.spotId}"
+                                        th:data-spot-name="${spot.locationName}"
+                                        th:data-place-id="${spot.googlePlaceId}"
+                                        th:data-day="${entry.key}"
+                                        th:data-order="${spot.visitOrder}"
+                                        th:data-has-ticket="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}"
+                                        onclick="openSpotModal(this)">
+
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <!-- 時間 (用 visitOrder 推算簡易時間: 08:00 起每 2 小時) -->
+                                                <span class="text-primary font-bold text-sm min-w-[50px]"
+                                                    th:text="${#strings.toString(8 + (spot.visitOrder != null ? (spot.visitOrder - 1) * 2 : 0)) + ':00'}">09:00</span>
+                                                <!-- 景點名稱 -->
+                                                <h4 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors"
+                                                    th:text="${spot.locationName}">景點名稱</h4>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <!-- 有門票標記 -->
+                                                <span th:if="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}"
+                                                    class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                    <span class="material-symbols-outlined text-xs">local_activity</span>
+                                                    付費
+                                                </span>
+                                                <span
+                                                    class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors text-sm">chevron_right</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 沒有行程資料時 -->
+                    <div th:if="${groupedByDay == null || groupedByDay.isEmpty()}"
+                        class="bg-slate-50 dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-12 text-center">
+                        <span class="material-symbols-outlined text-5xl text-slate-300 mb-4 block">map</span>
+                        <p class="text-slate-500 text-lg">行程景點資料將在此顯示</p>
+                    </div>
+                </div>
+
+                <!-- ========== 右側：提醒 + 票券明細 ========== -->
                 <div class="w-full lg:w-[380px] shrink-0 space-y-6">
+
+                    <!-- 行前貼心小提醒 -->
                     <div
                         class="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 p-6 rounded-2xl shadow-lg">
                         <h4 class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold mb-5 text-lg">
                             <span class="material-symbols-outlined">lightbulb</span>
-                            行前貼心提醒
+                            行前貼心小提醒
                         </h4>
                         <ul class="space-y-4">
                             <li class="flex gap-3 items-start">
                                 <span class="material-symbols-outlined text-blue-500 text-base mt-0.5">schedule</span>
-                                <span class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">最佳拍攝光線為 09:00 -
-                                    11:00，請務必準時集合。</span>
+                                <span class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">請於出發前確認所有票券的使用說明與有效期限。</span>
                             </li>
                             <li class="flex gap-3 items-start">
                                 <span class="material-symbols-outlined text-blue-500 text-base mt-0.5">info</span>
                                 <span
-                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">拍攝平交道時請遵守交通守則，切勿踏入鐵軌。</span>
+                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">已購買的電子票券會自動發送至您的 E-mail 信箱。</span>
+                            </li>
+                            <li class="flex gap-3 items-start">
+                                <span
+                                    class="material-symbols-outlined text-blue-500 text-base mt-0.5">confirmation_number</span>
+                                <span
+                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">付費景點可點擊行程卡片查看電子票券 QR Code。</span>
                             </li>
                             <li class="flex gap-3 items-start">
                                 <span
                                     class="material-symbols-outlined text-blue-500 text-base mt-0.5">directions_transit</span>
                                 <span
-                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">建議持「江之電一日券」可更靈活移動於各點之間。</span>
-                            </li>
-                            <li class="flex gap-3 items-start">
-                                <span class="material-symbols-outlined text-blue-500 text-base mt-0.5">air</span>
-                                <span
-                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">海邊風大，建議攜帶輕便防風外套。</span>
+                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">建議提前下載離線地圖，以便在旅途中使用。</span>
                             </li>
                         </ul>
                     </div>
+
+                    <!-- 回首頁按鈕 -->
+                    <a th:href="@{/home}"
+                        class="block w-full bg-primary hover:bg-primary/90 text-white dark:text-background-dark text-center py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/30 transition-all active:scale-[0.98]">
+                        <span class="flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">home</span>
+                            回到首頁
+                        </span>
+                    </a>
                 </div>
             </div>
         </main>
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-
     </div>
 
-    <div class="modal fade" id="kamakuraModal" tabindex="-1" aria-labelledby="kamakuraModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
+    <!-- ==================== 景點詳情 Modal ==================== -->
+    <div id="spotModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div
+            class="relative bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/10">
 
-                <div class="modal-header">
-                    <h5 class="modal-title font-bold text-xl" id="kamakuraModalLabel">鎌倉高校前平交道 - 景點詳情</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- 關閉按鈕 -->
+            <button id="closeModalBtn"
+                class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-primary/80 hover:bg-primary text-white flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+
+            <!-- Modal 標題 -->
+            <div class="flex items-center gap-2 p-6 pb-0">
+                <span class="material-symbols-outlined text-primary">explore</span>
+                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200">景點詳情</h3>
+            </div>
+
+            <!-- 景點照片 -->
+            <div class="p-6 pb-4">
+                <div id="modal-photo"
+                    class="w-full h-56 lg:h-72 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl text-slate-300 animate-pulse">photo_camera</span>
                 </div>
+            </div>
 
-                <div class="modal-body">
-                    <img src="https://via.placeholder.com/800x400" alt="鎌倉平交道實景" class="w-100 mb-3 rounded">
-                    <p class="text-slate-700">
-                        這裡是灌籃高手粉絲必訪的聖地！建議拍攝時間為上午，光線順光。
-                        <br><br>
-                        <strong>交通方式：</strong>搭乘江之島電鐵至「鎌倉高校前站」，出站步行約 1 分鐘即可抵達。
+            <!-- 景點資訊 -->
+            <div class="px-6 pb-4">
+                <h2 id="modal-name" class="text-2xl font-black text-slate-800 dark:text-white mb-2">景點名稱</h2>
+                <p id="modal-description" class="text-primary font-bold text-sm mb-4"></p>
+                <p id="modal-detail" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed"></p>
+            </div>
+
+            <!-- 付費景點通證 + QR Code (從後端 API 載入) -->
+            <div id="modal-ticket-section" class="hidden px-6 pb-6">
+                <div
+                    class="bg-gradient-to-b from-[#251d15] to-[#1a1209] rounded-xl p-6 text-center border border-primary/20">
+                    <div class="flex items-center justify-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-primary">confirmation_number</span>
+                        <h4 class="text-primary font-bold text-lg">付費景點通證</h4>
+                    </div>
+                    <!-- QR Code 圖片 (由後端 /api/ticket/qrcode/{id} 生成) -->
+                    <div class="bg-white rounded-xl p-4 inline-block mb-4 shadow-lg">
+                        <img id="modal-qrcode" class="w-40 h-40"
+                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="QR Code" />
+                    </div>
+                    <p id="modal-ticket-status" class="text-primary/70 text-sm font-medium">
+                        請在入口處向工作人員出示此 QR Code 進行掃描驗證。
                     </p>
                 </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-                </div>
-
             </div>
+
         </div>
     </div>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script th:inline="javascript">
+        // ==========================================
+        // 🎫 jQuery 驅動的 QR Code & 行程互動邏輯
+        // ==========================================
+
+        $(document).ready(function () {
+
+            // 從 Thymeleaf 注入訂單 ID
+            const orderId = /*[[${order != null ? order.orderId : 0}]]*/ 0;
+
+            // ==========================================
+            // 📦 頁面載入時，從後端撈取所有票券資料
+            // ==========================================
+            let ticketDataMap = {}; // key: spotId, value: ticket info
+
+            if (orderId > 0) {
+                $.ajax({
+                    url: '/api/ticket/byOrder/' + orderId,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function (tickets) {
+                        console.log('📦 載入票券資料:', tickets);
+                        // 建立 spotId → ticket 的對照表
+                        tickets.forEach(function (ticket) {
+                            if (ticket.spotId) {
+                                ticketDataMap[ticket.spotId] = ticket;
+                            }
+                            // 同時建立 orderDetailId 的對照表
+                            ticketDataMap['detail_' + ticket.orderDetailId] = ticket;
+                        });
+
+                        // 把所有 ticket 也用 orderDetailId 建立索引
+                        window.allTickets = tickets;
+                    },
+                    error: function (xhr) {
+                        console.warn('票券資料載入失敗:', xhr.status);
+                    }
+                });
+            }
+
+            // ==========================================
+            // 📅 Day 分頁切換 (jQuery)
+            // ==========================================
+            $('.day-tab').on('click', function () {
+                const day = $(this).data('day');
+
+                // 切換 Tab 樣式
+                $('.day-tab')
+                    .removeClass('bg-primary text-white shadow-lg shadow-primary/30')
+                    .addClass('bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300');
+                $(this)
+                    .removeClass('bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300')
+                    .addClass('bg-primary text-white shadow-lg shadow-primary/30');
+
+                // 切換 Panel
+                $('.day-panel').addClass('hidden');
+                $('[data-day-panel="' + day + '"]').removeClass('hidden');
+            });
+
+            // Day 左右滾動
+            $('#day-scroll-left').on('click', function () {
+                $('#day-tabs').animate({ scrollLeft: '-=150' }, 300);
+            });
+            $('#day-scroll-right').on('click', function () {
+                $('#day-tabs').animate({ scrollLeft: '+=150' }, 300);
+            });
+
+            // ==========================================
+            // 🏛️ 景點 Modal — 點擊景點卡片
+            // ==========================================
+            $(document).on('click', '.spot-card', function () {
+                const $card = $(this);
+                const spotName = $card.data('spot-name');
+                const placeId = $card.data('place-id');
+                const hasTicket = $card.data('has-ticket') === true || $card.data('has-ticket') === 'true';
+                const spotId = $card.data('spot-id');
+                const day = $card.data('day');
+                const visitOrder = $card.data('order');
+
+                // 設定 Modal 基本資訊
+                $('#modal-name').text(spotName);
+                $('#modal-description').text('載入中...');
+                $('#modal-detail').text('');
+                $('#modal-photo').html(
+                    '<span class="material-symbols-outlined text-4xl text-slate-300 animate-pulse">photo_camera</span>'
+                );
+
+                // ==========================================
+                // 🎫 QR Code 區塊：用 jQuery AJAX 從後端取得
+                // ==========================================
+                if (hasTicket && ticketDataMap[spotId]) {
+                    const ticket = ticketDataMap[spotId];
+
+                    $('#modal-ticket-section').removeClass('hidden');
+
+                    // 🔑 關鍵！QR Code 圖片直接指向後端 API
+                    $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticket.orderDetailId);
+
+                    // 顯示票券使用狀態
+                    if (ticket.ticketUsed) {
+                        $('#modal-ticket-status')
+                            .text('⚠️ 此票券已使用過')
+                            .removeClass('text-primary/70').addClass('text-red-400');
+                    } else {
+                        $('#modal-ticket-status')
+                            .text('請在入口處向工作人員出示此 QR Code 進行掃描驗證。')
+                            .removeClass('text-red-400').addClass('text-primary/70');
+                    }
+                } else if (hasTicket) {
+                    // 有標記為付費但還沒在 ticketDataMap 中（可能還沒關聯 spotId）
+                    // 嘗試用 jQuery 從後端查詢
+                    $('#modal-ticket-section').removeClass('hidden');
+                    $('#modal-qrcode').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+                    $('#modal-ticket-status').text('票券資訊載入中...');
+
+                    // 如果有 allTickets，用票券名稱模糊比對
+                    if (window.allTickets && window.allTickets.length > 0) {
+                        // 找一張還沒配對過 spotId 的票
+                        const matchedTicket = window.allTickets.find(function (t) {
+                            return t.ticketType && t.ticketType.includes(spotName);
+                        }) || window.allTickets[0]; // fallback: 用第一張票
+
+                        if (matchedTicket) {
+                            $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + matchedTicket.orderDetailId);
+                            $('#modal-ticket-status').text('請在入口處向工作人員出示此 QR Code 進行掃描驗證。');
+                        }
+                    }
+                } else {
+                    $('#modal-ticket-section').addClass('hidden');
+                }
+
+                // 顯示 Modal
+                $('#spotModal').removeClass('hidden').addClass('flex');
+
+                // ==========================================
+                // 📸 Google Places API 載入照片 (如果可用)
+                // ==========================================
+                if (placeId && typeof google !== 'undefined' && google.maps && google.maps.places) {
+                    const service = new google.maps.places.PlacesService(document.createElement('div'));
+                    service.getDetails({
+                        placeId: placeId,
+                        fields: ['name', 'photos', 'editorial_summary', 'formatted_address']
+                    }, function (place, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            if (place.photos && place.photos.length > 0) {
+                                const photoUrl = place.photos[0].getUrl({ maxWidth: 800, maxHeight: 400 });
+                                $('#modal-photo').html(
+                                    '<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />'
+                                );
+                            }
+                            const desc = place.editorial_summary ? place.editorial_summary.overview : '';
+                            $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
+                            $('#modal-detail').text(place.formatted_address || '');
+                        } else {
+                            $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                        }
+                    });
+                } else {
+                    $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                    $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
+                }
+            });
+
+            //
+            // ==========================================
+            // ❌ 關閉 Modal
+            // ==========================================
+            $('#closeModalBtn').on('click', function () {
+                $('#spotModal').addClass('hidden').removeClass('flex');
+            });
+
+            // 點擊背景關閉
+            $('#spotModal').on('click', function (e) {
+                if (e.target === this) {
+                    $(this).addClass('hidden').removeClass('flex');
+                }
+            });
+
+            // ESC 鍵關閉
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    $('#spotModal').addClass('hidden').removeClass('flex');
+                }
+            });
+
+        }); // end $(document).ready
+    </script>
+
 </body>
 
 </html>

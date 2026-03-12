@@ -1,5 +1,6 @@
-﻿package com.example.FinalWeb.entity;
+package com.example.FinalWeb.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,14 +22,22 @@ public class OrdersDetailEntity {
     private String ticketType;
     private Integer ticketPrice;
 
+    // QR Code 驗證用的唯一 Token (UUID 格式)
+    @Column(unique = true)
+    private String qrToken;
+
+    // 票券是否已使用 (掃描驗證後設為 true)
+    private Boolean ticketUsed = false;
+
     // 拉關連線到 orders
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId")
     private OrdersEntity orders;
 
-    // 拉關連線到 myMap
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spotId")
+    // 拉關連線到 myMap (加購項目可能沒有對應景點，所以 nullable)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "spotId", nullable = true)
     private MyMapEntity myMap;
 
 }
+
