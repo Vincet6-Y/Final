@@ -14,16 +14,20 @@ public class MemberService {
     @Autowired
     private MemberRepo memberRepo;
 
-    public boolean login(String email, String passwd) {
+    public MemberEntity login(String email, String passwd) {
 
         Optional<MemberEntity> memberEntity = memberRepo.findByEmail(email);
 
         if (memberEntity.isEmpty()) {
-            return false;
+            return null;
         }
 
         MemberEntity member = memberEntity.get();
+        
+        if (!member.getPasswd().equals(passwd)) {
+            return null;
+        }
 
-        return member.getPasswd().equals(passwd);
+        return member;
     }
 }

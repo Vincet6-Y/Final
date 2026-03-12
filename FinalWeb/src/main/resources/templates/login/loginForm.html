@@ -6,6 +6,11 @@
         </div>
 
         <form class="space-y-6" action="/auth/login" method="post">
+            
+            <div th:if="${param.error}" class="mb-4 rounded-lg bg-red-500/15 border border-red-400/30 px-4 py-3 text-sm text-red-200">
+                帳號或密碼錯誤
+            </div>
+
             <div class="space-y-2">
                 <label class="text-sm font-medium text-white/80 ml-1">Email</label>
                 <div class="relative group">

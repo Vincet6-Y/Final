@@ -58,10 +58,23 @@
 
                 <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
             </button> -->
-            <a th:href="@{/auth}"><button
-                    class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
+            <div th:if="${session.loginMember == null}">
+                <a th:href="@{/auth}"
+                class="inline-block bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
                     會員登入
-                </button></a>
+                </a>
+            </div>
+
+            <div th:if="${session.loginMember != null}" class="flex items-center gap-3">
+                <span class="text-sm text-white">
+                    歡迎，<span th:text="${session.loginMember.name}"></span>
+                </span>
+
+                <a th:href="@{/auth/logout}"
+                class="inline-block border border-white/20 hover:border-white/40 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all">
+                    登出
+                </a>
+            </div>
         </div>
 
         <script>
