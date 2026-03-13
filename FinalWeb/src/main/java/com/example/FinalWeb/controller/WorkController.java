@@ -1,7 +1,6 @@
 package com.example.FinalWeb.controller;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -9,8 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.WorkService;
 
@@ -20,6 +17,18 @@ public class WorkController {
 
     @Autowired
     private WorkService service;
+
+     // 首頁邏輯
+    @GetMapping("/home")
+    public String home(Model model) {
+        System.out.println("=== 偵測到訪問首頁 ===");
+        
+        // 抓取資料
+        List<WorkDetailEntity> featuredList = service.getWorkList(0, 4, "DESC", null).getContent();
+        
+        model.addAttribute("featuredList", featuredList);
+        return "home";
+    }
 
     // 測試抓 TiDB 的資料用 RestController，需要強制轉 JSON
     // @GetMapping(value = "/test", produces = "application/json")

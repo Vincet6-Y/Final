@@ -11,4 +11,6 @@ import com.example.FinalWeb.entity.WorkDetailEntity;
 @Repository
 public interface WorkDetailRepo extends JpaRepository<WorkDetailEntity, Integer> {
     Page<WorkDetailEntity> findByWorkClass(String workClass, Pageable pageable);
+    // 在你的 WorkDetailRepo 介面新增這一行
+Page<WorkDetailEntity> findByWorkNameContaining(String workName, Pageable pageable);
 }
