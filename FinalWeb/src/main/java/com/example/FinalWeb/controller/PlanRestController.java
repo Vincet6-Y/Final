@@ -1,6 +1,7 @@
 package com.example.FinalWeb.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +53,9 @@ public class PlanRestController {
             myPlan.setJourneyPlan(official);
             myPlan.setMyPlanName(official.getPlanName() + " (我的自訂)");
             myPlan.setStartDate(java.time.LocalDate.now().plusDays(7));
-            
+
             // 🌟 關鍵修正：將 Session 裡的會員物件轉型並設定給 myPlan
-            myPlan.setMember((MemberEntity) member); 
+            myPlan.setMember((MemberEntity) member);
 
             myPlan = myPlanRepo.save(myPlan); // 先存，取得新的 myPlanId
 
@@ -95,11 +96,11 @@ public class PlanRestController {
 
     // 更新對應景點的 GooglePlaceID
     @PutMapping("/updateNodePlaceId/{spotId}")
-    public ResponseEntity<?> updateNodePlaceId(@PathVariable Integer spotId, @RequestBody java.util.Map<String, String> body) {
+    public ResponseEntity<?> updateNodePlaceId(@PathVariable Integer spotId, @RequestBody Map<String, String> body) {
         try {
             String newPlaceId = body.get("placeId");
             return mapRepo.findById(spotId).map(node -> {
-                node.setGooglePlaceID(newPlaceId); 
+                node.setGooglePlaceID(newPlaceId);
                 mapRepo.save(node);
                 return ResponseEntity.ok(java.util.Map.of("success", true));
             }).orElse(ResponseEntity.notFound().build());
@@ -116,7 +117,7 @@ public class PlanRestController {
         try {
             // 從 myMapRepo 中撈出屬於這個 myPlanId 的所有景點，並依天數與順序排序
             List<MyMapEntity> nodes = myMapRepo.findByMyPlan_MyPlanIdOrderByDayNumberAscVisitOrderAsc(myPlanId);
-            
+
             return ResponseEntity.ok(nodes);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
