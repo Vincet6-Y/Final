@@ -26,12 +26,14 @@ public class MemberController {
     @PostMapping("/login")
     public String login(MemberLoginDTO login,
                         HttpSession session,
+                        @RequestParam(required = false) String redirect,
                         RedirectAttributes redirectAttr,
                         Model model) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
         if (member == null) {
+            // 登入失敗時，顯示錯誤訊息並保留使用者輸入的資料
             model.addAttribute("toast", ToastInfoDTO.error("帳號或密碼錯誤"));
             model.addAttribute("loginData", login);
             model.addAttribute("openPanel", "login");
