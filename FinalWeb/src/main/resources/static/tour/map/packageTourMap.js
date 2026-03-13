@@ -45,7 +45,6 @@ function initMap() {
 
     setupAutocomplete("pac-input-desktop");
     setupAutocomplete("pac-input-mobile");
-    calculateAndDisplayRoute(1);
 
     map.addListener("click", (event) => {
         if (event.placeId) {
@@ -787,3 +786,54 @@ function goToPayment() {
     // return false 阻止 <a> 標籤的預設行為
     return false;
 }
+
+// ==========================================
+// 🌟 載入「會員個人」行程資料 (專屬於 packageTourMap 使用)
+// ==========================================
+async function loadMyPlanData(myPlanId) {
+    try {
+        // 確保你有在 PlanRestController 加上這個 API
+        const res = await fetch(`/api/plan/myPlanNodes/${myPlanId}`);
+        if (!res.ok) throw new Error(`API 請求失敗：${res.status}`);
+        const data = await res.json();
+        
+        itineraryData = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+        
+        for (const node of data) {
+            const day = node.dayNumber || 1;
+            itineraryData[day].push({
+                spotId: node.spotId, 
+                place_id: node.googlePlaceId, // 注意大小寫要對應你的 Entity
+                lat: parseFloat(node.latitude),
+                lng: parseFloat(node.longitude),
+                name: node.locationName,
+                arrivals: "08:00",
+                duration: "1"
+            });
+        }
+
+        if (itineraryData[1].length > 0) {
+            map.setCenter({ lat: itineraryData[1][0].lat, lng: itineraryData[1][0].lng });
+        }
+        selectDay(1); 
+
+    } catch (error) {
+        console.error("🔥 載入個人行程錯誤：", error);
+    }
+}
+
+// 🌟 網頁載入時啟動個人行程
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const myPlanId = urlParams.get('myPlanId');
+
+    if (myPlanId) {
+        // 每 0.1 秒檢查地圖是否準備好，準備好就載入資料
+        const checkReady = setInterval(() => {
+            if (typeof directionsService !== 'undefined' && directionsService !== null) {
+                clearInterval(checkReady);
+                loadMyPlanData(myPlanId);
+            }
+        }, 100);
+    }
+});

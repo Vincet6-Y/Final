@@ -22,15 +22,25 @@ public class MemberController {
 
     // 處理登入
     @PostMapping("/login")
-    public String login(MemberLoginDTO login,  HttpSession session) {
+    public String login(MemberLoginDTO login,  HttpSession session, @RequestParam(required = false) String redirect) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
         if(member == null){
-            return "redirect:/auth?error";
+            // 登入失敗時，把 redirect 參數帶回去，以免使用者重試登入後迷路
+            String errorUrl = "/auth?error";
+            if (redirect != null && !redirect.isEmpty()) {
+                errorUrl += "&redirect=" + redirect;
+            }
+            return "redirect" + errorUrl;
         }
 
         session.setAttribute("loginMember", member);
+
+        // 🌟 核心修改：如果有指定跳轉網址，就跳轉過去
+        if (redirect != null && !redirect.isEmpty()) {
+            return "redirect:" + redirect;
+        }
 
         return "redirect:/home";
     }

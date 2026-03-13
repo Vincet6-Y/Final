@@ -60,6 +60,7 @@
   </style>
 </head>
 
+
 <body
     class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
 
@@ -132,7 +133,62 @@
         </div>
     </div>
 
-    <header th:replace="~{ fragments/header :: myHeader}"></header>
+    <header th:fragment="myHeader"
+        class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
+        <a th:href="@{/home}">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
+                    <img alt="Seichi Junrei Logo" class="w-full h-full object-contain" th:src="@{/images/LOGO.png}" />
+                </div>
+                <h1 class="text-primary text-2xl font-bold tracking-tight"
+                    style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</h1>
+            </div>
+        </a>
+        <nav class="hidden md:flex flex-1 justify-center items-center gap-10">
+            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                th:href="@{/news}">最新消息</a>
+            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                th:href="@{/info}">旅遊情報</a>
+            <div class="relative group">
+                <a class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
+                    th:href="@{/workList}">
+                    聖地作品巡禮
+                    <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+                </a>
+                <div
+                    class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
+                        href="#">電影作品</a>
+                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
+                        href="#">動畫作品</a>
+                </div>
+            </div>
+            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                th:href="@{/packageTour}">行程規劃</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <button aria-label="Toggle theme"
+                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
+                onclick="document.documentElement.classList.toggle('dark')">
+                <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
+                <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
+            </button>
+            <!-- head CSS 不是直接放入而是引用時用這條
+            <button aria-label="Toggle theme"
+                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
+                onclick="document.documentElement.classList.toggle('dark')">
+
+                <span class="material-symbols-outlined block dark:hidden">light_mode</span>
+
+                <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
+            </button> -->
+            <a th:href="@{/login}"><button
+                    class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
+                    會員登入
+                </button></a>
+        </div>
+    </header>
 
     <main class="flex-1 relative flex w-full h-full overflow-hidden">
 
