@@ -22,7 +22,7 @@ import com.example.FinalWeb.repo.MyPlanRepo;
 
 @RestController
 @RequestMapping("/api/plan")
-public class PlanRestController {
+public class PlanController {
 
     @Autowired
     private MyPlanRepo myPlanRepo;
