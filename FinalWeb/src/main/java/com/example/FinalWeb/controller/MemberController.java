@@ -3,7 +3,7 @@ package com.example.FinalWeb.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,26 +24,23 @@ public class MemberController {
 
     // 處理登入
     @PostMapping("/login")
-    public String login(MemberLoginDTO login,  
-                        HttpSession session, 
-                        RedirectAttributes redirectAttr) {
+    public String login(MemberLoginDTO login,
+                        HttpSession session,
+                        RedirectAttributes redirectAttr,
+                        Model model) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
-        if(member == null){
-            redirectAttr.addFlashAttribute(
-                "toast",
-                ToastInfoDTO.error("帳號或密碼錯誤")
-            );
-            return "redirect:/auth";
+        if (member == null) {
+            model.addAttribute("toast", ToastInfoDTO.error("帳號或密碼錯誤"));
+            model.addAttribute("loginData", login);
+            model.addAttribute("openPanel", "login");
+            return "auth";
         }
 
         session.setAttribute("loginMember", member);
 
-        redirectAttr.addFlashAttribute(
-            "toast",
-            ToastInfoDTO.success("登入成功，歡迎回來")
-        );
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
 
         return "redirect:/home";
     }
@@ -64,23 +61,31 @@ public class MemberController {
 
     // 處理註冊
     @PostMapping("/register")
-    public String register(MemberRegisterDTO register) {
+    public String register(MemberRegisterDTO register,
+                        Model model) {
 
         String result = memberService.register(register);
 
         if ("註冊成功".equals(result)) {
-            return "redirect:/auth?registerSuccess";
+            return "redirect:/auth";
         }
 
         if ("Email已註冊".equals(result)) {
-            return "redirect:/auth?registerError=emailExists";
+            model.addAttribute("toast", ToastInfoDTO.error("此 Email 已註冊"));
+            model.addAttribute("openPanel", "register");
+            model.addAttribute("registerData", register);
+            return "auth";
         }
 
         if ("密碼不一致".equals(result)) {
-            return "redirect:/auth?registerError=passwdNotMatch";
+            model.addAttribute("toast", ToastInfoDTO.error("兩次輸入的密碼不一致"));
+            model.addAttribute("openPanel", "register");
+            model.addAttribute("registerData", register);
+            return "auth";
         }
 
-        return "redirect:/auth";
+        return "auth";
     }
+
 
 }

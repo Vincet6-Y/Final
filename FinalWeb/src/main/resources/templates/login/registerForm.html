@@ -1,4 +1,4 @@
-<div th:fragment="registerForm" id="registerFormFace" class="card-face">
+<div th:fragment="registerForm" id="registerFormFace" class="card-face" th:classappend="${openPanel == 'register'} ? ' active' : ''">
     <div class="form-content">
 
         <div class="mb-10">
@@ -20,7 +20,8 @@
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                         placeholder="請輸入真實姓名"
                         type="text"
-                        required />
+                        required 
+                        th:value="${registerData != null ? registerData.name() : ''}" />
                 </div>
             </div>
 
@@ -37,7 +38,8 @@
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                         placeholder="example@mail.com"
                         type="email"
-                        required />
+                        required
+                        th:value="${registerData != null ? registerData.email() : ''}" />
                 </div>
             </div>
 
@@ -56,7 +58,8 @@
                             class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                             placeholder="0900-000-000"
                             type="tel"
-                            required />
+                            required
+                            th:value="${registerData != null ? registerData.phone() : ''}" />
                     </div>
                 </div>
 
@@ -71,7 +74,8 @@
                             name="birthday"
                             class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                             type="date"
-                            required />
+                            required 
+                            th:value="${registerData != null ? registerData.birthday() : ''}" />
                     </div>
                 </div>
 
