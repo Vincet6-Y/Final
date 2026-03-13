@@ -24,6 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.ResponseEntity;
+import com.example.FinalWeb.repo.MyPlanRepo;
+import com.example.FinalWeb.entity.MyPlanEntity;
 
 @Controller
 @ControllerAdvice(assignableTypes = GlobalController.class)
@@ -41,6 +45,45 @@ public class PaymentController {
 
     @Autowired
     private OrdersDetailRepo ordersDetailRepo;
+    
+    @Autowired
+    private MyPlanRepo myPlanRepo;
+
+    // 前端按下「前往付款」時，會先打這支 API 建立一張「未付款」的訂單
+    @PostMapping("/createOrderFromPlan")
+    @ResponseBody
+    public ResponseEntity<?> createOrderFromPlan(@RequestParam("myPlanId") Integer myPlanId, HttpSession session) {
+        try {
+            // 找出對應的行程
+            MyPlanEntity myPlan = myPlanRepo.findById(myPlanId)
+                    .orElseThrow(() -> new IllegalArgumentException("找不到對應的行程"));
+
+            // 實體化一張新訂單
+            OrdersEntity order = new OrdersEntity();
+            order.setMyPlan(myPlan);
+            order.setOrderTime(java.time.LocalDateTime.now());
+            order.setPayStatus("未付款");
+
+            // 嘗試把訂單掛在登入的會員身上
+            Object memberObj = session.getAttribute("loginMember");
+            if (memberObj != null && memberObj instanceof com.example.FinalWeb.entity.MemberEntity) {
+                order.setMember((com.example.FinalWeb.entity.MemberEntity) memberObj);
+            } else if (myPlan.getMember() != null) {
+                // 如果 Session 掉失，或授權狀態出借，嘗試使用 MyPlan 上的擁有者會員
+                order.setMember(myPlan.getMember());
+            }
+
+            // 儲存進資料庫
+            OrdersEntity savedOrder = ordersRepo.save(order);
+
+            // 回傳正式建立的 orderId 給前端跳轉
+            return ResponseEntity.ok(java.util.Map.of("success", true, "orderId", savedOrder.getOrderId()));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(java.util.Map.of("success", false, "message", e.getMessage()));
+        }
+    }
 
     // 利用 @ModelAttribute 攔截 /payment 請求，主動將訂單資料塞入 Model
     // orderId 必須由上游頁面（行程規劃頁）透過 URL 帶入，例如 /payment?orderId=123
@@ -137,6 +180,28 @@ public class PaymentController {
             ordersDetailRepo.save(transportDetail);
         }
 
+        // 🌟 統計最新總計金額，如果為0，不再戳綠界，直接將訂單完成並轉跳
+        int currentTotalAmount = 0;
+        if (order.getOrderDetails() != null) {
+            currentTotalAmount = order.getOrderDetails().stream()
+                    .mapToInt(d -> d.getTicketPrice() != null ? d.getTicketPrice() : 0)
+                    .sum();
+        }
+        if (addonTicketPrices != null) {
+            currentTotalAmount += addonTicketPrices.stream().mapToInt(p -> p != null ? p : 0).sum();
+        }
+        if (addonTransportPrice != null) {
+            currentTotalAmount += addonTransportPrice;
+        }
+
+        if (currentTotalAmount == 0) {
+            order.setPayStatus("已完成(無須付款)");
+            order.setPayTime(java.time.LocalDateTime.now());
+            ordersRepo.save(order);
+            // 由於被這支方法標記為 ResponseBody，我們利用 script 來實現瀏覽器的跳轉
+            return "<script>window.location.href='/payment/paymentsuccess?orderId=" + order.getOrderId() + "';</script>";
+        }
+
         // 利用真實資料庫裡的訂單 ID 進行綠界結帳
         return ecpayService.ecpayCheckout(orderId);
     }
@@ -184,6 +249,19 @@ public class PaymentController {
         System.out.println("RtnCode=" + rtnCode + ", TradeNo=" + tradeNo
                 + ", CustomField1=" + customOrderId + ", MacValid=" + macValid);
 
+        // 決定 orderId：優先用 CustomField1，備用從 TradeNo 解析
+        String orderId = customOrderId;
+        if (orderId == null || orderId.isEmpty()) {
+            // MerchantTradeNo 格式: OD{orderId}T{timestamp}
+            if (tradeNo != null && tradeNo.startsWith("OD")) {
+                try {
+                    orderId = tradeNo.substring(2, tradeNo.indexOf("T"));
+                } catch (Exception e) {
+                    System.err.println("從 TradeNo 解析 orderId 失敗: " + e.getMessage());
+                }
+            }
+        }
+
         // ✅ 只要 RtnCode = "1" (付款成功)，就跳到成功頁面
         // （開發環境 CheckMacValue 可能因 localhost 回傳參數差異而失敗，所以不能完全依賴它）
         if ("1".equals(rtnCode)) {
@@ -194,24 +272,16 @@ public class PaymentController {
                 System.err.println("前端轉跳更新資料庫失敗（可忽略）: " + e.getMessage());
             }
 
-            // 決定 orderId：優先用 CustomField1，備用從 TradeNo 解析
-            String orderId = customOrderId;
-            if (orderId == null || orderId.isEmpty()) {
-                // MerchantTradeNo 格式: OD{orderId}T{timestamp}
-                if (tradeNo != null && tradeNo.startsWith("OD")) {
-                    try {
-                        orderId = tradeNo.substring(2, tradeNo.indexOf("T"));
-                    } catch (Exception e) {
-                        System.err.println("從 TradeNo 解析 orderId 失敗: " + e.getMessage());
-                    }
-                }
-            }
-
             System.out.println("✅ 付款成功！跳轉到 /payment/paymentsuccess?orderId=" + orderId);
             return new RedirectView("/payment/paymentsuccess?orderId=" + orderId);
         }
 
         System.out.println("❌ 付款失敗或取消: " + params.get("RtnMsg"));
+        // 取消付款時，帶上 orderId 返回結帳頁面
+        if (orderId != null && !orderId.isEmpty()) {
+            return new RedirectView("/payment?orderId=" + orderId);
+        }
+        // 如果需要跳轉到其他專屬頁
         return new RedirectView("/payment");
     }
 

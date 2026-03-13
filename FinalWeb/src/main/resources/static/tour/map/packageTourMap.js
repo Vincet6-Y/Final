@@ -776,13 +776,33 @@ document.addEventListener("DOMContentLoaded", () => {
 // 這裡將那個 orderId 附加在 URL 上，傳遞給 /payment 進行結帳。
 // ==========================================
 function goToPayment() {
-    // TODO: 這裡未來要替換成負責行程同學 API 回傳的真實 orderId
-    // 假設行程儲存後會把 orderId 存在 window 變數或 sessionStorage
-    const orderId = window.currentOrderId || sessionStorage.getItem('currentOrderId') || 1001;
-    
-    // 將 orderId 帶入網址跳轉
-    window.location.href = '/payment?orderId=' + orderId;
-    
+    // 從網址列抓取目前的 myPlanId
+    const urlParams = new URLSearchParams(window.location.search);
+    const myPlanId = urlParams.get('myPlanId');
+
+    if (!myPlanId) {
+        alert("找不到行程 ID，請先儲存行程或確認網址！");
+        return false;
+    }
+
+    // 打 API 給後端建立真實訂單
+    fetch(`/payment/createOrderFromPlan?myPlanId=${myPlanId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.orderId) {
+            // 成功取得真實 orderId，跳轉到付款頁面
+            window.location.href = '/payment?orderId=' + data.orderId;
+        } else {
+            alert("建立訂單失敗：" + (data.message || "未知錯誤"));
+        }
+    })
+    .catch(error => {
+        console.error("結帳建立失敗:", error);
+        alert("系統發生錯誤，無法建立訂單");
+    });
+
     // return false 阻止 <a> 標籤的預設行為
     return false;
 }

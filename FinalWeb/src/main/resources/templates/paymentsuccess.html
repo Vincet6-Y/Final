@@ -206,54 +206,60 @@
     </div>
 
     <!-- ==================== 景點詳情 Modal ==================== -->
-    <div id="spotModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div
-            class="relative bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/10">
+    <div id="spotModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 lg:p-10">
+        <div class="relative bg-[#1e1e1e] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10">
 
-            <!-- 關閉按鈕 -->
-            <button id="closeModalBtn"
-                class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-primary/80 hover:bg-primary text-white flex items-center justify-center transition-colors">
-                <span class="material-symbols-outlined text-lg">close</span>
-            </button>
-
-            <!-- Modal 標題 -->
-            <div class="flex items-center gap-2 p-6 pb-0">
-                <span class="material-symbols-outlined text-primary">explore</span>
-                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200">景點詳情</h3>
-            </div>
-
-            <!-- 景點照片 -->
-            <div class="p-6 pb-4">
-                <div id="modal-photo"
-                    class="w-full h-56 lg:h-72 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-4xl text-slate-300 animate-pulse">photo_camera</span>
+            <!-- 頂部標題與關閉按鈕 -->
+            <div class="flex items-center justify-between p-5 border-b border-white/5 shrink-0 bg-[#251d15]/50">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-orange-500 text-xl">directions_transit</span>
+                    <h3 class="text-lg font-bold text-white">景點詳情</h3>
                 </div>
+                <button id="closeModalBtn"
+                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-orange-500 text-white flex items-center justify-center transition-colors">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
             </div>
 
-            <!-- 景點資訊 -->
-            <div class="px-6 pb-4">
-                <h2 id="modal-name" class="text-2xl font-black text-slate-800 dark:text-white mb-2">景點名稱</h2>
-                <p id="modal-description" class="text-primary font-bold text-sm mb-4"></p>
-                <p id="modal-detail" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed"></p>
-            </div>
+            <!-- 內容區 (左邊照片，右邊文字與 QR Code) -->
+            <div class="flex flex-col md:flex-row flex-1 overflow-y-auto min-h-[400px]">
+                
+                <!-- 左側：景點照片 -->
+                <div class="w-full md:w-1/2 bg-black flex items-center justify-center relative min-h-[300px] shrink-0">
+                    <div id="modal-photo" class="absolute inset-0 w-full h-full flex items-center justify-center text-slate-500">
+                        <span class="material-symbols-outlined text-4xl animate-pulse">photo_camera</span>
+                    </div>
+                </div>
 
-            <!-- 付費景點通證 + QR Code (從後端 API 載入) -->
-            <div id="modal-ticket-section" class="hidden px-6 pb-6">
-                <div
-                    class="bg-gradient-to-b from-[#251d15] to-[#1a1209] rounded-xl p-6 text-center border border-primary/20">
-                    <div class="flex items-center justify-center gap-2 mb-4">
-                        <span class="material-symbols-outlined text-primary">confirmation_number</span>
-                        <h4 class="text-primary font-bold text-lg">付費景點通證</h4>
+                <!-- 右側：文字說明與 QRCode -->
+                <div class="w-full md:w-1/2 p-6 lg:p-10 flex flex-col overflow-y-auto custom-scrollbar bg-[#1c140d]">
+                    <h2 id="modal-name" class="text-3xl font-black text-white mb-4">景點名稱</h2>
+                    <p id="modal-description" class="text-orange-500 font-bold mb-4 leading-relaxed tracking-wide"></p>
+                    <p id="modal-detail" class="text-sm text-slate-400 leading-relaxed mb-8 flex-1"></p>
+
+                    <!-- 付費景點通證 + QR Code -->
+                    <div id="modal-ticket-section" class="hidden shrink-0 mt-auto">
+                        <div class="bg-gradient-to-b from-[#332211] to-[#1a1005] rounded-xl p-6 text-center border border-orange-500/20 shadow-lg relative overflow-hidden">
+                            <!-- 背景裝飾 -->
+                            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-600/0 via-orange-500 to-orange-600/0"></div>
+                            
+                            <div class="flex items-center justify-center gap-2 mb-6">
+                                <span class="material-symbols-outlined text-orange-500">confirmation_number</span>
+                                <h4 class="text-orange-500 font-bold text-lg tracking-wider">付費景點憑證</h4>
+                            </div>
+                            
+                            <!-- QR Code 圖片 -->
+                            <div class="bg-white rounded-xl p-3 inline-block shadow-2xl mx-auto mb-4 relative z-10 transition-transform hover:scale-105 duration-300">
+                                <img id="modal-qrcode" class="w-32 h-32 md:w-40 md:h-40 object-contain"
+                                    src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                    alt="QR Code" />
+                            </div>
+                            
+                            <p id="modal-ticket-status" class="text-orange-500/80 text-xs font-semibold tracking-wide">
+                                請在入口處向工作人員出示此 QR Code 進行掃描驗證。
+                            </p>
+                        </div>
                     </div>
-                    <!-- QR Code 圖片 (由後端 /api/ticket/qrcode/{id} 生成) -->
-                    <div class="bg-white rounded-xl p-4 inline-block mb-4 shadow-lg">
-                        <img id="modal-qrcode" class="w-40 h-40"
-                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                            alt="QR Code" />
-                    </div>
-                    <p id="modal-ticket-status" class="text-primary/70 text-sm font-medium">
-                        請在入口處出示此 QR Code 進行掃描驗證。
-                    </p>
                 </div>
             </div>
 

@@ -35,11 +35,23 @@
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbLcMmZwh16FnfkOoVi8_4skwM34Nq5WaGZXvk9ukM3To6113tQRms_5gn6R1cp_bMdEarK9QJdi9HTuBFlE7Lp_3N3AVMLo6-HZ0Gmkg1k-nM4NLt1-4oRIghTQQ2jqBV-60kdY1UEfhJnGLlqyC7c1-QwdZJT1cAfEXPrm6Ot0HpKXSdZliYJzmgCEB-jtMLTdchDCHR2rVxi7RJxV0XfRPEA_NxzdVjAC35Z62bBhUwrMXxC2pzsL_9nuRcnXrFwL0n9DcSteU" />
                         </div>
                         <div class="flex-grow">
-                            <!-- 行程名稱：優先顯示 myPlan 的名稱，沒有則顯示預設文字 -->
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3"
-                                th:text="${order.myPlan != null && order.myPlan.myPlanName != null} ? ${order.myPlan.myPlanName} : '聖地巡禮行程'">
-                                聖地巡禮行程
-                            </h3>
+                            <!-- 行程名稱：優先顯示 myPlan 的名稱，支援行內編輯 -->
+                            <div class="flex items-center gap-3 mb-3" id="planNameDisplayBlock">
+                                <h3 id="planNameDisplay" class="text-xl font-bold text-gray-900 dark:text-white"
+                                    th:text="${order.myPlan != null && order.myPlan.myPlanName != null} ? ${order.myPlan.myPlanName} : '聖地巡禮行程'">
+                                    聖地巡禮行程
+                                </h3>
+                                <button type="button" onclick="editPlanName()" class="text-orange-500 hover:text-orange-600 focus:outline-none transition-colors border-2 border-orange-500/20 rounded-full w-8 h-8 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </button>
+                            </div>
+                            
+                            <div id="planNameEditBlock" class="hidden items-center gap-2 mb-3">
+                                <input type="text" id="planNameInput" class="input-field rounded-lg px-3 py-2 text-sm border border-orange-500/50 dark:bg-[#251d15] dark:text-white w-64 focus:ring-2 focus:ring-orange-500 outline-none transition-all shadow-sm"
+                                       th:value="${order.myPlan != null && order.myPlan.myPlanName != null} ? ${order.myPlan.myPlanName} : '聖地巡禮行程'" />
+                                <button type="button" onclick="savePlanName()" class="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-bold shadow-md transition-colors">儲存</button>
+                                <button type="button" onclick="cancelEditPlanName()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-sm font-medium transition-colors">取消</button>
+                            </div>
 
                             <div class="flex flex-wrap gap-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
                                 <div class="flex items-center gap-2">
@@ -257,6 +269,56 @@
     </script>
 
     <script th:inline="javascript">
+        // ==========================================
+        // 行程名稱變更功能
+        // ==========================================
+        function editPlanName() {
+            $('#planNameDisplayBlock').hide();
+            $('#planNameEditBlock').removeClass('hidden').addClass('flex');
+            $('#planNameInput').focus().select();
+        }
+
+        function cancelEditPlanName() {
+            $('#planNameEditBlock').removeClass('flex').addClass('hidden');
+            $('#planNameDisplayBlock').show();
+            // 恢復原值
+            $('#planNameInput').val($('#planNameDisplay').text().trim());
+        }
+
+        function savePlanName() {
+            const newName = $('#planNameInput').val().trim();
+            if (!newName) {
+                alert("名稱不可為空");
+                return;
+            }
+            
+            // 從 Thymeleaf 取得 myPlanId (如果有)
+            const myPlanId = /*[[${order.myPlan != null ? order.myPlan.myPlanId : null}]]*/ null;
+            if (!myPlanId) {
+                alert("找不到對應的行程ID，無法編輯名稱。");
+                cancelEditPlanName();
+                return;
+            }
+
+            $.ajax({
+                url: `/api/plan/updateName/${myPlanId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ name: newName }),
+                success: function(res) {
+                    if (res.success) {
+                        $('#planNameDisplay').text(res.newName);
+                        cancelEditPlanName();
+                    } else {
+                        alert(res.message || "更新失敗");
+                    }
+                },
+                error: function(xhr) {
+                    alert('更新失敗，請檢查網路狀態');
+                }
+            });
+        }
+
         $(document).ready(function () {
             // ==========================================
             // 🎫 jQuery 自動加總邏輯

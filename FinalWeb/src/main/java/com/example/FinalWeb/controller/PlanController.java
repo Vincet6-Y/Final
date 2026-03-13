@@ -124,4 +124,22 @@ public class PlanController {
                     .body(java.util.Map.of("success", false, "message", "獲取個人資料失敗：" + e.getMessage()));
         }
     }
+
+    // 更新使用者自訂行程名稱
+    @PutMapping("/updateName/{myPlanId}")
+    public ResponseEntity<?> updateMyPlanName(@PathVariable Integer myPlanId, @RequestBody Map<String, String> body) {
+        try {
+            String newName = body.get("name");
+            if (newName == null || newName.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "名稱不可為空"));
+            }
+            return myPlanRepo.findById(myPlanId).map(plan -> {
+                plan.setMyPlanName(newName);
+                myPlanRepo.save(plan);
+                return ResponseEntity.ok(java.util.Map.of("success", true, "newName", newName));
+            }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("success", false)));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(java.util.Map.of("success", false, "message", e.getMessage()));
+        }
+    }
 }
