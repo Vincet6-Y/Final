@@ -52,7 +52,7 @@ public class MemberController {
 
         session.setAttribute("loginMember", member);
 
-        // redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
 
         // 🌟 核心修改：如果有指定跳轉網址，就跳轉過去
         if (redirect != null && !redirect.isEmpty()) {
