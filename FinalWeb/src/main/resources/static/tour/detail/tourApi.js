@@ -156,7 +156,7 @@ function copyToMyPlan(officialPlanId) {
                 alert('系統提示：請先登入會員，才能將官方行程加入您的專屬規劃中！');
                 // 將當前網址存起來，導向登入頁，並加上 autoCopy=true 參數
                 // 這樣登入成功跳回來時，系統才知道要自動幫他點擊複製
-                window.location.href = `/login?redirect=/packageTourDetail?planId=${officialPlanId}&autoCopy=true`;
+                window.location.href = `/auth?redirect=/packageTourDetail?planId=${officialPlanId}&autoCopy=true`;
                 throw new Error('Unauthorized');
             }
             if (!response.ok) throw new Error('系統錯誤');

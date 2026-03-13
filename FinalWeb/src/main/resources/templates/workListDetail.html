@@ -29,12 +29,14 @@
 
                             <div th:if="${idNow.workClass == '電影'}" class="flex items-center justify-between gap-6">
                                 <span class="text-primary font-bold text-sm tracking-widest">片長</span>
-                                <span class="text-white font-medium text-right" th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
+                                <span class="text-white font-medium text-right"
+                                    th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
                             </div>
 
                             <div th:if="${idNow.workClass == '動畫'}" class="flex items-center justify-between gap-6">
                                 <span class="text-primary font-bold text-sm tracking-widest">總集數</span>
-                                <span class="text-white font-medium text-right" th:text="${idNow.episodes} + ' 集'">12 集</span>
+                                <span class="text-white font-medium text-right" th:text="${idNow.episodes} + ' 集'">12
+                                    集</span>
                             </div>
                         </div>
                     </div>
@@ -78,7 +80,7 @@
                         <div class="flex-1 h-px bg-slate-200 dark:bg-white/10"></div>
                     </div>
                 </div>
-                <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+                <div th:each=" plan : ${plans}" class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
                     <div
                         class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-8 hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden group">
                         <div
@@ -90,8 +92,10 @@
                                 <span class="material-symbols-outlined font-bold">calendar_today</span>
                             </div>
                             <div>
-                                <h3 class="text-2xl font-black text-slate-800 dark:text-white">該作品5天的行程</h3>
-                                <p class="text-primary text-sm font-bold">精華版聖地巡禮</p>
+                                <h3 th:text="${plan.planName}"
+                                    class="text-2xl font-black text-slate-800 dark:text-white">該作品5天的行程</h3>
+                                <p th:text="${plan.planCity}" 
+                                class="text-primary text-sm font-bold">精華版聖地巡禮</p>
                             </div>
                         </div>
                         <div class="space-y-6 mb-10 flex-1">

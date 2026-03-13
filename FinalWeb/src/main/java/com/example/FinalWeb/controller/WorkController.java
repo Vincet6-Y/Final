@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.example.FinalWeb.entity.JourneyPlanEntity;
 import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.WorkService;
 
@@ -18,14 +20,14 @@ public class WorkController {
     @Autowired
     private WorkService service;
 
-     // 首頁邏輯
+    // 首頁邏輯
     @GetMapping("/home")
     public String home(Model model) {
         System.out.println("=== 偵測到訪問首頁 ===");
-        
+
         // 抓取資料
         List<WorkDetailEntity> featuredList = service.getWorkList(0, 4, "DESC", null, "1980", "2026").getContent();
-        
+
         model.addAttribute("featuredList", featuredList);
         return "home";
     }
@@ -43,7 +45,7 @@ public class WorkController {
             @RequestParam(required = false) String workClass,
             @RequestParam(defaultValue = "1980") String minYear,
             @RequestParam(defaultValue = "2026") String maxYear) {
-                
+
         Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass, minYear, maxYear);
 
         model.addAttribute("works", workPage);
@@ -61,10 +63,13 @@ public class WorkController {
             @RequestParam(value = "workId") int workId) {
 
         WorkDetailEntity gEntity = service.getWorkId(workId);
-
+        
+        List<JourneyPlanEntity> getPlan = service.getPlan(workId);
+        
+        
         model.addAttribute("idNow", gEntity);
+        model.addAttribute("plans", getPlan);
 
         return "workListDetail";
     }
-
 }
