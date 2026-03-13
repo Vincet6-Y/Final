@@ -26,20 +26,20 @@ public class ArticleService {
     // -------------------------------
     // 初始化資料（第一次啟動自動匯入 JSON）
     // -------------------------------
-    @PostConstruct
-    public void initData() {
-        try {
-            long count = articleRepo.count();
-            if (count == 0) {
-                System.out.println(">>> [ArticleService] 資料庫為空，開始匯入初始 JSON 資料...");
-                importFromJson();
-            } else {
-                System.out.println(">>> [ArticleService] 資料庫已有 " + count + " 筆資料，跳過初始化。");
-            }
-        } catch (Exception e) {
-            System.err.println(">>> [ArticleService] 初始化失敗：" + e.getMessage());
-        }
+   @PostConstruct
+public void initData() {
+    try {
+        // 開發階段：每次啟動都先清空資料庫，確保 JSON 的變動能生效
+        System.out.println(">>> [ArticleService] 正在清空舊資料並重新匯入 JSON...");
+        articleRepo.deleteAll(); 
+        importFromJson();
+        
+        long count = articleRepo.count();
+        System.out.println(">>> [ArticleService] 目前資料庫總筆數: " + count);
+    } catch (Exception e) {
+        System.err.println(">>> [ArticleService] 初始化失敗：" + e.getMessage());
     }
+}
 
     /**
      * 從 resources/news.json 讀取初始文章
