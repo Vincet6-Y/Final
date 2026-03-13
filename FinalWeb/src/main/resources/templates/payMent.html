@@ -100,9 +100,11 @@
                             <select id="ticketSelect"
                                 class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                                 <option value="0" data-name="">不需加購</option>
-                                <option value="2000" data-name="東京迪士尼樂園">東京迪士尼樂園 (+NT$2,000)</option>
-                                <option value="500" data-name="澀谷天空展望台">澀谷天空展望台 (+NT$500)</option>
-                                <option value="300" data-name="吉卜力美術館">吉卜力美術館 (+NT$300)</option>
+                                <option th:each="ticket : ${availableTickets}"
+                                        th:value="${ticket.price}"
+                                        th:data-name="${ticket.ticketName}"
+                                        th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'">
+                                </option>
                             </select>
                         </div>
                         <div>

@@ -1,4 +1,4 @@
-<div th:fragment="loginForm" id="loginFormFace" class="card-face active">
+<div th:fragment="loginForm" id="loginFormFace" class="card-face" th:classappend="${openPanel != 'register'} ? ' active' : ''">
     <div class="form-content">
         <div class="mb-10">
             <h2 class="text-3xl font-bold text-white mb-2">會員登入</h2>
@@ -7,7 +7,7 @@
 
         <form class="space-y-6" action="/auth/login" method="post">
             
-            <input type="hidden" name="redirect" th:value="${param.redirect}">
+            <input type="hidden" name="redirect" th:value="${redirect != null ? redirect : param.redirect}">
 
             <div th:if="${param.error}" class="mb-4 rounded-lg bg-red-500/15 border border-red-400/30 px-4 py-3 text-sm text-red-200">
                 帳號或密碼錯誤
@@ -25,7 +25,8 @@
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-muted/50"
                         placeholder="請輸入 Email"
                         type="email"
-                        required />
+                        required
+                        th:value="${loginData != null} ? ${loginData.email()} : ''" />
                 </div>
             </div>
 
