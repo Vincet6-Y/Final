@@ -189,11 +189,20 @@
 
                 <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
             </button> -->
-            <a th:href="@{/login}"><button
+            <a th:if="${session.loginMember == null}" th:href="@{/auth}"><button
                     class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
                     會員登入
-                </button></a>
-        </div>
+                </button>
+            </a>
+
+            <div th:if="${session.loginMember != null}" class="flex items-center gap-4">
+                <span class="text-sm font-bold text-slate-700 dark:text-slate-200" th:text="${session.loginMember.name}">使用者名稱</span>
+                <a th:href="@{/auth/logout}">
+                    <button class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
+                        登出
+                    </button>
+                </a>
+            </div>
     </header>
 
     <main class="flex-1 relative flex w-full h-full overflow-hidden">
@@ -295,7 +304,11 @@
 
     <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'"
         async defer></script>
-    <script th:src="@{/tour/map/packageTourMap.js}"></script>
+
+    <script th:src="@{/tour/map/myTourGlobals.js}"></script>
+    <script th:src="@{/tour/map/myTourApi.js}"></script>
+    <script th:src="@{/tour/map/myTourMap.js}"></script>
+    <script th:src="@{/tour/map/myTourUi.js}"></script>
 </body>
 
 </html>
