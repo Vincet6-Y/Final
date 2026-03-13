@@ -12,7 +12,7 @@
 
     <section>
         <div class="flex items-center justify-between mb-8">
-            <h3 class="text-2xl font-bold flex items-center gap-2 text-white">
+            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
                 <span class="material-symbols-outlined text-primary">event_note</span>
                 日本當地活動情報彙整
             </h3>
@@ -28,7 +28,7 @@
                     <div class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold">祭典活動</div>
                 </div>
                 <div class="p-5">
-                    <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors text-white">秩父神社例大祭 (秩父夜祭)</h4>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white">秩父神社例大祭 (秩父夜祭)</h4>
                     <div class="flex items-center gap-2 text-slate-400 text-sm">
                         <span class="material-symbols-outlined text-sm">calendar_month</span>
                         2024/12/02 - 12/03
@@ -44,7 +44,7 @@
                     <div class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold">動漫活動</div>
                 </div>
                 <div class="p-5">
-                    <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors text-white">神田祭 × 動漫聯名活動詳情</h4>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white">神田祭 × 動漫聯名活動詳情</h4>
                     <div class="flex items-center gap-2 text-slate-400 text-sm">
                         <span class="material-symbols-outlined text-sm">calendar_month</span>
                         2024/05/15
@@ -60,7 +60,7 @@
                     <div class="absolute top-3 left-3 bg-primary text-background-dark px-3 py-1 rounded-full text-xs font-bold">特展</div>
                 </div>
                 <div class="p-5">
-                    <h4 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors text-white">京都動漫節 2024 (Kyomaf)</h4>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white">京都動漫節 2024 (Kyomaf)</h4>
                     <div class="flex items-center gap-2 text-slate-400 text-sm">
                         <span class="material-symbols-outlined text-sm">calendar_month</span>
                         2024/09/21 - 09/22
@@ -73,7 +73,7 @@
     <section>
         <div class="flex items-center gap-2 mb-8">
             <span class="material-symbols-outlined text-primary">cloudy_snowing</span>
-            <h3 class="text-2xl font-bold text-white">日本即時天氣預報</h3>
+            <h3  class="text-2xl font-bold text-slate-900 dark:text-white">日本即時天氣預報</h3>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -88,14 +88,14 @@
                 <div class="flex items-center gap-4 mb-8">
                     <span class="text-5xl">🌡️</span>
                     <div>
-                        <div class="text-3xl font-black text-white mb-1 tracking-tight">
+                        <div class="text-lg font-bold text-slate-900 dark:text-white">
                             <span th:text="${cityData.daily.temperature_2m_max[0]}">20</span>°C
                         </div>
                         <p class="text-slate-400 text-xs">今日最高溫</p>
                     </div>
                 </div>
 
-                <div class="bg-slate-800/40 rounded-lg overflow-hidden border border-white/5">
+                <div class="bg-orange-50/80 rounded-lg overflow-hidden border border-white/5">
                     <table class="w-full text-sm text-left">
                         <thead class="text-xs text-slate-500 uppercase bg-primary/10">
                             <tr>
@@ -120,7 +120,7 @@
     <section>
         <div class="flex items-center gap-2 mb-8">
             <span class="material-symbols-outlined text-primary">auto_awesome</span>
-            <h3 class="text-2xl font-bold text-white">節氣時辰</h3>
+            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">節氣時辰</h3>
         </div>
         <div class="space-y-6">
             <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden group">

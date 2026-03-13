@@ -7,8 +7,10 @@
     <title>行程規劃 - 聖地巡禮</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
 
     <script id="tailwind-config">
@@ -49,15 +51,25 @@
     .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
     @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in-up { animation: fadeInSlideUp 0.4s ease-out forwards; }
+
+        .theme-toggle-sun { display: block; }
+        .theme-toggle-moon { display: none; }
+        .dark .theme-toggle-sun { display: none; }
+        .dark .theme-toggle-moon { display: block; }
   </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
 
-    <div id="rich-place-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
 
-            <button onclick="closeRichModal()" class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
+    <div id="rich-place-modal"
+        class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+        <div
+            class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
+
+            <button onclick="closeRichModal()"
+                class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
                 <span class="material-symbols-outlined text-xl">close</span>
             </button>
 
@@ -69,7 +81,8 @@
 
             <div class="p-6 md:p-8 overflow-y-auto no-scrollbar flex-1 relative">
 
-                <button onclick="confirmAddToItinerary()" class="absolute top-6 right-6 bg-[#008ccf] hover:bg-[#007ab8] text-white px-5 py-2 rounded-full font-bold shadow-lg transition flex items-center gap-2">
+                <button onclick="confirmAddToItinerary()"
+                    class="absolute top-6 right-6 bg-[#008ccf] hover:bg-[#007ab8] text-white px-5 py-2 rounded-full font-bold shadow-lg transition flex items-center gap-2">
                     <span class="material-symbols-outlined text-lg">add_circle</span>
                     <span id="modal-btn-text">加入 Day1 行程</span>
                 </button>
@@ -100,7 +113,8 @@
                             </li>
                             <li class="flex items-center gap-3 text-slate-300">
                                 <span class="material-symbols-outlined text-yellow-500 shrink-0">language</span>
-                                <a id="modal-place-website" href="#" target="_blank" class="text-blue-400 hover:underline truncate">無網站資訊</a>
+                                <a id="modal-place-website" href="#" target="_blank"
+                                    class="text-blue-400 hover:underline truncate">無網站資訊</a>
                             </li>
                             <li class="flex items-center gap-3 text-slate-300">
                                 <span class="material-symbols-outlined text-yellow-500 shrink-0">call</span>
@@ -187,32 +201,43 @@
         <div id="map" class="absolute inset-0 z-0 h-full w-full bg-slate-100 dark:bg-[#1a140d]"></div>
 
         <div class="flex-1 relative pointer-events-none z-10 h-full">
-            <div class="hidden md:flex flex-col gap-2 absolute top-6 right-6 w-full max-w-sm pointer-events-auto items-end">
-                <div class="relative flex items-center w-full h-12 rounded-full focus-within:shadow-xl bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border border-slate-300 dark:border-white/10 overflow-hidden shadow-lg transition-all">
-                    <div class="grid place-items-center h-full w-12 text-slate-400"><span class="material-symbols-outlined">search</span></div>
-                    <input class="peer h-full w-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400" type="text" id="pac-input-desktop" placeholder="輸入關鍵字或點擊下方分類..." />
+            <div
+                class="hidden md:flex flex-col gap-2 absolute top-6 right-6 w-full max-w-sm pointer-events-auto items-end">
+                <div
+                    class="relative flex items-center w-full h-12 rounded-full focus-within:shadow-xl bg-white/95 dark:bg-background-dark/95 backdrop-blur-md border border-slate-300 dark:border-white/10 overflow-hidden shadow-lg transition-all">
+                    <div class="grid place-items-center h-full w-12 text-slate-400"><span
+                            class="material-symbols-outlined">search</span></div>
+                    <input
+                        class="peer h-full w-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400"
+                        type="text" id="pac-input-desktop" placeholder="輸入關鍵字或點擊下方分類..." />
                 </div>
                 <div class="flex items-center justify-end gap-2 px-1 mt-1 w-full">
-                    <button onclick="searchNearby('tourist_attraction')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition shadow-md">
+                    <button onclick="searchNearby('tourist_attraction')"
+                        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition shadow-md">
                         <span class="material-symbols-outlined text-sm text-primary">attractions</span> 景點
                     </button>
-                    <button onclick="searchNearby('lodging')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-500 hover:text-white transition shadow-md">
+                    <button onclick="searchNearby('lodging')"
+                        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-500 hover:text-white transition shadow-md">
                         <span class="material-symbols-outlined text-sm text-blue-500">hotel</span> 住宿
                     </button>
-                    <button onclick="searchNearby('restaurant')" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white transition shadow-md">
+                    <button onclick="searchNearby('restaurant')"
+                        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white transition shadow-md">
                         <span class="material-symbols-outlined text-sm text-red-400">restaurant</span> 美食
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="itinerary-panel" class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
+        <div id="itinerary-panel"
+            class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
 
-            <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-30 bg-white dark:bg-background-dark shadow-sm shrink-0">
+            <div
+                class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-30 bg-white dark:bg-background-dark shadow-sm shrink-0">
                 <div class="flex items-center gap-2">
                     <h1 class="text-lg font-bold text-primary tracking-tight">詳細行程</h1>
                 </div>
-                <a th:href="@{/payment}" class="flex items-center gap-1 md:gap-2 bg-primary hover:bg-orange-600 text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
+                <a id="goToPaymentBtn" href="/payment" onclick="return goToPayment()"
+                    class="flex items-center gap-1 md:gap-2 bg-primary hover:bg-orange-600 text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
                     <span class="material-symbols-outlined text-base">shopping_cart_checkout</span>前往付款
                 </a>
             </div>
@@ -220,42 +245,57 @@
             <div class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col" id="itinerary-scroll-area">
 
                 <div class="relative w-full h-[180px] shrink-0 bg-slate-800 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70">
+                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80"
+                        class="w-full h-full object-cover opacity-70">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                         <div>
-                            <span class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本, 關西</span>
+                            <span
+                                class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本,
+                                關西</span>
                             <h1 class="text-xl font-bold text-white tracking-wide shadow-sm">大阪京都5天4夜鐵腿之旅</h1>
                         </div>
                     </div>
                 </div>
 
                 <div class="p-4 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-white/10 shrink-0">
-                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
+                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">
+                        這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
                 </div>
 
-                <div class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark overflow-x-auto border-b border-slate-200 dark:border-white/10 no-scrollbar shrink-0">
-                    <button onclick="selectDay(1)" id="btn-day-1" class="px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md">Day 1</button>
-                    <button onclick="selectDay(2)" id="btn-day-2" class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition">Day 2</button>
+                <div
+                    class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark overflow-x-auto border-b border-slate-200 dark:border-white/10 no-scrollbar shrink-0">
+                    <button onclick="selectDay(1)" id="btn-day-1"
+                        class="px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md">Day
+                        1</button>
+                    <button onclick="selectDay(2)" id="btn-day-2"
+                        class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition">Day
+                        2</button>
                 </div>
 
-                <div class="md:hidden m-4 relative flex items-center w-[calc(100%-2rem)] h-12 rounded-full bg-slate-100 dark:bg-surface-dark border border-slate-300 dark:border-white/10 overflow-hidden shadow-sm shrink-0">
-                    <div class="grid place-items-center h-full w-12 text-slate-400"><span class="material-symbols-outlined">search</span></div>
-                    <input class="w-full h-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400" type="text" id="pac-input-mobile" placeholder="搜尋並加入景點..." />
+                <div
+                    class="md:hidden m-4 relative flex items-center w-[calc(100%-2rem)] h-12 rounded-full bg-slate-100 dark:bg-surface-dark border border-slate-300 dark:border-white/10 overflow-hidden shadow-sm shrink-0">
+                    <div class="grid place-items-center h-full w-12 text-slate-400"><span
+                            class="material-symbols-outlined">search</span></div>
+                    <input
+                        class="w-full h-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400"
+                        type="text" id="pac-input-mobile" placeholder="搜尋並加入景點..." />
                 </div>
-                
+
             </div>
         </div>
 
-        <button id="mobile-toggle-btn" onclick="toggleMobileView()" class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
+        <button id="mobile-toggle-btn" onclick="toggleMobileView()"
+            class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
             <span class="material-symbols-outlined" id="toggle-icon">map</span>
             <span id="toggle-text">展開地圖</span>
         </button>
 
     </main>
 
-    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" async defer></script>
-    <script th:src="@{/js/packageTourMap.js}"></script>
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'"
+        async defer></script>
+    <script th:src="@{/tour/map/packageTourMap.js}"></script>
 </body>
 
 </html>
