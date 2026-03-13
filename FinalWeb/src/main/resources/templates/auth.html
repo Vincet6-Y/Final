@@ -43,10 +43,12 @@
             </div>
         </div>
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+        <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
 
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script th:src="@{/member/js/cardSlide.js}"></script>
         <script th:src="@{/member/js/passwdEyeIcon.js}"></script>
+        <script th:src="@{/member/js/toastInfo.js}"></script>
 
     </body>
 </html>

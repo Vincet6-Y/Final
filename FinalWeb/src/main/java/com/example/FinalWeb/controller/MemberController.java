@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.FinalWeb.dto.MemberLoginDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
+import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.service.MemberService;
 
@@ -22,24 +24,42 @@ public class MemberController {
 
     // 處理登入
     @PostMapping("/login")
-    public String login(MemberLoginDTO login,  HttpSession session) {
+    public String login(MemberLoginDTO login,  
+                        HttpSession session, 
+                        RedirectAttributes redirectAttr) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
         if(member == null){
-            return "redirect:/auth?msg=loginError";
+            redirectAttr.addFlashAttribute(
+                "toast",
+                ToastInfoDTO.error("帳號或密碼錯誤")
+            );
+            return "redirect:/auth";
         }
 
         session.setAttribute("loginMember", member);
 
-        return "redirect:/home?msg=loginSuccess";
+        redirectAttr.addFlashAttribute(
+            "toast",
+            ToastInfoDTO.success("登入成功，歡迎回來")
+        );
+
+        return "redirect:/home";
     }
 
     // 處理登出
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session,
+                         RedirectAttributes redirectAttr) {
         session.invalidate();
-        return "redirect:/home?msg=logoutSuccess";
+        
+        redirectAttr.addFlashAttribute(
+            "toast",
+            ToastInfoDTO.success("已成功登出")
+        );
+
+        return "redirect:/home";
     }
 
     // 處理註冊
