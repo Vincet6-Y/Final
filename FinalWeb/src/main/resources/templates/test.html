@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>日本新聞</title>
+</head>
+
+<body>
+
+<h2>最新日本新聞</h2>
+
+<div id="news"></div>
+
+<script>
+
+fetch("http://localhost:8080/api/news/japan")
+.then(res => res.json())
+.then(data => {
+
+const container = document.getElementById("news");
+
+data.forEach(n => {
+
+const div = document.createElement("div");
+
+div.innerHTML = `
+<a href="${n.link}" target="_blank">
+${n.title}
+</a>
+<br>
+<small>${n.date}</small>
+<hr>
+`;
+
+container.appendChild(div);
+
+});
+
+});
+
+</script>
+
+</body>
+</html>
