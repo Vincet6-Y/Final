@@ -606,3 +606,58 @@ document.addEventListener("DOMContentLoaded", () => {
         updateDayButtonsAndLists(newStart);
     });
 });
+
+// 完善規劃按鈕點擊事件
+async function copyToMyPlan(officialPlanId) {
+    if (!officialPlanId) return;
+
+    try {
+        const response = await fetch(`/api/plan/copy/${officialPlanId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        // 🌟 處理 Session 不存在 (未登入 401)
+        if (response.status === 401) {
+            // 取得當前網址 (例如 /packageTourDetail?planId=1)
+            const currentPath = window.location.pathname + window.location.search;
+            const separator = currentPath.includes('?') ? '&' : '?';
+            // 加上 autoCopy=true 標記
+            const targetUrl = encodeURIComponent(currentPath + separator + "autoCopy=true");
+            
+            alert('請先登入會員，系統將於登入後自動為您複製行程！');
+            // 🌟 導向組員負責的登入頁面 (/auth) 並帶上目標網址
+            window.location.href = `/auth?redirect=${targetUrl}`;
+            return;
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            // 成功後跳轉至地圖編輯頁面
+            window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
+        } else {
+            alert('複製失敗：' + data.message);
+        }
+    } catch (error) {
+        console.error("複製行程時出錯:", error);
+    }
+}
+
+// 🌟 偵測是否是登入後跳轉回來
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const planId = urlParams.get('planId');
+    const autoCopy = urlParams.get('autoCopy');
+
+    // 如果網址帶有 autoCopy，代表是登入後自動回來
+    if (autoCopy === 'true' && planId) {
+        console.log("偵測到登入後回傳，正在自動執行完善規劃...");
+        
+        // 🌟 小優化：把網址上的 autoCopy=true 擦掉，避免使用者按 F5 重新整理時又觸發一次複製
+        const cleanUrl = window.location.pathname + `?planId=${planId}`;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        // 延遲 1 秒確保地圖等資源載入完成，然後自動幫他按按鈕
+        setTimeout(() => copyToMyPlan(planId), 1000); 
+    }
+});

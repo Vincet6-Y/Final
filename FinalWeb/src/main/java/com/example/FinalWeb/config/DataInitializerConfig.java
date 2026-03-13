@@ -93,7 +93,7 @@ public class DataInitializerConfig implements CommandLineRunner {
         m.setLocationName(name);
         m.setLatitude(new BigDecimal(lat));
         m.setLongitude(new BigDecimal(lng));
-        m.setGooglePlaceID(pid); // 這裡請確認 MapEntity 的 setter 名稱
+        m.setGooglePlaceID(pid);
         mapRepo.save(m);
     }
 }
