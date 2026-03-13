@@ -155,47 +155,49 @@
     </main>
 
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-  </div>
-  
-  <script>
-document.getElementById('searchBtn').addEventListener('click', function() {
-    const keyword = document.getElementById('searchInput').value.trim();
-    if (!keyword) return;
 
-    fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`)
-        .then(response => {
-            if (!response.ok) throw new Error("找不到作品");
-            return response.json();
-        })
-        .then(work => {
-            window.location.href = `/workListDetail?workId=${work.workId}`;
-        })
-        .catch(error => {
-            console.warn(error);
-            window.location.href = `/workList?keyword=${encodeURIComponent(keyword)}`;
-        });
-});
+    <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+      function showContent(tab) {
 
-    function showContent(tab) {
-      const japanContent = document.getElementById('content-japan');
-      const mofaContent = document.getElementById('content-mofa');
-      const btnJapan = document.getElementById('btn-japan');
-      const btnMofa = document.getElementById('btn-mofa');
+          const $japanContent = $("#content-japan");
+          const $mofaContent = $("#content-mofa");
+          const $btnJapan = $("#btn-japan");
+          const $btnMofa = $("#btn-mofa");
 
-      if (tab === 'japan') {
-        japanContent.classList.remove('hidden');
-        japanContent.classList.add('flex');
-        mofaContent.classList.add('hidden');
-        btnJapan.className = "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group";
-        btnMofa.className = "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm";
-      } else {
-        japanContent.classList.add('hidden');
-        japanContent.classList.remove('flex');
-        mofaContent.classList.remove('hidden');
-        btnMofa.className = "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group";
-        btnJapan.className = "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm";
+          if (tab === "japan") {
+
+              // 顯示日本資訊
+              $japanContent.removeClass("hidden").addClass("flex");
+              $mofaContent.addClass("hidden");
+
+              // 按鈕樣式
+              $btnJapan.attr("class",
+                  "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group"
+              );
+
+              $btnMofa.attr("class",
+                  "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm"
+              );
+
+          } else {
+
+              // 顯示外交部資訊
+              $japanContent.addClass("hidden").removeClass("flex");
+              $mofaContent.removeClass("hidden");
+
+              // 按鈕樣式
+              $btnMofa.attr("class",
+                  "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group"
+              );
+
+              $btnJapan.attr("class",
+                  "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm"
+              );
+          }
       }
-    }
-  </script>
+    </script>
+    <script th:src="@{/member/js/toastInfo.js}"></script>
 </body>
 </html>

@@ -1,5 +1,7 @@
 package com.example.FinalWeb.repo;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +12,10 @@ import com.example.FinalWeb.entity.WorkDetailEntity;
 
 @Repository
 public interface WorkDetailRepo extends JpaRepository<WorkDetailEntity, Integer> {
-    Page<WorkDetailEntity> findByWorkClass(String workClass, Pageable pageable);
-    // 在你的 WorkDetailRepo 介面新增這一行
-Page<WorkDetailEntity> findByWorkNameContaining(String workName, Pageable pageable);
+    // Page<WorkDetailEntity> findByWorkClass(String workClass, Pageable pageable);
+    Page<WorkDetailEntity> findByWorkClassAndOnDateBetween(String workClass, Pageable pageable, LocalDate startYear, LocalDate endYear);
+    Page<WorkDetailEntity> findByOnDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+    Page<WorkDetailEntity> findByWorkNameContaining(String workName, Pageable pageable);
+
 }

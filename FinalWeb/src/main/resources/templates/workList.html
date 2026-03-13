@@ -31,21 +31,54 @@
                     動畫作品
                 </a>
             </div>
-            <div class="flex justify-end gap-3 mb-10">
-                <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow})}"
-                    class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
-                    th:classappend="${sortNow == 'DESC'} 
-                                    ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
-                                    : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
-                    上映日期 - 近
-                </a>
-                <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow})}"
-                    class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
-                    th:classappend="${sortNow == 'ASC'} 
-                                    ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
-                                    : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
-                    上映日期 - 遠
-                </a>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-4 mb-10">
+
+                <form th:action="@{/workList}" method="get"
+                    class="flex items-center gap-3 bg-white dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 w-fit">
+
+                    <input type="hidden" name="workClass" th:value="${classNow}" />
+                    <input type="hidden" name="sortDir" th:value="${sortNow}" />
+
+                    <label class="text-sm font-bold text-slate-600 dark:text-slate-300">年份區間：</label>
+
+                    <select name="minYear"
+                        class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
+                        <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
+                            th:selected="${year.toString() == minYearNow}"> </option>
+                    </select>
+
+                    <span class="text-slate-400 font-bold">-</span>
+
+                    <select name="maxYear"
+                        class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
+                        <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
+                            th:selected="${year.toString() == maxYearNow}">
+                        </option>
+                    </select>
+
+                    <button type="submit"
+                        class="ml-2 px-4 py-1.5 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 transition-all">
+                        篩選
+                    </button>
+                </form>
+
+                <div class="flex gap-3">
+                    <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
+                        class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
+                        th:classappend="${sortNow == 'DESC'} 
+                            ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                            : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
+                        上映日期 - 近
+                    </a>
+                    <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
+                        class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
+                        th:classappend="${sortNow == 'ASC'} 
+                            ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                            : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
+                        上映日期 - 遠
+                    </a>
+                </div>
 
             </div>
             <div class="flex flex-col gap-8">

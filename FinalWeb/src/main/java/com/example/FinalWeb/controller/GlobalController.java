@@ -91,7 +91,9 @@ public class GlobalController {
     }
 
     @RequestMapping("/auth")
-    public String authPage() {
+    public String authPage(@RequestParam(required = false) String redirect,
+                            Model model) {
+        model.addAttribute("redirect", redirect);
         return "auth";
     }
 
