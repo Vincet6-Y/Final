@@ -168,14 +168,72 @@ public class PaymentController {
                 }
             }
 
-            System.out.println("✅ 付款成功！跳轉到 /paymentsuccess?orderId=" + orderId);
-            return new RedirectView("/paymentsuccess?orderId=" + orderId);
+            System.out.println("✅ 付款成功！跳轉到 /payment/paymentsuccess?orderId=" + orderId);
+            return new RedirectView("/payment/paymentsuccess?orderId=" + orderId);
         }
 
         System.out.println("❌ 付款失敗或取消: " + params.get("RtnMsg"));
         return new RedirectView("/payment");
     }
 
+    @RequestMapping("/paymentsuccess")
+    public String paymentsuccess(@RequestParam(name = "orderId", required = false) Integer orderId, Model model) {
+        if (orderId != null) {
+            ordersRepo.findById(orderId).ifPresent(order -> {
+                model.addAttribute("order", order);
+
+                // 計算總金額
+                int totalAmount = 0;
+                if (order.getOrderDetails() != null) {
+                    totalAmount = order.getOrderDetails().stream()
+                            .mapToInt(d -> d.getTicketPrice() != null ? d.getTicketPrice() : 0)
+                            .sum();
+                }
+                model.addAttribute("totalAmount", totalAmount);
+
+                // 取得行程底下的所有景點 (MyMap)
+                if (order.getMyPlan() != null) {
+                    model.addAttribute("myPlan", order.getMyPlan());
+
+                    if (order.getMyPlan().getMyMaps() != null) {
+                        java.util.List<com.example.FinalWeb.entity.MyMapEntity> allMaps = order.getMyPlan().getMyMaps();
+                        model.addAttribute("myMaps", allMaps);
+
+                        // 依照 dayNumber 分組
+                        java.util.Map<Integer, java.util.List<com.example.FinalWeb.entity.MyMapEntity>> groupedByDay = allMaps
+                                .stream()
+                                .sorted(java.util.Comparator.comparingInt(
+                                        (com.example.FinalWeb.entity.MyMapEntity m) -> m.getDayNumber() != null
+                                                ? m.getDayNumber()
+                                                : 0)
+                                        .thenComparingInt(m -> m.getVisitOrder() != null ? m.getVisitOrder() : 0))
+                                .collect(java.util.stream.Collectors.groupingBy(
+                                        m -> m.getDayNumber() != null ? m.getDayNumber() : 1,
+                                        java.util.TreeMap::new,
+                                        java.util.stream.Collectors.toList()));
+                        model.addAttribute("groupedByDay", groupedByDay);
+
+                        // 計算最大天數 (用於 Day 分頁按鈕)
+                        int maxDay = allMaps.stream()
+                                .mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1)
+                                .max().orElse(1);
+                        model.addAttribute("maxDay", maxDay);
+                    }
+
+                    // 建立「有付費票券」的 spotId 清單 (用於前端判斷是否顯示 QR Code)
+                    java.util.Set<Integer> ticketSpotIds = new java.util.HashSet<>();
+                    if (order.getOrderDetails() != null) {
+                        for (com.example.FinalWeb.entity.OrdersDetailEntity detail : order.getOrderDetails()) {
+                            if (detail.getMyMap() != null && detail.getMyMap().getSpotId() != null) {
+                                ticketSpotIds.add(detail.getMyMap().getSpotId());
+                            }
+                        }
+                    }
+                    model.addAttribute("ticketSpotIds", ticketSpotIds);
+                }
+            });
+        }
+        return "paymentsuccess";
+    }
+
 }
-
-
