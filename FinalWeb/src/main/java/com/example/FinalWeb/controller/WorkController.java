@@ -24,7 +24,7 @@ public class WorkController {
         System.out.println("=== 偵測到訪問首頁 ===");
         
         // 抓取資料
-        List<WorkDetailEntity> featuredList = service.getWorkList(0, 4, "DESC", null).getContent();
+        List<WorkDetailEntity> featuredList = service.getWorkList(0, 4, "DESC", null, "1980", "2026").getContent();
         
         model.addAttribute("featuredList", featuredList);
         return "home";

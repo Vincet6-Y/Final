@@ -7,8 +7,10 @@
     <title>行程規劃 - 聖地巡禮</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
 
     <script id="tailwind-config">
@@ -49,15 +51,25 @@
     .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
     @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in-up { animation: fadeInSlideUp 0.4s ease-out forwards; }
+
+        .theme-toggle-sun { display: block; }
+        .theme-toggle-moon { display: none; }
+        .dark .theme-toggle-sun { display: none; }
+        .dark .theme-toggle-moon { display: block; }
+
   </style>
 </head>
 
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
 
-    <div id="rich-place-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
+    <div id="rich-place-modal"
+        class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+        <div
+            class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
 
-            <button onclick="closeRichModal()" class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
+            <button onclick="closeRichModal()"
+                class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
                 <span class="material-symbols-outlined text-xl">close</span>
             </button>
 
@@ -94,7 +106,8 @@
                             </li>
                             <li class="flex items-center gap-3 text-slate-300">
                                 <span class="material-symbols-outlined text-yellow-500 shrink-0">language</span>
-                                <a id="modal-place-website" href="#" target="_blank" class="text-blue-400 hover:underline truncate">無網站資訊</a>
+                                <a id="modal-place-website" href="#" target="_blank"
+                                    class="text-blue-400 hover:underline truncate">無網站資訊</a>
                             </li>
                             <li class="flex items-center gap-3 text-slate-300">
                                 <span class="material-symbols-outlined text-yellow-500 shrink-0">call</span>
@@ -119,62 +132,7 @@
         </div>
     </div>
 
-    <header th:fragment="myHeader"
-        class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
-        <a th:href="@{/home}">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
-                    <img alt="Seichi Junrei Logo" class="w-full h-full object-contain" th:src="@{/images/LOGO.png}" />
-                </div>
-                <h1 class="text-primary text-2xl font-bold tracking-tight"
-                    style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</h1>
-            </div>
-        </a>
-        <nav class="hidden md:flex flex-1 justify-center items-center gap-10">
-            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/news}">最新消息</a>
-            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/info}">旅遊情報</a>
-            <div class="relative group">
-                <a class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
-                    th:href="@{/workList}">
-                    聖地作品巡禮
-                    <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
-                </a>
-                <div
-                    class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
-                        href="#">電影作品</a>
-                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
-                        href="#">動畫作品</a>
-                </div>
-            </div>
-            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/packageTour}">行程規劃</a>
-        </nav>
-        <div class="flex items-center gap-4">
-            <button aria-label="Toggle theme"
-                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                onclick="document.documentElement.classList.toggle('dark')">
-                <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
-                <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
-            </button>
-            <!-- head CSS 不是直接放入而是引用時用這條
-            <button aria-label="Toggle theme"
-                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                onclick="document.documentElement.classList.toggle('dark')">
-
-                <span class="material-symbols-outlined block dark:hidden">light_mode</span>
-
-                <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
-            </button> -->
-            <a th:href="@{/login}"><button
-                    class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
-                    會員登入
-                </button></a>
-        </div>
-    </header>
+    <header th:replace="~{ fragments/header :: myHeader}"></header>
 
     <main class="flex-1 relative flex w-full h-full overflow-hidden">
 
@@ -183,13 +141,16 @@
         <div class="flex-1 relative pointer-events-none z-10 h-full">
         </div>
 
-        <div id="itinerary-panel" class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
+        <div id="itinerary-panel"
+            class="absolute inset-0 z-20 md:relative md:w-[420px] md:z-10 flex flex-col bg-white dark:bg-background-dark/95 backdrop-blur-md md:border-l border-slate-200 dark:border-white/10 shadow-[-10px_0_20px_rgba(0,0,0,0.5)] transition-transform duration-300 ease-in-out transform translate-y-0 md:translate-y-0 pointer-events-auto">
 
-            <div class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-30 bg-white dark:bg-background-dark shadow-sm shrink-0">
+            <div
+                class="p-3 border-b border-slate-200 dark:border-white/10 flex items-center justify-between z-30 bg-white dark:bg-background-dark shadow-sm shrink-0">
                 <div class="flex items-center gap-2">
                     <h1 class="text-lg font-bold text-primary tracking-tight">官方行程總覽</h1>
                 </div>
-                <button th:onclick="'copyToMyPlan(' + ${plan?.planId} + ')'" class="flex items-center gap-1 md:gap-2 bg-[#008ccf] hover:bg-[#007ab8] text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
+                <button th:onclick="'copyToMyPlan(' + ${plan?.planId} + ')'"
+                    class="flex items-center gap-1 md:gap-2 bg-[#008ccf] hover:bg-[#007ab8] text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
                     <span class="material-symbols-outlined text-base">edit_document</span>完善規劃
                 </button>
             </div>
@@ -197,18 +158,22 @@
             <div class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col" id="itinerary-scroll-area">
 
                 <div class="relative w-full h-[180px] shrink-0 bg-slate-800 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80" class="w-full h-full object-cover opacity-70" />
+                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80"
+                        class="w-full h-full object-cover opacity-70" />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                         <div>
-                            <span class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本, 關西</span>
+                            <span
+                                class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本,
+                                關西</span>
                             <h1 class="text-xl font-bold text-white tracking-wide shadow-sm">大阪京都5天4夜鐵腿之旅</h1>
                         </div>
                     </div>
                 </div>
 
                 <div class="p-4 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-white/10 shrink-0">
-                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
+                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">
+                        這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
                 </div>
 
                 <div class="flex items-center gap-2 p-3 ... shrink-0" id="day-buttons-container">
@@ -223,14 +188,16 @@
         </div>
         </div>
 
-        <button id="mobile-toggle-btn" onclick="toggleMobileView()" class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
+        <button id="mobile-toggle-btn" onclick="toggleMobileView()"
+            class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
             <span class="material-symbols-outlined" id="toggle-icon">map</span>
             <span id="toggle-text">展開地圖</span>
         </button>
 
     </main>
 
-    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" async defer></script>
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'"
+        async defer></script>
 
     <script th:src="@{/tour/Detail/tourGlobals.js}"></script>
     <script th:src="@{/tour/Detail/tourApi.js}"></script>

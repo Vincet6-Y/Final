@@ -15,4 +15,7 @@ public interface WorkDetailRepo extends JpaRepository<WorkDetailEntity, Integer>
     // Page<WorkDetailEntity> findByWorkClass(String workClass, Pageable pageable);
     Page<WorkDetailEntity> findByWorkClassAndOnDateBetween(String workClass, Pageable pageable, LocalDate startYear, LocalDate endYear);
     Page<WorkDetailEntity> findByOnDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+    Page<WorkDetailEntity> findByWorkNameContaining(String workName, Pageable pageable);
+
 }
