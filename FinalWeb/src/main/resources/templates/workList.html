@@ -110,7 +110,7 @@
             <div class="mt-16 flex justify-center">
                 <nav class="flex items-center gap-2">
                     <a th:if="${page > 0}"
-                        th:href="@{/workList(page=${page-1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
+                        th:href="@{/workList(page=${page - 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_left</span>
@@ -131,8 +131,8 @@
                     </th:block>
                     <!-- <span th:text="${page + 1}"></span> / <span th:text="${works.totalPages}"></span> -->
 
-                    <a th:if="${page+1 < works.totalPages}"
-                        th:href="@{/workList(page=${page+1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
+                    <a th:if="${page + 1 < works.totalPages}"
+                        th:href="@{/workList(page=${page + 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
                         style="">
                         <span class="material-symbols-outlined" style="">chevron_right</span>
