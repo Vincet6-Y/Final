@@ -77,13 +77,13 @@ public class GlobalController {
     @Value("${google.maps.api-key:NONE}")
     private String googleMapsApiKey;
 
-    // 2. 修改原本的 packageTourMap 方法
-    @RequestMapping("/packageTourMap")
-    public String packageTourMap(Model model) {
-        // 將金鑰存入 model，這樣前端 Thymeleaf 才能抓到
-        model.addAttribute("apiKey", googleMapsApiKey);
-        return "packageTourMap";
-    }
+    // 已寫在 PackageTourMapController
+    // @RequestMapping("/packageTourMap")
+    // public String packageTourMap(Model model) {
+    //     // 將金鑰存入 model，這樣前端 Thymeleaf 才能抓到
+    //     model.addAttribute("apiKey", googleMapsApiKey);
+    //     return "packageTourMap";
+    // }
 
     @RequestMapping("/member")
     public String member() {

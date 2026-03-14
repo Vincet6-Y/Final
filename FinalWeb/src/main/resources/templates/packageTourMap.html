@@ -203,6 +203,7 @@
                     </button>
                 </a>
             </div>
+        </div>
     </header>
 
     <main class="flex-1 relative flex w-full h-full overflow-hidden">
@@ -253,23 +254,31 @@
 
             <div class="flex-1 overflow-y-auto no-scrollbar relative flex flex-col" id="itinerary-scroll-area">
 
-                <div class="relative w-full h-[180px] shrink-0 bg-slate-800 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80"
-                        class="w-full h-full object-cover opacity-70">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                        <div>
-                            <span
-                                class="px-2 py-0.5 bg-primary/90 text-white text-[10px] font-bold rounded mb-1.5 inline-block backdrop-blur-sm">日本,
-                                關西</span>
-                            <h1 class="text-xl font-bold text-white tracking-wide shadow-sm">大阪京都5天4夜鐵腿之旅</h1>
-                        </div>
+                <div class="relative w-full h-[220px] shrink-0 bg-slate-800 overflow-hidden">
+                    <img th:if="${myPlan?.journeyPlan?.workDetail?.workImg != null}"
+                        th:src="${myPlan.journeyPlan.workDetail.workImg}"
+                        class="w-full h-full object-cover" />
+                    <img th:unless="${myPlan?.journeyPlan?.workDetail?.workImg != null}"
+                        src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80"
+                        class="w-full h-full object-cover opacity-80" />
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+                    <div class="absolute bottom-4 left-4">
+                        <span class="px-3 py-1 bg-primary text-white text-xs font-bold rounded shadow-lg backdrop-blur-sm"
+                            th:text="${myPlan?.journeyPlan?.planCity ?: '自訂行程'}">
+                            日本, 東京
+                        </span>
                     </div>
                 </div>
 
-                <div class="p-4 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-white/10 shrink-0">
-                    <p class="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">
-                        這趟為期5天的旅程將帶你深入關西的心臟地帶。從大阪的熱鬧美食街到京都的古老寺廟...</p>
+                <div class="p-5 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 shrink-0">
+                    <div class="flex flex-col gap-1">
+                        <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-tight"
+                            th:text="${myPlan?.myPlanName ?: '我的專屬行程'}">
+                            載入中...
+                        </h1>
+                    </div>
                 </div>
 
                 <div
