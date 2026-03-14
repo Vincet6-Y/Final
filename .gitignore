@@ -1,3 +1,5 @@
 /.metadata/
 src/main/resources/application.properties
 FinalWeb/src/main/resources/application.properties
+
+.env
