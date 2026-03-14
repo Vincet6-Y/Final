@@ -348,9 +348,9 @@
             });
 
             // ==========================================
-            // 🏛️ 景點 Modal — 點擊景點卡片 (終極除錯版)
+            // 🏛️ 景點 Modal — 點擊景點卡片
             // ==========================================
-            $(document).on('click', '.spot-card', async function () {
+            $(document).on('click', '.spot-card', function () {
                 const $card = $(this);
                 const spotName = $card.data('spot-name');
                 const placeId = $card.data('place-id');
@@ -358,10 +358,6 @@
                 const spotId = $card.data('spot-id');
                 const day = $card.data('day');
                 const visitOrder = $card.data('order');
-
-                console.log("=== 🔍 點擊景點卡片 ===");
-                console.log("景點名稱:", spotName);
-                console.log("Place ID:", placeId);
 
                 // 設定 Modal 基本資訊
                 $('#modal-name').text(spotName);
@@ -372,7 +368,7 @@
                 );
 
                 // ==========================================
-                // 🎫 QR Code 區塊
+                // 🎫 QR Code 區塊：用 jQuery AJAX 從後端取得
                 // ==========================================
                 if (hasTicket && ticketDataMap[spotId]) {
                     const ticket = ticketDataMap[spotId];
@@ -380,9 +376,13 @@
                     $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticket.orderDetailId);
 
                     if (ticket.ticketUsed) {
-                        $('#modal-ticket-status').text('⚠️ 此票券已使用過').removeClass('text-primary/70').addClass('text-red-400');
+                        $('#modal-ticket-status')
+                            .text('⚠️ 此票券已使用過')
+                            .removeClass('text-primary/70').addClass('text-red-400');
                     } else {
-                        $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。').removeClass('text-red-400').addClass('text-primary/70');
+                        $('#modal-ticket-status')
+                            .text('請在入口處出示此 QR Code 進行掃描驗證。')
+                            .removeClass('text-red-400').addClass('text-primary/70');
                     }
                 } else if (hasTicket) {
                     $('#modal-ticket-section').removeClass('hidden');
@@ -390,7 +390,10 @@
                     $('#modal-ticket-status').text('票券資訊載入中...');
 
                     if (window.allTickets && window.allTickets.length > 0) {
-                        const matchedTicket = window.allTickets.find(t => t.ticketType && t.ticketType.includes(spotName)) || window.allTickets[0];
+                        const matchedTicket = window.allTickets.find(function (t) {
+                            return t.ticketType && t.ticketType.includes(spotName);
+                        }) || window.allTickets[0];
+
                         if (matchedTicket) {
                             $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + matchedTicket.orderDetailId);
                             $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。');
@@ -404,51 +407,35 @@
                 $('#spotModal').removeClass('hidden').addClass('flex');
 
                 // ==========================================
-                // 📸 Google Places API 載入照片 (官方推薦 async 寫法)
+                // 📸 Google Places API 載入照片 (新版安全寫法)
                 // ==========================================
-                try {
-                    // 檢查 1：有沒有 Place ID
-                    if (!placeId) {
-                        console.warn("⚠️ 警告：這個景點沒有 Google Place ID，無法抓照片！");
-                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                        $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
-                        return; // 直接結束
-                    }
+                if (placeId && typeof google !== 'undefined' && google.maps && google.maps.places) {
+                    if (google.maps.places.Place) {
+                        const place = new google.maps.places.Place({ id: placeId });
 
-                    // 檢查 2：Google 核心有沒有載入
-                    if (typeof google === 'undefined') {
-                        console.warn("⚠️ 警告：Google Maps 核心尚未載入！");
-                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                        $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
-                        return;
-                    }
+                        place.fetchFields({ fields: ['photos', 'editorialSummary', 'formattedAddress'] })
+                            .then(() => {
+                                if (place.photos && place.photos.length > 0) {
+                                    const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
+                                    $('#modal-photo').html(
+                                        '<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />'
+                                    );
+                                }
 
-                    console.log("🚀 開始向 Google 請求新版 Places 函式庫...");
-                    const { Place } = await google.maps.importLibrary("places");
-
-                    console.log("✅ 成功載入函式庫，開始抓取地點資料...");
-                    const place = new Place({ id: placeId });
-
-                    // 執行抓取
-                    await place.fetchFields({ fields: ['photos', 'editorialSummary', 'formattedAddress'] });
-                    console.log("📸 成功抓到地點資料！", place);
-
-                    // 顯示照片
-                    if (place.photos && place.photos.length > 0) {
-                        const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
-                        $('#modal-photo').html('<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />');
+                                const desc = place.editorialSummary ? place.editorialSummary.text : '';
+                                $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
+                                $('#modal-detail').text(place.formattedAddress || '');
+                            })
+                            .catch((error) => {
+                                console.error("載入照片或地點細節失敗：", error);
+                                $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                                $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
+                            });
                     } else {
-                        console.log("⚠️ Google 沒有提供這個景點的照片");
+                        console.warn("找不到新版 Place API，請確認你的 script tag 有加上 v=weekly");
+                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
                     }
-
-                    // 顯示文字
-                    const desc = place.editorialSummary ? place.editorialSummary.text : '';
-                    $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
-                    $('#modal-detail').text(place.formattedAddress || '');
-
-                } catch (error) {
-                    // 如果 Google 拒絕我們 (例如 GCP API 沒開通)，會跑到這裡印出紅字
-                    console.error("❌ 抓取地點資料發生錯誤：", error);
+                } else {
                     $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
                     $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
                 }
