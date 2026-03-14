@@ -1,4 +1,4 @@
-<div th:fragment="loginHero" id="loginHeroFace" class="card-face active">
+<div th:fragment="loginHero" id="loginHeroFace" class="card-face" th:classappend="${openPanel != 'register'} ? ' active' : ''">
     <img
         src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtiFU2yXVpdB3YN5EOpiNLrgWmf-jnk_hR4tjRyxsmtZWaPzGa5PYIHvbmpeHvce8sBkygKaednh35I3G5bgg85JGa52V85uuWVkmMRskHzScYSlu3KxDYreSrbzSBOnb6G0AI7G0tBHZ-CyrtSOzqBiDKUEiEUO-y1MhHLxyBHHLCGdRQqAFv_xtqlqCAX-d_MwERlUoWJlLrGxGLhN6ALqaxxfXmSbHp4K5RNRvnSA5Ut_UqNhYcp55Yhlk2SJnKOkOfgsPDS3o"
         class="hero-bg"

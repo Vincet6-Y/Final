@@ -59,14 +59,13 @@
                     </div>
 
                     <div class="mt-20 pt-10 border-t border-white/10">
-                        <a href="/news"
-                            class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
-                            <span
-                                class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
-                            返回最新消息
-                        </a>
-                    </div>
-                </div>
+                        <a th:href="${article.articleClass == '特色活動'} ? @{/info} : @{/news}"
+                        class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
+                            <span class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
+                            <span th:text="${article.articleClass == '特色活動'} ? '返回旅遊情報' : '返回最新消息'">返回</span>
+                </a>
+            </div>
+          </div>
             </main>
             <!-- Footer -->
             <footer th:replace="~{ fragments/footer :: myFooter}"></footer>

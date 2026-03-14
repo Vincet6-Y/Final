@@ -3,80 +3,102 @@
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
-<body
-    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <header th:replace="~{ fragments/header :: myHeader}"> </header>
+
+        <header th:replace="~{ fragments/header :: myHeader}"></header>
 
         <main class="flex-1 px-6 lg:px-20 py-10 max-w-7xl mx-auto w-full">
             <div class="flex flex-col lg:flex-row gap-10">
+
                 <aside class="w-full lg:w-48 flex-shrink-0">
-                    <div
-                        class="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 sticky top-24">
+                    <div class="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 sticky top-24">
                         <h3 class="text-slate-900 dark:text-white font-bold mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary text-xl">filter_list</span>
-                            行程篩選
+                            <span class="material-symbols-outlined text-primary text-xl">calendar_month</span>
+                            行程天數
                         </h3>
+
                         <div class="space-y-4">
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input checked=""
-                                    class="w-5 h-5 border-slate-300 text-primary focus:ring-primary dark:bg-white/10 dark:border-white/20"
-                                    name="duration" type="radio" />
-                                <span
-                                    class="text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors font-medium">5天假期</span>
-                            </label>
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input
-                                    class="w-5 h-5 border-slate-300 text-primary focus:ring-primary dark:bg-white/10 dark:border-white/20"
-                                    name="duration" type="radio" />
-                                <span
-                                    class="text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors font-medium">10天假期</span>
-                            </label>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="radio" name="dayCount" value="all" checked
+                                        class="day-filter w-4 h-4 border-slate-300 text-primary focus:ring-primary dark:border-white/10 dark:bg-white/5" />
+                                    <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">全部行程</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="radio" name="dayCount" value="3"
+                                        class="day-filter w-4 h-4 border-slate-300 text-primary focus:ring-primary dark:border-white/10 dark:bg-white/5" />
+                                    <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">3天</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="radio" name="dayCount" value="5"
+                                        class="day-filter w-4 h-4 border-slate-300 text-primary focus:ring-primary dark:border-white/10 dark:bg-white/5" />
+                                    <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">5天</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </aside>
+
                 <div class="flex-1">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div id="tour-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                        <a th:each="plan : ${journeyPlans}"
-                            th:href="@{/packageTourDetail(planId=${plan.planId})}"
-                            class="group bg-[#2a2621] rounded-2xl overflow-hidden border border-slate-700/50 hover:border-primary/50 transition-all flex flex-col cursor-pointer block shadow-lg">
+                        <div th:each="plan : ${journeyPlans}"
+                            class="tour-card bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col"
+                            th:data-days="${plan.daysCount}">
 
-                            <div class="p-4 flex items-center justify-between z-10 bg-[#25201b]">
-                                <h4 class="text-white font-bold text-[17px] truncate tracking-wide" th:text="${plan.planName}">行程名稱</h4>
+                            <a th:href="@{/packageTourDetail(planId=${plan.planId})}" class="flex flex-col h-full">
+                                <div class="p-5 flex-1 flex flex-col">
 
-                                <button th:onclick="'event.preventDefault(); toggleFavorite(this, ' + ${plan.planId} + ')'"
-                                    class="text-primary hover:scale-110 transition-transform shrink-0">
-                                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
-                                </button>
-                            </div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold"
+                                            th:text="${plan.daysCount + '天'}">
+                                        </span>
 
-                            <div class="relative aspect-square w-full bg-slate-800">
+                                        <button th:onclick="'event.preventDefault(); toggleFavorite(this, ' + ${plan.planId} + ')'"
+                                            class="hover:scale-110 transition-transform shrink-0"
+                                            th:classappend="${session.loginMember != null && myFavoritePlanIds != null && myFavoritePlanIds.contains(plan.planId)} ? 'text-primary' : 'text-slate-400 dark:text-slate-500'">
+                                            <span class="material-symbols-outlined text-2xl"
+                                                th:style="${session.loginMember != null && myFavoritePlanIds != null && myFavoritePlanIds.contains(plan.planId)} ? 'font-variation-settings: \'FILL\' 1;' : 'font-variation-settings: \'FILL\' 0;'">
+                                                favorite
+                                            </span>
+                                        </button>
+                                    </div>
 
-                                <img th:if="${plan.workDetail != null && plan.workDetail.workImg != null}"
-                                    th:src="${plan.workDetail.workImg}"
-                                    class="w-full h-full object-cover" alt="行程劇照" />
+                                    <div class="relative aspect-[4/3] w-full bg-slate-800 rounded-xl overflow-hidden mb-4">
+                                        <img th:if="${plan.workDetail != null && plan.workDetail.workImg != null}"
+                                            th:src="${plan.workDetail.workImg}"
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="行程劇照" />
 
-                                <div th:unless="${plan.workDetail != null && plan.workDetail.workImg != null}"
-                                    class="w-full h-full bg-slate-700 flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-white/20 text-6xl">image</span>
+                                        <div th:unless="${plan.workDetail != null && plan.workDetail.workImg != null}"
+                                            class="w-full h-full bg-slate-700 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-white/20 text-6xl">image</span>
+                                        </div>
+
+                                        <div class="absolute bottom-3 left-3">
+                                            <span class="bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-md text-sm font-bold shadow-md"
+                                                th:text="${plan.planCity}">城市</span>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="font-bold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1"
+                                        th:text="${plan.planName}">行程名稱</h4>
+
+                                    <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2"
+                                        th:text="${plan.workDetail != null ? '朝聖作品：' + plan.workDetail.workName : '精選推薦行程'}">
+                                    </p>
                                 </div>
-
-                                <div class="absolute bottom-3 left-3">
-                                    <span class="bg-[#ff7b00] text-black px-3 py-1 rounded-md text-sm font-bold shadow-md"
-                                        th:text="${plan.planCity != null ? plan.planCity : '日本'}">城市標籤</span>
-                                </div>
-                            </div>
-                        </a>
-
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
-        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 
+        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
     </div>
 
+    <script th:src="@{/tour/packageTour.js}"></script>
 </body>
 
 </html>

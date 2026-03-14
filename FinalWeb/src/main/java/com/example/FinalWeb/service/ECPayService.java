@@ -31,8 +31,11 @@ public class ECPayService {
         Map<String, String> params = new TreeMap<>();
         String time = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
-        // 產生唯一交易編號: OD + ID + T + 時間戳，並儲存至訂單供後續對應
-        String merchantTradeNo = "OD" + order.getOrderId() + "T" + System.currentTimeMillis();
+        // 將時間戳轉成 36 進制，會從 13 位數字變成約 8-9 位的英文+數字
+        // 組合：前綴(2) + 訂單ID(可變) + 縮時字串(9)
+        // 存入資料庫並送出
+        String compactTime = Long.toString(System.currentTimeMillis(), 36).toUpperCase();
+        String merchantTradeNo = "OD" + order.getOrderId() + compactTime;
         order.setTradeNo(merchantTradeNo);
         ordersRepo.save(order);
 

@@ -26,13 +26,13 @@ import com.google.zxing.qrcode.QRCodeWriter;
  * 🎫 票券 QR Code REST API
  * 
  * 提供三個核心功能：
- * 1. GET  /api/ticket/qrcode/{orderDetailId} → 回傳 QR Code PNG 圖片
- * 2. GET  /api/ticket/info/{orderDetailId}   → 回傳票券的 JSON 資訊 (供前端 jQuery 使用)
- * 3. POST /api/ticket/verify/{qrToken}       → 工作人員掃描後驗證票券
+ * 1. GET /api/ticket/qrcode/{orderDetailId} → 回傳 QR Code PNG 圖片
+ * 2. GET /api/ticket/info/{orderDetailId} → 回傳票券的 JSON 資訊 (供前端 jQuery 使用)
+ * 3. POST /api/ticket/verify/{qrToken} → 工作人員掃描後驗證票券
  */
 @RestController
 @RequestMapping("/api/ticket")
-public class TicketRestController {
+public class TicketController {
 
     @Autowired
     private OrdersDetailRepo ordersDetailRepo;
@@ -49,7 +49,6 @@ public class TicketRestController {
             // 從資料庫找到票券明細
             OrdersDetailEntity detail = ordersDetailRepo.findById(orderDetailId)
                     .orElse(null);
-
             if (detail == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -93,7 +92,8 @@ public class TicketRestController {
     /**
      * ✅ API 2: 取得指定票券的 JSON 資訊 (給 jQuery AJAX 用)
      * 
-     * 回傳: { orderDetailId, ticketType, ticketPrice, qrToken, ticketUsed, qrCodeUrl }
+     * 回傳: { orderDetailId, ticketType, ticketPrice, qrToken, ticketUsed, qrCodeUrl
+     * }
      */
     @GetMapping("/info/{orderDetailId}")
     public ResponseEntity<?> getTicketInfo(@PathVariable Integer orderDetailId) {
@@ -124,7 +124,7 @@ public class TicketRestController {
      * ✅ API 3: 掃描 QR Code 後的驗證 (工作人員用)
      * 
      * 掃描 QR Code → 打開驗證 URL → 後端檢查 token 是否有效
-     * GET  /api/ticket/verify/{qrToken} → 回傳驗證結果頁面或 JSON
+     * GET /api/ticket/verify/{qrToken} → 回傳驗證結果頁面或 JSON
      */
     @GetMapping("/verify/{qrToken}")
     public ResponseEntity<?> verifyTicket(@PathVariable String qrToken) {
