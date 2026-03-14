@@ -10,7 +10,7 @@ function selectDay(day) {
     }
 
     document.querySelectorAll('.day-list').forEach(list => list.classList.add('hidden'));
-    
+
     const targetList = document.getElementById(`list-day-${day}`);
     if (targetList) targetList.classList.remove('hidden');
 
@@ -18,8 +18,8 @@ function selectDay(day) {
     if (modalBtn) modalBtn.innerText = `加入 Day ${day} 行程`;
 
     // 🌟 關鍵修復：先強制畫出目前的景點列表，讓使用者不用等 Google 算路線！
-    renderItineraryPanel(day); 
-    
+    renderItineraryPanel(day);
+
     // 背景去算路線
     calculateAndDisplayRoute(day);
 }
@@ -35,7 +35,7 @@ async function fetchAndShowDetails(placeId) {
         } else if (status === "NOT_FOUND") {
             // 🚩 核心修復：如果 ID 沒效了，嘗試在當前行程中尋找對應的座標來修復
             console.warn("⚠️ Place ID 已失效，嘗試啟動緊急修復程序...");
-            
+
             // 從全域變數尋找當前點擊的景點座標
             let targetNode = null;
             Object.values(itineraryData).flat().forEach(node => {
@@ -450,15 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const totalDays = 5;
     const daysToAdd = totalDays - 1;
 
-    const today = new Date();
-    const defaultStart = new Date(today);
-    defaultStart.setDate(today.getDate() + 3);
-    const defaultEnd = new Date(defaultStart);
-    defaultEnd.setDate(defaultStart.getDate() + daysToAdd);
-
-    const formatYMD = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    const formatMD = (d) => String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
-
 
     // ✅ 新增這段魔法：用計時器每 0.1 秒確認一次地圖醒了沒
     const checkReady = setInterval(() => {
@@ -471,47 +462,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (planId) {
                 console.log("🟢 畫面與地圖皆已就緒，開始載入資料 ID:", planId);
-                loadPlanData(planId); 
+                loadPlanData(planId);
             } else {
                 selectDay(1); // 如果沒有 planId，安全地顯示 Day 1 空畫面
             }
         }
     }, 100);
 
-    // 1. 日期選擇器 UI 建立
-    const datePickerWrapper = document.createElement('div');
-    datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative group hover:border-primary/50 transition-colors shrink-0";
-
-    const calendarIcon = document.createElement('span');
-    calendarIcon.className = "material-symbols-outlined text-[14px] text-slate-400 group-hover:text-primary transition-colors";
-    calendarIcon.innerText = "calendar_today";
-
-    const dateDisplay = document.createElement('span');
-    dateDisplay.className = "text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors tracking-wider";
-    dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(defaultEnd)}`;
-
-    const dateInput = document.createElement('input');
-    dateInput.type = "date";
-    dateInput.value = formatYMD(defaultStart);
-    dateInput.className = "absolute top-full left-0 w-0 h-0 opacity-0 pointer-events-none";
-
-    datePickerWrapper.addEventListener('click', () => {
-        try { dateInput.showPicker(); } catch (error) { dateInput.focus(); }
-    });
-
-    datePickerWrapper.appendChild(calendarIcon);
-    datePickerWrapper.appendChild(dateDisplay);
-    datePickerWrapper.appendChild(dateInput);
-    titleContainer.appendChild(datePickerWrapper);
-
     // ==========================================
     // ✨ 左右滑動箭頭 UI 注入 (DOM 包裝魔法)
     // ==========================================
-    const buttonContainer = document.getElementById('btn-day-1').parentElement;
+    const buttonContainer = document.getElementById('day-buttons-container');
 
     // 建立外層 Wrapper (讓箭頭可以浮動對齊)
     const tabsWrapper = document.createElement('div');
-    tabsWrapper.className = 'relative flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden sticky top-0 z-20 shadow-sm';
+    // 🌟 核心修正：移除會干擾的 relative，單純保留 sticky，並將 z-index 拉高到 z-40 確保不會被蓋住
+    tabsWrapper.className = 'sticky top-0 z-40 flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden shadow-md';
 
     // 把原本的按鈕區塊塞進 Wrapper 裡
     buttonContainer.parentNode.insertBefore(tabsWrapper, buttonContainer);
@@ -555,14 +521,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // ✨ 動態生成 Day 按鈕與列表
     // ==========================================
-    function updateDayButtonsAndLists(startDate) {
-        const scrollArea = document.getElementById('itinerary-scroll-area');
+    function updateDayButtonsAndLists() {
+        // 抓取 HTML 中專門用來放行程列表的容器
+        const listContainerWrapper = document.getElementById('itinerary-lists-container');
         buttonContainer.innerHTML = '';
 
         for (let i = 1; i <= totalDays; i++) {
-            const currentDayDate = new Date(startDate);
-            currentDayDate.setDate(startDate.getDate() + (i - 1));
-
+            // 1. 建立 Day 按鈕
             const btn = document.createElement('button');
             btn.id = `btn-day-${i}`;
             btn.setAttribute('onclick', `selectDay(${i})`);
@@ -570,42 +535,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? "px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md shrink-0"
                 : "px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0";
 
-            btn.innerText = `Day ${i} (${formatMD(currentDayDate)})`;
+            btn.innerText = `Day ${i}`; // 乾淨俐落，只顯示 Day X
             buttonContainer.appendChild(btn);
 
+            // 2. 建立對應的行程列表區塊
             let listContainer = document.getElementById(`list-day-${i}`);
             if (!listContainer) {
                 listContainer = document.createElement('div');
                 listContainer.id = `list-day-${i}`;
                 listContainer.className = "day-list p-4 flex flex-col pb-24 pt-0 hidden";
-                // ... 塞入預設的「行程尚未安排」HTML ...
                 listContainer.innerHTML = `
                         <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
                             <div class="w-1.5 h-full bg-slate-300 dark:bg-slate-600 absolute left-0 top-0"></div>
                             <div class="ml-2">
-                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Day ${i} 行程尚未安排</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">請從地圖點擊景點加入</p>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Day ${i} 行程載入中...</h3>
                             </div>
                         </div>`;
-                scrollArea.appendChild(listContainer);
+                listContainerWrapper.appendChild(listContainer);
             }
             if (!itineraryData[i]) itineraryData[i] = [];
         }
-        // 每次重新產生按鈕後，等畫面算好寬度，重新檢查要不要出現箭頭
+        // 重新檢查左右箭頭是否需要顯示
         setTimeout(checkArrows, 100);
     }
 
-    updateDayButtonsAndLists(defaultStart);
-
-    dateInput.addEventListener('change', (e) => {
-        if (!e.target.value) return;
-        const newStart = new Date(e.target.value);
-        const newEnd = new Date(newStart);
-        newEnd.setDate(newStart.getDate() + daysToAdd);
-        dateDisplay.innerText = `${formatMD(newStart)} - ${formatMD(newEnd)}`;
-        updateDayButtonsAndLists(newStart);
-    });
-});
+    // 🔴 關鍵修正：呼叫時不要再傳入任何參數 (把原本括號裡的 defaultStart 拿掉)
+    updateDayButtonsAndLists();
+}); // 這裡是 DOMContentLoaded 的結尾
 
 // 完善規劃按鈕點擊事件
 async function copyToMyPlan(officialPlanId) {
@@ -624,7 +580,7 @@ async function copyToMyPlan(officialPlanId) {
             const separator = currentPath.includes('?') ? '&' : '?';
             // 加上 autoCopy=true 標記
             const targetUrl = encodeURIComponent(currentPath + separator + "autoCopy=true");
-            
+
             alert('請先登入會員，系統將於登入後自動為您複製行程！');
             // 🌟 導向組員負責的登入頁面 (/auth) 並帶上目標網址
             window.location.href = `/auth?redirect=${targetUrl}`;
@@ -652,12 +608,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // 如果網址帶有 autoCopy，代表是登入後自動回來
     if (autoCopy === 'true' && planId) {
         console.log("偵測到登入後回傳，正在自動執行完善規劃...");
-        
+
         // 🌟 小優化：把網址上的 autoCopy=true 擦掉，避免使用者按 F5 重新整理時又觸發一次複製
         const cleanUrl = window.location.pathname + `?planId=${planId}`;
         window.history.replaceState({}, document.title, cleanUrl);
 
         // 延遲 1 秒確保地圖等資源載入完成，然後自動幫他按按鈕
-        setTimeout(() => copyToMyPlan(planId), 1000); 
+        setTimeout(() => copyToMyPlan(planId), 1000);
     }
 });
