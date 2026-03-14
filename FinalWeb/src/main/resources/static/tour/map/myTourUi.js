@@ -29,12 +29,12 @@ function showRichModal(place) {
     };
     resetFields();
 
-    // --- 開始填入新資料 ---
-    document.getElementById('modal-place-name').innerText = place.name || '未命名地點';
-    document.getElementById('modal-place-address').innerText = place.formatted_address || '無詳細地址資訊';
-    document.getElementById('modal-place-rating').innerText = place.rating || '無評分';
-    document.getElementById('modal-place-reviews').innerText = `(${place.user_ratings_total || 0} 則評論)`;
-    document.getElementById('modal-place-phone').innerText = place.formatted_phone_number || '無電話資訊';
+    // --- 🌟 配合新版 API (New) 開始填入新資料 ---
+    document.getElementById('modal-place-name').innerText = place.displayName || '未命名地點';
+    document.getElementById('modal-place-address').innerText = place.formattedAddress || '無詳細地址資訊';
+    document.getElementById('modal-place-rating').innerText = place.rating || '0.0';
+    document.getElementById('modal-place-reviews').innerText = `(${place.userRatingCount || 0} 則評論)`;
+    document.getElementById('modal-place-phone').innerText = place.nationalPhoneNumber || '無電話資訊';
 
     // 🌟 新增：處理景點類型 (取第一個分類，並將底線換成空格以利閱讀)
     const typeEl = document.getElementById('modal-place-type');
@@ -45,8 +45,8 @@ function showRichModal(place) {
     // 🌟 新增：處理官方網站連結
     const websiteEl = document.getElementById('modal-place-website');
     if (websiteEl) {
-        if (place.website) {
-            websiteEl.href = place.website;
+        if (place.websiteURI) { // 新版為 websiteURI
+            websiteEl.href = place.websiteURI;
             websiteEl.innerText = '前往官方網站';
             websiteEl.classList.remove('pointer-events-none', 'text-slate-500');
         } else {
@@ -56,25 +56,24 @@ function showRichModal(place) {
         }
     }
 
-    // 處理簡介
-    if (place.editorial_summary && place.editorial_summary.overview) {
-        document.getElementById('modal-place-desc').innerText = place.editorial_summary.overview;
+    if (place.editorialSummary) { // 新版直接是一串文字，不是物件
+        document.getElementById('modal-place-desc').innerText = place.editorialSummary;
     } else {
         document.getElementById('modal-place-desc').innerText = '此地點暫無詳細的官方簡介。這是一處值得您親自探索的地方！';
     }
 
     // 處理圖片 (如果沒有足夠圖片，原本設定的 loading 圖會繼續顯示)
     if (place.photos && place.photos.length >= 1) {
-        document.getElementById('modal-img-main').src = place.photos[0].getUrl({ maxWidth: 800 });
-        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getUrl({ maxWidth: 400 });
-        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getUrl({ maxWidth: 400 });
+        document.getElementById('modal-img-main').src = place.photos[0].getURI({ maxWidth: 800 });
+        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getURI({ maxWidth: 400 });
+        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getURI({ maxWidth: 400 });
     }
 
     // 🌟 修改：處理營業時間 (改為條列式展開，捨棄原本單純的「營業中/休息中」)
     const hoursEl = document.getElementById('modal-place-hours');
     if (hoursEl) {
-        if (place.opening_hours && place.opening_hours.weekday_text) {
-            hoursEl.innerHTML = place.opening_hours.weekday_text.map(text =>
+        if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
+            hoursEl.innerHTML = place.regularOpeningHours.weekdayDescriptions.map(text =>
                 `<p class="flex justify-between border-b border-white/5 pb-1"><span>${text}</span></p>`
             ).join('');
         } else {
@@ -110,44 +109,59 @@ function selectDay(day) {
 }
 
 // ==========================================
-// 🌟 彈窗開關與加入行程 (升級版：無 ID 即時救援機制)
+// 🌟 彈窗開關與即時搜尋救援 (升級為 Places API New 邏輯)
 // ==========================================
-function openPlaceDetails(day, index) {
+async function openPlaceDetails(day, index) {
     // 防呆機制
     if (!day || !itineraryData[day]) return;
 
     const placeNode = itineraryData[day][index];
     if (!placeNode) return;
 
+    // 地圖自動移動並放大
+    if (map && placeNode.lat && placeNode.lng) {
+        map.panTo({ lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) });
+        map.setZoom(16);
+    }
+
     const placeId = placeNode.place_id;
 
-    // 如果 ID 有效就開啟詳細資訊
-    if (placeId && placeId !== 'undefined' && placeId !== 'null') {
+    // 🌟 嚴格防呆：真正的 Google ID 超過 20 字元。如果太短 (例如不小心存到資料庫 ID "510123")，直接判定無效並啟動救援！
+    if (placeId && placeId !== 'undefined' && placeId !== 'null' && String(placeId).length > 10) {
         fetchAndShowDetails(placeId);
     } else {
-        console.log(`[${placeNode.name}] 缺少 ID，正在透過名稱即時搜尋...`);
+        console.log(`[${placeNode.name}] 缺少或無效 ID (${placeId})，啟動新版 API 即時搜尋...`);
+        
+        try {
+            const { Place } = await google.maps.importLibrary("places");
+            
+            // 🌟 使用新版 API 的 searchByText
+            const request = {
+                textQuery: placeNode.name,
+                locationBias: {
+                    center: { lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) },
+                    radius: 50 // 在周圍 50 公尺內精準搜尋
+                },
+                language: 'zh-TW'
+            };
 
-        // 🌟 修正一：把遺失的 request 物件補回來！
-        const request = {
-            query: placeNode.name,
-            location: new google.maps.LatLng(placeNode.lat, placeNode.lng),
-            radius: 50
-        };
-
-        placesService.textSearch(request, (results, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
-                const foundPlaceId = results[0].place_id;
-                console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的 ID:`, foundPlaceId);
-
-                // 偷偷補回記憶體裡，這樣下次點擊就不用重查了，速度更快！
+            const { places } = await Place.searchByText(request);
+            
+            if (places && places.length > 0) {
+                const foundPlaceId = places[0].id;
+                console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
+        
+                // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
                 placeNode.place_id = foundPlaceId;
-
+        
                 // 呼叫 API 顯示彈窗
                 fetchAndShowDetails(foundPlaceId);
             } else {
                 alert(`很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
             }
-        });
+        } catch (error) {
+            console.error("❌ 即時搜尋救援失敗:", error);
+        }
     }
 }
 
@@ -159,12 +173,12 @@ function confirmAddToItinerary() {
     if (!tempSelectedPlace) return;
 
     itineraryData[currentDay].push({
-        place_id: tempSelectedPlace.place_id,
-        lat: tempSelectedPlace.geometry.location.lat(),
-        lng: tempSelectedPlace.geometry.location.lng(),
-        name: tempSelectedPlace.name,
+        place_id: tempSelectedPlace.id, // 🌟 新版是 .id 不是 .place_id
+        lat: tempSelectedPlace.location.lat(), // 🌟 新版直接用 .location
+        lng: tempSelectedPlace.location.lng(),
+        name: tempSelectedPlace.displayName, // 🌟 新版是 .displayName
         arrivals: "8:00",
-        duration: "1",
+        duration: "1", 
         hasTicketOffer: Math.random() > 0.5
     });
 
@@ -561,12 +575,16 @@ function toggleMobileView() {
 document.addEventListener("DOMContentLoaded", () => {
     const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
 
-    const totalDays = 5;
+    // 🌟 安全讀取 HTML 中的資料庫隱藏欄位
+    const dbStartDateInput = document.getElementById('db-startDate');
+    const dbTotalDaysInput = document.getElementById('db-totalDays');
+
+    // 🌟 如果資料庫有日期就用，沒有的話就預設為今天
+    const today = new Date();
+    const defaultStart = (dbStartDateInput && dbStartDateInput.value) ? new Date(dbStartDateInput.value) : today;
+    const totalDays = (dbTotalDaysInput && dbTotalDaysInput.value) ? parseInt(dbTotalDaysInput.value) : 5;
     const daysToAdd = totalDays - 1;
 
-    const today = new Date();
-    const defaultStart = new Date(today);
-    defaultStart.setDate(today.getDate() + 3);
     const defaultEnd = new Date(defaultStart);
     defaultEnd.setDate(defaultStart.getDate() + daysToAdd);
 

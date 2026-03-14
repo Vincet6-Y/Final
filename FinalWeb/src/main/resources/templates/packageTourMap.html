@@ -256,7 +256,7 @@
 
                 <div class="relative w-full h-[220px] shrink-0 bg-slate-800 overflow-hidden">
                     <img th:if="${myPlan?.journeyPlan?.workDetail?.workImg != null}"
-                        th:src="${myPlan.journeyPlan.workDetail.workImg}"
+                        th:src="${myPlan?.journeyPlan?.workDetail?.workImg ?: '預設圖片網址'}"
                         class="w-full h-full object-cover" />
                     <img th:unless="${myPlan?.journeyPlan?.workDetail?.workImg != null}"
                         src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80"
@@ -310,14 +310,14 @@
         </button>
 
     </main>
-
-    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'"
-        async defer></script>
+    <input type="hidden" id="db-startDate" th:value="${myPlan?.startDate}" />
+    <input type="hidden" id="db-totalDays" th:value="${myPlan?.journeyPlan?.daysCount ?: 5}" />
 
     <script th:src="@{/tour/map/myTourGlobals.js}"></script>
     <script th:src="@{/tour/map/myTourApi.js}"></script>
     <script th:src="@{/tour/map/myTourMap.js}"></script>
     <script th:src="@{/tour/map/myTourUi.js}"></script>
-</body>
 
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
+</body>
 </html>

@@ -4,8 +4,7 @@ function initMap() {
         zoom: 11,
         mapId: 'cc3bebf698c5799e3aa4aca9',
         disableDefaultUI: true,
-        zoomControl: true,
-        styles: document.documentElement.classList.contains('dark') ? [{ elementType: "geometry", stylers: [{ color: "#242f3e" }] }] : []
+        zoomControl: true
     });
 
     directionsService = new google.maps.DirectionsService();
@@ -16,24 +15,35 @@ function initMap() {
 
 }
 
-function searchNearby(type) {
-    if (!placesService) return;
-
-    // 改用地圖中心點與半徑 3 公里來搜尋
+// ==========================================
+// 🌟 搜尋附近景點 (升級為 Places API New)
+// ==========================================
+async function searchNearby(type) {
+    const { Place } = await google.maps.importLibrary("places");
+    
+    // 新版搜尋參數結構
     const request = {
-        location: map.getCenter(),
-        radius: 3000,
-        type: type // 關鍵修改：這裡直接接收從 HTML 按鈕傳進來的 type 變數
+        fields: ['id', 'displayName', 'location'],
+        locationRestriction: {
+            center: map.getCenter(),
+            radius: 3000,
+        },
+        includedTypes: [type], // 陣列格式
+        maxResultCount: 20,
     };
 
-    placesService.nearbySearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+    try {
+        const { places } = await Place.searchNearby(request);
+        if (places && places.length > 0) {
             clearMarkers();
-            results.forEach(createMarker);
+            places.forEach(createMarker);
         } else {
             alert('附近找不到相關結果，請移動地圖或縮放後再試一次！');
         }
-    });
+    } catch (e) {
+        console.error("搜尋附近景點失敗:", e);
+        alert('搜尋失敗，請稍微移動地圖後再試一次。');
+    }
 }
 
 function setupAutocomplete(inputId) {
@@ -59,17 +69,16 @@ function setupAutocomplete(inputId) {
     });
 }
 
-function createMarker(basicPlace) {
+function createMarker(place) {
     const marker = new google.maps.Marker({
-        map,
-        position: basicPlace.geometry.location,
-        title: basicPlace.name,
+        map, 
+        position: place.location, // 🌟 新版直接取 location
+        title: place.displayName, // 🌟 新版取 displayName
         animation: google.maps.Animation.DROP
     });
     markers.push(marker);
-    // 點擊時，必須確保傳入的是當前這個 marker 的 place_id
     marker.addListener("click", () => {
-        fetchAndShowDetails(basicPlace.place_id);
+        fetchAndShowDetails(place.id); // 🌟 新版傳入 .id
     });
 }
 

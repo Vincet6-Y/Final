@@ -24,42 +24,59 @@ function selectDay(day) {
     calculateAndDisplayRoute(day);
 }
 
+// ==========================================
+// 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
+// ==========================================
 async function fetchAndShowDetails(placeId) {
-    // 1. 先嘗試用現有的 placeId 抓資料
-    placesService.getDetails({
-        placeId: placeId,
-        fields: ['place_id', 'name', 'formatted_address', 'geometry', 'rating', 'photos', 'formatted_phone_number', 'opening_hours', 'editorial_summary', 'user_ratings_total', 'website', 'types']
-    }, async (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            showRichModal(place);
-        } else if (status === "NOT_FOUND") {
-            // 🚩 核心修復：如果 ID 沒效了，嘗試在當前行程中尋找對應的座標來修復
-            console.warn("⚠️ Place ID 已失效，嘗試啟動緊急修復程序...");
+    if (!placeId || placeId === 'undefined' || placeId === 'null') {
+        console.warn("⚠️ 無效的 Place ID，無法查詢詳細資訊。");
+        return;
+    }
 
-            // 從全域變數尋找當前點擊的景點座標
-            let targetNode = null;
-            Object.values(itineraryData).flat().forEach(node => {
-                if (node.place_id === placeId) targetNode = node;
-            });
+    try {
+        console.log("正在使用 Places API (New) 查詢:", placeId);
+        // 1. 動態載入新版 Places 函式庫
+        const { Place } = await google.maps.importLibrary("places");
 
-            if (targetNode && targetNode.lat && targetNode.lng) {
+        // 2. 建立 Place 物件並指定語系
+        const place = new Place({ id: placeId, requestedLanguage: "zh-TW" });
+
+        // 3. 使用 fetchFields 請求特定欄位 (新版屬性名稱)
+        await place.fetchFields({
+            fields: [
+                'id', 'displayName', 'formattedAddress', 'location',
+                'rating', 'userRatingCount', 'photos', 'nationalPhoneNumber',
+                'regularOpeningHours', 'editorialSummary', 'websiteURI', 'types'
+            ]
+        });
+
+        // 4. 呼叫 UI 顯示
+        showRichModal(place);
+
+    } catch (error) {
+        console.warn("❌ Google API 查詢失敗或 ID 失效，嘗試救援...", error);
+
+        // 保持原有的救援機制 (針對 tourUi.js 的失效 ID 修復)
+        let targetNode = null;
+        Object.values(itineraryData).flat().forEach(node => {
+            if (node.place_id === placeId) targetNode = node;
+        });
+
+        if (targetNode && targetNode.lat && targetNode.lng) {
+            if (typeof findPlaceIdByCoords === 'function') {
                 const freshId = await findPlaceIdByCoords(targetNode.lat, targetNode.lng);
                 if (freshId) {
                     console.log("✨ 修復成功！取得新 ID:", freshId);
-                    // 重新用新 ID 抓一次資料
                     fetchAndShowDetails(freshId);
-                    // 同步回報給後端更新資料庫 (此函式在 tourApi.js)
                     if (typeof updateDatabasePlaceId === 'function') {
                         updateDatabasePlaceId(targetNode.spotId, freshId);
                     }
                 }
-            } else {
-                alert('找不到該地點的有效資訊，請嘗試重新搜尋加入。');
             }
         } else {
-            console.error("Google API Error:", status);
+            alert('無法從 Google 取得該地點的詳細資訊');
         }
-    });
+    }
 }
 
 function showRichModal(place) {
@@ -93,12 +110,12 @@ function showRichModal(place) {
     };
     resetFields();
 
-    // --- 開始填入新資料 ---
-    document.getElementById('modal-place-name').innerText = place.name || '未命名地點';
-    document.getElementById('modal-place-address').innerText = place.formatted_address || '無詳細地址資訊';
-    document.getElementById('modal-place-rating').innerText = place.rating || '無評分';
-    document.getElementById('modal-place-reviews').innerText = `(${place.user_ratings_total || 0} 則評論)`;
-    document.getElementById('modal-place-phone').innerText = place.formatted_phone_number || '無電話資訊';
+    // --- 🌟 配合新版 API (New) 開始填入新資料 ---
+    document.getElementById('modal-place-name').innerText = place.displayName || '未命名地點';
+    document.getElementById('modal-place-address').innerText = place.formattedAddress || '無詳細地址資訊';
+    document.getElementById('modal-place-rating').innerText = place.rating || '0.0';
+    document.getElementById('modal-place-reviews').innerText = `(${place.userRatingCount || 0} 則評論)`;
+    document.getElementById('modal-place-phone').innerText = place.nationalPhoneNumber || '無電話資訊';
 
     // 🌟 新增：處理景點類型 (取第一個分類，並將底線換成空格以利閱讀)
     const typeEl = document.getElementById('modal-place-type');
@@ -109,8 +126,8 @@ function showRichModal(place) {
     // 🌟 新增：處理官方網站連結
     const websiteEl = document.getElementById('modal-place-website');
     if (websiteEl) {
-        if (place.website) {
-            websiteEl.href = place.website;
+        if (place.websiteURI) { // 新版為 websiteURI
+            websiteEl.href = place.websiteURI;
             websiteEl.innerText = '前往官方網站';
             websiteEl.classList.remove('pointer-events-none', 'text-slate-500');
         } else {
@@ -120,25 +137,24 @@ function showRichModal(place) {
         }
     }
 
-    // 處理簡介
-    if (place.editorial_summary && place.editorial_summary.overview) {
-        document.getElementById('modal-place-desc').innerText = place.editorial_summary.overview;
+    if (place.editorialSummary) { // 新版直接是一串文字，不是物件
+        document.getElementById('modal-place-desc').innerText = place.editorialSummary;
     } else {
         document.getElementById('modal-place-desc').innerText = '此地點暫無詳細的官方簡介。這是一處值得您親自探索的地方！';
     }
 
     // 處理圖片 (如果沒有足夠圖片，原本設定的 loading 圖會繼續顯示)
     if (place.photos && place.photos.length >= 1) {
-        document.getElementById('modal-img-main').src = place.photos[0].getUrl({ maxWidth: 800 });
-        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getUrl({ maxWidth: 400 });
-        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getUrl({ maxWidth: 400 });
+        document.getElementById('modal-img-main').src = place.photos[0].getURI({ maxWidth: 800 });
+        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getURI({ maxWidth: 400 });
+        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getURI({ maxWidth: 400 });
     }
 
     // 🌟 修改：處理營業時間 (改為條列式展開，捨棄原本單純的「營業中/休息中」)
     const hoursEl = document.getElementById('modal-place-hours');
     if (hoursEl) {
-        if (place.opening_hours && place.opening_hours.weekday_text) {
-            hoursEl.innerHTML = place.opening_hours.weekday_text.map(text =>
+        if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
+            hoursEl.innerHTML = place.regularOpeningHours.weekdayDescriptions.map(text =>
                 `<p class="flex justify-between border-b border-white/5 pb-1"><span>${text}</span></p>`
             ).join('');
         } else {
@@ -151,15 +167,60 @@ function showRichModal(place) {
 }
 
 // ==========================================
-// 🌟 側邊欄點擊呼叫景點詳細資訊
+// 🌟 彈窗開關與即時搜尋救援 (升級為 Places API New 邏輯)
 // ==========================================
-function openPlaceDetails(placeId) {
-    if (!placeId || placeId === 'undefined') {
-        // 如果是沒有 place_id 的自訂地點 (例如手動輸入的起點)，就跳過
-        return;
+async function openPlaceDetails(day, index) {
+    // 防呆機制
+    if (!day || !itineraryData[day]) return;
+
+    const placeNode = itineraryData[day][index];
+    if (!placeNode) return;
+
+    // 地圖自動移動並放大
+    if (map && placeNode.lat && placeNode.lng) {
+        map.panTo({ lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) });
+        map.setZoom(16);
     }
-    // 借用我們原本寫好的 fetch 函式來抓資料並顯示彈窗
-    fetchAndShowDetails(placeId);
+
+    const placeId = placeNode.place_id;
+
+    // 🌟 嚴格防呆：真正的 Google ID 超過 20 字元。如果太短 (例如不小心存到資料庫 ID "510123")，直接判定無效並啟動救援！
+    if (placeId && placeId !== 'undefined' && placeId !== 'null' && String(placeId).length > 10) {
+        fetchAndShowDetails(placeId);
+    } else {
+        console.log(`[${placeNode.name}] 缺少或無效 ID (${placeId})，啟動新版 API 即時搜尋...`);
+
+        try {
+            const { Place } = await google.maps.importLibrary("places");
+
+            // 🌟 使用新版 API 的 searchByText
+            const request = {
+                textQuery: placeNode.name,
+                locationBias: {
+                    center: { lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) },
+                    radius: 50 // 在周圍 50 公尺內精準搜尋
+                },
+                language: 'zh-TW'
+            };
+
+            const { places } = await Place.searchByText(request);
+
+            if (places && places.length > 0) {
+                const foundPlaceId = places[0].id;
+                console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
+
+                // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
+                placeNode.place_id = foundPlaceId;
+
+                // 呼叫 API 顯示彈窗
+                fetchAndShowDetails(foundPlaceId);
+            } else {
+                alert(`很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
+            }
+        } catch (error) {
+            console.error("❌ 即時搜尋救援失敗:", error);
+        }
+    }
 }
 
 function closeRichModal() {
@@ -337,7 +398,7 @@ function renderItineraryPanel(day) {
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
               <div class="ml-2 flex justify-between items-center w-full">
                   <div class="flex-1">
-                      <h3 onclick="openPlaceDetails('${dayStartPlace.place_id}')" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
+                      <h3 onclick="openPlaceDetails(${day}, 0)" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
                       <div class="flex items-center gap-2 mt-2">
                           <span class="text-xs text-slate-500 dark:text-slate-400">出發時間：</span>
                           <span class="text-xs font-bold text-primary">${dayStartPlace.arrivals}</span>
@@ -392,7 +453,7 @@ function renderItineraryPanel(day) {
             <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
             <div class="flex justify-between items-start ml-2">
               <div class="flex-1">
-                <h3 onclick="openPlaceDetails('${destinationPlace.place_id}')" 
+                <h3 onclick="openPlaceDetails(${day}, ${i})" 
                     class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer 
                     hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${destinationPlace.name}
                 </h3>
