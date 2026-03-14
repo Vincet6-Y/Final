@@ -226,7 +226,7 @@
 
                 <div class="relative w-full h-[220px] shrink-0 bg-slate-800 overflow-hidden">
                     <img th:if="${plan.workDetail != null && plan.workDetail.workImg != null}"
-                        th:src="${plan.workDetail.workImg}"
+                        th:src="${plan?.workDetail?.workImg?: '預設圖片網址'}"
                         class="w-full h-full object-cover" />
                     <img th:unless="${plan.workDetail != null && plan.workDetail.workImg != null}"
                         src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&q=80"
@@ -245,7 +245,7 @@
                 <div class="p-5 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 shrink-0">
                     <div class="flex flex-col gap-1">
                         <h1 class="text-xl font-bold text-slate-900 dark:text-white leading-tight"
-                            th:text="${(plan.workDetail != null ? plan.workDetail.workName : '精選行程') + ' ' + plan.daysCount + '天' + (plan.daysCount - 1) + '夜'}">
+                            th:text="${(plan?.workDetail?.workName ?: '精選推薦') + ' ' + plan?.daysCount + '天' + (plan?.daysCount - 1) + '夜'}">
                         </h1>
                     </div>
                 </div>
@@ -269,13 +269,12 @@
 
     </main>
 
-    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'"
-        async defer></script>
+    <script th:src="@{/tour/Detail/tourGlobals.js}" defer></script>
+    <script th:src="@{/tour/Detail/tourApi.js}" defer></script>
+    <script th:src="@{/tour/Detail/tourMap.js}" defer></script>
+    <script th:src="@{/tour/Detail/tourUi.js}" defer></script>
 
-    <script th:src="@{/tour/Detail/tourGlobals.js}"></script>
-    <script th:src="@{/tour/Detail/tourApi.js}"></script>
-    <script th:src="@{/tour/Detail/tourMap.js}"></script>
-    <script th:src="@{/tour/Detail/tourUi.js}"></script>
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" defer></script>
 </body>
 
 </html>

@@ -1,30 +1,57 @@
 // ==========================================
-// 🌟 取得景點詳細資訊並顯示彈窗 (核心功能)
+// 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
 // ==========================================
-function fetchAndShowDetails(placeId) {
-    if (!placeId || placeId === 'undefined' || placeId === 'null') {
+async function fetchAndShowDetails(placeId) {
+    // 🌟 加入 String(placeId).length < 10 攔截假 ID，避免 Google 噴 INVALID_REQUEST
+    if (!placeId || placeId === 'undefined' || placeId === 'null' || String(placeId).length < 10) {
         console.warn("⚠️ 無效的 Place ID，無法查詢詳細資訊。");
         return;
     }
 
-    console.log("正在查詢 Google 景點詳細資料:", placeId);
+    try {
+        console.log("正在使用 Places API (New) 查詢:", placeId);
+        // 1. 動態載入新版 Places 函式庫
+        const { Place } = await google.maps.importLibrary("places");
+        
+        // 2. 建立 Place 物件並指定語系
+        const place = new Place({ id: placeId, requestedLanguage: "zh-TW" });
+        
+        // 3. 使用 fetchFields 請求特定欄位 (新版屬性名稱)
+        await place.fetchFields({
+            fields: [
+                'id', 'displayName', 'formattedAddress', 'location', 
+                'rating', 'userRatingCount', 'photos', 'nationalPhoneNumber', 
+                'regularOpeningHours', 'editorialSummary', 'websiteURI', 'types'
+            ]
+        });
 
-    // 呼叫 Google Places Service
-    placesService.getDetails({
-        placeId: placeId,
-        fields: ['place_id', 'name', 'formatted_address', 'geometry', 'rating', 'photos', 'formatted_phone_number', 'opening_hours', 'editorial_summary', 'user_ratings_total', 'website', 'types']
-    }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            // 如果 Google 沒回傳 ID，手動補上
-            if (!place.place_id) place.place_id = placeId;
+        // 4. 呼叫 UI 顯示
+        showRichModal(place);
 
-            // 呼叫 myTourUi.js 中的顯示函式
-            showRichModal(place);
+    } catch (error) {
+        console.warn("❌ Google API 查詢失敗或 ID 失效，嘗試救援...", error);
+        
+        // 保持原有的救援機制 (針對 tourUi.js 的失效 ID 修復)
+        let targetNode = null;
+        Object.values(itineraryData).flat().forEach(node => {
+            if (node.place_id === placeId) targetNode = node;
+        });
+
+        if (targetNode && targetNode.lat && targetNode.lng) {
+            if (typeof findPlaceIdByCoords === 'function') {
+                const freshId = await findPlaceIdByCoords(targetNode.lat, targetNode.lng);
+                if (freshId) {
+                    console.log("✨ 修復成功！取得新 ID:", freshId);
+                    fetchAndShowDetails(freshId);
+                    if (typeof updateDatabasePlaceId === 'function') {
+                        updateDatabasePlaceId(targetNode.spotId, freshId);
+                    }
+                }
+            }
         } else {
-            console.error("❌ Google API 查詢失敗，狀態碼:", status);
             alert('無法從 Google 取得該地點的詳細資訊');
         }
-    });
+    }
 }
 
 // ==========================================
