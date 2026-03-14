@@ -30,7 +30,7 @@ public class TicketService {
             case "ChIJr6UTdvlOGGART30L2LcRlmc":
                 return new TicketInfo("鏈鋸人 新江之島水族館門票", 500);
             // 📍 你的名字 須賀神社
-            case "ChIJAyWqAPdfImARdOlSRxQ5AYc":
+            case "ChIJ8VLVBuTsGGARfIDGqQDmC0Q":
                 return new TicketInfo("你的名字 須賀神社參拜套票", 500);
             // 📍 你的名字 國立新美術館
             case "ChIJP-vO9nuLGGARGJ2q8uryJUA":

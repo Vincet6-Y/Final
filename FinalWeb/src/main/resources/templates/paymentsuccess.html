@@ -206,8 +206,10 @@
     </div>
 
     <!-- ==================== 景點詳情 Modal ==================== -->
-    <div id="spotModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 lg:p-10">
-        <div class="relative bg-[#1e1e1e] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10">
+    <div id="spotModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 lg:p-10">
+        <div
+            class="relative bg-[#1e1e1e] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10">
 
             <!-- 頂部標題與關閉按鈕 -->
             <div class="flex items-center justify-between p-5 border-b border-white/5 shrink-0 bg-[#251d15]/50">
@@ -223,10 +225,11 @@
 
             <!-- 內容區 (左邊照片，右邊文字與 QR Code) -->
             <div class="flex flex-col md:flex-row flex-1 overflow-y-auto min-h-[400px]">
-                
+
                 <!-- 左側：景點照片 -->
                 <div class="w-full md:w-1/2 bg-black flex items-center justify-center relative min-h-[300px] shrink-0">
-                    <div id="modal-photo" class="absolute inset-0 w-full h-full flex items-center justify-center text-slate-500">
+                    <div id="modal-photo"
+                        class="absolute inset-0 w-full h-full flex items-center justify-center text-slate-500">
                         <span class="material-symbols-outlined text-4xl animate-pulse">photo_camera</span>
                     </div>
                 </div>
@@ -239,22 +242,26 @@
 
                     <!-- 付費景點通證 + QR Code -->
                     <div id="modal-ticket-section" class="hidden shrink-0 mt-auto">
-                        <div class="bg-gradient-to-b from-[#332211] to-[#1a1005] rounded-xl p-6 text-center border border-orange-500/20 shadow-lg relative overflow-hidden">
+                        <div
+                            class="bg-gradient-to-b from-[#332211] to-[#1a1005] rounded-xl p-6 text-center border border-orange-500/20 shadow-lg relative overflow-hidden">
                             <!-- 背景裝飾 -->
-                            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-600/0 via-orange-500 to-orange-600/0"></div>
-                            
+                            <div
+                                class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-600/0 via-orange-500 to-orange-600/0">
+                            </div>
+
                             <div class="flex items-center justify-center gap-2 mb-6">
                                 <span class="material-symbols-outlined text-orange-500">confirmation_number</span>
                                 <h4 class="text-orange-500 font-bold text-lg tracking-wider">付費景點憑證</h4>
                             </div>
-                            
+
                             <!-- QR Code 圖片 -->
-                            <div class="bg-white rounded-xl p-3 inline-block shadow-2xl mx-auto mb-4 relative z-10 transition-transform hover:scale-105 duration-300">
+                            <div
+                                class="bg-white rounded-xl p-3 inline-block shadow-2xl mx-auto mb-4 relative z-10 transition-transform hover:scale-105 duration-300">
                                 <img id="modal-qrcode" class="w-32 h-32 md:w-40 md:h-40 object-contain"
                                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                     alt="QR Code" />
                             </div>
-                            
+
                             <p id="modal-ticket-status" class="text-orange-500/80 text-xs font-semibold tracking-wide">
                                 請在入口處向工作人員出示此 QR Code 進行掃描驗證。
                             </p>
@@ -267,7 +274,8 @@
     </div>
 
     <!-- 引入 Google Maps API 來讀取 GooglePlaceID 照片 -->
-    <script th:if="${apiKey != null && apiKey != 'NONE'}" th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places'"></script>
+    <script th:if="${apiKey != null && apiKey != 'NONE'}"
+        th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly'"></script>
 
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -340,9 +348,9 @@
             });
 
             // ==========================================
-            // 🏛️ 景點 Modal — 點擊景點卡片
+            // 🏛️ 景點 Modal — 點擊景點卡片 (終極除錯版)
             // ==========================================
-            $(document).on('click', '.spot-card', function () {
+            $(document).on('click', '.spot-card', async function () {
                 const $card = $(this);
                 const spotName = $card.data('spot-name');
                 const placeId = $card.data('place-id');
@@ -350,6 +358,10 @@
                 const spotId = $card.data('spot-id');
                 const day = $card.data('day');
                 const visitOrder = $card.data('order');
+
+                console.log("=== 🔍 點擊景點卡片 ===");
+                console.log("景點名稱:", spotName);
+                console.log("Place ID:", placeId);
 
                 // 設定 Modal 基本資訊
                 $('#modal-name').text(spotName);
@@ -360,40 +372,25 @@
                 );
 
                 // ==========================================
-                // 🎫 QR Code 區塊：用 jQuery AJAX 從後端取得
+                // 🎫 QR Code 區塊
                 // ==========================================
                 if (hasTicket && ticketDataMap[spotId]) {
                     const ticket = ticketDataMap[spotId];
-
                     $('#modal-ticket-section').removeClass('hidden');
-
-                    // 🔑 關鍵！QR Code 圖片直接指向後端 API
                     $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticket.orderDetailId);
 
-                    // 顯示票券使用狀態
                     if (ticket.ticketUsed) {
-                        $('#modal-ticket-status')
-                            .text('⚠️ 此票券已使用過')
-                            .removeClass('text-primary/70').addClass('text-red-400');
+                        $('#modal-ticket-status').text('⚠️ 此票券已使用過').removeClass('text-primary/70').addClass('text-red-400');
                     } else {
-                        $('#modal-ticket-status')
-                            .text('請在入口處出示此 QR Code 進行掃描驗證。')
-                            .removeClass('text-red-400').addClass('text-primary/70');
+                        $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。').removeClass('text-red-400').addClass('text-primary/70');
                     }
                 } else if (hasTicket) {
-                    // 有標記為付費但還沒在 ticketDataMap 中（可能還沒關聯 spotId）
-                    // 嘗試用 jQuery 從後端查詢
                     $('#modal-ticket-section').removeClass('hidden');
                     $('#modal-qrcode').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
                     $('#modal-ticket-status').text('票券資訊載入中...');
 
-                    // 如果有 allTickets，用票券名稱模糊比對
                     if (window.allTickets && window.allTickets.length > 0) {
-                        // 找一張還沒配對過 spotId 的票
-                        const matchedTicket = window.allTickets.find(function (t) {
-                            return t.ticketType && t.ticketType.includes(spotName);
-                        }) || window.allTickets[0]; // fallback: 用第一張票
-
+                        const matchedTicket = window.allTickets.find(t => t.ticketType && t.ticketType.includes(spotName)) || window.allTickets[0];
                         if (matchedTicket) {
                             $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + matchedTicket.orderDetailId);
                             $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。');
@@ -407,29 +404,51 @@
                 $('#spotModal').removeClass('hidden').addClass('flex');
 
                 // ==========================================
-                // 📸 Google Places API 載入照片 (如果可用)
+                // 📸 Google Places API 載入照片 (官方推薦 async 寫法)
                 // ==========================================
-                if (placeId && typeof google !== 'undefined' && google.maps && google.maps.places) {
-                    const service = new google.maps.places.PlacesService(document.createElement('div'));
-                    service.getDetails({
-                        placeId: placeId,
-                        fields: ['name', 'photos', 'editorial_summary', 'formatted_address']
-                    }, function (place, status) {
-                        if (status === google.maps.places.PlacesServiceStatus.OK) {
-                            if (place.photos && place.photos.length > 0) {
-                                const photoUrl = place.photos[0].getUrl({ maxWidth: 800, maxHeight: 400 });
-                                $('#modal-photo').html(
-                                    '<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />'
-                                );
-                            }
-                            const desc = place.editorial_summary ? place.editorial_summary.overview : '';
-                            $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
-                            $('#modal-detail').text(place.formatted_address || '');
-                        } else {
-                            $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                        }
-                    });
-                } else {
+                try {
+                    // 檢查 1：有沒有 Place ID
+                    if (!placeId) {
+                        console.warn("⚠️ 警告：這個景點沒有 Google Place ID，無法抓照片！");
+                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                        $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
+                        return; // 直接結束
+                    }
+
+                    // 檢查 2：Google 核心有沒有載入
+                    if (typeof google === 'undefined') {
+                        console.warn("⚠️ 警告：Google Maps 核心尚未載入！");
+                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                        $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
+                        return;
+                    }
+
+                    console.log("🚀 開始向 Google 請求新版 Places 函式庫...");
+                    const { Place } = await google.maps.importLibrary("places");
+
+                    console.log("✅ 成功載入函式庫，開始抓取地點資料...");
+                    const place = new Place({ id: placeId });
+
+                    // 執行抓取
+                    await place.fetchFields({ fields: ['photos', 'editorialSummary', 'formattedAddress'] });
+                    console.log("📸 成功抓到地點資料！", place);
+
+                    // 顯示照片
+                    if (place.photos && place.photos.length > 0) {
+                        const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
+                        $('#modal-photo').html('<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />');
+                    } else {
+                        console.log("⚠️ Google 沒有提供這個景點的照片");
+                    }
+
+                    // 顯示文字
+                    const desc = place.editorialSummary ? place.editorialSummary.text : '';
+                    $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
+                    $('#modal-detail').text(place.formattedAddress || '');
+
+                } catch (error) {
+                    // 如果 Google 拒絕我們 (例如 GCP API 沒開通)，會跑到這裡印出紅字
+                    console.error("❌ 抓取地點資料發生錯誤：", error);
                     $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
                     $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
                 }

@@ -1,35 +1,29 @@
 package com.example.FinalWeb.controller;
 
 import com.example.FinalWeb.entity.MyMapEntity;
+import com.example.FinalWeb.entity.OrdersEntity;
+import com.example.FinalWeb.entity.MyPlanEntity;
 import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.service.ECPayService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
+import com.example.FinalWeb.service.OrderService;
+import com.example.FinalWeb.service.TicketService;
+import com.example.FinalWeb.repo.OrdersRepo;
+import com.example.FinalWeb.repo.MyPlanRepo;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import com.example.FinalWeb.repo.OrdersRepo;
-import com.example.FinalWeb.repo.OrdersDetailRepo;
-import com.example.FinalWeb.entity.OrdersEntity;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.example.FinalWeb.service.TicketService;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.ResponseEntity;
-import com.example.FinalWeb.repo.MyPlanRepo;
-import com.example.FinalWeb.entity.MyPlanEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Controller
 @ControllerAdvice(assignableTypes = GlobalController.class)
@@ -43,103 +37,72 @@ public class PaymentController {
     private TicketService ticketService;
 
     @Autowired
-    private OrdersRepo ordersRepo;
+    private OrderService orderService;
 
     @Autowired
-    private OrdersDetailRepo ordersDetailRepo;
+    private OrdersRepo ordersRepo;
 
     @Autowired
     private MyPlanRepo myPlanRepo;
 
-    // 搭配google API，讓google 照片可以正常顯示
     @Value("${google.maps.api-key:NONE}")
     private String googleMapsApiKey;
 
-    // 前端按下「前往付款」時，會先打這支 API 建立一張「未付款」的訂單
+    // 1. 建立未付款訂單
     @PostMapping("/createOrderFromPlan")
     @ResponseBody
     public ResponseEntity<?> createOrderFromPlan(@RequestParam("myPlanId") Integer myPlanId, HttpSession session) {
         try {
-            // 找出對應的行程
             MyPlanEntity myPlan = myPlanRepo.findById(myPlanId)
                     .orElseThrow(() -> new IllegalArgumentException("找不到對應的行程"));
 
-            // 實體化一張新訂單
             OrdersEntity order = new OrdersEntity();
             order.setMyPlan(myPlan);
             order.setOrderTime(java.time.LocalDateTime.now());
             order.setPayStatus("未付款");
 
-            // 嘗試把訂單掛在登入的會員身上
             Object memberObj = session.getAttribute("loginMember");
             if (memberObj != null && memberObj instanceof com.example.FinalWeb.entity.MemberEntity) {
                 order.setMember((com.example.FinalWeb.entity.MemberEntity) memberObj);
             } else if (myPlan.getMember() != null) {
-                // 如果 Session 掉失，或授權狀態出借，嘗試使用 MyPlan 上的擁有者會員
                 order.setMember(myPlan.getMember());
             }
 
-            // 儲存進資料庫
             OrdersEntity savedOrder = ordersRepo.save(order);
-
-            // 回傳正式建立的 orderId 給前端跳轉
-            return ResponseEntity.ok(java.util.Map.of("success", true, "orderId", savedOrder.getOrderId()));
+            return ResponseEntity.ok(Map.of("success", true, "orderId", savedOrder.getOrderId()));
 
         } catch (Exception e) {
             return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(java.util.Map.of("success", false, "message", e.getMessage()));
+                    .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 
-    // 利用 @ModelAttribute 攔截 /payment 請求，主動將訂單資料塞入 Model
+    // 2. 攔截請求，提早準備好付款頁面的資料
     @ModelAttribute
     public void addPaymentDataIfNecessary(HttpServletRequest request,
-            @RequestParam(name = "orderId", required = false) Integer orderId,
-            Model model) {
+            @RequestParam(name = "orderId", required = false) Integer orderId, Model model) {
         if ("/payment".equals(request.getRequestURI())) {
-            OrdersEntity order = null;
-            if (orderId != null) {
-                // ✅ 從 DB 用上游帶入的 orderId 查詢訂單
-                order = ordersRepo.findById(orderId).orElse(null);
-            }
-            if (order == null) {
-                // 如果沒帶 orderId 或查不到，給空物件避免前端報錯
-                order = new OrdersEntity();
-            }
+            OrdersEntity order = (orderId != null) ? ordersRepo.findById(orderId).orElse(new OrdersEntity())
+                    : new OrdersEntity();
             model.addAttribute("order", order);
 
-            int totalAmount = 0;
-            if (order.getOrderDetails() != null) {
-                totalAmount = order.getOrderDetails().stream()
-                        .mapToInt(detail -> detail.getTicketPrice() != null ? detail.getTicketPrice() : 0)
-                        .sum();
-            }
-            model.addAttribute("totalAmount", totalAmount);
-            // ============================================
-            // 🌟 新增邏輯：找出行程裡面有哪些專屬票券可以讓使用者加購！
-            // ============================================
-            List<TicketService.TicketInfo> availableTickets = new ArrayList<>();
-            // 確保訂單有綁定行程，且行程裡面有景點
-            if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
-                // 把行程的景點一個一個拿出來看
-                for (MyMapEntity myMap : order.getMyPlan().getMyMaps()) {
-                    // 呼叫剛剛寫的 Service 來判斷
-                    TicketService.TicketInfo ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
+            // 🌟 呼叫 Service 算錢，一行解決！
+            model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
+            List<TicketService.TicketInfo> availableTickets = new ArrayList<>();
+            if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
+                for (MyMapEntity myMap : order.getMyPlan().getMyMaps()) {
+                    TicketService.TicketInfo ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
                     if (ticket != null) {
-                        // 如果有賣這張票，收集起來
                         availableTickets.add(ticket);
                     }
                 }
             }
-            // 把可購買的門票清單傳給 Thymeleaf 前端！
             model.addAttribute("availableTickets", availableTickets);
-            // ============================================
         }
     }
 
-    // 前端送出帶有實體 orderId 的 POST 請求來結帳
-    // 同時接收加購項目的名稱與價格，存入 OrdersDetail 後再進行綠界結帳
+    // 3. 執行結帳核心邏輯
     @PostMapping(value = "/checkout", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String checkout(@RequestParam("orderId") Integer orderId,
@@ -150,82 +113,43 @@ public class PaymentController {
             @RequestParam(name = "addonTransportPrice", required = false) Integer addonTransportPrice) {
 
         // 取得訂單
-        OrdersEntity order = ordersRepo.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("找不到該筆訂單: " + orderId));
+        OrdersEntity order = orderService.getOrderById(orderId);
 
-        // 🌟 處理使用者在結帳前修改的自訂標題
+        // 修改行程名稱
         if (newPlanName != null && !newPlanName.trim().isEmpty() && order.getMyPlan() != null) {
             order.getMyPlan().setMyPlanName(newPlanName.trim());
             myPlanRepo.save(order.getMyPlan());
         }
 
-        // 🌟 處理多張門票加購
-        if (addonTicketNames != null && addonTicketPrices != null
-                && addonTicketNames.size() == addonTicketPrices.size()) {
-            for (int i = 0; i < addonTicketNames.size(); i++) {
-                String tName = addonTicketNames.get(i);
-                Integer tPrice = addonTicketPrices.get(i);
-                if (tName != null && !tName.isEmpty() && tPrice > 0) {
-                    OrdersDetailEntity ticketDetail = new OrdersDetailEntity();
-                    ticketDetail.setTicketType(tName);
-                    ticketDetail.setTicketPrice(tPrice);
-                    ticketDetail.setOrders(order);
-                    ticketDetail.setQrToken(UUID.randomUUID().toString());
-                    ticketDetail.setTicketUsed(false);
-                    // 存進資料庫
-                    ordersDetailRepo.save(ticketDetail);
-                }
-            }
-        }
+        // 🌟 呼叫 Service 處理所有加購票券的存檔工作
+        orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, addonTransportName,
+                addonTransportPrice);
 
-        // 處理交通票券
-        if (addonTransportName != null && !addonTransportName.isEmpty() && addonTransportPrice != null
-                && addonTransportPrice > 0) {
-            OrdersDetailEntity transportDetail = new OrdersDetailEntity();
-            transportDetail.setTicketType(addonTransportName);
-            transportDetail.setTicketPrice(addonTransportPrice);
-            transportDetail.setOrders(order);
-            transportDetail.setQrToken(java.util.UUID.randomUUID().toString());
-            transportDetail.setTicketUsed(false);
-            ordersDetailRepo.save(transportDetail);
-        }
+        // 🌟 重新去資料庫抓最新的訂單(包含剛剛加購的明細)，再呼叫 Service 算出最新總金額
+        OrdersEntity updatedOrder = orderService.getOrderById(orderId);
+        int currentTotalAmount = orderService.calculateTotalAmount(updatedOrder);
 
-        // 🌟 統計最新總計金額，如果為0，不再戳綠界，直接將訂單完成並轉跳
-        int currentTotalAmount = 0;
-        if (order.getOrderDetails() != null) {
-            currentTotalAmount = order.getOrderDetails().stream()
-                    .mapToInt(d -> d.getTicketPrice() != null ? d.getTicketPrice() : 0)
-                    .sum();
-        }
-        if (addonTicketPrices != null) {
-            currentTotalAmount += addonTicketPrices.stream().mapToInt(p -> p != null ? p : 0).sum();
-        }
-        if (addonTransportPrice != null) {
-            currentTotalAmount += addonTransportPrice;
-        }
-
+        // 金額為 0，直接轉跳成功頁
         if (currentTotalAmount == 0) {
-            order.setPayStatus("已完成(無須付款)");
-            order.setPayTime(java.time.LocalDateTime.now());
-            ordersRepo.save(order);
-            // 由於被這支方法標記為 ResponseBody，我們利用 script 來實現瀏覽器的跳轉
-            return "<script>window.location.href='/payment/paymentsuccess?orderId=" + order.getOrderId()
+            updatedOrder.setPayStatus("已完成(無須付款)");
+            updatedOrder.setPayTime(java.time.LocalDateTime.now());
+            ordersRepo.save(updatedOrder);
+            return "<script>window.location.href='/payment/paymentsuccess?orderId=" + updatedOrder.getOrderId()
                     + "';</script>";
         }
 
-        // 利用真實資料庫裡的訂單 ID 進行綠界結帳
+        // 金額大於 0，呼叫綠界金流
         return ecpayService.ecpayCheckout(orderId);
     }
 
-    // 綠界 Server TO Server 背景回傳付款結果
+    // 4. 綠界背景回傳 (保持不變)
     @PostMapping("/callback")
     @ResponseBody
     public String ecpayCallback(@RequestParam Map<String, String> params) {
         try {
             ecpayService.processCallback(params);
             if ("1".equals(params.get("RtnCode"))) {
-                System.out.println("背景回傳付款成功, 綠界訂單編號: " + params.get("MerchantTradeNo") + ", 內部訂單 ID: "
-                        + params.get("CustomField1"));
+                System.out.println("背景回傳付款成功: " + params.get("MerchantTradeNo"));
             }
             return "1|OK";
         } catch (Exception e) {
@@ -234,68 +158,38 @@ public class PaymentController {
         }
     }
 
-    // 將綠界轉跳回來的 POST 請求接住作驗證
+    // 5. 綠界前端轉跳回傳 (保持不變)
     @PostMapping("/success")
     public RedirectView paymentSuccess(@RequestParam Map<String, String> params) {
-        System.out.println("===== 綠界轉跳回來 /payment/success =====");
-        System.out.println("收到參數: " + params);
-
-        if (params == null || params.isEmpty()) {
-            System.out.println("❌ 沒有收到任何參數，跳回付款頁");
+        if (params == null || params.isEmpty())
             return new RedirectView("/payment");
-        }
 
         String rtnCode = params.get("RtnCode");
-        String tradeNo = params.get("MerchantTradeNo");
         String customOrderId = params.get("CustomField1");
-        boolean macValid = false;
+        String tradeNo = params.get("MerchantTradeNo");
 
-        // 嘗試驗證 CheckMacValue
-        try {
-            macValid = ecpayService.verifyCheckMacValue(params);
-        } catch (Exception e) {
-            System.err.println("CheckMacValue 驗證時發生例外: " + e.getMessage());
-        }
-
-        System.out.println("RtnCode=" + rtnCode + ", TradeNo=" + tradeNo
-                + ", CustomField1=" + customOrderId + ", MacValid=" + macValid);
-
-        // 決定 orderId：優先用 CustomField1，備用從 TradeNo 解析
         String orderId = customOrderId;
-        if (orderId == null || orderId.isEmpty()) {
-            // MerchantTradeNo 格式: OD{orderId}T{timestamp}
-            if (tradeNo != null && tradeNo.startsWith("OD")) {
-                try {
-                    orderId = tradeNo.substring(2, tradeNo.indexOf("T"));
-                } catch (Exception e) {
-                    System.err.println("從 TradeNo 解析 orderId 失敗: " + e.getMessage());
-                }
+        if ((orderId == null || orderId.isEmpty()) && tradeNo != null && tradeNo.startsWith("OD")) {
+            try {
+                orderId = tradeNo.substring(2, tradeNo.indexOf("T"));
+            } catch (Exception ignored) {
             }
         }
 
-        // ✅ 只要 RtnCode = "1" (付款成功)，就跳到成功頁面
-        // （開發環境 CheckMacValue 可能因 localhost 回傳參數差異而失敗，所以不能完全依賴它）
         if ("1".equals(rtnCode)) {
-            // 嘗試更新資料庫 (localhost 開發環境下 callback 打不到)
             try {
                 ecpayService.processCallback(params);
-            } catch (Exception e) {
-                System.err.println("前端轉跳更新資料庫失敗（可忽略）: " + e.getMessage());
+            } catch (Exception ignored) {
             }
-
-            System.out.println("✅ 付款成功！跳轉到 /payment/paymentsuccess?orderId=" + orderId);
             return new RedirectView("/payment/paymentsuccess?orderId=" + orderId);
         }
 
-        System.out.println("❌ 付款失敗或取消: " + params.get("RtnMsg"));
-        // 取消付款時，帶上 orderId 返回結帳頁面
-        if (orderId != null && !orderId.isEmpty()) {
+        if (orderId != null && !orderId.isEmpty())
             return new RedirectView("/payment?orderId=" + orderId);
-        }
-        // 如果需要跳轉到其他專屬頁
         return new RedirectView("/payment");
     }
 
+    // 6. 成功畫面展示
     @RequestMapping("/paymentsuccess")
     public String paymentsuccess(@RequestParam(name = "orderId", required = false) Integer orderId, Model model) {
         model.addAttribute("apiKey", googleMapsApiKey);
@@ -303,82 +197,37 @@ public class PaymentController {
             ordersRepo.findById(orderId).ifPresent(order -> {
                 model.addAttribute("order", order);
 
-                // 計算總金額
-                int totalAmount = 0;
-                if (order.getOrderDetails() != null) {
-                    totalAmount = order.getOrderDetails().stream()
-                            .mapToInt(d -> d.getTicketPrice() != null ? d.getTicketPrice() : 0)
-                            .sum();
-                }
-                model.addAttribute("totalAmount", totalAmount);
+                // 🌟 呼叫 Service 算總金額
+                model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
-                // 取得行程底下的所有景點 (MyMap)
-                if (order.getMyPlan() != null) {
+                if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
+                    List<MyMapEntity> allMaps = order.getMyPlan().getMyMaps();
                     model.addAttribute("myPlan", order.getMyPlan());
+                    model.addAttribute("myMaps", allMaps);
 
-                    if (order.getMyPlan().getMyMaps() != null) {
-                        List<MyMapEntity> allMaps = order.getMyPlan().getMyMaps();
-                        model.addAttribute("myMaps", allMaps);
+                    // 🌟 呼叫 Service 取得分組好的行程表
+                    model.addAttribute("groupedByDay", orderService.groupMapsByDay(allMaps));
 
-                        // 依照 dayNumber 分組
-                        Map<Integer, List<MyMapEntity>> groupedByDay = allMaps
-                                .stream()
-                                .sorted(Comparator.comparingInt(
-                                        (MyMapEntity m) -> m.getDayNumber() != null
-                                                ? m.getDayNumber()
-                                                : 0)
-                                        .thenComparingInt(m -> m.getVisitOrder() != null ? m.getVisitOrder() : 0))
-                                .collect(Collectors.groupingBy(
-                                        m -> m.getDayNumber() != null ? m.getDayNumber() : 1,
-                                        TreeMap::new,
-                                        Collectors.toList()));
-                        model.addAttribute("groupedByDay", groupedByDay);
-
-                        // 計算最大天數 (用於 Day 分頁按鈕)
-                        int maxDay = allMaps.stream()
-                                .mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1)
-                                .max().orElse(1);
-                        model.addAttribute("maxDay", maxDay);
-                    }
-
-                    // 建立「有付費票券」的 spotId 清單 (用於前端判斷是否顯示 QR Code)
-                    Set<Integer> ticketSpotIds = new HashSet<>();
-                    // 未關聯到特定景點的票券(例如交通票)
-                    List<OrdersDetailEntity> transportTickets = new ArrayList<>();
-
-                    if (order.getOrderDetails() != null) {
-                        for (OrdersDetailEntity detail : order.getOrderDetails()) {
-                            boolean isSpotTicket = false;
-
-                            if (detail.getMyMap() != null && detail.getMyMap().getSpotId() != null) {
-                                ticketSpotIds.add(detail.getMyMap().getSpotId());
-                                isSpotTicket = true;
-                            } else if (detail.getTicketType() != null && order.getMyPlan() != null
-                                    && order.getMyPlan().getMyMaps() != null) {
-                                // 嘗試對應加購的門票與行程景點
-                                for (MyMapEntity m : order.getMyPlan().getMyMaps()) {
-                                    TicketService.TicketInfo tInfo = ticketService
-                                            .getTicketByPlaceId(m.getGooglePlaceId());
-                                    if (tInfo != null && detail.getTicketType().equals(tInfo.ticketName)) {
-                                        ticketSpotIds.add(m.getSpotId());
-                                        isSpotTicket = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // 若未能對應到任何景點，則視為交通票券
-                            if (!isSpotTicket) {
-                                transportTickets.add(detail);
-                            }
-                        }
-                    }
-                    model.addAttribute("ticketSpotIds", ticketSpotIds);
-                    model.addAttribute("transportTickets", transportTickets);
+                    // 計算最大天數
+                    int maxDay = allMaps.stream().mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1).max()
+                            .orElse(1);
+                    model.addAttribute("maxDay", maxDay);
                 }
+
+                // 🌟 呼叫 Service 一次取得分類好的實體票與交通票
+                Map<String, Object> classifiedTickets = orderService.classifyTickets(order);
+
+                // 因為 Service 回傳的是 Object，我們需要做個安全的強制轉型再塞給 Model
+                @SuppressWarnings("unchecked")
+                Set<Integer> ticketSpotIds = (Set<Integer>) classifiedTickets.get("ticketSpotIds");
+                @SuppressWarnings("unchecked")
+                List<OrdersDetailEntity> transportTickets = (List<OrdersDetailEntity>) classifiedTickets
+                        .get("transportTickets");
+
+                model.addAttribute("ticketSpotIds", ticketSpotIds);
+                model.addAttribute("transportTickets", transportTickets);
             });
         }
         return "paymentsuccess";
     }
-
 }
