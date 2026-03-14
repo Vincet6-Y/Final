@@ -43,6 +43,27 @@ public class TicketController {
         }
     }
 
+    // 🌟 共用方法：負責把 Entity 轉成前端要的 Map 格式
+    private Map<String, Object> convertToTicketMap(OrdersDetailEntity detail) {
+        // 確保 Token 存在 (重複利用你寫好的方法)
+        ensureQrTokenExists(detail);
+
+        Map<String, Object> item = new HashMap<>();
+        item.put("orderDetailId", detail.getOrderDetailId());
+        item.put("ticketType", detail.getTicketType());
+        item.put("ticketPrice", detail.getTicketPrice());
+        item.put("qrToken", detail.getQrToken());
+        item.put("ticketUsed", detail.getTicketUsed() != null ? detail.getTicketUsed() : false);
+        item.put("qrCodeUrl", "/api/ticket/qrcode/" + detail.getOrderDetailId());
+
+        // 如果有地圖資訊也一併放入
+        if (detail.getMyMap() != null) {
+            item.put("spotId", detail.getMyMap().getSpotId());
+            item.put("locationName", detail.getMyMap().getLocationName());
+        }
+        return item;
+    }
+
     /**
      * ✅ API 1: 取得指定票券的 QR Code 圖片 (PNG)
      */
@@ -53,10 +74,8 @@ public class TicketController {
             if (detail == null) {
                 return ResponseEntity.notFound().build();
             }
-
             // 呼叫共用方法，確保 Token 存在
             ensureQrTokenExists(detail);
-
             String verifyUrl = "/api/ticket/verify/" + detail.getQrToken();
 
             QRCodeWriter qrWriter = new QRCodeWriter();
@@ -84,33 +103,20 @@ public class TicketController {
     }
 
     /**
-     * ✅ API 2: 取得指定票券的 JSON 資訊 (給 jQuery AJAX 用)
+     * ✅ API 2: 取得指定票券的 JSON 資訊
      */
     @GetMapping("/info/{orderDetailId}")
     public ResponseEntity<?> getTicketInfo(@PathVariable Integer orderDetailId) {
         OrdersDetailEntity detail = ordersDetailRepo.findById(orderDetailId).orElse(null);
-
         if (detail == null) {
             return ResponseEntity.notFound().build();
         }
-
-        // 呼叫共用方法
-        ensureQrTokenExists(detail);
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("orderDetailId", detail.getOrderDetailId());
-        result.put("ticketType", detail.getTicketType());
-        result.put("ticketPrice", detail.getTicketPrice());
-        result.put("qrToken", detail.getQrToken());
-        result.put("ticketUsed", detail.getTicketUsed() != null ? detail.getTicketUsed() : false);
-        result.put("qrCodeUrl", "/api/ticket/qrcode/" + detail.getOrderDetailId());
-
-        return ResponseEntity.ok(result);
+        // 只要一行就能取得轉換好的資料！
+        return ResponseEntity.ok(convertToTicketMap(detail));
     }
 
     /**
      * ✅ API 3: 掃描 QR Code 後的驗證 (工作人員用)
-     * (這支 API 邏輯已經寫得很好了，保持原樣)
      */
     @GetMapping("/verify/{qrToken}")
     public ResponseEntity<?> verifyTicket(@PathVariable String qrToken) {
@@ -143,35 +149,17 @@ public class TicketController {
     }
 
     /**
-     * ✅ API 4: 取得某訂單下所有票券的資訊 (給前端一次撈全部)
+     * ✅ API 4: 取得某訂單下所有票券的資訊
      */
     @GetMapping("/byOrder/{orderId}")
     public ResponseEntity<?> getTicketsByOrder(@PathVariable Integer orderId) {
-
-        // 🌟 改良點：直接用 Repo 新方法，讓資料庫(SQL)去篩選資料，不要撈出整張表！
         List<OrdersDetailEntity> details = ordersDetailRepo.findByOrders_OrderId(orderId);
-
         List<Map<String, Object>> ticketList = new ArrayList<>();
 
         for (OrdersDetailEntity detail : details) {
-            // 呼叫共用方法
-            ensureQrTokenExists(detail);
-
-            Map<String, Object> item = new HashMap<>();
-            item.put("orderDetailId", detail.getOrderDetailId());
-            item.put("ticketType", detail.getTicketType());
-            item.put("ticketPrice", detail.getTicketPrice());
-            item.put("qrToken", detail.getQrToken());
-            item.put("ticketUsed", detail.getTicketUsed() != null ? detail.getTicketUsed() : false);
-            item.put("qrCodeUrl", "/api/ticket/qrcode/" + detail.getOrderDetailId());
-
-            if (detail.getMyMap() != null) {
-                item.put("spotId", detail.getMyMap().getSpotId());
-                item.put("locationName", detail.getMyMap().getLocationName());
-            }
-            ticketList.add(item);
+            // 迴圈內也只要一行！
+            ticketList.add(convertToTicketMap(detail));
         }
-
         return ResponseEntity.ok(ticketList);
     }
 }
