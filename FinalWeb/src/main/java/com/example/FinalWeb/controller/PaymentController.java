@@ -15,7 +15,9 @@ import com.example.FinalWeb.entity.OrdersEntity;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.example.FinalWeb.service.TicketService;
 import java.util.ArrayList;
@@ -45,9 +47,13 @@ public class PaymentController {
 
     @Autowired
     private OrdersDetailRepo ordersDetailRepo;
-    
+
     @Autowired
     private MyPlanRepo myPlanRepo;
+
+    // 搭配google API，讓google 照片可以正常顯示
+    @Value("${google.maps.api-key:NONE}")
+    private String googleMapsApiKey;
 
     // 前端按下「前往付款」時，會先打這支 API 建立一張「未付款」的訂單
     @PostMapping("/createOrderFromPlan")
@@ -86,7 +92,6 @@ public class PaymentController {
     }
 
     // 利用 @ModelAttribute 攔截 /payment 請求，主動將訂單資料塞入 Model
-    // orderId 必須由上游頁面（行程規劃頁）透過 URL 帶入，例如 /payment?orderId=123
     @ModelAttribute
     public void addPaymentDataIfNecessary(HttpServletRequest request,
             @RequestParam(name = "orderId", required = false) Integer orderId,
@@ -109,8 +114,6 @@ public class PaymentController {
                         .mapToInt(detail -> detail.getTicketPrice() != null ? detail.getTicketPrice() : 0)
                         .sum();
             }
-            if (totalAmount == 0)
-                totalAmount = 1;
             model.addAttribute("totalAmount", totalAmount);
             // ============================================
             // 🌟 新增邏輯：找出行程裡面有哪些專屬票券可以讓使用者加購！
@@ -140,6 +143,7 @@ public class PaymentController {
     @PostMapping(value = "/checkout", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String checkout(@RequestParam("orderId") Integer orderId,
+            @RequestParam(name = "newPlanName", required = false) String newPlanName,
             @RequestParam(name = "addonTicketName", required = false) List<String> addonTicketNames,
             @RequestParam(name = "addonTicketPrice", required = false) List<Integer> addonTicketPrices,
             @RequestParam(name = "addonTransportName", required = false) String addonTransportName,
@@ -148,6 +152,12 @@ public class PaymentController {
         // 取得訂單
         OrdersEntity order = ordersRepo.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("找不到該筆訂單: " + orderId));
+
+        // 🌟 處理使用者在結帳前修改的自訂標題
+        if (newPlanName != null && !newPlanName.trim().isEmpty() && order.getMyPlan() != null) {
+            order.getMyPlan().setMyPlanName(newPlanName.trim());
+            myPlanRepo.save(order.getMyPlan());
+        }
 
         // 🌟 處理多張門票加購
         if (addonTicketNames != null && addonTicketPrices != null
@@ -160,7 +170,7 @@ public class PaymentController {
                     ticketDetail.setTicketType(tName);
                     ticketDetail.setTicketPrice(tPrice);
                     ticketDetail.setOrders(order);
-                    ticketDetail.setQrToken(java.util.UUID.randomUUID().toString());
+                    ticketDetail.setQrToken(UUID.randomUUID().toString());
                     ticketDetail.setTicketUsed(false);
                     // 存進資料庫
                     ordersDetailRepo.save(ticketDetail);
@@ -199,7 +209,8 @@ public class PaymentController {
             order.setPayTime(java.time.LocalDateTime.now());
             ordersRepo.save(order);
             // 由於被這支方法標記為 ResponseBody，我們利用 script 來實現瀏覽器的跳轉
-            return "<script>window.location.href='/payment/paymentsuccess?orderId=" + order.getOrderId() + "';</script>";
+            return "<script>window.location.href='/payment/paymentsuccess?orderId=" + order.getOrderId()
+                    + "';</script>";
         }
 
         // 利用真實資料庫裡的訂單 ID 進行綠界結帳
@@ -287,6 +298,7 @@ public class PaymentController {
 
     @RequestMapping("/paymentsuccess")
     public String paymentsuccess(@RequestParam(name = "orderId", required = false) Integer orderId, Model model) {
+        model.addAttribute("apiKey", googleMapsApiKey);
         if (orderId != null) {
             ordersRepo.findById(orderId).ifPresent(order -> {
                 model.addAttribute("order", order);
@@ -355,7 +367,7 @@ public class PaymentController {
                                 }
                             }
 
-                            // 若未能對應到任何景點，則視為交通票券或其他附加票
+                            // 若未能對應到任何景點，則視為交通票券
                             if (!isSpotTicket) {
                                 transportTickets.add(detail);
                             }

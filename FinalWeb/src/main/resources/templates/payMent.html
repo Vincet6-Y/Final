@@ -225,6 +225,7 @@
                         <!-- 結帳表單：帶上 orderId + 加購項目的隱藏欄位 -->
                         <form id="checkoutForm" th:action="@{/payment/checkout}" method="POST" class="w-full">
                             <input type="hidden" name="orderId" th:value="${order.orderId}" />
+                            <input type="hidden" id="checkoutPlanName" name="newPlanName" value="" />
                             <!-- jQuery 動態塞入的加購隱藏欄位 -->
                             <input type="hidden" id="addonTicketName" name="addonTicketName" value="" />
                             <input type="hidden" id="addonTicketPrice" name="addonTicketPrice" value="0" />
@@ -390,6 +391,9 @@
             // ✅ 結帳前驗證
             // ==========================================
             $('#checkoutForm').on('submit', function (e) {
+                // 將目前的名稱塞入隱藏欄位，確保結帳時標題會隨之存檔
+                $('#checkoutPlanName').val($('#planNameInput').val().trim());
+
                 if (!$('#agreeCheckbox').is(':checked')) {
                     e.preventDefault();
                     alert('請先勾選同意服務條款與隱私權聲明！');

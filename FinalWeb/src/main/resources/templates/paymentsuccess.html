@@ -266,6 +266,9 @@
         </div>
     </div>
 
+    <!-- 引入 Google Maps API 來讀取 GooglePlaceID 照片 -->
+    <script th:if="${apiKey != null && apiKey != 'NONE'}" th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places'"></script>
+
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
