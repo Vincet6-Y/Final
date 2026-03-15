@@ -104,7 +104,7 @@ public class PaymentController {
                     }
                 }
 
-                // 🌟 新增：呼叫 TicketService 取得智慧推薦的交通票，並傳給前端 Model！
+                // 呼叫 TicketService 取得智慧推薦的交通票，並傳給前端 Model
                 List<TicketService.TicketInfo> recommendedTransports = ticketService
                         .recommendTransportTickets(planSpots);
                 model.addAttribute("recommendedTransports", recommendedTransports);
@@ -137,10 +137,10 @@ public class PaymentController {
             order.getMyPlan().setStartDate(LocalDate.parse(newStartDate));
             myPlanRepo.save(order.getMyPlan());
         }
-        // 🌟 呼叫 Service 把不要的舊票券刪掉！
+        // 呼叫 Service 把不要的舊票券刪掉
         orderService.removeOrderDetails(removeDetailIds);
 
-        // 🌟 處理加購票券
+        // 處理加購票券
         orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, transportId);
 
         // 重新去資料庫抓最新的訂單(包含剛剛加購的明細)
@@ -215,7 +215,7 @@ public class PaymentController {
             ordersRepo.findById(orderId).ifPresent(order -> {
                 model.addAttribute("order", order);
 
-                // 🌟 呼叫 Service 算總金額
+                // 呼叫 Service 算總金額
                 model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
                 if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
@@ -223,13 +223,19 @@ public class PaymentController {
                     model.addAttribute("myPlan", order.getMyPlan());
                     model.addAttribute("myMaps", allMaps);
 
-                    // 🌟 呼叫 Service 取得分組好的行程表
+                    // 呼叫 Service 取得分組好的行程表
                     model.addAttribute("groupedByDay", orderService.groupMapsByDay(allMaps));
 
                     // 計算最大天數
                     int maxDay = allMaps.stream().mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1).max()
                             .orElse(1);
                     model.addAttribute("maxDay", maxDay);
+                    // 根據 startDate 跟 maxDay 算出結束日期
+                    if (order.getMyPlan().getStartDate() != null) {
+                        // 結束日期 = 出發日期 + (總天數 - 1) 天
+                        LocalDate endDate = order.getMyPlan().getStartDate().plusDays(maxDay - 1);
+                        model.addAttribute("endDate", endDate);
+                    }
                 }
 
                 // 呼叫 Service 一次取得分類好的實體票與交通票
