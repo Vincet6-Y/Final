@@ -25,7 +25,9 @@
                 <!-- 行程日期 -->
                 <div class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-10 py-4 rounded-xl text-lg font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block"
                     th:if="${myPlan != null && myPlan.startDate != null}">
-                    完善規劃抓到的行程日期：<span class="text-primary" th:text="${myPlan.startDate}">e.g. 3/2~3/7</span>
+                    完善規劃抓到的行程日期：
+                    <span class="text-primary"
+                        th:text="${#temporals.format(myPlan.startDate, 'yyyy年MM月dd日')}">2026年03月20日</span>
                 </div>
             </div>
 

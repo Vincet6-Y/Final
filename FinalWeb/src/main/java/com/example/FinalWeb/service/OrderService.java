@@ -28,9 +28,6 @@ public class OrderService {
     @Autowired
     private TicketService ticketService;
 
-    /**
-     * 【邏輯】建立新訂單 (包含多筆票券明細)
-     */
     @Transactional
     public OrdersEntity createOrder(MemberEntity member, MyPlanEntity myPlan, List<OrdersDetailEntity> ticketCart) {
         OrdersEntity newOrder = new OrdersEntity();
@@ -41,41 +38,35 @@ public class OrderService {
 
         if (ticketCart != null && !ticketCart.isEmpty()) {
             for (OrdersDetailEntity ticket : ticketCart) {
-                ticket.setOrders(newOrder); // 告訴每一張票券「你的主人是誰」
+                ticket.setOrders(newOrder);
             }
         }
         newOrder.setOrderDetails(ticketCart);
-        return ordersRepo.save(newOrder); // 一鍵存檔
+        return ordersRepo.save(newOrder);
     }
 
-    /**
-     * 【邏輯】根據訂單 ID 尋找訂單，找不到就拋出例外
-     */
     public OrdersEntity getOrderById(Integer orderId) {
         return ordersRepo.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("找不到該筆訂單 ID: " + orderId));
     }
 
-    /**
-     * 【邏輯】計算訂單的總金額
-     */
     public int calculateTotalAmount(OrdersEntity order) {
         if (order == null || order.getOrderDetails() == null) {
             return 0;
         }
-        // 將明細攤開，抽出票價後加總
         return order.getOrderDetails().stream()
                 .mapToInt(detail -> detail.getTicketPrice() != null ? detail.getTicketPrice() : 0)
                 .sum();
     }
 
     /**
-     * 【邏輯】處理前端傳來的加購門票與交通票，並存入資料庫
+     * 🌟 修改重點：【邏輯】處理前端傳來的加購門票與交通票
      */
     @Transactional
     public void processAddonTickets(OrdersEntity order, List<String> ticketNames, List<Integer> ticketPrices,
-            String transportName, Integer transportPrice) {
-        // 處理多張景點門票
+            String transportId) {
+
+        // --- 1. 處理多張景點門票 (邏輯不變) ---
         if (ticketNames != null && ticketPrices != null && ticketNames.size() == ticketPrices.size()) {
             for (int i = 0; i < ticketNames.size(); i++) {
                 String tName = ticketNames.get(i);
@@ -86,10 +77,28 @@ public class OrderService {
                 }
             }
         }
-        // 處理單張交通票
-        if (transportName != null && !transportName.isEmpty() && transportPrice != null && transportPrice > 0) {
-            OrdersDetailEntity transportDetail = createNewTicketDetail(order, transportName, transportPrice);
-            ordersDetailRepo.save(transportDetail);
+
+        // --- 2. 🌟 安全地處理單張交通票 ---
+        if (transportId != null && !transportId.isEmpty()) {
+            // 從我們寫好的 TicketService 去撈出絕對安全的名稱與價格
+            TicketService.TicketInfo tInfo = ticketService.getTicketById(transportId);
+
+            // 如果 tInfo 不是 null，代表這個 ID 是合法的，我們才幫他建立訂單明細
+            if (tInfo != null) {
+                OrdersDetailEntity transportDetail = createNewTicketDetail(order, tInfo.getTicketName(),
+                        tInfo.getPrice());
+                ordersDetailRepo.save(transportDetail);
+            }
+        }
+    }
+
+    /**
+     * 🌟 新增：刪除使用者在結帳頁面取消的「舊票券」
+     */
+    @Transactional
+    public void removeOrderDetails(List<Integer> detailIds) {
+        if (detailIds != null && !detailIds.isEmpty()) {
+            ordersDetailRepo.deleteAllById(detailIds);
         }
     }
 
@@ -104,9 +113,6 @@ public class OrderService {
         return detail;
     }
 
-    /**
-     * 【邏輯】將行程景點依照「天數 (dayNumber)」與「順序」進行分組
-     */
     public Map<Integer, List<MyMapEntity>> groupMapsByDay(List<MyMapEntity> allMaps) {
         if (allMaps == null || allMaps.isEmpty()) {
             return new TreeMap<>();
@@ -120,10 +126,6 @@ public class OrderService {
                         Collectors.toList()));
     }
 
-    /**
-     * 【邏輯】分類票券：將訂單內的票券分為「有對應景點的(回傳 spotId)」與「純交通票」
-     * 回傳一個 Map 讓 Controller 可以一次拿走這兩包資料
-     */
     public Map<String, Object> classifyTickets(OrdersEntity order) {
         Set<Integer> ticketSpotIds = new HashSet<>();
         List<OrdersDetailEntity> transportTickets = new ArrayList<>();
@@ -132,17 +134,14 @@ public class OrderService {
             for (OrdersDetailEntity detail : order.getOrderDetails()) {
                 boolean isSpotTicket = false;
 
-                // 情況一：這張票本來就綁定某個景點
                 if (detail.getMyMap() != null && detail.getMyMap().getSpotId() != null) {
                     ticketSpotIds.add(detail.getMyMap().getSpotId());
                     isSpotTicket = true;
-                }
-                // 情況二：這張票是加購的，我們去行程景點裡面找有沒有名字一樣的
-                else if (detail.getTicketType() != null && order.getMyPlan() != null
+                } else if (detail.getTicketType() != null && order.getMyPlan() != null
                         && order.getMyPlan().getMyMaps() != null) {
                     for (MyMapEntity m : order.getMyPlan().getMyMaps()) {
                         TicketService.TicketInfo tInfo = ticketService.getTicketByPlaceId(m.getGooglePlaceId());
-                        if (tInfo != null && detail.getTicketType().equals(tInfo.ticketName)) {
+                        if (tInfo != null && detail.getTicketType().equals(tInfo.getTicketName())) {
                             ticketSpotIds.add(m.getSpotId());
                             isSpotTicket = true;
                             break;
@@ -150,14 +149,13 @@ public class OrderService {
                     }
                 }
 
-                // 如果都不是，那它就是交通票
+                // 如果找不到對應景點，它就會乖乖被分類到交通票的清單裡
                 if (!isSpotTicket) {
                     transportTickets.add(detail);
                 }
             }
         }
 
-        // 打包回傳
         Map<String, Object> result = new HashMap<>();
         result.put("ticketSpotIds", ticketSpotIds);
         result.put("transportTickets", transportTickets);
