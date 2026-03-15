@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/auth")
-public class MemberController {
+public class MemberAuthController {
 
     @Autowired
     private MemberService memberService;
@@ -58,20 +58,6 @@ public class MemberController {
         if (redirect != null && !redirect.isEmpty()) {
             return "redirect:" + redirect;
         }
-
-        return "redirect:/home";
-    }
-
-    // 處理登出
-    @GetMapping("/logout")
-    public String logout(HttpSession session,
-                         RedirectAttributes redirectAttr) {
-        session.invalidate();
-        
-        redirectAttr.addFlashAttribute(
-            "toast",
-            ToastInfoDTO.success("已成功登出")
-        );
 
         return "redirect:/home";
     }
