@@ -97,11 +97,6 @@ public class GlobalController {
         return "member";
     }
 
-    @RequestMapping("/memberProfile")
-    public String memberProfile() {
-        return "memberProfile";
-    }
-
     // 保持路徑，已寫在ArticleWebController
     // @RequestMapping("/news")
     // public String news() {

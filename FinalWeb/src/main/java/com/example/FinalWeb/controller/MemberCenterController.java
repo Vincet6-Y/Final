@@ -24,7 +24,11 @@ public class MemberCenterController {
         return "redirect:/home";
     }
 
-
-
     
+    @GetMapping("/profile")
+    public String memberProfile() {
+        return "memberProfile";
+    }
+
+
 }
