@@ -42,10 +42,47 @@
                             <span class="text-[10px] uppercase tracking-wider text-slate-500">評價</span>
                         </div>
                     </div>
-                    <button
-                        class="w-full mt-6 py-3 bg-primary text-background-dark font-bold rounded-xl hover:opacity-90 transition-opacity">
-                        編輯個人資料
-                    </button>
+                    <div class="w-full mt-6 flex items-center gap-3">
+                        <a th:href="@{/member/profile}"
+                        class="flex-1 py-3 bg-primary text-background-dark font-bold rounded-xl hover:opacity-90 transition-opacity text-center">
+                            編輯個人資料
+                        </a>
+
+                        <div class="relative">
+                            <button id="memberMenuBtn" type="button"
+                                    class="size-12 rounded-full border-2 border-sky-500 text-sky-500 hover:bg-sky-500/10 transition flex items-center justify-center">
+                                <span class="material-symbols-outlined">settings</span>
+                            </button>
+
+                            <div id="memberMenu"
+                                class="hidden absolute right-0 top-14 w-64 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden z-50">
+
+                                <a href="#"
+                                class="flex items-center gap-3 px-4 py-4 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+                                    <span class="material-symbols-outlined text-[20px]">share</span>
+                                    分享
+                                </a>
+
+                                <a href="#"
+                                class="flex items-center gap-3 px-4 py-4 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+                                    <span class="material-symbols-outlined text-[20px]">description</span>
+                                    服務條款與隱私聲明
+                                </a>
+
+                                <a href="#"
+                                class="flex items-center gap-3 px-4 py-4 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition border-b border-slate-200 dark:border-white/10">
+                                    <span class="material-symbols-outlined text-[20px]">mail</span>
+                                    意見回饋
+                                </a>
+
+                                <a th:href="@{/member/logout}"
+                                class="flex items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+                                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                                    登出
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- Navigation List -->
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-2 hidden lg:flex flex-col">
@@ -202,8 +239,24 @@
         </main>
         <!-- Footer Footer -->
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-
     </div>
+    <script>
+        const memberMenuBtn = document.getElementById("memberMenuBtn");
+        const memberMenu = document.getElementById("memberMenu");
+
+        if (memberMenuBtn && memberMenu) {
+            memberMenuBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                memberMenu.classList.toggle("hidden");
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!memberMenu.contains(e.target) && !memberMenuBtn.contains(e.target)) {
+                    memberMenu.classList.add("hidden");
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
