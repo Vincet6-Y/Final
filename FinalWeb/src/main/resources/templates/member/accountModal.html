@@ -1,0 +1,127 @@
+<th:block th:fragment="accountModal">
+    <div id="accountModal"
+        class="hidden fixed inset-0 z-[999] flex items-center justify-center px-4">
+        
+        <div id="accountModalBackdrop"
+            class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <div class="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl overflow-hidden">            
+            <!-- header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">帳戶設定</h2>
+                <button type="button" id="closeAccountModal"
+                        class="size-10 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center transition">
+                    <span class="material-symbols-outlined text-slate-700 dark:text-slate-200">close</span>
+                </button>
+            </div>
+
+            <!-- content -->
+            <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                
+                <!-- accordion 1 -->
+                <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                    <button type="button"
+                            class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
+                        <span class="font-bold text-slate-900 dark:text-slate-100">帳號管理</span>
+                        <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                    </button>
+                    <div class="accordion-content px-5 py-5 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                        <!-- 帳號綁定 -->
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 mb-4">
+                                帳號綁定
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- LINE 綁定 -->
+                                <div class="rounded-2xl border border-slate-300 dark:border-white/10 p-4 flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-4 min-w-0">
+                                        <div class="size-16 rounded-full border border-slate-300 dark:border-white/15 flex items-center justify-center shrink-0 bg-white dark:bg-zinc-800">
+                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">LINE</span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm text-slate-500 dark:text-slate-400"
+                                                th:text="${lineBound} ? '已綁定' : '未綁定'">未綁定</p>
+                                        </div>
+                                    </div>
+                                    <button type="button"
+                                            class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                                            th:text="${lineBound} ? '解除綁定' : '立即綁定'">
+                                    </button>
+                                </div>
+                                <!-- Google 綁定 -->
+                                <div class="rounded-2xl border border-slate-300 dark:border-white/10 p-4 flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-4 min-w-0">
+                                        <div class="size-16 rounded-full border border-slate-300 dark:border-white/15 flex items-center justify-center shrink-0 bg-white dark:bg-zinc-800">
+                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Google</span>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm text-slate-500 dark:text-slate-400"
+                                                th:text="${googleBound} ? '已綁定' : '未綁定'">未綁定</p>
+                                        </div>
+                                    </div>
+                                    <button type="button"
+                                            class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                                            th:text="${googleBound} ? '解除綁定' : '立即綁定'">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 刪除帳號 -->
+                        <div class="mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
+                            <h3 class="text-base font-bold text-red-600 dark:text-red-400 mb-3">
+                                刪除帳號
+                            </h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4 leading-6">
+                                刪除帳號後，相關會員資料將無法恢復，請確認後再執行此操作。
+                            </p>
+                            <button type="button"
+                                    class="px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition">
+                                刪除帳號
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- accordion 2 -->
+                <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                    <button type="button"
+                            class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
+                        <span class="font-bold text-slate-900 dark:text-slate-100">修改密碼</span>
+                        <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                    </button>
+                    <div class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                        <div class="space-y-3">
+                            <input type="password" placeholder="目前密碼"
+                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
+                            <input type="password" placeholder="新密碼"
+                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
+                            <input type="password" placeholder="確認新密碼"
+                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
+                            <button type="button"
+                                    class="px-5 py-2.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition">
+                                儲存密碼
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- accordion 3 -->
+                <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                    <button type="button"
+                            class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
+                        <span class="font-bold text-slate-900 dark:text-slate-100">服務條款與隱私聲明</span>
+                        <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                    </button>
+                    <div class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                        <div class="text-sm leading-7 text-slate-700 dark:text-slate-300 space-y-3">
+                            <p>這裡可以放服務條款摘要內容。</p>
+                            <p>這裡可以放隱私政策摘要內容。</p>
+                            <a href="#" class="text-primary hover:underline">查看完整條款</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</th:block>
