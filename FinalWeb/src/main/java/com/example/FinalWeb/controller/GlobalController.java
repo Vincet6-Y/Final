@@ -84,17 +84,22 @@ public class GlobalController {
         model.addAttribute("apiKey", googleMapsApiKey);
         return "packageTourMap";
     }
+    
+    @RequestMapping("/auth")
+    public String authPage(@RequestParam(required = false) String redirect,
+                            Model model) {
+        model.addAttribute("redirect", redirect);
+        return "auth";
+    }
 
     @RequestMapping("/member")
     public String member() {
         return "member";
     }
 
-    @RequestMapping("/auth")
-    public String authPage(@RequestParam(required = false) String redirect,
-                            Model model) {
-        model.addAttribute("redirect", redirect);
-        return "auth";
+    @RequestMapping("/memberProfile")
+    public String memberProfile() {
+        return "memberProfile";
     }
 
     // 保持路徑，已寫在ArticleWebController
