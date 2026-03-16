@@ -4,12 +4,25 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Map;
+import java.util.TreeMap;
 
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+
+@Component
 public class ECPayUtil {
+    private static String HASH_KEY;
+    private static String HASH_IV;
 
-    // 綠界測試環境 3D驗證專用特店(3002607) 的 HashKey 和 HashIV
-    private final static String HASH_KEY = "pwFHCqoQZGmho4w6";
-    private final static String HASH_IV = "EkRm7iFT261dpevs";
+    @Value("${ecpay.hash-key}")
+    public void setHashKey(String hashKey) {
+        ECPayUtil.HASH_KEY = hashKey;
+    }
+
+    @Value("${ecpay.hash-iv}")
+    public void setHashIv(String hashIv) {
+        ECPayUtil.HASH_IV = hashIv;
+    }
 
     public static boolean verifyCheckMacValue(Map<String, String> params) {
         String receiveCheckMacValue = params.get("CheckMacValue");
@@ -17,8 +30,8 @@ public class ECPayUtil {
             return false;
         }
 
-        // 必須將參數按字母排序 (A-Z) 來計算 CheckMacValue，並且不能修改原始的 params
-        Map<String, String> treeMap = new java.util.TreeMap<>(params);
+        // TreeMap 實作了自動依 Key 值（字母 A-Z）排序的功能
+        Map<String, String> treeMap = new TreeMap<>(params);
         treeMap.remove("CheckMacValue");
 
         String calculateCheckMacValue = generateCheckMacValue(treeMap);
@@ -28,13 +41,14 @@ public class ECPayUtil {
     public static String generateCheckMacValue(Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
         sb.append("HashKey=").append(HASH_KEY);
+
         for (Map.Entry<String, String> entry : params.entrySet()) {
             sb.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }
         sb.append("&HashIV=").append(HASH_IV);
 
+        // 使用 UTF-8 進行 URL Encode，並轉為小寫
         String encodedStr = URLEncoder.encode(sb.toString(), StandardCharsets.UTF_8).toLowerCase();
-
         // 綠界的 URL Encode 特殊規則處理
         encodedStr = encodedStr.replace("%2d", "-")
                 .replace("%5f", "_")
@@ -44,7 +58,7 @@ public class ECPayUtil {
                 .replace("%28", "(")
                 .replace("%29", ")")
                 .replace("%20", "+");
-
+        // 進行 SHA-256 雜湊並轉為大寫
         return sha256(encodedStr).toUpperCase();
     }
 
