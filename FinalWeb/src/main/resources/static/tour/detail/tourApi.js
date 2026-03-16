@@ -1,7 +1,9 @@
 // ==========================================
 // 🌟 1. 載入官方行程資料 (用於 packageTourDetail)
 // ==========================================
-async function loadPlanData(planId) {
+
+
+     async function loadPlanData(planId) {
     try {
         const res = await fetch(`/api/plan/officialPlanNodes/${planId}`);
         if (!res.ok) throw new Error(`API 請求失敗：${res.status}`);
@@ -10,7 +12,14 @@ async function loadPlanData(planId) {
         let nodes = Array.isArray(data) ? data : (data.data || []);
         if (nodes.length === 0) return;
 
-        itineraryData = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+        // 🌟 1. 自動計算這筆資料中最大的天數
+        const maxDay = nodes.reduce((max, node) => Math.max(max, node.dayNumber || 1), 1);
+
+        // 🌟 2. 動態初始化 itineraryData，不再寫死 1~10
+        itineraryData = {};
+        for (let d = 1; d <= maxDay; d++) {
+            itineraryData[d] = [];
+        }
 
         for (const node of nodes) {
             let safePlaceId = (node.GooglePlaceID || node.googlePlaceID || "").replace(/["']/g, "").trim();
@@ -24,6 +33,9 @@ async function loadPlanData(planId) {
             }
 
             const day = node.dayNumber || 1;
+            // 防呆：確保該天的陣列存在
+            if (!itineraryData[day]) itineraryData[day] = [];
+            
             itineraryData[day].push({
                 spotId: node.spotId,
                 place_id: safePlaceId,
@@ -35,14 +47,20 @@ async function loadPlanData(planId) {
             });
         }
 
-        if (itineraryData[1].length > 0) {
+        // 🌟 3. 重點：通知 UI 根據實際天數重新產生日數按鈕
+        // 確保 tourUi.js 裡有這個 updateDayButtonsAndLists 函式
+        if (typeof updateDayButtonsAndLists === 'function') {
+            updateDayButtonsAndLists(maxDay);
+        }
+
+        if (itineraryData[1] && itineraryData[1].length > 0) {
             const firstLat = itineraryData[1][0].lat;
             const firstLng = itineraryData[1][0].lng;
-            // 🌟 加上防呆：確定經緯度不是 NaN 才設定中心點
             if (!isNaN(firstLat) && !isNaN(firstLng)) {
                 map.setCenter({ lat: firstLat, lng: firstLng });
             }
         }
+        
         calculateAndDisplayRoute(1);
         selectDay(1);
 

@@ -169,28 +169,73 @@ function closeRichModal() {
     document.getElementById('rich-place-modal').classList.add('hidden');
 }
 
-function confirmAddToItinerary() {
+// ==========================================
+// 🌟 修正：加入景點時，先存資料庫再更新畫面
+// ==========================================
+async function confirmAddToItinerary() {
     if (!tempSelectedPlace) return;
 
-    itineraryData[currentDay].push({
-        place_id: tempSelectedPlace.id, // 🌟 新版是 .id 不是 .place_id
-        lat: tempSelectedPlace.location.lat(), // 🌟 新版直接用 .location
-        lng: tempSelectedPlace.location.lng(),
-        name: tempSelectedPlace.displayName, // 🌟 新版是 .displayName
-        arrivals: "8:00",
-        duration: "1",
-        hasTicketOffer: Math.random() > 0.5
-    });
+    const planId = window.currentMyPlanId;
+    const day = currentDay;
 
-    calculateAndDisplayRoute(currentDay);
+    if (!planId) {
+        alert("找不到行程 ID，無法加入景點");
+        return;
+    }
 
-    const scrollArea = document.getElementById('itinerary-scroll-area');
-    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+    // 將按鈕文字改成載入中，避免使用者連點
+    const btnText = document.getElementById('modal-btn-text');
+    const originalText = btnText.innerText;
+    btnText.innerText = "加入中...";
 
-    closeRichModal();
+    try {
+        // 1. 呼叫後端 API，將景點存入資料庫
+        const response = await fetch('/api/plan/addNode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                myPlanId: planId,
+                dayNumber: day,
+                placeId: tempSelectedPlace.id,
+                name: tempSelectedPlace.displayName,
+                lat: tempSelectedPlace.location.lat(),
+                lng: tempSelectedPlace.location.lng()
+            })
+        });
 
-    if (window.innerWidth <= 768 && isMapView) {
-        toggleMobileView();
+        const data = await response.json();
+
+        if (data.success) {
+            // 2. 資料庫儲存成功後，才把帶有真實 spotId 的資料塞進畫面陣列中
+            itineraryData[day].push({
+                spotId: data.spotId,
+                place_id: tempSelectedPlace.id,
+                lat: tempSelectedPlace.location.lat(),
+                lng: tempSelectedPlace.location.lng(),
+                name: tempSelectedPlace.displayName,
+                arrivals: "08:00",
+                duration: "1",
+                hasTicketOffer: Math.random() > 0.5
+            });
+
+            calculateAndDisplayRoute(day);
+
+            const scrollArea = document.getElementById('itinerary-scroll-area');
+            if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+            closeRichModal();
+
+            if (window.innerWidth <= 768 && isMapView) {
+                toggleMobileView();
+            }
+        } else {
+            alert("加入失敗：" + data.message);
+        }
+    } catch (error) {
+        console.error("加入景點發生錯誤:", error);
+        alert("伺服器發生錯誤");
+    } finally {
+        // 恢復按鈕文字
+        btnText.innerText = originalText;
     }
 }
 
@@ -415,7 +460,40 @@ function handleDrop(e, day, dropIndex) {
     // 重新計算路線與渲染列表
     calculateAndDisplayRoute(day);
     draggedItemInfo = null;
+
+    // 🌟 新增：將移動後的新順序傳送給後端儲存
+    syncOrderToDatabase(day);
+
     return false;
+}
+
+// 🌟 核心功能：將移動後的順序同步至資料庫
+async function syncOrderToDatabase(day) {
+    const list = itineraryData[day];
+    
+    // 1. 整理出該天所有景點的新順序 (對應資料庫的 spotId 與新的 visitOrder)
+    const payload = list.map((item, index) => ({
+        spotId: item.spotId,
+        visitOrder: index + 1 // 順序改為 1, 2, 3...
+    })).filter(i => i.spotId); // 過濾掉尚未存入資料庫的臨時點
+
+    if (payload.length === 0) return;
+
+    try {
+        console.log(`正在同步 Day ${day} 的新順序...`);
+        const response = await fetch('/api/plan/updateOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        if (!data.success) {
+            console.error("順序儲存失敗:", data.message);
+        }
+    } catch (error) {
+        console.error("同步順序時發生連線錯誤:", error);
+    }
 }
 
 function handleDragEnd(e) {
@@ -546,9 +624,34 @@ function renderItineraryPanel(day) {
     }
 }
 
-function removeItineraryItem(day, index) {
-    itineraryData[day].splice(index, 1);
-    calculateAndDisplayRoute(day);
+// 🌟 修正版：刪除景點並同步資料庫
+async function removeItineraryItem(day, index) {
+    const item = itineraryData[day][index];
+    
+    // 如果是剛從地圖加入、尚未取得 spotId 的點，直接從陣列移除即可
+    if (!item.spotId) {
+        itineraryData[day].splice(index, 1);
+        calculateAndDisplayRoute(day);
+        return;
+    }
+
+    if (confirm(`確定要從 Day ${day} 移除「${item.name}」嗎？`)) {
+        try {
+            const response = await fetch(`/api/plan/deleteNode/${item.spotId}`, { method: 'DELETE' });
+            const data = await response.json();
+
+            if (data.success) {
+                // 資料庫刪除成功後，才移除畫面顯示
+                itineraryData[day].splice(index, 1);
+                calculateAndDisplayRoute(day);
+                console.log("資料庫同步刪除成功");
+            } else {
+                alert("資料庫同步失敗：" + data.message);
+            }
+        } catch (error) {
+            console.error("刪除錯誤:", error);
+        }
+    }
 }
 
 function toggleMobileView() {
