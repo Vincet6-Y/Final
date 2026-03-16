@@ -25,9 +25,9 @@ public class MapEntity {
     private Integer visitOrder;
     private String locationName;
 
-    @Column(name = "longitude", precision = 10, scale = 6)
+    @Column(name = "longitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal longitude;
-    @Column(name = "latitude", precision = 10, scale = 6)
+    @Column(name = "latitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal latitude;
     private String GooglePlaceID;
 
