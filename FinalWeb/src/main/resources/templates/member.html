@@ -86,137 +86,15 @@
             <!-- Main Content -->
             <div class="lg:col-span-8 flex flex-col gap-8">
                 <!-- Purchase Records Section -->
-                <section>
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">receipt_long</span>
-                            購買紀錄
-                        </h2>
-                        <a class="text-primary text-sm hover:underline" href="#">查看全部</a>
-                    </div>
-                    <div class="flex flex-col gap-4">
-                        <!-- Record Item 1 -->
-                        <div
-                            class="group bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col md:flex-row items-center gap-6 hover:border-primary/50 transition-all">
-                            <div class="w-full md:w-32 h-24 rounded-xl overflow-hidden shrink-0">
-                                <img alt="Kyoto Temple"
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                    data-alt="Traditional Japanese temple with autumn leaves"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRnxvMrWkVRNL2oYqIj27Xs1Vk-pl_yGNgPBhMqNqH_UCQxPmeQ2qdjwjd-kMWKz_RIGyNTa5FVxGFbPy2yKUU0TJac9zqbe6iOd65lBDMgcPqumiAKJxDpoAkNB-SdWyVVSS9JQe0EJlHBt-MHjX-MQPXUYMex3HcTckEvtYfXjxPRQZEUtv4y8rpEIuxllgmbAHNgnXhZw14qJfZCJAUv3EkEEUO_-0l8wW_vjkUuqqxS-mS4UjoSIu0mcwcDhk167_X0sbN9Ao" />
-                            </div>
-                            <div class="flex-1 space-y-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-slate-100 text-lg">京都·哲學之路禪修五日遊</h3>
-                                    <span class="text-primary font-bold">NT$ 24,500</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-sm text-slate-400">
-                                    <span class="flex items-center gap-1"><span
-                                            class="material-symbols-outlined text-[16px]">calendar_month</span>
-                                        2024.03.15</span>
-                                    <span
-                                        class="px-2 py-0.5 rounded bg-green-500/10 text-green-500 text-xs font-medium">已完成付款</span>
-                                </div>
-                            </div>
-                            <button
-                                class="w-full md:w-auto px-6 py-2.5 bg-white/10 hover:bg-white/20 text-slate-100 rounded-lg text-sm font-bold transition-colors">
-                                詳細行程
-                            </button>
-                        </div>
-                        <!-- Record Item 2 -->
-                        <div
-                            class="group bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col md:flex-row items-center gap-6 hover:border-primary/50 transition-all">
-                            <div class="w-full md:w-32 h-24 rounded-xl overflow-hidden shrink-0">
-                                <img alt="Ise Jingu"
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                    data-alt="Torii gate at Ise Jingu at sunrise"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoOhDhAarKSeHKtZr3i7Gkh_J9UQ6S4E3TdCNaY4-vppAzv2snjCNa7YigbqbQsHKS97WEAz0ZAwSau4kOvjFkiana8LYSWcZwVhOi_2G1p4cKiRIoik6VzYAH9d4OCCUCIp1sHmzWBw1NY0ezmXAIRz44cheikO-Qa0Vspe-AOxMhfKVPXiw2sU_3jpzWXI-TSMlUsbo9zD6BJ5XJD3mfdCMmvMkYMzrmVOKKKTAR-IccWRSuPmFHsvnZpLR5Y-IyEbowX57PsB4" />
-                            </div>
-                            <div class="flex-1 space-y-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-slate-100 text-lg">伊勢神宮·心靈滌淨三日巡禮</h3>
-                                    <span class="text-primary font-bold">NT$ 12,800</span>
-                                </div>
-                                <div class="flex items-center gap-4 text-sm text-slate-400">
-                                    <span class="flex items-center gap-1"><span
-                                            class="material-symbols-outlined text-[16px]">calendar_month</span>
-                                        2024.02.10</span>
-                                    <span
-                                        class="px-2 py-0.5 rounded bg-green-500/10 text-green-500 text-xs font-medium">已完成付款</span>
-                                </div>
-                            </div>
-                            <button
-                                class="w-full md:w-auto px-6 py-2.5 bg-white/10 hover:bg-white/20 text-slate-100 rounded-lg text-sm font-bold transition-colors">
-                                詳細行程
-                            </button>
-                        </div>
-                    </div>
-                </section>
+                <th:block th:replace="~{member/purchaseRecord :: purchaseRecord}"></th:block>
                 <!-- Saved List Section -->
-                <section>
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">favorite</span>
-                            收藏行程
-                        </h2>
-                        <a class="text-primary text-sm hover:underline" href="#">查看全部</a>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Favorite Item 1 -->
-                        <div
-                            class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col hover:shadow-xl hover:shadow-primary/5 transition-all">
-                            <div class="relative h-48">
-                                <img alt="Koyasan" class="w-full h-full object-cover"
-                                    data-alt="Atmospheric forest path in Mount Koya"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9geycgzxAiJsH00kQBcoYEFav3NH5IJxoJbP2FLzAx3klwhIw8bwjKDhmMQGqlvmbMnClJog56HvxfDHJJebV1-oYZCDiyMqyK8PU0OWfSk7JNsJypMXaRMBMgzFFvP6anvXvp-79IMbj6P2-XawU5FnirwtGjTPvWWOsilGQtmOQzLV4Sf72uVgRikpBB42sNpTnjOKnlsO0-7ilXNMKdj1w-48Vdz9XuuoRg6g1acWtMjGLBdw5eW5T7et--8QZZxOmOsDnz44" />
-                                <div
-                                    class="absolute top-3 right-3 bg-background-dark/60 backdrop-blur-md p-2 rounded-full text-primary">
-                                    <span class="material-symbols-outlined fill-1">favorite</span>
-                                </div>
-                            </div>
-                            <div class="p-5 flex flex-col flex-1">
-                                <h3 class="font-bold text-slate-100 text-lg mb-2">高野山·宿坊體驗與空海大師足跡</h3>
-                                <p class="text-slate-400 text-sm line-clamp-2 flex-1">探索真言宗的源頭，在寧靜的山林中體驗清晨的誦經與精進料理...
-                                </p>
-                                <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-                                    <span class="text-slate-500 text-xs font-medium uppercase">待完善計畫</span>
-                                    <button
-                                        class="px-4 py-2 bg-primary/20 text-primary hover:bg-primary hover:text-background-dark rounded-lg text-xs font-bold transition-all">
-                                        完善規劃
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Favorite Item 2 -->
-                        <div
-                            class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col hover:shadow-xl hover:shadow-primary/5 transition-all">
-                            <div class="relative h-48">
-                                <img alt="Kumano Kodo" class="w-full h-full object-cover"
-                                    data-alt="Misty mountain peaks along the Kumano Kodo trail"
-                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCWkh-SVI8VQg4AZS_7iqEaKidYq9OjLHGfByVDNIPFcw0LLjS8yqC4I52LC_Zg4Tge0iEprBCxyUi2oX1Qet083ZOyjwA_HL8zvXiTtmIqIoJr7_mqvQ005PyjFd2TSU1KjK3ra0IpRfHIMylxNVmdPiSqbZGfl65B2kRwuaUKvgchpxkdUoMkX3l-_Bnuue7X7_FrnDks1QT5RIdoXHS2XBpBgLNYdb4A08bYUBuE7fkDE9CwSCXScZB8yQA_Exo0AuYve1vvF0" />
-                                <div
-                                    class="absolute top-3 right-3 bg-background-dark/60 backdrop-blur-md p-2 rounded-full text-primary">
-                                    <span class="material-symbols-outlined fill-1">favorite</span>
-                                </div>
-                            </div>
-                            <div class="p-5 flex flex-col flex-1">
-                                <h3 class="font-bold text-slate-100 text-lg mb-2">熊野古道·中邊路步行巡禮之旅</h3>
-                                <p class="text-slate-400 text-sm line-clamp-2 flex-1">世界遺產巡禮，跨越歷史的千年古道，感受自然與信仰的融合...</p>
-                                <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-                                    <span class="text-slate-500 text-xs font-medium uppercase">待完善計畫</span>
-                                    <button
-                                        class="px-4 py-2 bg-primary/20 text-primary hover:bg-primary hover:text-background-dark rounded-lg text-xs font-bold transition-all">
-                                        完善規劃
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <th:block th:replace="~{member/favoritePlan :: favoritePlan}"></th:block>
             </div>
         </main>
         <!-- Footer Footer -->
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
     </div>
+    <th:block th:replace="~{member/purchaseModal :: purchaseModal}"></th:block>
     <th:block th:replace="~{member/accountModal :: accountModal}"></th:block>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
@@ -237,6 +115,7 @@
         });
     </script>
     <script th:src="@{/member/js/accountModal.js}"></script>
+    <script th:src="@{/member/js/purchaseModal.js}"></script>
 </body>
 
 </html>

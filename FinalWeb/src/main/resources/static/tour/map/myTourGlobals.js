@@ -10,3 +10,5 @@ const WALK_THRESHOLD_KM = 1.0;
 let itineraryData = { 1: [], 2: [], 3: [], 4: [], 5: [] };
 let routeLegs = {};
 let draggedItemInfo = null;
+
+let routeMarkers = [];

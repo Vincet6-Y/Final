@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.FinalWeb.entity.MemberEntity; // 🌟 新增引入 MemberEntity
+import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.MyPlanEntity;
 import com.example.FinalWeb.entity.JourneyPlanEntity;
 import com.example.FinalWeb.entity.MapEntity;
@@ -139,7 +139,8 @@ public class packageTourDetailController {
                 return ResponseEntity.ok(java.util.Map.of("success", true, "newName", newName));
             }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("success", false)));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(java.util.Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.internalServerError()
+                    .body(java.util.Map.of("success", false, "message", e.getMessage()));
         }
     }
 }

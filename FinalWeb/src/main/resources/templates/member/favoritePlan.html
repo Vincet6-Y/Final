@@ -1,0 +1,48 @@
+<th:block th:fragment="favoritePlan">
+    <section>
+
+        <div class="flex items-center justify-between mb-4 px-1">
+            <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">favorite</span>
+                收藏行程
+            </h2>
+            <a class="text-primary text-sm hover:underline" href="#">查看全部</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div
+                class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col hover:shadow-xl hover:shadow-primary/5 transition-all">
+
+                <div class="relative h-48">
+                    <img class="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9geycgzxAiJsH00kQBcoYEFav3NH5IJxoJbP2FLzAx3klwhIw8bwjKDhmMQGqlvmbMnClJog56HvxfDHJJebV1-oYZCDiyMqyK8PU0OWfSk7JNsJypMXaRMBMgzFFvP6anvXvp-79IMbj6P2-XawU5FnirwtGjTPvWWOsilGQtmOQzLV4Sf72uVgRikpBB42sNpTnjOKnlsO0-7ilXNMKdj1w-48Vdz9XuuoRg6g1acWtMjGLBdw5eW5T7et--8QZZxOmOsDnz44"/>
+                </div>
+
+                <div class="p-5 flex flex-col flex-1">
+                    <h3 class="font-bold text-slate-100 text-lg mb-2">
+                        高野山·宿坊體驗與空海大師足跡
+                    </h3>
+
+                    <p class="text-slate-400 text-sm line-clamp-2 flex-1">
+                        探索真言宗的源頭，在寧靜的山林中體驗清晨的誦經與精進料理...
+                    </p>
+
+                    <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                        <span class="text-slate-500 text-xs font-medium uppercase">
+                            待完善計畫
+                        </span>
+
+                        <button
+                            class="px-4 py-2 bg-primary/20 text-primary hover:bg-primary hover:text-background-dark rounded-lg text-xs font-bold transition-all">
+                            完善規劃
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+</th:block>
