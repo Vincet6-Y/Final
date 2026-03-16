@@ -1,4 +1,39 @@
 // TODO: 行程無法對應到 DayX 上面
+function updateDayButtonsAndLists(totalDays) {
+    const buttonContainer = document.getElementById('day-buttons-container');
+    const listContainer = document.getElementById('itinerary-lists-container');
+
+    if (!buttonContainer || !listContainer) return;
+
+    buttonContainer.innerHTML = '';
+    listContainer.innerHTML = '';
+
+    for (let day = 1; day <= totalDays; day++) {
+        buttonContainer.insertAdjacentHTML(
+            'beforeend',
+            `
+            <button
+                id="btn-day-${day}"
+                onclick="selectDay(${day})"
+                class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0">
+                Day ${day}
+            </button>
+            `
+        );
+
+        listContainer.insertAdjacentHTML(
+            'beforeend',
+            `
+            <div id="list-day-${day}" class="day-list hidden p-4 space-y-3"></div>
+            `
+        );
+    }
+}
+
+// 切換目前顯示的行程 Day
+// 1. 更新按鈕樣式
+// 2. 顯示對應 Day 的行程列表
+// 3. 呼叫路線計算與列表渲染
 function selectDay(day) {
     currentDay = day;
     document.querySelectorAll('[id^="btn-day-"]').forEach(btn => {
@@ -26,6 +61,7 @@ function selectDay(day) {
 
 // ==========================================
 // 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
+// 從 Google Places API 取得景點詳細資訊，並開啟資訊 Modal
 // ==========================================
 async function fetchAndShowDetails(placeId) {
     if (!placeId || placeId === 'undefined' || placeId === 'null') {
@@ -79,6 +115,8 @@ async function fetchAndShowDetails(placeId) {
     }
 }
 
+// 顯示景點詳細資訊的 Modal 視窗
+// 將 Google Places API 回傳資料填入 UI
 function showRichModal(place) {
     tempSelectedPlace = place;
 
@@ -223,10 +261,12 @@ async function openPlaceDetails(day, index) {
     }
 }
 
+// 關閉景點詳細資訊視窗
 function closeRichModal() {
     document.getElementById('rich-place-modal').classList.add('hidden');
 }
 
+// 將使用者在地圖選取的景點加入行程
 function confirmAddToItinerary() {
     if (!tempSelectedPlace) return;
 
@@ -255,6 +295,8 @@ function confirmAddToItinerary() {
 
 // ==========================================
 // 🌟時間自動推算引擎
+// 根據交通時間與停留時間
+// 自動推算每個景點的抵達時間
 // ==========================================
 function recalculateTimes(day) {
     const places = itineraryData[day];
@@ -290,12 +332,14 @@ function recalculateTimes(day) {
 }
 
 // 🌟使用者編輯時間的觸發事件
+// 使用者修改停留時間
 function updateDuration(day, index, newDuration) {
     itineraryData[day][index].duration = parseFloat(newDuration) || 1;
     recalculateTimes(day); // 重新推算下方所有行程
     renderItineraryPanel(day); // 重新渲染畫面
 }
 
+// 使用者手動修改抵達時間
 function updateArrivalTime(day, index, newTime) {
     itineraryData[day][index].arrivals = newTime;
     recalculateTimes(day); // 重新推算下方所有行程
@@ -304,6 +348,7 @@ function updateArrivalTime(day, index, newTime) {
 
 // ==========================================
 // 🌟 拖曳事件處理函數 (Drag and Drop Logic)
+// 拖曳開始
 // ==========================================
 function handleDragStart(e, day, index) {
     draggedItemInfo = { day, index };
@@ -484,6 +529,7 @@ function removeItineraryItem(day, index) {
     calculateAndDisplayRoute(day);
 }
 
+// 手機版切換地圖 / 行程
 function toggleMobileView() {
     const panel = document.getElementById('itinerary-panel');
     const icon = document.getElementById('toggle-icon');
@@ -502,112 +548,10 @@ function toggleMobileView() {
     }
 }
 
-// ==========================================
-// 🌟 新增功能：動態加入「// ...existing code...
-    // 取得 packagetourdetail.html 上設定的天數（優先用 data-total-days / id=total-days / URL 參數 totalDays）
-    const totalDays = (() => {
-        const fromDom =
-            document.querySelector('[data-total-days]') ||
-            document.getElementById('total-days');
-
-        if (fromDom) {
-            const val = fromDom.dataset.totalDays || fromDom.value || fromDom.innerText;
-            const parsed = parseInt(val, 10);
-            if (!Number.isNaN(parsed) && parsed > 0) return parsed;
-        }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlDays = parseInt(urlParams.get('totalDays'), 10);
-        if (!Number.isNaN(urlDays) && urlDays > 0) return urlDays;
-
-        return 10; // 預設 10 天
-    })();
-    const daysToAdd = totalDays - 1;
-    // ...existing code...箭頭
-// ==========================================
-document.addEventListener("DOMContentLoaded", () => {
-    const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
-
-  //  const totalDays = 10;
-   // const daysToAdd = totalDays - 1;
-
-
-    // ✅ 新增這段魔法：用計時器每 0.1 秒確認一次地圖醒了沒
-    const checkReady = setInterval(() => {
-        // 確認 directionsService 已經被 initMap 給初始化了
-        if (typeof directionsService !== 'undefined' && directionsService !== null) {
-            clearInterval(checkReady); // 確認雙方都準備好，停止計時器
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const planId = urlParams.get('planId');
-
-            if (planId) {
-                console.log("🟢 畫面與地圖皆已就緒，開始載入資料 ID:", planId);
-                loadPlanData(planId);
-            } else {
-                selectDay(1); // 如果沒有 planId，安全地顯示 Day 1 空畫面
-            }
-        }
-    }, 100);
-
-    // ==========================================
-    // ✨ 左右滑動箭頭 UI 注入 (DOM 包裝魔法)
-    // ==========================================
-    const buttonContainer = document.getElementById('day-buttons-container');
-
-    // 建立外層 Wrapper (讓箭頭可以浮動對齊)
-    const tabsWrapper = document.createElement('div');
-    // 🌟 核心修正：移除會干擾的 relative，單純保留 sticky，並將 z-index 拉高到 z-40 確保不會被蓋住
-    tabsWrapper.className = 'sticky top-0 z-40 flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden shadow-md';
-
-    // 把原本的按鈕區塊塞進 Wrapper 裡
-    buttonContainer.parentNode.insertBefore(tabsWrapper, buttonContainer);
-    tabsWrapper.appendChild(buttonContainer);
-
-    // 移除原本的底線，避免雙重邊框，並加上平滑滾動
-    buttonContainer.classList.remove('border-b', 'border-slate-200', 'dark:border-white/10', 'shrink-0');
-    buttonContainer.classList.add('w-full', 'scroll-smooth');
-
-    // 建立左邊箭頭 (有漂亮陰影的圓形按鈕)
-    const leftBtn = document.createElement('button');
-    leftBtn.className = "absolute left-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
-    leftBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_left</span>';
-
-    // 建立右邊箭頭
-    const rightBtn = document.createElement('button');
-    rightBtn.className = "absolute right-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
-    rightBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_right</span>';
-
-    tabsWrapper.appendChild(leftBtn);
-    tabsWrapper.appendChild(rightBtn);
-
-    // 點擊箭頭滑動事件 (每次滑動約 200px)
-    leftBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: -200, behavior: 'smooth' }));
-    rightBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: 200, behavior: 'smooth' }));
-
-    // 判斷箭頭是否該顯示 (如果滑到最左邊就隱藏左箭頭，最右邊就隱藏右箭頭)
-    const checkArrows = () => {
-        if (buttonContainer.scrollWidth > buttonContainer.clientWidth) {
-            leftBtn.classList.toggle('hidden', buttonContainer.scrollLeft <= 0);
-            rightBtn.classList.toggle('hidden', buttonContainer.scrollLeft + buttonContainer.clientWidth >= buttonContainer.scrollWidth - 2);
-        } else {
-            leftBtn.classList.add('hidden');
-            rightBtn.classList.add('hidden');
-        }
-    };
-
-    buttonContainer.addEventListener('scroll', checkArrows);
-    window.addEventListener('resize', checkArrows);
-
-    // ==========================================
-    // ✨ 動態生成 Day 按鈕與列表
-    // ==========================================
- // ✅ 1. 讓函式獨立在最外面，並接收 actualDays 參數
-// ...existing code...
-
-// 🌟 取得行程天數（優先用 data-total-days / id=total-days / 再用 URL 參數 totalDays）
+// 取得行程天數
 function getTotalDaysFromPage(defaultDays = 10) {
     const fromDom = document.querySelector('[data-total-days]') || document.getElementById('total-days');
+
     if (fromDom) {
         const val = fromDom.dataset.totalDays || fromDom.value || fromDom.innerText;
         const parsed = parseInt(val, 10);
@@ -621,57 +565,124 @@ function getTotalDaysFromPage(defaultDays = 10) {
     return defaultDays;
 }
 
-// ...existing code...
+// 建立 Day 按鈕與對應的行程列表容器
+// 用於初始化行程頁面 UI
+// totalDays 來自行程總天數
+function updateDayButtonsAndLists(totalDays) {
+    const buttonContainer = document.getElementById('day-buttons-container');
+    const listContainer = document.getElementById('itinerary-lists-container');
+
+    if (!buttonContainer || !listContainer) return;
+
+    buttonContainer.innerHTML = '';
+    listContainer.innerHTML = '';
+
+    for (let day = 1; day <= totalDays; day++) {
+        buttonContainer.insertAdjacentHTML(
+            'beforeend',
+            `
+            <button
+                id="btn-day-${day}"
+                onclick="selectDay(${day})"
+                class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0">
+                Day ${day}
+            </button>
+            `
+        );
+
+        listContainer.insertAdjacentHTML(
+            'beforeend',
+            `
+            <div id="list-day-${day}" class="day-list hidden p-4 space-y-3"></div>
+            `
+        );
+    }
+}
+
+// 初始化 Day Tab 滑動
+function initDayTabsScroll() {
+    const buttonContainer = document.getElementById('day-buttons-container');
+    if (!buttonContainer || !buttonContainer.parentNode) return;
+
+    if (buttonContainer.dataset.scrollInitialized === 'true') return;
+    buttonContainer.dataset.scrollInitialized = 'true';
+
+    const tabsWrapper = document.createElement('div');
+    tabsWrapper.className = 'sticky top-0 z-40 flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden shadow-md';
+
+    buttonContainer.parentNode.insertBefore(tabsWrapper, buttonContainer);
+    tabsWrapper.appendChild(buttonContainer);
+
+    buttonContainer.classList.remove('border-b', 'border-slate-200', 'dark:border-white/10', 'shrink-0');
+    buttonContainer.classList.add('w-full', 'scroll-smooth');
+
+    const leftBtn = document.createElement('button');
+    leftBtn.className = "absolute left-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
+    leftBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_left</span>';
+
+    const rightBtn = document.createElement('button');
+    rightBtn.className = "absolute right-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
+    rightBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_right</span>';
+
+    tabsWrapper.appendChild(leftBtn);
+    tabsWrapper.appendChild(rightBtn);
+
+    leftBtn.addEventListener('click', () => {
+        buttonContainer.scrollBy({ left: -200, behavior: 'smooth' });
+    });
+
+    rightBtn.addEventListener('click', () => {
+        buttonContainer.scrollBy({ left: 200, behavior: 'smooth' });
+    });
+
+    const checkArrows = () => {
+        if (buttonContainer.scrollWidth > buttonContainer.clientWidth) {
+            leftBtn.classList.toggle('hidden', buttonContainer.scrollLeft <= 0);
+            rightBtn.classList.toggle(
+                'hidden',
+                buttonContainer.scrollLeft + buttonContainer.clientWidth >= buttonContainer.scrollWidth - 2
+            );
+        } else {
+            leftBtn.classList.add('hidden');
+            rightBtn.classList.add('hidden');
+        }
+    };
+
+    buttonContainer.addEventListener('scroll', checkArrows);
+    window.addEventListener('resize', checkArrows);
+    setTimeout(checkArrows, 100);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-    const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
-
-    // ✅ 改用動態天數，不再固定 10 天
     const totalDays = getTotalDaysFromPage();
     updateDayButtonsAndLists(totalDays);
+    initDayTabsScroll();
 
-    // ✅ 新增這段魔法：用計時器每 0.1 秒確認一次地圖醒了沒
+    const urlParams = new URLSearchParams(window.location.search);
+    const planId = urlParams.get('planId');
+    const autoCopy = urlParams.get('autoCopy');
+
+    if (autoCopy === 'true' && planId) {
+        const cleanUrl = window.location.pathname + `?planId=${planId}`;
+        window.history.replaceState({}, document.title, cleanUrl);
+
+        setTimeout(() => copyToMyPlan(planId), 1000);
+    }
+
     const checkReady = setInterval(() => {
-        // 確認 directionsService 已經被 initMap 給初始化了
         if (typeof directionsService !== 'undefined' && directionsService !== null) {
-            clearInterval(checkReady); // 確認雙方都準備好，停止計時器
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const planId = urlParams.get('planId');
+            clearInterval(checkReady);
 
             if (planId) {
                 console.log("🟢 畫面與地圖皆已就緒，開始載入資料 ID:", planId);
                 loadPlanData(planId);
             } else {
-                selectDay(1); // 如果沒有 planId，安全地顯示 Day 1 空畫面
+                selectDay(1);
             }
         }
     }, 100);
-
-    // ...existing code...
 });
 
-// ✅ 2. 修改後的 DOMContentLoaded (刪除寫死的 10 天邏輯)
-document.addEventListener("DOMContentLoaded", () => {
-    // 這裡原本寫死 totalDays = 10 的地方全部刪掉！
-    // 這裡原本呼叫 updateDayButtonsAndLists() 的地方也刪掉！
-
-    const checkReady = setInterval(() => {
-        if (typeof directionsService !== 'undefined' && directionsService !== null) {
-            clearInterval(checkReady);
-            const urlParams = new URLSearchParams(window.location.search);
-            const planId = urlParams.get('planId');
-            if (planId) {
-                loadPlanData(planId); // 讓 API 抓完資料後去決定天數
-            }
-        }
-    }, 100);
-                      
-    // 🔴 關鍵修正：呼叫時不要再傳入任何參數 (把原本括號裡的 defaultStart 拿掉)
-   // updateDayButtonsAndLists();
-}); // 這裡是 DOMContentLoaded 的結尾
-
-// 完善規劃按鈕點擊事件
 async function copyToMyPlan(officialPlanId) {
     if (!officialPlanId) return;
 
@@ -681,23 +692,18 @@ async function copyToMyPlan(officialPlanId) {
             headers: { 'Content-Type': 'application/json' }
         });
 
-        // 🌟 處理 Session 不存在 (未登入 401)
         if (response.status === 401) {
-            // 取得當前網址 (例如 /packageTourDetail?planId=1)
             const currentPath = window.location.pathname + window.location.search;
             const separator = currentPath.includes('?') ? '&' : '?';
-            // 加上 autoCopy=true 標記
             const targetUrl = encodeURIComponent(currentPath + separator + "autoCopy=true");
 
             alert('請先登入會員，系統將於登入後自動為您複製行程！');
-            // 🌟 導向組員負責的登入頁面 (/auth) 並帶上目標網址
             window.location.href = `/auth?redirect=${targetUrl}`;
             return;
         }
 
         const data = await response.json();
         if (data.success) {
-            // 成功後跳轉至地圖編輯頁面
             window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
         } else {
             alert('複製失敗：' + data.message);
@@ -706,22 +712,3 @@ async function copyToMyPlan(officialPlanId) {
         console.error("複製行程時出錯:", error);
     }
 }
-
-// 🌟 偵測是否是登入後跳轉回來
-document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const planId = urlParams.get('planId');
-    const autoCopy = urlParams.get('autoCopy');
-
-    // 如果網址帶有 autoCopy，代表是登入後自動回來
-    if (autoCopy === 'true' && planId) {
-        console.log("偵測到登入後回傳，正在自動執行完善規劃...");
-
-        // 🌟 小優化：把網址上的 autoCopy=true 擦掉，避免使用者按 F5 重新整理時又觸發一次複製
-        const cleanUrl = window.location.pathname + `?planId=${planId}`;
-        window.history.replaceState({}, document.title, cleanUrl);
-
-        // 延遲 1 秒確保地圖等資源載入完成，然後自動幫他按按鈕
-        setTimeout(() => copyToMyPlan(planId), 1000);
-    }
-});
