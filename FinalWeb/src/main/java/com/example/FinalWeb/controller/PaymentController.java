@@ -8,6 +8,7 @@ import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.service.ECPayService;
 import com.example.FinalWeb.service.OrderService;
 import com.example.FinalWeb.service.TicketService;
+import com.example.FinalWeb.dto.TicketDto;
 import com.example.FinalWeb.repo.OrdersRepo;
 import com.example.FinalWeb.repo.MyPlanRepo;
 
@@ -35,16 +36,12 @@ public class PaymentController {
 
     @Autowired
     private ECPayService ecpayService;
-
     @Autowired
     private TicketService ticketService;
-
     @Autowired
     private OrderService orderService;
-
     @Autowired
     private OrdersRepo ordersRepo;
-
     @Autowired
     private MyPlanRepo myPlanRepo;
 
@@ -91,22 +88,18 @@ public class PaymentController {
 
             // 呼叫 Service 算錢
             model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
-
-            List<TicketService.TicketInfo> availableTickets = new ArrayList<>();
+            List<TicketDto> availableTickets = new ArrayList<>();
             if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
                 List<MyMapEntity> planSpots = order.getMyPlan().getMyMaps();
-
                 // 抓取對應景點的門票
                 for (MyMapEntity myMap : planSpots) {
-                    TicketService.TicketInfo ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
+                    TicketDto ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
                     if (ticket != null) {
                         availableTickets.add(ticket);
                     }
                 }
-
                 // 呼叫 TicketService 取得智慧推薦的交通票，並傳給前端 Model
-                List<TicketService.TicketInfo> recommendedTransports = ticketService
-                        .recommendTransportTickets(planSpots);
+                List<TicketDto> recommendedTransports = ticketService.recommendTransportTickets(planSpots);
                 model.addAttribute("recommendedTransports", recommendedTransports);
             }
             model.addAttribute("availableTickets", availableTickets);
@@ -120,7 +113,7 @@ public class PaymentController {
             @RequestParam(name = "newPlanName", required = false) String newPlanName,
             @RequestParam(name = "addonTicketName", required = false) List<String> addonTicketNames,
             @RequestParam(name = "addonTicketPrice", required = false) List<Integer> addonTicketPrices,
-            @RequestParam(name = "transportId", required = false) String transportId,
+            @RequestParam(name = "transportIds", required = false) List<String> transportIds,
             @RequestParam(name = "newStartDate", required = false) String newStartDate,
             @RequestParam(name = "removeDetailIds", required = false) List<Integer> removeDetailIds) {
 
@@ -137,11 +130,12 @@ public class PaymentController {
             order.getMyPlan().setStartDate(LocalDate.parse(newStartDate));
             myPlanRepo.save(order.getMyPlan());
         }
+
         // 呼叫 Service 把不要的舊票券刪掉
         orderService.removeOrderDetails(removeDetailIds);
 
         // 處理加購票券
-        orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, transportId);
+        orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, transportIds);
 
         // 重新去資料庫抓最新的訂單(包含剛剛加購的明細)
         OrdersEntity updatedOrder = orderService.getOrderById(orderId);
@@ -176,7 +170,7 @@ public class PaymentController {
         }
     }
 
-    // 5. 綠界前端轉跳回傳 (保持不變)
+    // 5. 綠界前端轉跳回傳
     @PostMapping("/success")
     public RedirectView paymentSuccess(@RequestParam Map<String, String> params) {
         if (params == null || params.isEmpty())
@@ -230,6 +224,7 @@ public class PaymentController {
                     int maxDay = allMaps.stream().mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1).max()
                             .orElse(1);
                     model.addAttribute("maxDay", maxDay);
+
                     // 根據 startDate 跟 maxDay 算出結束日期
                     if (order.getMyPlan().getStartDate() != null) {
                         // 結束日期 = 出發日期 + (總天數 - 1) 天

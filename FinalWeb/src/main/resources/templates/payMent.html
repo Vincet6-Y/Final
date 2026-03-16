@@ -19,7 +19,6 @@
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 space-y-6">
-
                 <!-- ==================== 行程摘要 ==================== -->
                 <section class="section-card rounded-xl p-8">
                     <div class="flex items-center gap-3 mb-8">
@@ -42,7 +41,6 @@
                                     <span class="material-symbols-outlined text-sm">edit</span>
                                 </button>
                             </div>
-                            <!-- ==================== 編輯行程名稱 ==================== -->
                             <div id="planNameEditBlock" class="hidden items-center gap-2 mb-3">
                                 <input type="text" id="planNameInput"
                                     class="input-field rounded-lg px-3 py-2 text-sm border border-orange-500/50 dark:bg-[#251d15] dark:text-white w-64 focus:ring-2 focus:ring-orange-500 outline-none transition-all shadow-sm"
@@ -52,13 +50,11 @@
                                 <button type="button" onclick="cancelEditPlanName()"
                                     class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-sm font-medium transition-colors">取消</button>
                             </div>
-                            <!-- ==================== 行程日期 ==================== -->
                             <div class="flex items-center gap-3 mb-6">
                                 <span class="material-symbols-outlined text-orange-500 text-lg">calendar_today</span>
-                                <span class="text-gray-600 dark:text-gray-300 font-bold"
+                                <span id="displayStartDate" class="text-gray-600 dark:text-gray-300 font-bold"
                                     th:text="${order.myPlan != null && order.myPlan.startDate != null} ? ${order.myPlan.startDate} : '待選擇'"></span>
                             </div>
-
                             <!-- ==================== 預計出發日期 ==================== -->
                             <div class="pt-6 border-t border-gray-200 dark:border-white/5">
                                 <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
@@ -71,7 +67,6 @@
                             </div>
                         </div>
                 </section>
-
                 <!-- ==================== 已包含票券 ==================== -->
                 <section class="section-card rounded-xl p-8"
                     th:if="${order.orderDetails != null && !order.orderDetails.isEmpty()}">
@@ -102,7 +97,6 @@
                         </div>
                     </div>
                 </section>
-
                 <!-- ==================== 加購付費項目 ==================== -->
                 <section class="section-card rounded-xl p-8">
                     <div class="flex items-center gap-3 mb-8">
@@ -135,7 +129,7 @@
                                 <optgroup th:if="${recommendedTransports != null && !recommendedTransports.isEmpty()}"
                                     label="💡 智慧推薦">
                                     <option th:each="transport : ${recommendedTransports}"
-                                        th:value="${transport.ticketName}" th:data-price="${transport.price}"
+                                        th:value="${transport.ticketId}" th:data-price="${transport.price}"
                                         th:data-name="${transport.ticketName}"
                                         th:text="${transport.ticketName} + ' (+NT$' + ${#numbers.formatInteger(transport.price, 0, 'COMMA')} + ')'">
                                     </option>
@@ -155,42 +149,13 @@
                     </div>
 
                     <div id="addon-summary" class="mt-6 hidden">
-                        <div class="border-t border-gray-200 dark:border-white/10 pt-4 space-y-2">
-                            <div id="addon-ticket-row"
-                                class="hidden flex justify-between items-center text-sm text-orange-600 dark:text-orange-400">
-                                <span class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">confirmation_number</span>
-                                    <span id="addon-ticket-name">-</span>
-                                </span>
-                                <div class="flex items-center gap-3">
-                                    <span id="addon-ticket-price" class="font-bold">NT$ 0</span>
-                                    <button type="button"
-                                        class="remove-ticket-btn text-gray-400 hover:text-red-500 transition-colors"
-                                        title="取消加購">
-                                        <span class="material-symbols-outlined text-lg">cancel</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="addon-transport-row"
-                                class="hidden flex justify-between items-center text-sm text-blue-600 dark:text-blue-400">
-                                <span class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-sm">train</span>
-                                    <span id="addon-transport-name">-</span>
-                                </span>
-                                <div class="flex items-center gap-3">
-                                    <span id="addon-transport-price" class="font-bold">NT$ 0</span>
-                                    <button type="button"
-                                        class="remove-transport-btn text-gray-400 hover:text-red-500 transition-colors"
-                                        title="取消加購">
-                                        <span class="material-symbols-outlined text-lg">cancel</span>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="border-t border-gray-200 dark:border-white/10 pt-4">
+                            <div id="ticket-list-container" class="space-y-2"></div>
+                            <div id="transport-list-container" class="space-y-2 mt-4"></div>
                         </div>
                     </div>
                 </section>
             </div>
-
             <!-- ==================== 右側：訂單金額明細 ==================== -->
             <div class="lg:col-span-4">
                 <div class="sticky top-28 space-y-6">
@@ -214,23 +179,8 @@
 
                                 <input type="hidden" id="removeDetailIds" name="removeDetailIds" value="" />
 
-                                <div id="summary-addon-ticket"
-                                    class="hidden flex justify-between items-center text-orange-500 text-sm mb-2">
-                                    <span class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-xs">add_circle</span>
-                                        <span id="summary-ticket-name">-</span>
-                                    </span>
-                                    <span id="summary-ticket-price" class="font-medium">NT$ 0</span>
-                                </div>
-
-                                <div id="summary-addon-transport"
-                                    class="hidden flex justify-between items-center text-blue-500 text-sm mb-2">
-                                    <span class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-xs">add_circle</span>
-                                        <span id="summary-transport-name">-</span>
-                                    </span>
-                                    <span id="summary-transport-price" class="font-medium">NT$ 0</span>
-                                </div>
+                                <div id="summary-ticket-list" class="space-y-2 mb-2"></div>
+                                <div id="summary-transport-list" class="space-y-2 mb-2"></div>
 
                                 <div
                                     class="pt-6 border-t border-gray-200 dark:border-white/5 flex justify-between items-end">
@@ -263,9 +213,6 @@
                             <input type="hidden" name="orderId" th:value="${order.orderId}" />
                             <input type="hidden" id="checkoutPlanName" name="newPlanName" value="" />
                             <input type="hidden" id="checkoutStartDate" name="newStartDate" value="" />
-                            <input type="hidden" id="addonTicketName" name="addonTicketName" value="" />
-                            <input type="hidden" id="addonTicketPrice" name="addonTicketPrice" value="0" />
-                            <input type="hidden" id="transportId" name="transportId" value="" />
 
                             <button id="checkoutBtn" type="submit"
                                 class="w-full btn-gradient py-4 rounded-xl font-bold text-lg shadow-xl text-gray-800 dark:text-gray-300 shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">

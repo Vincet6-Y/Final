@@ -180,14 +180,16 @@
                                             th:text="${ticket.ticketType}">票券名稱</span>
                                     </span>
                                     <div class="flex items-center gap-2">
-                                        <!-- 有門票標記 -->
+                                        <span class="text-xs font-bold text-orange-600 dark:text-orange-400 mr-1"
+                                            th:text="'NT$ ' + ${#numbers.formatInteger(ticket.ticketPrice, 0, 'COMMA')}">NT$
+                                            0
+                                        </span>
+
                                         <span
                                             class="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-orange-500/20">
                                             <span class="material-symbols-outlined text-[10px]">local_activity</span>
                                             付費
                                         </span>
-                                        <span
-                                            class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-orange-500 transition-colors text-sm">chevron_right</span>
                                     </div>
                                 </div>
                             </li>
