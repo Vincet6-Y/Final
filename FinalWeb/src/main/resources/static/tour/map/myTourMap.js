@@ -1,15 +1,9 @@
 async function initMap() {
-    const darkMapStyle = [
-        { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-        { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] }
-    ];
 
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 34.6937, lng: 135.5023 },
         zoom: 11,
-        mapId: "cc3bebf698c5799e3aa4aca9",
+        mapId: "2fd53a2f051832ea485534f4",
         disableDefaultUI: true,
         zoomControl: true,
         zoomControlOptions: { position: google.maps.ControlPosition.LEFT_BOTTOM }
