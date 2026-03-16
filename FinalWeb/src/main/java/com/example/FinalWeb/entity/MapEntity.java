@@ -2,6 +2,7 @@
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,17 +20,20 @@ public class MapEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer spotId;
-    
+
     private Integer dayNumber;
     private Integer visitOrder;
     private String locationName;
+
+    @Column(name = "longitude", precision = 10, scale = 6)
     private BigDecimal longitude;
+    @Column(name = "latitude", precision = 10, scale = 6)
     private BigDecimal latitude;
     private String GooglePlaceID;
-    
+
     // 拉關連線到 journeyPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planId")
     private JourneyPlanEntity journeyPlan;
-    
+
 }
