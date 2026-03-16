@@ -10,11 +10,11 @@ function showRichModal(place) {
         document.getElementById('modal-place-phone').innerText = '無電話資訊';
         document.getElementById('modal-place-hours').innerHTML = '營業時間載入中...';
         document.getElementById('modal-place-desc').innerText = '載入中...';
-        
+
         // 歸零新增的欄位 (類型與網站)
         const typeEl = document.getElementById('modal-place-type');
         if (typeEl) typeEl.innerText = '載入中...';
-        
+
         const websiteEl = document.getElementById('modal-place-website');
         if (websiteEl) {
             websiteEl.innerText = '載入中...';
@@ -29,12 +29,12 @@ function showRichModal(place) {
     };
     resetFields();
 
-    // --- 開始填入新資料 ---
-    document.getElementById('modal-place-name').innerText = place.name || '未命名地點';
-    document.getElementById('modal-place-address').innerText = place.formatted_address || '無詳細地址資訊';
-    document.getElementById('modal-place-rating').innerText = place.rating || '無評分';
-    document.getElementById('modal-place-reviews').innerText = `(${place.user_ratings_total || 0} 則評論)`;
-    document.getElementById('modal-place-phone').innerText = place.formatted_phone_number || '無電話資訊';
+    // --- 🌟 配合新版 API (New) 開始填入新資料 ---
+    document.getElementById('modal-place-name').innerText = place.displayName || '未命名地點';
+    document.getElementById('modal-place-address').innerText = place.formattedAddress || '無詳細地址資訊';
+    document.getElementById('modal-place-rating').innerText = place.rating || '0.0';
+    document.getElementById('modal-place-reviews').innerText = `(${place.userRatingCount || 0} 則評論)`;
+    document.getElementById('modal-place-phone').innerText = place.nationalPhoneNumber || '無電話資訊';
 
     // 🌟 新增：處理景點類型 (取第一個分類，並將底線換成空格以利閱讀)
     const typeEl = document.getElementById('modal-place-type');
@@ -45,8 +45,8 @@ function showRichModal(place) {
     // 🌟 新增：處理官方網站連結
     const websiteEl = document.getElementById('modal-place-website');
     if (websiteEl) {
-        if (place.website) {
-            websiteEl.href = place.website;
+        if (place.websiteURI) { // 新版為 websiteURI
+            websiteEl.href = place.websiteURI;
             websiteEl.innerText = '前往官方網站';
             websiteEl.classList.remove('pointer-events-none', 'text-slate-500');
         } else {
@@ -56,25 +56,24 @@ function showRichModal(place) {
         }
     }
 
-    // 處理簡介
-    if (place.editorial_summary && place.editorial_summary.overview) {
-        document.getElementById('modal-place-desc').innerText = place.editorial_summary.overview;
+    if (place.editorialSummary) { // 新版直接是一串文字，不是物件
+        document.getElementById('modal-place-desc').innerText = place.editorialSummary;
     } else {
         document.getElementById('modal-place-desc').innerText = '此地點暫無詳細的官方簡介。這是一處值得您親自探索的地方！';
     }
 
     // 處理圖片 (如果沒有足夠圖片，原本設定的 loading 圖會繼續顯示)
     if (place.photos && place.photos.length >= 1) {
-        document.getElementById('modal-img-main').src = place.photos[0].getUrl({ maxWidth: 800 });
-        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getUrl({ maxWidth: 400 });
-        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getUrl({ maxWidth: 400 });
+        document.getElementById('modal-img-main').src = place.photos[0].getURI({ maxWidth: 800 });
+        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getURI({ maxWidth: 400 });
+        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getURI({ maxWidth: 400 });
     }
 
     // 🌟 修改：處理營業時間 (改為條列式展開，捨棄原本單純的「營業中/休息中」)
     const hoursEl = document.getElementById('modal-place-hours');
     if (hoursEl) {
-        if (place.opening_hours && place.opening_hours.weekday_text) {
-            hoursEl.innerHTML = place.opening_hours.weekday_text.map(text => 
+        if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
+            hoursEl.innerHTML = place.regularOpeningHours.weekdayDescriptions.map(text =>
                 `<p class="flex justify-between border-b border-white/5 pb-1"><span>${text}</span></p>`
             ).join('');
         } else {
@@ -95,28 +94,75 @@ function selectDay(day) {
         btn.className = "px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0";
     });
     const activeBtn = document.getElementById(`btn-day-${day}`);
-    if(activeBtn) {
+    if (activeBtn) {
         activeBtn.className = "px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md shrink-0";
     }
 
     document.querySelectorAll('.day-list').forEach(list => list.classList.add('hidden'));
     const dayList = document.getElementById(`list-day-${day}`);
-    if(dayList) dayList.classList.remove('hidden');
+    if (dayList) dayList.classList.remove('hidden');
 
     const modalBtnText = document.getElementById('modal-btn-text');
-    if(modalBtnText) modalBtnText.innerText = `加入 Day ${day} 行程`;
-    
+    if (modalBtnText) modalBtnText.innerText = `加入 Day ${day} 行程`;
+
     calculateAndDisplayRoute(day);
 }
 
 // ==========================================
-// 彈窗開關與加入行程
+// 🌟 彈窗開關與即時搜尋救援 (升級為 Places API New 邏輯)
 // ==========================================
-function openPlaceDetails(placeId) {
-    if (!placeId || placeId === 'undefined') {
-        return; 
+async function openPlaceDetails(day, index) {
+    // 防呆機制
+    if (!day || !itineraryData[day]) return;
+
+    const placeNode = itineraryData[day][index];
+    if (!placeNode) return;
+
+    // 地圖自動移動並放大
+    if (map && placeNode.lat && placeNode.lng) {
+        map.panTo({ lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) });
+        map.setZoom(16);
     }
-    fetchAndShowDetails(placeId); 
+
+    const placeId = placeNode.place_id;
+
+    // 🌟 嚴格防呆：真正的 Google ID 超過 20 字元。如果太短 (例如不小心存到資料庫 ID "510123")，直接判定無效並啟動救援！
+    if (placeId && placeId !== 'undefined' && placeId !== 'null' && String(placeId).length > 10) {
+        fetchAndShowDetails(placeId);
+    } else {
+        console.log(`[${placeNode.name}] 缺少或無效 ID (${placeId})，啟動新版 API 即時搜尋...`);
+        
+        try {
+            const { Place } = await google.maps.importLibrary("places");
+            
+            // 🌟 使用新版 API 的 searchByText
+            const request = {
+                textQuery: placeNode.name,
+                locationBias: {
+                    center: { lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) },
+                    radius: 50 // 在周圍 50 公尺內精準搜尋
+                },
+                language: 'zh-TW'
+            };
+
+            const { places } = await Place.searchByText(request);
+            
+            if (places && places.length > 0) {
+                const foundPlaceId = places[0].id;
+                console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
+        
+                // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
+                placeNode.place_id = foundPlaceId;
+        
+                // 呼叫 API 顯示彈窗
+                fetchAndShowDetails(foundPlaceId);
+            } else {
+                alert(`很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
+            }
+        } catch (error) {
+            console.error("❌ 即時搜尋救援失敗:", error);
+        }
+    }
 }
 
 function closeRichModal() {
@@ -127,10 +173,10 @@ function confirmAddToItinerary() {
     if (!tempSelectedPlace) return;
 
     itineraryData[currentDay].push({
-        place_id: tempSelectedPlace.place_id, 
-        lat: tempSelectedPlace.geometry.location.lat(),
-        lng: tempSelectedPlace.geometry.location.lng(),
-        name: tempSelectedPlace.name,
+        place_id: tempSelectedPlace.id, // 🌟 新版是 .id 不是 .place_id
+        lat: tempSelectedPlace.location.lat(), // 🌟 新版直接用 .location
+        lng: tempSelectedPlace.location.lng(),
+        name: tempSelectedPlace.displayName, // 🌟 新版是 .displayName
         arrivals: "8:00",
         duration: "1", 
         hasTicketOffer: Math.random() > 0.5
@@ -139,7 +185,7 @@ function confirmAddToItinerary() {
     calculateAndDisplayRoute(currentDay);
 
     const scrollArea = document.getElementById('itinerary-scroll-area');
-    if(scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
 
     closeRichModal();
 
@@ -184,14 +230,14 @@ function recalculateTimes(day) {
 
 function updateDuration(day, index, newDuration) {
     itineraryData[day][index].duration = parseFloat(newDuration) || 1;
-    recalculateTimes(day); 
-    renderItineraryPanel(day); 
+    recalculateTimes(day);
+    renderItineraryPanel(day);
 }
 
 function updateArrivalTime(day, index, newTime) {
     itineraryData[day][index].arrivals = newTime;
-    recalculateTimes(day); 
-    renderItineraryPanel(day); 
+    recalculateTimes(day);
+    renderItineraryPanel(day);
 }
 
 // ==========================================
@@ -221,16 +267,15 @@ function renderItineraryPanel(day) {
     const isDay1 = day === 1;
     const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
 
-    // 🌟 修改：起點加入 <input type="time"> 讓使用者改出發時間
-    // 🌟 修改：起點加入 onclick 事件
+    // 🌟 修正二：起點的 onclick 改成傳入 (day, 0)
     const dayStartHTML = `
           <div draggable="true" ondragstart="handleDragStart(event, ${day}, 0)" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, 0)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm cursor-move transition-all duration-200 hover:shadow-md">
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
               <div class="ml-2 flex justify-between items-center w-full">
                   <div class="flex-1">
-                      <h3 onclick="openPlaceDetails('${dayStartPlace.place_id}')" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
+                      <h3 onclick="openPlaceDetails(${day}, 0)" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
                       <div class="flex items-center gap-2 mt-2">
-                          <span class="text-xs text-slate-500 dark:text-slate-400">${isDay1 ? '出發時間' : '出發時間'}：</span>
+                          <span class="text-xs text-slate-500 dark:text-slate-400">出發時間：</span>
                           <input type="time" value="${dayStartPlace.arrivals}" onchange="updateArrivalTime(${day}, 0, this.value)" class="text-xs font-bold text-primary bg-transparent border-b border-dashed border-primary/50 outline-none cursor-pointer p-0 focus:ring-0">
                       </div>
                   </div>
@@ -250,12 +295,11 @@ function renderItineraryPanel(day) {
 
         if (leg) {
             const distanceKm = leg.distance.value / 1000;
-            // 如果距離大於 1 公里，統一顯示「車程估算」並給予車子圖示
             if (distanceKm > WALK_THRESHOLD_KM) {
-                travelMode = '車程估算'; 
-                travelIcon = 'directions_car'; 
+                travelMode = '車程估算';
+                travelIcon = 'directions_car';
             } else {
-                travelMode = '走路'; 
+                travelMode = '走路';
                 travelIcon = 'directions_walk';
             }
             durationText = `約 ${leg.duration.text}`;
@@ -278,15 +322,14 @@ function renderItineraryPanel(day) {
                 </div>
             ` : '';
 
-        // 🌟 修改：目的地加入停留時間的 <input type="number">
+        // 🌟 修正三：清理了重複的 <h3> 標籤，確保 HTML 乾淨
         const destinationHTML = `
               <div draggable="true" ondragstart="handleDragStart(event, ${day}, ${i})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, ${i})" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm animate-fade-in-up cursor-move transition-all duration-200 hover:shadow-md">
                 <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
                 <div class="flex justify-between items-start ml-2">
                   <div class="flex-1">
-                    <h3 onclick="openPlaceDetails('${destinationPlace.place_id}')" 
-                        class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer 
-                        hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${destinationPlace.name}
+                    <h3 onclick="openPlaceDetails(${day}, ${i})" 
+                        class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${destinationPlace.name}
                     </h3>
                     
                     <div class="flex items-center gap-3 mt-3 text-xs text-slate-500 dark:text-slate-400">
@@ -413,7 +456,7 @@ function renderItineraryPanel(day) {
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
               <div class="ml-2 flex justify-between items-center w-full">
                   <div class="flex-1">
-                      <h3 onclick="openPlaceDetails('${dayStartPlace.place_id}')" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
+                      <h3 onclick="openPlaceDetails(${day}, 0)" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
                       <div class="flex items-center gap-2 mt-2">
                           <span class="text-xs text-slate-500 dark:text-slate-400">${isDay1 ? '出發時間' : '出發時間'}：</span>
                           <input type="time" value="${dayStartPlace.arrivals}" onchange="updateArrivalTime(${day}, 0, this.value)" class="text-xs font-bold text-primary bg-transparent border-b border-dashed border-primary/50 outline-none cursor-pointer p-0 focus:ring-0">
@@ -437,10 +480,10 @@ function renderItineraryPanel(day) {
             const distanceKm = leg.distance.value / 1000;
             // 如果距離大於 1 公里，統一顯示「車程估算」並給予車子圖示
             if (distanceKm > WALK_THRESHOLD_KM) {
-                travelMode = '車程估算'; 
-                travelIcon = 'directions_car'; 
+                travelMode = '車程估算';
+                travelIcon = 'directions_car';
             } else {
-                travelMode = '走路'; 
+                travelMode = '走路';
                 travelIcon = 'directions_walk';
             }
             durationText = `約 ${leg.duration.text}`;
@@ -469,7 +512,7 @@ function renderItineraryPanel(day) {
                 <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
                 <div class="flex justify-between items-start ml-2">
                   <div class="flex-1">
-                    <h3 onclick="openPlaceDetails('${destinationPlace.place_id}')" 
+                    <h3 onclick="openPlaceDetails(${day}, ${i})" 
                         class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer 
                         hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${destinationPlace.name}
                     </h3>
@@ -532,12 +575,16 @@ function toggleMobileView() {
 document.addEventListener("DOMContentLoaded", () => {
     const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
 
-    const totalDays = 5;
+    // 🌟 安全讀取 HTML 中的資料庫隱藏欄位
+    const dbStartDateInput = document.getElementById('db-startDate');
+    const dbTotalDaysInput = document.getElementById('db-totalDays');
+
+    // 🌟 如果資料庫有日期就用，沒有的話就預設為今天
+    const today = new Date();
+    const defaultStart = (dbStartDateInput && dbStartDateInput.value) ? new Date(dbStartDateInput.value) : today;
+    const totalDays = (dbTotalDaysInput && dbTotalDaysInput.value) ? parseInt(dbTotalDaysInput.value) : 5;
     const daysToAdd = totalDays - 1;
 
-    const today = new Date();
-    const defaultStart = new Date(today);
-    defaultStart.setDate(today.getDate() + 3);
     const defaultEnd = new Date(defaultStart);
     defaultEnd.setDate(defaultStart.getDate() + daysToAdd);
 
@@ -662,7 +709,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateDayButtonsAndLists(defaultStart);
     // 🌟 新增這行：網頁載入後，主動觸發 Day 1 的點擊事件，解開隱藏狀態！
-    selectDay(1); 
+    selectDay(1);
 
     dateInput.addEventListener('change', (e) => {
         if (!e.target.value) return;
@@ -680,13 +727,33 @@ document.addEventListener("DOMContentLoaded", () => {
 // 這裡將那個 orderId 附加在 URL 上，傳遞給 /payment 進行結帳。
 // ==========================================
 function goToPayment() {
-    // TODO: 這裡未來要替換成負責行程同學 API 回傳的真實 orderId
-    // 假設行程儲存後會把 orderId 存在 window 變數或 sessionStorage
-    const orderId = window.currentOrderId || sessionStorage.getItem('currentOrderId') || 1001;
-    
-    // 將 orderId 帶入網址跳轉
-    window.location.href = '/payment?orderId=' + orderId;
-    
+    // 從網址列抓取目前的 myPlanId
+    const urlParams = new URLSearchParams(window.location.search);
+    const myPlanId = urlParams.get('myPlanId');
+
+    if (!myPlanId) {
+        alert("找不到行程 ID，請先儲存行程或確認網址！");
+        return false;
+    }
+
+    // 打 API 給後端建立真實訂單
+    fetch(`/payment/createOrderFromPlan?myPlanId=${myPlanId}`, {
+        method: 'POST'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.orderId) {
+                // 成功取得真實 orderId，跳轉到付款頁面
+                window.location.href = '/payment?orderId=' + data.orderId;
+            } else {
+                alert("建立訂單失敗：" + (data.message || "未知錯誤"));
+            }
+        })
+        .catch(error => {
+            console.error("結帳建立失敗:", error);
+            alert("系統發生錯誤，無法建立訂單");
+        });
+
     // return false 阻止 <a> 標籤的預設行為
     return false;
 }

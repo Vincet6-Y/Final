@@ -10,7 +10,7 @@ function selectDay(day) {
     }
 
     document.querySelectorAll('.day-list').forEach(list => list.classList.add('hidden'));
-    
+
     const targetList = document.getElementById(`list-day-${day}`);
     if (targetList) targetList.classList.remove('hidden');
 
@@ -18,48 +18,65 @@ function selectDay(day) {
     if (modalBtn) modalBtn.innerText = `加入 Day ${day} 行程`;
 
     // 🌟 關鍵修復：先強制畫出目前的景點列表，讓使用者不用等 Google 算路線！
-    renderItineraryPanel(day); 
-    
+    renderItineraryPanel(day);
+
     // 背景去算路線
     calculateAndDisplayRoute(day);
 }
 
+// ==========================================
+// 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
+// ==========================================
 async function fetchAndShowDetails(placeId) {
-    // 1. 先嘗試用現有的 placeId 抓資料
-    placesService.getDetails({
-        placeId: placeId,
-        fields: ['place_id', 'name', 'formatted_address', 'geometry', 'rating', 'photos', 'formatted_phone_number', 'opening_hours', 'editorial_summary', 'user_ratings_total', 'website', 'types']
-    }, async (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            showRichModal(place);
-        } else if (status === "NOT_FOUND") {
-            // 🚩 核心修復：如果 ID 沒效了，嘗試在當前行程中尋找對應的座標來修復
-            console.warn("⚠️ Place ID 已失效，嘗試啟動緊急修復程序...");
-            
-            // 從全域變數尋找當前點擊的景點座標
-            let targetNode = null;
-            Object.values(itineraryData).flat().forEach(node => {
-                if (node.place_id === placeId) targetNode = node;
-            });
+    if (!placeId || placeId === 'undefined' || placeId === 'null') {
+        console.warn("⚠️ 無效的 Place ID，無法查詢詳細資訊。");
+        return;
+    }
 
-            if (targetNode && targetNode.lat && targetNode.lng) {
+    try {
+        console.log("正在使用 Places API (New) 查詢:", placeId);
+        // 1. 動態載入新版 Places 函式庫
+        const { Place } = await google.maps.importLibrary("places");
+
+        // 2. 建立 Place 物件並指定語系
+        const place = new Place({ id: placeId, requestedLanguage: "zh-TW" });
+
+        // 3. 使用 fetchFields 請求特定欄位 (新版屬性名稱)
+        await place.fetchFields({
+            fields: [
+                'id', 'displayName', 'formattedAddress', 'location',
+                'rating', 'userRatingCount', 'photos', 'nationalPhoneNumber',
+                'regularOpeningHours', 'editorialSummary', 'websiteURI', 'types'
+            ]
+        });
+
+        // 4. 呼叫 UI 顯示
+        showRichModal(place);
+
+    } catch (error) {
+        console.warn("❌ Google API 查詢失敗或 ID 失效，嘗試救援...", error);
+
+        // 保持原有的救援機制 (針對 tourUi.js 的失效 ID 修復)
+        let targetNode = null;
+        Object.values(itineraryData).flat().forEach(node => {
+            if (node.place_id === placeId) targetNode = node;
+        });
+
+        if (targetNode && targetNode.lat && targetNode.lng) {
+            if (typeof findPlaceIdByCoords === 'function') {
                 const freshId = await findPlaceIdByCoords(targetNode.lat, targetNode.lng);
                 if (freshId) {
                     console.log("✨ 修復成功！取得新 ID:", freshId);
-                    // 重新用新 ID 抓一次資料
                     fetchAndShowDetails(freshId);
-                    // 同步回報給後端更新資料庫 (此函式在 tourApi.js)
                     if (typeof updateDatabasePlaceId === 'function') {
                         updateDatabasePlaceId(targetNode.spotId, freshId);
                     }
                 }
-            } else {
-                alert('找不到該地點的有效資訊，請嘗試重新搜尋加入。');
             }
         } else {
-            console.error("Google API Error:", status);
+            alert('無法從 Google 取得該地點的詳細資訊');
         }
-    });
+    }
 }
 
 function showRichModal(place) {
@@ -93,12 +110,12 @@ function showRichModal(place) {
     };
     resetFields();
 
-    // --- 開始填入新資料 ---
-    document.getElementById('modal-place-name').innerText = place.name || '未命名地點';
-    document.getElementById('modal-place-address').innerText = place.formatted_address || '無詳細地址資訊';
-    document.getElementById('modal-place-rating').innerText = place.rating || '無評分';
-    document.getElementById('modal-place-reviews').innerText = `(${place.user_ratings_total || 0} 則評論)`;
-    document.getElementById('modal-place-phone').innerText = place.formatted_phone_number || '無電話資訊';
+    // --- 🌟 配合新版 API (New) 開始填入新資料 ---
+    document.getElementById('modal-place-name').innerText = place.displayName || '未命名地點';
+    document.getElementById('modal-place-address').innerText = place.formattedAddress || '無詳細地址資訊';
+    document.getElementById('modal-place-rating').innerText = place.rating || '0.0';
+    document.getElementById('modal-place-reviews').innerText = `(${place.userRatingCount || 0} 則評論)`;
+    document.getElementById('modal-place-phone').innerText = place.nationalPhoneNumber || '無電話資訊';
 
     // 🌟 新增：處理景點類型 (取第一個分類，並將底線換成空格以利閱讀)
     const typeEl = document.getElementById('modal-place-type');
@@ -109,8 +126,8 @@ function showRichModal(place) {
     // 🌟 新增：處理官方網站連結
     const websiteEl = document.getElementById('modal-place-website');
     if (websiteEl) {
-        if (place.website) {
-            websiteEl.href = place.website;
+        if (place.websiteURI) { // 新版為 websiteURI
+            websiteEl.href = place.websiteURI;
             websiteEl.innerText = '前往官方網站';
             websiteEl.classList.remove('pointer-events-none', 'text-slate-500');
         } else {
@@ -120,25 +137,24 @@ function showRichModal(place) {
         }
     }
 
-    // 處理簡介
-    if (place.editorial_summary && place.editorial_summary.overview) {
-        document.getElementById('modal-place-desc').innerText = place.editorial_summary.overview;
+    if (place.editorialSummary) { // 新版直接是一串文字，不是物件
+        document.getElementById('modal-place-desc').innerText = place.editorialSummary;
     } else {
         document.getElementById('modal-place-desc').innerText = '此地點暫無詳細的官方簡介。這是一處值得您親自探索的地方！';
     }
 
     // 處理圖片 (如果沒有足夠圖片，原本設定的 loading 圖會繼續顯示)
     if (place.photos && place.photos.length >= 1) {
-        document.getElementById('modal-img-main').src = place.photos[0].getUrl({ maxWidth: 800 });
-        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getUrl({ maxWidth: 400 });
-        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getUrl({ maxWidth: 400 });
+        document.getElementById('modal-img-main').src = place.photos[0].getURI({ maxWidth: 800 });
+        if (place.photos[1]) document.getElementById('modal-img-sub1').src = place.photos[1].getURI({ maxWidth: 400 });
+        if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getURI({ maxWidth: 400 });
     }
 
     // 🌟 修改：處理營業時間 (改為條列式展開，捨棄原本單純的「營業中/休息中」)
     const hoursEl = document.getElementById('modal-place-hours');
     if (hoursEl) {
-        if (place.opening_hours && place.opening_hours.weekday_text) {
-            hoursEl.innerHTML = place.opening_hours.weekday_text.map(text =>
+        if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
+            hoursEl.innerHTML = place.regularOpeningHours.weekdayDescriptions.map(text =>
                 `<p class="flex justify-between border-b border-white/5 pb-1"><span>${text}</span></p>`
             ).join('');
         } else {
@@ -151,15 +167,60 @@ function showRichModal(place) {
 }
 
 // ==========================================
-// 🌟 側邊欄點擊呼叫景點詳細資訊
+// 🌟 彈窗開關與即時搜尋救援 (升級為 Places API New 邏輯)
 // ==========================================
-function openPlaceDetails(placeId) {
-    if (!placeId || placeId === 'undefined') {
-        // 如果是沒有 place_id 的自訂地點 (例如手動輸入的起點)，就跳過
-        return;
+async function openPlaceDetails(day, index) {
+    // 防呆機制
+    if (!day || !itineraryData[day]) return;
+
+    const placeNode = itineraryData[day][index];
+    if (!placeNode) return;
+
+    // 地圖自動移動並放大
+    if (map && placeNode.lat && placeNode.lng) {
+        map.panTo({ lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) });
+        map.setZoom(16);
     }
-    // 借用我們原本寫好的 fetch 函式來抓資料並顯示彈窗
-    fetchAndShowDetails(placeId);
+
+    const placeId = placeNode.place_id;
+
+    // 🌟 嚴格防呆：真正的 Google ID 超過 20 字元。如果太短 (例如不小心存到資料庫 ID "510123")，直接判定無效並啟動救援！
+    if (placeId && placeId !== 'undefined' && placeId !== 'null' && String(placeId).length > 10) {
+        fetchAndShowDetails(placeId);
+    } else {
+        console.log(`[${placeNode.name}] 缺少或無效 ID (${placeId})，啟動新版 API 即時搜尋...`);
+
+        try {
+            const { Place } = await google.maps.importLibrary("places");
+
+            // 🌟 使用新版 API 的 searchByText
+            const request = {
+                textQuery: placeNode.name,
+                locationBias: {
+                    center: { lat: parseFloat(placeNode.lat), lng: parseFloat(placeNode.lng) },
+                    radius: 50 // 在周圍 50 公尺內精準搜尋
+                },
+                language: 'zh-TW'
+            };
+
+            const { places } = await Place.searchByText(request);
+
+            if (places && places.length > 0) {
+                const foundPlaceId = places[0].id;
+                console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
+
+                // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
+                placeNode.place_id = foundPlaceId;
+
+                // 呼叫 API 顯示彈窗
+                fetchAndShowDetails(foundPlaceId);
+            } else {
+                alert(`很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
+            }
+        } catch (error) {
+            console.error("❌ 即時搜尋救援失敗:", error);
+        }
+    }
 }
 
 function closeRichModal() {
@@ -337,7 +398,7 @@ function renderItineraryPanel(day) {
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
               <div class="ml-2 flex justify-between items-center w-full">
                   <div class="flex-1">
-                      <h3 onclick="openPlaceDetails('${dayStartPlace.place_id}')" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
+                      <h3 onclick="openPlaceDetails(${day}, 0)" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
                       <div class="flex items-center gap-2 mt-2">
                           <span class="text-xs text-slate-500 dark:text-slate-400">出發時間：</span>
                           <span class="text-xs font-bold text-primary">${dayStartPlace.arrivals}</span>
@@ -392,7 +453,7 @@ function renderItineraryPanel(day) {
             <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
             <div class="flex justify-between items-start ml-2">
               <div class="flex-1">
-                <h3 onclick="openPlaceDetails('${destinationPlace.place_id}')" 
+                <h3 onclick="openPlaceDetails(${day}, ${i})" 
                     class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer 
                     hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${destinationPlace.name}
                 </h3>
@@ -450,15 +511,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const totalDays = 5;
     const daysToAdd = totalDays - 1;
 
-    const today = new Date();
-    const defaultStart = new Date(today);
-    defaultStart.setDate(today.getDate() + 3);
-    const defaultEnd = new Date(defaultStart);
-    defaultEnd.setDate(defaultStart.getDate() + daysToAdd);
-
-    const formatYMD = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    const formatMD = (d) => String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
-
 
     // ✅ 新增這段魔法：用計時器每 0.1 秒確認一次地圖醒了沒
     const checkReady = setInterval(() => {
@@ -471,47 +523,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (planId) {
                 console.log("🟢 畫面與地圖皆已就緒，開始載入資料 ID:", planId);
-                loadPlanData(planId); 
+                loadPlanData(planId);
             } else {
                 selectDay(1); // 如果沒有 planId，安全地顯示 Day 1 空畫面
             }
         }
     }, 100);
 
-    // 1. 日期選擇器 UI 建立
-    const datePickerWrapper = document.createElement('div');
-    datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative group hover:border-primary/50 transition-colors shrink-0";
-
-    const calendarIcon = document.createElement('span');
-    calendarIcon.className = "material-symbols-outlined text-[14px] text-slate-400 group-hover:text-primary transition-colors";
-    calendarIcon.innerText = "calendar_today";
-
-    const dateDisplay = document.createElement('span');
-    dateDisplay.className = "text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors tracking-wider";
-    dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(defaultEnd)}`;
-
-    const dateInput = document.createElement('input');
-    dateInput.type = "date";
-    dateInput.value = formatYMD(defaultStart);
-    dateInput.className = "absolute top-full left-0 w-0 h-0 opacity-0 pointer-events-none";
-
-    datePickerWrapper.addEventListener('click', () => {
-        try { dateInput.showPicker(); } catch (error) { dateInput.focus(); }
-    });
-
-    datePickerWrapper.appendChild(calendarIcon);
-    datePickerWrapper.appendChild(dateDisplay);
-    datePickerWrapper.appendChild(dateInput);
-    titleContainer.appendChild(datePickerWrapper);
-
     // ==========================================
     // ✨ 左右滑動箭頭 UI 注入 (DOM 包裝魔法)
     // ==========================================
-    const buttonContainer = document.getElementById('btn-day-1').parentElement;
+    const buttonContainer = document.getElementById('day-buttons-container');
 
     // 建立外層 Wrapper (讓箭頭可以浮動對齊)
     const tabsWrapper = document.createElement('div');
-    tabsWrapper.className = 'relative flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden sticky top-0 z-20 shadow-sm';
+    // 🌟 核心修正：移除會干擾的 relative，單純保留 sticky，並將 z-index 拉高到 z-40 確保不會被蓋住
+    tabsWrapper.className = 'sticky top-0 z-40 flex items-center w-full shrink-0 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-background-dark overflow-hidden shadow-md';
 
     // 把原本的按鈕區塊塞進 Wrapper 裡
     buttonContainer.parentNode.insertBefore(tabsWrapper, buttonContainer);
@@ -555,14 +582,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // ✨ 動態生成 Day 按鈕與列表
     // ==========================================
-    function updateDayButtonsAndLists(startDate) {
-        const scrollArea = document.getElementById('itinerary-scroll-area');
+    function updateDayButtonsAndLists() {
+        // 抓取 HTML 中專門用來放行程列表的容器
+        const listContainerWrapper = document.getElementById('itinerary-lists-container');
         buttonContainer.innerHTML = '';
 
         for (let i = 1; i <= totalDays; i++) {
-            const currentDayDate = new Date(startDate);
-            currentDayDate.setDate(startDate.getDate() + (i - 1));
-
+            // 1. 建立 Day 按鈕
             const btn = document.createElement('button');
             btn.id = `btn-day-${i}`;
             btn.setAttribute('onclick', `selectDay(${i})`);
@@ -570,42 +596,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 ? "px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md shrink-0"
                 : "px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0";
 
-            btn.innerText = `Day ${i} (${formatMD(currentDayDate)})`;
+            btn.innerText = `Day ${i}`; // 乾淨俐落，只顯示 Day X
             buttonContainer.appendChild(btn);
 
+            // 2. 建立對應的行程列表區塊
             let listContainer = document.getElementById(`list-day-${i}`);
             if (!listContainer) {
                 listContainer = document.createElement('div');
                 listContainer.id = `list-day-${i}`;
                 listContainer.className = "day-list p-4 flex flex-col pb-24 pt-0 hidden";
-                // ... 塞入預設的「行程尚未安排」HTML ...
                 listContainer.innerHTML = `
                         <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
                             <div class="w-1.5 h-full bg-slate-300 dark:bg-slate-600 absolute left-0 top-0"></div>
                             <div class="ml-2">
-                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Day ${i} 行程尚未安排</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">請從地圖點擊景點加入</p>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Day ${i} 行程載入中...</h3>
                             </div>
                         </div>`;
-                scrollArea.appendChild(listContainer);
+                listContainerWrapper.appendChild(listContainer);
             }
             if (!itineraryData[i]) itineraryData[i] = [];
         }
-        // 每次重新產生按鈕後，等畫面算好寬度，重新檢查要不要出現箭頭
+        // 重新檢查左右箭頭是否需要顯示
         setTimeout(checkArrows, 100);
     }
 
-    updateDayButtonsAndLists(defaultStart);
-
-    dateInput.addEventListener('change', (e) => {
-        if (!e.target.value) return;
-        const newStart = new Date(e.target.value);
-        const newEnd = new Date(newStart);
-        newEnd.setDate(newStart.getDate() + daysToAdd);
-        dateDisplay.innerText = `${formatMD(newStart)} - ${formatMD(newEnd)}`;
-        updateDayButtonsAndLists(newStart);
-    });
-});
+    // 🔴 關鍵修正：呼叫時不要再傳入任何參數 (把原本括號裡的 defaultStart 拿掉)
+    updateDayButtonsAndLists();
+}); // 這裡是 DOMContentLoaded 的結尾
 
 // 完善規劃按鈕點擊事件
 async function copyToMyPlan(officialPlanId) {
@@ -624,7 +641,7 @@ async function copyToMyPlan(officialPlanId) {
             const separator = currentPath.includes('?') ? '&' : '?';
             // 加上 autoCopy=true 標記
             const targetUrl = encodeURIComponent(currentPath + separator + "autoCopy=true");
-            
+
             alert('請先登入會員，系統將於登入後自動為您複製行程！');
             // 🌟 導向組員負責的登入頁面 (/auth) 並帶上目標網址
             window.location.href = `/auth?redirect=${targetUrl}`;
@@ -652,12 +669,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // 如果網址帶有 autoCopy，代表是登入後自動回來
     if (autoCopy === 'true' && planId) {
         console.log("偵測到登入後回傳，正在自動執行完善規劃...");
-        
+
         // 🌟 小優化：把網址上的 autoCopy=true 擦掉，避免使用者按 F5 重新整理時又觸發一次複製
         const cleanUrl = window.location.pathname + `?planId=${planId}`;
         window.history.replaceState({}, document.title, cleanUrl);
 
         // 延遲 1 秒確保地圖等資源載入完成，然後自動幫他按按鈕
-        setTimeout(() => copyToMyPlan(planId), 1000); 
+        setTimeout(() => copyToMyPlan(planId), 1000);
     }
 });

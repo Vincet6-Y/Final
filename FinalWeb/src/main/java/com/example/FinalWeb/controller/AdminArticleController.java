@@ -1,0 +1,61 @@
+package com.example.FinalWeb.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.FinalWeb.entity.ArticleEntity;
+import com.example.FinalWeb.service.ArticleService;
+
+@RestController
+@RequestMapping("/admin/articles")
+public class AdminArticleController {
+
+    @Autowired
+    private ArticleService articleService;
+
+    // ------------------------------------------------
+    // 1. 取得所有文章 (Read - 支援分頁)
+    // ------------------------------------------------
+    @GetMapping
+    public ResponseEntity<Page<ArticleEntity>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // 呼叫 Service 拿取分頁資料
+        Page<ArticleEntity> articlePage = articleService.findAllPaged(page, size);
+
+        // 回傳 HTTP 200 (OK) 與包裝好的分頁物件
+        return ResponseEntity.ok(articlePage);
+    }
+
+    // ------------------------------------------------
+    // 2. 新增文章 (Create)
+    // ------------------------------------------------
+    @PostMapping
+    public ResponseEntity<ArticleEntity> create(@RequestBody ArticleEntity article) {
+        ArticleEntity saved = articleService.createArticle(article);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved); // HTTP 201
+    }
+
+    // ------------------------------------------------
+    // 3. 修改文章 (Update)
+    // ------------------------------------------------
+    @PutMapping("/{id}")
+    public ResponseEntity<ArticleEntity> update(@PathVariable Integer id,
+            @RequestBody ArticleEntity article) {
+        ArticleEntity updated = articleService.updateArticle(id, article);
+        return ResponseEntity.ok(updated); // HTTP 200
+    }
+
+    // ------------------------------------------------
+    // 4. 刪除文章 (Delete)
+    // ------------------------------------------------
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        articleService.deleteArticle(id);
+        return ResponseEntity.noContent().build(); // HTTP 204
+    }
+}

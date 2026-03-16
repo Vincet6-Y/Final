@@ -17,15 +17,20 @@ public class ArticleDTO {
         this.articleClass = entity.getArticleClass();
         this.title = entity.getTitle();
         this.content = entity.getContent();
+        this.purePreview = generatePreview(entity.getContent());
+    }
 
-        // 核心邏輯：清洗 Markdown 符號，讓卡片顯示純文字
-        if (entity.getContent() != null) {
-            String clean = entity.getContent()
-                    .replaceAll("[#*>`\\-]", "")
-                    .replaceAll("\\n+", " ") // 把換行合併成空格
-                    .replaceAll("\\s{2,}", " ") // 合併連續空格
-                    .trim();
-            this.purePreview = clean.length() > 65 ? clean.substring(0, 65) + "..." : clean;
+    // 核心邏輯：清洗 Markdown 符號，讓卡片顯示純文字
+    // 可讀性高、不怕 null、未來可擴充
+    private String generatePreview(String content) {
+        if (content == null) {
+            return "";
         }
+        String clean = content
+                .replaceAll("[#*>`\\-]", "")
+                .replaceAll("\\n+", " ")
+                .replaceAll("\\s{2,}", " ")
+                .trim();
+        return clean.length() > 65 ? clean.substring(0, 65) + "..." : clean;
     }
 }

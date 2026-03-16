@@ -7,9 +7,6 @@
     class="min-h-screen selection:bg-orange-500/30 bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
     <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
-    <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <main class="max-w-7xl mx-auto px-6 py-12">
         <div class="mb-12">
             <div class="flex items-center gap-2 text-xs text-gray-500 mb-4 uppercase tracking-widest font-bold">
@@ -35,33 +32,47 @@
                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbLcMmZwh16FnfkOoVi8_4skwM34Nq5WaGZXvk9ukM3To6113tQRms_5gn6R1cp_bMdEarK9QJdi9HTuBFlE7Lp_3N3AVMLo6-HZ0Gmkg1k-nM4NLt1-4oRIghTQQ2jqBV-60kdY1UEfhJnGLlqyC7c1-QwdZJT1cAfEXPrm6Ot0HpKXSdZliYJzmgCEB-jtMLTdchDCHR2rVxi7RJxV0XfRPEA_NxzdVjAC35Z62bBhUwrMXxC2pzsL_9nuRcnXrFwL0n9DcSteU" />
                         </div>
                         <div class="flex-grow">
-                            <!-- 行程名稱：優先顯示 myPlan 的名稱，沒有則顯示預設文字 -->
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3"
-                                th:text="${order.myPlan != null && order.myPlan.myPlanName != null} ? ${order.myPlan.myPlanName} : '聖地巡禮行程'">
-                                聖地巡禮行程
-                            </h3>
-
-                            <div class="flex flex-wrap gap-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
-                                <div class="flex items-center gap-2">
-                                    <span
-                                        class="material-symbols-outlined text-orange-500 text-lg">calendar_today</span>
-                                    <span th:text="${order.myPlan != null && order.myPlan.startDate != null} ? ${order.myPlan.startDate} : '待選擇'">待選擇</span>
-                                </div>
+                            <div class="flex items-center gap-3 mb-3" id="planNameDisplayBlock">
+                                <h3 id="planNameDisplay" class="text-xl font-bold text-gray-900 dark:text-white"
+                                    th:text="${order.myPlan != null && order.myPlan.myPlanName != null} ? ${order.myPlan.myPlanName} : '聖地巡禮行程'">
+                                    聖地巡禮行程
+                                </h3>
+                                <button type="button" onclick="editPlanName()"
+                                    class="text-orange-500 hover:text-orange-600 focus:outline-none transition-colors border-2 border-orange-500/20 rounded-full w-8 h-8 flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </button>
                             </div>
+                            <!-- ==================== 編輯行程名稱 ==================== -->
+                            <div id="planNameEditBlock" class="hidden items-center gap-2 mb-3">
+                                <input type="text" id="planNameInput"
+                                    class="input-field rounded-lg px-3 py-2 text-sm border border-orange-500/50 dark:bg-[#251d15] dark:text-white w-64 focus:ring-2 focus:ring-orange-500 outline-none transition-all shadow-sm"
+                                    th:value="${order.myPlan != null ? order.myPlan.myPlanName : '聖地巡禮行程'}" />
+                                <button type="button" onclick="savePlanName()"
+                                    class="bg-orange-500 hover:bg-orange-600 text-white rounded-lg px-4 py-2 text-sm font-bold shadow-md transition-colors">儲存</button>
+                                <button type="button" onclick="cancelEditPlanName()"
+                                    class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-sm font-medium transition-colors">取消</button>
+                            </div>
+                            <!-- ==================== 行程日期 ==================== -->
+                            <div class="flex items-center gap-3 mb-6">
+                                <span class="material-symbols-outlined text-orange-500 text-lg">calendar_today</span>
+                                <span class="text-gray-600 dark:text-gray-300 font-bold"
+                                    th:text="${order.myPlan != null && order.myPlan.startDate != null} ? ${order.myPlan.startDate} : '待選擇'"></span>
+                            </div>
+
+                            <!-- ==================== 預計出發日期 ==================== -->
                             <div class="pt-6 border-t border-gray-200 dark:border-white/5">
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">預計出發日期
-                                    <span class="text-orange-500/80 ml-1">(需大於今日 3 天)</span></label>
-                                <div class="relative max-w-xs">
-                                    <input
-                                        class="input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2"
-                                        id="travelDate" required="" type="date" />
-                                </div>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                                    預計出發日期 <span class="text-orange-500 ml-1">(修改後將同步更新行程)</span>
+                                </label>
+
+                                <input id="travelDate" type="date" required
+                                    class="input-field w-full max-w-xs px-4 py-3 text-sm rounded-lg border border-gray-300 dark:border-orange-500/50 bg-white dark:bg-[#251d15] text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all shadow-sm dark:[color-scheme:dark]"
+                                    th:value="${order.myPlan != null ? order.myPlan.startDate : ''}" />
                             </div>
                         </div>
-                    </div>
                 </section>
 
-                <!-- ==================== 已包含的票券明細 (來自 OrdersDetail) ==================== -->
+                <!-- ==================== 已包含票券 ==================== -->
                 <section class="section-card rounded-xl p-8"
                     th:if="${order.orderDetails != null && !order.orderDetails.isEmpty()}">
                     <div class="flex items-center gap-3 mb-8">
@@ -72,20 +83,27 @@
                     </div>
                     <div class="space-y-3">
                         <div th:each="detail : ${order.orderDetails}"
-                            class="flex justify-between items-center bg-green-500/5 border border-green-500/10 rounded-lg px-5 py-3">
+                            class="db-ticket-row flex justify-between items-center bg-green-500/5 border border-green-500/10 rounded-lg px-5 py-3">
                             <div class="flex items-center gap-3">
                                 <span class="material-symbols-outlined text-green-500 text-lg">local_activity</span>
                                 <span class="text-sm font-medium text-gray-700 dark:text-gray-200"
                                     th:text="${detail.ticketType}">票券名稱</span>
                             </div>
-                            <span class="text-sm font-bold text-green-600 dark:text-green-400 db-ticket-price"
-                                th:text="'NT$ ' + ${detail.ticketPrice}"
-                                th:data-price="${detail.ticketPrice}">NT$ 0</span>
+                            <div class="flex items-center gap-4">
+                                <span class="text-sm font-bold text-green-600 dark:text-green-400"
+                                    th:text="'NT$ ' + ${detail.ticketPrice}">NT$ 0</span>
+                                <button type="button"
+                                    class="remove-db-ticket-btn text-gray-400 hover:text-red-500 transition-colors"
+                                    th:data-id="${detail.orderDetailId}" th:data-price="${detail.ticketPrice}"
+                                    title="取消購買此票券">
+                                    <span class="material-symbols-outlined text-lg">cancel</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- ==================== 加購付費項目 (jQuery 動態加總) ==================== -->
+                <!-- ==================== 加購付費項目 ==================== -->
                 <section class="section-card rounded-xl p-8">
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
@@ -100,26 +118,42 @@
                             <select id="ticketSelect"
                                 class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                                 <option value="0" data-name="">不需加購</option>
-                                <option value="2000" data-name="東京迪士尼樂園">東京迪士尼樂園 (+NT$2,000)</option>
-                                <option value="500" data-name="澀谷天空展望台">澀谷天空展望台 (+NT$500)</option>
-                                <option value="300" data-name="吉卜力美術館">吉卜力美術館 (+NT$300)</option>
+                                <option th:each="ticket : ${availableTickets}" th:value="${ticket.price}"
+                                    th:data-name="${ticket.ticketName}"
+                                    th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'">
+                                </option>
                             </select>
                         </div>
                         <div>
-                            <label
-                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">交通票券加購</label>
+                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">交通票券加購
+                                <span th:if="${recommendedTransports != null && !recommendedTransports.isEmpty()}"
+                                    class="text-orange-500 text-xs font-bold ml-1">🔥 推薦！</span>
+                            </label>
                             <select id="transportSelect"
                                 class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
-                                <option value="0" data-name="">不需加購</option>
-                                <option value="11500" data-name="JR Pass 全國版7日票券">JR Pass 全國版7日票券 (+NT$11,500)
-                                </option>
-                                <option value="350" data-name="東京地鐵三日券">東京地鐵三日券 (+NT$350)</option>
-                                <option value="180" data-name="鐮倉江之電一日券">鐮倉江之電一日券 (+NT$180)</option>
+                                <option value="" data-price="0" data-name="">不需加購</option>
+                                <optgroup th:if="${recommendedTransports != null && !recommendedTransports.isEmpty()}"
+                                    label="💡 智慧推薦">
+                                    <option th:each="transport : ${recommendedTransports}"
+                                        th:value="${transport.ticketName}" th:data-price="${transport.price}"
+                                        th:data-name="${transport.ticketName}"
+                                        th:text="${transport.ticketName} + ' (+NT$' + ${#numbers.formatInteger(transport.price, 0, 'COMMA')} + ')'">
+                                    </option>
+                                </optgroup>
+                                <optgroup label="全日本通用神券">
+                                    <option value="TRANS_TOKYO_SUBWAY_24H" data-price="800" data-name="東京地鐵 24 小時券">東京地鐵
+                                        24 小時券 (+NT$800)</option>
+                                    <option value="TRANS_KYOTO_BUS_1D" data-price="1100" data-name="京都地下鐵・巴士 1 日券">
+                                        京都地下鐵・巴士 1 日券 (+NT$1,100)</option>
+                                    <option value="TRANS_OSAKA_AMAZING_1D" data-price="2800" data-name="大阪周遊卡 1 日券">
+                                        大阪周遊卡 1 日券 (+NT$2,800)</option>
+                                    <option value="TRANS_JR_PASS_7D" data-price="50000" data-name="JR Pass 全日本鐵路周遊券 7日">
+                                        JR Pass 全日本鐵路周遊券 7日 (+NT$50,000)</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
 
-                    <!-- 即時顯示加購項目摘要 -->
                     <div id="addon-summary" class="mt-6 hidden">
                         <div class="border-t border-gray-200 dark:border-white/10 pt-4 space-y-2">
                             <div id="addon-ticket-row"
@@ -128,7 +162,14 @@
                                     <span class="material-symbols-outlined text-sm">confirmation_number</span>
                                     <span id="addon-ticket-name">-</span>
                                 </span>
-                                <span id="addon-ticket-price" class="font-bold">NT$ 0</span>
+                                <div class="flex items-center gap-3">
+                                    <span id="addon-ticket-price" class="font-bold">NT$ 0</span>
+                                    <button type="button"
+                                        class="remove-ticket-btn text-gray-400 hover:text-red-500 transition-colors"
+                                        title="取消加購">
+                                        <span class="material-symbols-outlined text-lg">cancel</span>
+                                    </button>
+                                </div>
                             </div>
                             <div id="addon-transport-row"
                                 class="hidden flex justify-between items-center text-sm text-blue-600 dark:text-blue-400">
@@ -136,7 +177,14 @@
                                     <span class="material-symbols-outlined text-sm">train</span>
                                     <span id="addon-transport-name">-</span>
                                 </span>
-                                <span id="addon-transport-price" class="font-bold">NT$ 0</span>
+                                <div class="flex items-center gap-3">
+                                    <span id="addon-transport-price" class="font-bold">NT$ 0</span>
+                                    <button type="button"
+                                        class="remove-transport-btn text-gray-400 hover:text-red-500 transition-colors"
+                                        title="取消加購">
+                                        <span class="material-symbols-outlined text-lg">cancel</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -146,83 +194,87 @@
             <!-- ==================== 右側：訂單金額明細 ==================== -->
             <div class="lg:col-span-4">
                 <div class="sticky top-28 space-y-6">
-                    <div class="section-card rounded-xl p-8">
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-6">訂單金額明細</h2>
-                        <div class="space-y-4 mb-8">
 
-                            <!-- 資料庫已有的票券明細 -->
-                            <div th:each="detail : ${order.orderDetails}"
-                                class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm mb-2">
-                                <span class="flex items-center gap-2">
+                    <form id="checkoutForm" th:action="@{/payment/checkout}" method="POST" class="w-full">
+                        <div class="section-card rounded-xl p-8">
+                            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-6">訂單金額明細</h2>
+
+                            <div class="space-y-4 mb-8">
+                                <div th:each="detail : ${order.orderDetails}"
+                                    th:id="'summary-db-' + ${detail.orderDetailId}"
+                                    class="flex justify-between items-center text-gray-500 dark:text-gray-400 text-sm mb-2">
+                                    <span class="flex items-center gap-2">
+                                        <span
+                                            class="material-symbols-outlined text-green-500 text-xs">check_circle</span>
+                                        <span th:text="${detail.ticketType}">票券名稱</span>
+                                    </span>
+                                    <span class="text-gray-900 dark:text-white font-medium"
+                                        th:text="'NT$ ' + ${detail.ticketPrice}">NT$ 0</span>
+                                </div>
+
+                                <input type="hidden" id="removeDetailIds" name="removeDetailIds" value="" />
+
+                                <div id="summary-addon-ticket"
+                                    class="hidden flex justify-between items-center text-orange-500 text-sm mb-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-xs">add_circle</span>
+                                        <span id="summary-ticket-name">-</span>
+                                    </span>
+                                    <span id="summary-ticket-price" class="font-medium">NT$ 0</span>
+                                </div>
+
+                                <div id="summary-addon-transport"
+                                    class="hidden flex justify-between items-center text-blue-500 text-sm mb-2">
+                                    <span class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-xs">add_circle</span>
+                                        <span id="summary-transport-name">-</span>
+                                    </span>
+                                    <span id="summary-transport-price" class="font-medium">NT$ 0</span>
+                                </div>
+
+                                <div
+                                    class="pt-6 border-t border-gray-200 dark:border-white/5 flex justify-between items-end">
+                                    <span class="text-gray-600 dark:text-gray-300 font-medium text-sm">應付總額</span>
+                                    <div class="text-right">
+                                        <span class="block text-[10px] text-orange-500 uppercase font-bold mb-1">Total
+                                            Amount</span>
+                                        <span id="display-total"
+                                            class="text-3xl font-bold text-orange-500 tracking-tighter"
+                                            th:text="'NT$ ' + ${totalAmount}">NT$ 0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 mb-8">
+                                <label class="flex items-start gap-3 cursor-pointer group">
+                                    <div class="mt-1">
+                                        <input id="agreeCheckbox" required
+                                            class="w-4 h-4 rounded border-gray-300 dark:border-white/20 text-orange-600 focus:ring-orange-600 bg-white dark:bg-black/40"
+                                            type="checkbox" />
+                                    </div>
                                     <span
-                                        class="material-symbols-outlined text-green-500 text-xs">check_circle</span>
-                                    <span th:text="${detail.ticketType}">票券名稱</span>
-                                </span>
-                                <span class="text-gray-900 dark:text-white font-medium"
-                                    th:text="'NT$ ' + ${detail.ticketPrice}">NT$ 0</span>
+                                        class="text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-400 transition-colors leading-normal">
+                                        我已確認旅客資訊正確，並同意 <a class="text-orange-500 hover:underline" href="#">服務條款</a> 與 <a
+                                            class="text-orange-500 hover:underline" href="#">隱私權聲明</a>。
+                                    </span>
+                                </label>
                             </div>
 
-                            <!-- jQuery 動態加購項目 (一開始隱藏) -->
-                            <div id="summary-addon-ticket"
-                                class="hidden flex justify-between items-center text-orange-500 text-sm mb-2">
-                                <span class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-xs">add_circle</span>
-                                    <span id="summary-ticket-name">-</span>
-                                </span>
-                                <span id="summary-ticket-price" class="font-medium">NT$ 0</span>
-                            </div>
-                            <div id="summary-addon-transport"
-                                class="hidden flex justify-between items-center text-blue-500 text-sm mb-2">
-                                <span class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-xs">add_circle</span>
-                                    <span id="summary-transport-name">-</span>
-                                </span>
-                                <span id="summary-transport-price" class="font-medium">NT$ 0</span>
-                            </div>
-
-                            <!-- 總金額 -->
-                            <div
-                                class="pt-6 border-t border-gray-200 dark:border-white/5 flex justify-between items-end">
-                                <span class="text-gray-600 dark:text-gray-300 font-medium text-sm">應付總額</span>
-                                <div class="text-right">
-                                    <span class="block text-[10px] text-orange-500 uppercase font-bold mb-1">Total
-                                        Amount</span>
-                                    <span id="display-total"
-                                        class="text-3xl font-bold text-orange-500 tracking-tighter"
-                                        th:text="'NT$ ' + ${totalAmount}">NT$ 0</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="space-y-4 mb-8">
-                            <label class="flex items-start gap-3 cursor-pointer group">
-                                <div class="mt-1">
-                                    <input id="agreeCheckbox"
-                                        class="w-4 h-4 rounded border-gray-300 dark:border-white/20 text-orange-600 focus:ring-orange-600 bg-white dark:bg-black/40"
-                                        type="checkbox" />
-                                </div>
-                                <span
-                                    class="text-xs text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-400 transition-colors leading-normal">
-                                    我已確認旅客資訊正確，並同意 <a class="text-orange-500 hover:underline" href="#">服務條款</a> 與 <a
-                                        class="text-orange-500 hover:underline" href="#">隱私權聲明</a>。
-                                </span>
-                            </label>
-                        </div>
-
-                        <!-- 結帳表單：帶上 orderId + 加購項目的隱藏欄位 -->
-                        <form id="checkoutForm" th:action="@{/payment/checkout}" method="POST" class="w-full">
                             <input type="hidden" name="orderId" th:value="${order.orderId}" />
-                            <!-- jQuery 動態塞入的加購隱藏欄位 -->
+                            <input type="hidden" id="checkoutPlanName" name="newPlanName" value="" />
+                            <input type="hidden" id="checkoutStartDate" name="newStartDate" value="" />
                             <input type="hidden" id="addonTicketName" name="addonTicketName" value="" />
                             <input type="hidden" id="addonTicketPrice" name="addonTicketPrice" value="0" />
-                            <input type="hidden" id="addonTransportName" name="addonTransportName" value="" />
-                            <input type="hidden" id="addonTransportPrice" name="addonTransportPrice" value="0" />
+                            <input type="hidden" id="transportId" name="transportId" value="" />
+
                             <button id="checkoutBtn" type="submit"
                                 class="w-full btn-gradient py-4 rounded-xl font-bold text-lg shadow-xl text-gray-800 dark:text-gray-300 shadow-orange-950/20 transition-transform active:scale-[0.98] flex items-center justify-center gap-3">
                                 <span>前往付款</span>
                                 <span class="material-symbols-outlined font-bold">arrow_forward</span>
                             </button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
+
                     <div class="bg-orange-500/5 border border-orange-500/10 p-5 rounded-xl flex gap-4 section-card">
                         <span class="material-symbols-outlined text-orange-500/60">verified_user</span>
                         <div>
@@ -234,106 +286,20 @@
                     </div>
                 </div>
             </div>
-        </div>
     </main>
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 
-    <script>
-        // ==========================================
-        // 📅 出發日期限制：至少 3 天後
-        // ==========================================
-        const travelDateInput = document.getElementById('travelDate');
-        const today = new Date();
-        const minDate = new Date(today);
-        minDate.setDate(today.getDate() + 3);
-        const year = minDate.getFullYear();
-        const month = String(minDate.getMonth() + 1).padStart(2, '0');
-        const day = String(minDate.getDate()).padStart(2, '0');
-        const minDateStr = `${year}-${month}-${day}`;
-        travelDateInput.min = minDateStr;
-        travelDateInput.value = minDateStr;
-    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script th:inline="javascript">
-        $(document).ready(function () {
-            // ==========================================
-            // 🎫 jQuery 自動加總邏輯
-            // ==========================================
-
-            // 1. 取得資料庫已有的票券總額 (由 Thymeleaf 注入)
-            const dbTotal = /*[[${totalAmount}]]*/ 0;
-
-            // 2. 每當加購下拉選單改變，就重新計算
-            $('.addon-select').on('change', function () {
-                recalculateTotal();
-            });
-
-            function recalculateTotal() {
-                // — 景點門票加購 —
-                const $ticketSelect = $('#ticketSelect');
-                const ticketPrice = parseInt($ticketSelect.val()) || 0;
-                const ticketName = $ticketSelect.find('option:selected').data('name') || '';
-
-                // — 交通票券加購 —
-                const $transportSelect = $('#transportSelect');
-                const transportPrice = parseInt($transportSelect.val()) || 0;
-                const transportName = $transportSelect.find('option:selected').data('name') || '';
-
-                // — 更新加購摘要區塊 —
-                if (ticketPrice > 0) {
-                    $('#addon-ticket-row').removeClass('hidden');
-                    $('#addon-ticket-name').text(ticketName);
-                    $('#addon-ticket-price').text('NT$ ' + ticketPrice.toLocaleString());
-                    $('#summary-addon-ticket').removeClass('hidden');
-                    $('#summary-ticket-name').text(ticketName);
-                    $('#summary-ticket-price').text('NT$ ' + ticketPrice.toLocaleString());
-                } else {
-                    $('#addon-ticket-row').addClass('hidden');
-                    $('#summary-addon-ticket').addClass('hidden');
-                }
-
-                if (transportPrice > 0) {
-                    $('#addon-transport-row').removeClass('hidden');
-                    $('#addon-transport-name').text(transportName);
-                    $('#addon-transport-price').text('NT$ ' + transportPrice.toLocaleString());
-                    $('#summary-addon-transport').removeClass('hidden');
-                    $('#summary-transport-name').text(transportName);
-                    $('#summary-transport-price').text('NT$ ' + transportPrice.toLocaleString());
-                } else {
-                    $('#addon-transport-row').addClass('hidden');
-                    $('#summary-addon-transport').addClass('hidden');
-                }
-
-                // 顯示/隱藏加購摘要整個區塊
-                if (ticketPrice > 0 || transportPrice > 0) {
-                    $('#addon-summary').removeClass('hidden');
-                } else {
-                    $('#addon-summary').addClass('hidden');
-                }
-
-                // — 計算最終總額 —
-                const grandTotal = dbTotal + ticketPrice + transportPrice;
-                $('#display-total').text('NT$ ' + grandTotal.toLocaleString());
-
-                // — 同步隱藏欄位值，提交時後端會用到 —
-                $('#addonTicketName').val(ticketName);
-                $('#addonTicketPrice').val(ticketPrice);
-                $('#addonTransportName').val(transportName);
-                $('#addonTransportPrice').val(transportPrice);
-            }
-
-            // ==========================================
-            // ✅ 結帳前驗證
-            // ==========================================
-            $('#checkoutForm').on('submit', function (e) {
-                if (!$('#agreeCheckbox').is(':checked')) {
-                    e.preventDefault();
-                    alert('請先勾選同意服務條款與隱私權聲明！');
-                    return false;
-                }
-            });
-        });
+        window.checkoutData = {
+            myPlanId: /*[[${order.myPlan != null ? order.myPlan.myPlanId : null}]]*/ null,
+            totalAmount: /*[[${totalAmount}]]*/ 0
+        };
     </script>
+
+    <script th:src="@{/payment/payment.js}"></script>
+
 </body>
 
 </html>

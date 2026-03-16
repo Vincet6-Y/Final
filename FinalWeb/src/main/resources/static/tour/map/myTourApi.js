@@ -1,68 +1,90 @@
 // ==========================================
-// 🌟 取得景點詳細資訊並顯示彈窗 (核心功能)
+// 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
 // ==========================================
-function fetchAndShowDetails(placeId) {
-    if (!placeId || placeId === 'undefined' || placeId === 'null') {
+async function fetchAndShowDetails(placeId) {
+    // 🌟 加入 String(placeId).length < 10 攔截假 ID，避免 Google 噴 INVALID_REQUEST
+    if (!placeId || placeId === 'undefined' || placeId === 'null' || String(placeId).length < 10) {
         console.warn("⚠️ 無效的 Place ID，無法查詢詳細資訊。");
         return;
     }
 
-    console.log("正在查詢 Google 景點詳細資料:", placeId);
-    
-    // 呼叫 Google Places Service
-    placesService.getDetails({
-        placeId: placeId,
-        fields: ['place_id', 'name', 'formatted_address', 'geometry', 'rating', 'photos', 'formatted_phone_number', 'opening_hours', 'editorial_summary', 'user_ratings_total', 'website', 'types']
-    }, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            // 如果 Google 沒回傳 ID，手動補上
-            if (!place.place_id) place.place_id = placeId;
-            
-            // 呼叫 myTourUi.js 中的顯示函式
-            showRichModal(place); 
+    try {
+        console.log("正在使用 Places API (New) 查詢:", placeId);
+        // 1. 動態載入新版 Places 函式庫
+        const { Place } = await google.maps.importLibrary("places");
+        
+        // 2. 建立 Place 物件並指定語系
+        const place = new Place({ id: placeId, requestedLanguage: "zh-TW" });
+        
+        // 3. 使用 fetchFields 請求特定欄位 (新版屬性名稱)
+        await place.fetchFields({
+            fields: [
+                'id', 'displayName', 'formattedAddress', 'location', 
+                'rating', 'userRatingCount', 'photos', 'nationalPhoneNumber', 
+                'regularOpeningHours', 'editorialSummary', 'websiteURI', 'types'
+            ]
+        });
+
+        // 4. 呼叫 UI 顯示
+        showRichModal(place);
+
+    } catch (error) {
+        console.warn("❌ Google API 查詢失敗或 ID 失效，嘗試救援...", error);
+        
+        // 保持原有的救援機制 (針對 tourUi.js 的失效 ID 修復)
+        let targetNode = null;
+        Object.values(itineraryData).flat().forEach(node => {
+            if (node.place_id === placeId) targetNode = node;
+        });
+
+        if (targetNode && targetNode.lat && targetNode.lng) {
+            if (typeof findPlaceIdByCoords === 'function') {
+                const freshId = await findPlaceIdByCoords(targetNode.lat, targetNode.lng);
+                if (freshId) {
+                    console.log("✨ 修復成功！取得新 ID:", freshId);
+                    fetchAndShowDetails(freshId);
+                    if (typeof updateDatabasePlaceId === 'function') {
+                        updateDatabasePlaceId(targetNode.spotId, freshId);
+                    }
+                }
+            }
         } else {
-            console.error("❌ Google API 查詢失敗，狀態碼:", status);
             alert('無法從 Google 取得該地點的詳細資訊');
         }
-    });
+    }
 }
 
 // ==========================================
-// 🌟 載入「會員個人」行程資料 (移植官方行程修復邏輯)
+// 🌟 載入「會員個人」行程資料 (修正版)
 // ==========================================
 async function loadMyPlanData(myPlanId) {
     try {
         console.log("正在發起請求，讀取個人行程 ID:", myPlanId);
         const res = await fetch(`/api/plan/myPlanNodes/${myPlanId}`);
         if (!res.ok) throw new Error(`API 請求失敗：${res.status}`);
-        
+
         const data = await res.json();
         let nodes = Array.isArray(data) ? data : (data.data || []);
-        
+
         if (nodes.length === 0) return;
 
         itineraryData = { 1: [], 2: [], 3: [], 4: [], 5: [] };
 
         for (const node of nodes) {
-            // 🌟 修復邏輯 A：清理 Place ID 字串 (相容不同 Entity 欄位名稱並清除引號)
-            let safePlaceId = (node.googlePlaceId || node.googlePlaceID || "").replace(/["']/g, "").trim();
+            // 🌟 核心修正：請確保你的後端回傳的 JSON 裡面，Google Place ID 的名稱是什麼？
+            // 官方行程可能是 GooglePlaceID，個人行程可能是 googlePlaceId
+            // 這裡涵蓋各種可能的大小寫，並確保它存在
+            let safePlaceId = (node.GooglePlaceId || node.googlePlaceId || node.googlePlaceID || node.GooglePlaceID || "").toString().trim();
 
-            // 🌟 修復邏輯 B：如果 ID 是空的，學官方行程用「座標」去跟 Google 要一個新的
-            if (!safePlaceId || safePlaceId.length < 5) {
-                console.warn(`[${node.locationName}] 缺失 Place ID，啟動緊急修復...`);
-                // 此函式在下方輔助函式區
-                const freshId = await findPlaceIdByCoords(node.latitude, node.longitude);
-                if (freshId) {
-                    safePlaceId = freshId;
-                    // 自動回報給後端補齊資料庫，下次載入就快了
-                    updateDatabasePlaceId(node.spotId, freshId);
-                }
+            if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5) {
+                console.error(`[${node.locationName}] 嚴重警告：後端沒有傳回有效的 Place ID！`, node);
+                safePlaceId = "undefined";
             }
 
             const day = node.dayNumber || 1;
             itineraryData[day].push({
                 spotId: node.spotId,
-                place_id: safePlaceId,
+                place_id: safePlaceId, // 如果是 undefined，點擊時就不會彈窗報錯
                 lat: parseFloat(node.latitude),
                 lng: parseFloat(node.longitude),
                 name: node.locationName,
@@ -71,44 +93,41 @@ async function loadMyPlanData(myPlanId) {
             });
         }
 
-        console.log("🌟 修復後的 itineraryData:", itineraryData);
+        console.log("🌟 解析後的 itineraryData:", itineraryData);
 
-        // 重設地圖中心點
         if (itineraryData[1].length > 0) {
             map.setCenter({ lat: itineraryData[1][0].lat, lng: itineraryData[1][0].lng });
         }
 
-        // 🌟 關鍵：資料補齊後，立即觸發計算與渲染
         calculateAndDisplayRoute(1);
-        selectDay(1); 
+        selectDay(1);
 
     } catch (error) {
         console.error("🔥 載入個人行程錯誤：", error);
     }
-}
 
-// ==========================================
-// 🌟 移植過來的輔助函式
-// ==========================================
-function findPlaceIdByCoords(lat, lng) {
-    return new Promise((resolve) => {
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ location: { lat: parseFloat(lat), lng: parseFloat(lng) } }, (results, status) => {
-            if (status === "OK" && results[0]) resolve(results[0].place_id);
-            else resolve(null);
+    // ==========================================
+    // 🌟 輔助函式
+    // ==========================================
+    function findPlaceIdByCoords(lat, lng) {
+        return new Promise((resolve) => {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat: parseFloat(lat), lng: parseFloat(lng) } }, (results, status) => {
+                if (status === "OK" && results[0]) resolve(results[0].place_id);
+                else resolve(null);
+            });
         });
-    });
-}
+    }
 
-async function updateDatabasePlaceId(spotId, newPlaceId) {
-    try {
-        // 🌟 請確保 PlanRestController 中有這支 PUT API (如下方說明)
-        await fetch(`/api/plan/updateNodePlaceId/${spotId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ placeId: newPlaceId })
-        });
-    } catch (err) {
-        console.error("同步至資料庫失敗:", err);
+    async function updateDatabasePlaceId(spotId, newPlaceId) {
+        try {
+            await fetch(`/api/plan/updateNodePlaceId/${spotId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ placeId: newPlaceId })
+            });
+        } catch (err) {
+            console.error("資料庫更新失敗:", err);
+        }
     }
 }

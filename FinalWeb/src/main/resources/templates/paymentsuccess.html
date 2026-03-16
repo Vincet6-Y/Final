@@ -13,8 +13,7 @@
             <!-- ==================== 頂部：行程標題 + 預訂成功 + 日期 ==================== -->
             <div class="text-center mb-10 flex flex-col items-center">
                 <!-- 行程標題 -->
-                <div
-                    class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-12 py-4 rounded-xl text-xl font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block mb-6"
+                <div class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-12 py-4 rounded-xl text-xl font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block mb-6"
                     th:text="${myPlan != null && myPlan.myPlanName != null} ? ${myPlan.myPlanName} : '聖地巡禮行程'">
                     自訂的行程標題
                 </div>
@@ -24,10 +23,12 @@
                     style="font-style: italic;">預訂成功！</h2>
 
                 <!-- 行程日期 -->
-                <div
-                    class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-10 py-4 rounded-xl text-lg font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block"
+                <div class="bg-white dark:bg-[#251d15] text-slate-800 dark:text-white px-10 py-4 rounded-xl text-lg font-bold border border-slate-200 dark:border-white/10 shadow-lg inline-block"
                     th:if="${myPlan != null && myPlan.startDate != null}">
-                    完善規劃抓到的行程日期：<span class="text-primary" th:text="${myPlan.startDate}">e.g. 3/2~3/7</span>
+                    行程日期：
+                    <span class="text-primary"
+                        th:text="${#temporals.format(myPlan.startDate, 'yyyy年MM月dd日')} + ${endDate != null ? ' ～ ' + #temporals.format(endDate, 'yyyy年MM月dd日') : ''}">
+                    </span>
                 </div>
             </div>
 
@@ -62,13 +63,12 @@
                     <div th:if="${groupedByDay != null && !groupedByDay.isEmpty()}">
                         <!-- 每個 Day 的景點列表 (用 data-day-panel 標記) -->
                         <div th:each="entry : ${groupedByDay}" th:data-day-panel="${entry.key}"
-                            th:classappend="${entry.key != 1} ? 'hidden' : ''"
-                            class="day-panel">
+                            th:classappend="${entry.key != 1} ? 'hidden' : ''" class="day-panel">
 
                             <div class="flex items-center gap-2 mb-6">
                                 <span class="material-symbols-outlined text-primary">calendar_today</span>
-                                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200"
-                                    th:text="'當日行程總覽'">當日行程總覽</h3>
+                                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200" th:text="'當日行程總覽'">
+                                    當日行程總覽</h3>
                             </div>
 
                             <div class="relative border-l-2 border-primary/40 ml-4 lg:ml-6 space-y-8 pb-8">
@@ -81,10 +81,8 @@
 
                                     <!-- 景點行 (可點擊 → 開啟 Modal) -->
                                     <div class="spot-card cursor-pointer group bg-white dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-4 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all"
-                                        th:data-spot-id="${spot.spotId}"
-                                        th:data-spot-name="${spot.locationName}"
-                                        th:data-place-id="${spot.googlePlaceId}"
-                                        th:data-day="${entry.key}"
+                                        th:data-spot-id="${spot.spotId}" th:data-spot-name="${spot.locationName}"
+                                        th:data-place-id="${spot.googlePlaceId}" th:data-day="${entry.key}"
                                         th:data-order="${spot.visitOrder}"
                                         th:data-has-ticket="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}">
 
@@ -99,9 +97,11 @@
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <!-- 有門票標記 -->
-                                                <span th:if="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}"
+                                                <span
+                                                    th:if="${ticketSpotIds != null && ticketSpotIds.contains(spot.spotId)}"
                                                     class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                                                    <span class="material-symbols-outlined text-xs">local_activity</span>
+                                                    <span
+                                                        class="material-symbols-outlined text-xs">local_activity</span>
                                                     付費
                                                 </span>
                                                 <span
@@ -135,24 +135,61 @@
                         <ul class="space-y-4">
                             <li class="flex gap-3 items-start">
                                 <span class="material-symbols-outlined text-blue-500 text-base mt-0.5">schedule</span>
-                                <span class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">請於出發前確認所有票券的使用說明與有效期限。</span>
+                                <span
+                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">請於出發前確認所有票券的使用說明與有效期限。</span>
                             </li>
                             <li class="flex gap-3 items-start">
                                 <span class="material-symbols-outlined text-blue-500 text-base mt-0.5">info</span>
                                 <span
-                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">已購買的電子票券會自動發送至您的 E-mail 信箱。</span>
+                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">已購買的電子票券會自動發送至您的
+                                    E-mail 信箱。</span>
                             </li>
                             <li class="flex gap-3 items-start">
                                 <span
                                     class="material-symbols-outlined text-blue-500 text-base mt-0.5">confirmation_number</span>
                                 <span
-                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">付費景點可點擊行程卡片查看電子票券 QR Code。</span>
+                                    class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">付費景點可點擊行程卡片查看電子票券
+                                    QR Code。</span>
                             </li>
                             <li class="flex gap-3 items-start">
                                 <span
                                     class="material-symbols-outlined text-blue-500 text-base mt-0.5">directions_transit</span>
                                 <span
                                     class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">建議提前下載離線地圖，以便在旅途中使用。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 未關聯景點的交通票或其他加購票券 -->
+                    <div th:if="${transportTickets != null && !transportTickets.isEmpty()}"
+                        class="bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/30 p-6 rounded-2xl shadow-lg">
+                        <h4 class="flex items-center gap-2 text-orange-600 dark:text-orange-400 font-bold mb-5 text-lg">
+                            <span class="material-symbols-outlined">train</span>
+                            交通票券
+                        </h4>
+                        <ul class="space-y-3">
+                            <li th:each="ticket : ${transportTickets}"
+                                class="transport-card cursor-pointer group bg-white dark:bg-black/20 rounded-xl border border-orange-200/50 dark:border-orange-900/50 p-4 shadow-sm hover:shadow-md hover:border-orange-400/50 transition-all flex flex-col gap-2"
+                                th:data-ticket-id="${ticket.orderDetailId}" th:data-ticket-name="${ticket.ticketType}">
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-2">
+                                        <span
+                                            class="material-symbols-outlined text-orange-500 text-base group-hover:scale-110 transition-transform">local_offer</span>
+                                        <span
+                                            class="text-sm text-slate-700 dark:text-slate-200 font-bold group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors"
+                                            th:text="${ticket.ticketType}">票券名稱</span>
+                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <!-- 有門票標記 -->
+                                        <span
+                                            class="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-orange-500/20">
+                                            <span class="material-symbols-outlined text-[10px]">local_activity</span>
+                                            付費
+                                        </span>
+                                        <span
+                                            class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-orange-500 transition-colors text-sm">chevron_right</span>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -173,58 +210,75 @@
 
     <!-- ==================== 景點詳情 Modal ==================== -->
     <div id="spotModal"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 lg:p-10">
         <div
-            class="relative bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/10">
+            class="relative bg-[#1e1e1e] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10">
 
-            <!-- 關閉按鈕 -->
-            <button id="closeModalBtn"
-                class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-primary/80 hover:bg-primary text-white flex items-center justify-center transition-colors">
-                <span class="material-symbols-outlined text-lg">close</span>
-            </button>
-
-            <!-- Modal 標題 -->
-            <div class="flex items-center gap-2 p-6 pb-0">
-                <span class="material-symbols-outlined text-primary">explore</span>
-                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200">景點詳情</h3>
-            </div>
-
-            <!-- 景點照片 -->
-            <div class="p-6 pb-4">
-                <div id="modal-photo"
-                    class="w-full h-56 lg:h-72 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-4xl text-slate-300 animate-pulse">photo_camera</span>
+            <!-- 頂部標題與關閉按鈕 -->
+            <div class="flex items-center justify-between p-5 border-b border-white/5 shrink-0 bg-[#251d15]/50">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-orange-500 text-xl">directions_transit</span>
+                    <h3 class="text-lg font-bold text-white">景點詳情</h3>
                 </div>
+                <button id="closeModalBtn"
+                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-orange-500 text-white flex items-center justify-center transition-colors">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
             </div>
 
-            <!-- 景點資訊 -->
-            <div class="px-6 pb-4">
-                <h2 id="modal-name" class="text-2xl font-black text-slate-800 dark:text-white mb-2">景點名稱</h2>
-                <p id="modal-description" class="text-primary font-bold text-sm mb-4"></p>
-                <p id="modal-detail" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed"></p>
-            </div>
+            <!-- 內容區 (左邊照片，右邊文字與 QR Code) -->
+            <div class="flex flex-col md:flex-row flex-1 overflow-y-auto min-h-[400px]">
 
-            <!-- 付費景點通證 + QR Code (從後端 API 載入) -->
-            <div id="modal-ticket-section" class="hidden px-6 pb-6">
-                <div
-                    class="bg-gradient-to-b from-[#251d15] to-[#1a1209] rounded-xl p-6 text-center border border-primary/20">
-                    <div class="flex items-center justify-center gap-2 mb-4">
-                        <span class="material-symbols-outlined text-primary">confirmation_number</span>
-                        <h4 class="text-primary font-bold text-lg">付費景點通證</h4>
+                <!-- 左側：景點照片 -->
+                <div class="w-full md:w-1/2 bg-black flex items-center justify-center relative min-h-[300px] shrink-0">
+                    <div id="modal-photo"
+                        class="absolute inset-0 w-full h-full flex items-center justify-center text-slate-500">
+                        <span class="material-symbols-outlined text-4xl animate-pulse">photo_camera</span>
                     </div>
-                    <!-- QR Code 圖片 (由後端 /api/ticket/qrcode/{id} 生成) -->
-                    <div class="bg-white rounded-xl p-4 inline-block mb-4 shadow-lg">
-                        <img id="modal-qrcode" class="w-40 h-40"
-                            src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="QR Code" />
+                </div>
+
+                <!-- 右側：文字說明與 QRCode -->
+                <div class="w-full md:w-1/2 p-6 lg:p-10 flex flex-col overflow-y-auto custom-scrollbar bg-[#1c140d]">
+                    <h2 id="modal-name" class="text-3xl font-black text-white mb-4">景點名稱</h2>
+                    <p id="modal-description" class="text-orange-500 font-bold mb-4 leading-relaxed tracking-wide"></p>
+                    <p id="modal-detail" class="text-sm text-slate-400 leading-relaxed mb-8 flex-1"></p>
+
+                    <!-- 付費景點通證 + QR Code -->
+                    <div id="modal-ticket-section" class="hidden shrink-0 mt-auto">
+                        <div
+                            class="bg-gradient-to-b from-[#332211] to-[#1a1005] rounded-xl p-6 text-center border border-orange-500/20 shadow-lg relative overflow-hidden">
+                            <!-- 背景裝飾 -->
+                            <div
+                                class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-600/0 via-orange-500 to-orange-600/0">
+                            </div>
+
+                            <div class="flex items-center justify-center gap-2 mb-6">
+                                <span class="material-symbols-outlined text-orange-500">confirmation_number</span>
+                                <h4 class="text-orange-500 font-bold text-lg tracking-wider">付費景點憑證</h4>
+                            </div>
+
+                            <!-- QR Code 圖片 -->
+                            <div
+                                class="bg-white rounded-xl p-3 inline-block shadow-2xl mx-auto mb-4 relative z-10 transition-transform hover:scale-105 duration-300">
+                                <img id="modal-qrcode" class="w-32 h-32 md:w-40 md:h-40 object-contain"
+                                    src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                                    alt="QR Code" />
+                            </div>
+
+                            <p id="modal-ticket-status" class="text-orange-500/80 text-xs font-semibold tracking-wide">
+                                請在入口處向工作人員出示此 QR Code 進行掃描驗證。
+                            </p>
+                        </div>
                     </div>
-                    <p id="modal-ticket-status" class="text-primary/70 text-sm font-medium">
-                        請在入口處向工作人員出示此 QR Code 進行掃描驗證。
-                    </p>
                 </div>
             </div>
 
         </div>
     </div>
+
+    <!-- 引入 Google Maps API 來讀取 GooglePlaceID 照片 -->
+    <script th:if="${apiKey != null && apiKey != 'NONE'}"
+        th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly'"></script>
 
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -321,39 +375,31 @@
                 // ==========================================
                 if (hasTicket && ticketDataMap[spotId]) {
                     const ticket = ticketDataMap[spotId];
-
                     $('#modal-ticket-section').removeClass('hidden');
-
-                    // 🔑 關鍵！QR Code 圖片直接指向後端 API
                     $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticket.orderDetailId);
 
-                    // 顯示票券使用狀態
                     if (ticket.ticketUsed) {
                         $('#modal-ticket-status')
                             .text('⚠️ 此票券已使用過')
                             .removeClass('text-primary/70').addClass('text-red-400');
                     } else {
                         $('#modal-ticket-status')
-                            .text('請在入口處向工作人員出示此 QR Code 進行掃描驗證。')
+                            .text('請在入口處出示此 QR Code 進行掃描驗證。')
                             .removeClass('text-red-400').addClass('text-primary/70');
                     }
                 } else if (hasTicket) {
-                    // 有標記為付費但還沒在 ticketDataMap 中（可能還沒關聯 spotId）
-                    // 嘗試用 jQuery 從後端查詢
                     $('#modal-ticket-section').removeClass('hidden');
                     $('#modal-qrcode').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
                     $('#modal-ticket-status').text('票券資訊載入中...');
 
-                    // 如果有 allTickets，用票券名稱模糊比對
                     if (window.allTickets && window.allTickets.length > 0) {
-                        // 找一張還沒配對過 spotId 的票
                         const matchedTicket = window.allTickets.find(function (t) {
                             return t.ticketType && t.ticketType.includes(spotName);
-                        }) || window.allTickets[0]; // fallback: 用第一張票
+                        }) || window.allTickets[0];
 
                         if (matchedTicket) {
                             $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + matchedTicket.orderDetailId);
-                            $('#modal-ticket-status').text('請在入口處向工作人員出示此 QR Code 進行掃描驗證。');
+                            $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。');
                         }
                     }
                 } else {
@@ -364,32 +410,79 @@
                 $('#spotModal').removeClass('hidden').addClass('flex');
 
                 // ==========================================
-                // 📸 Google Places API 載入照片 (如果可用)
+                // 📸 Google Places API 載入照片 (新版安全寫法)
                 // ==========================================
                 if (placeId && typeof google !== 'undefined' && google.maps && google.maps.places) {
-                    const service = new google.maps.places.PlacesService(document.createElement('div'));
-                    service.getDetails({
-                        placeId: placeId,
-                        fields: ['name', 'photos', 'editorial_summary', 'formatted_address']
-                    }, function (place, status) {
-                        if (status === google.maps.places.PlacesServiceStatus.OK) {
-                            if (place.photos && place.photos.length > 0) {
-                                const photoUrl = place.photos[0].getUrl({ maxWidth: 800, maxHeight: 400 });
-                                $('#modal-photo').html(
-                                    '<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />'
-                                );
-                            }
-                            const desc = place.editorial_summary ? place.editorial_summary.overview : '';
-                            $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
-                            $('#modal-detail').text(place.formatted_address || '');
-                        } else {
-                            $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                        }
-                    });
+                    if (google.maps.places.Place) {
+                        const place = new google.maps.places.Place({ id: placeId });
+
+                        place.fetchFields({ fields: ['photos', 'editorialSummary', 'formattedAddress'] })
+                            .then(() => {
+                                if (place.photos && place.photos.length > 0) {
+                                    const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
+                                    $('#modal-photo').html(
+                                        '<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />'
+                                    );
+                                }
+
+                                const desc = place.editorialSummary ? place.editorialSummary.text : '';
+                                $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
+                                $('#modal-detail').text(place.formattedAddress || '');
+                            })
+                            .catch((error) => {
+                                console.error("載入照片或地點細節失敗：", error);
+                                $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                                $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
+                            });
+                    } else {
+                        console.warn("找不到新版 Place API，請確認你的 script tag 有加上 v=weekly");
+                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
+                    }
                 } else {
                     $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
                     $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
                 }
+            });
+
+            // ==========================================
+            // 🎫 交通票券 Modal — 點擊交通票卡片
+            // ==========================================
+            $(document).on('click', '.transport-card', function () {
+                const $card = $(this);
+                const ticketName = $card.data('ticket-name');
+                const ticketId = $card.data('ticket-id');
+
+                // 設定 Modal 基本資訊
+                $('#modal-name').text(ticketName);
+                $('#modal-description').text('交通票券 & 附加項目');
+                $('#modal-detail').text('請妥善保存您的電子票券。');
+                $('#modal-photo').html(
+                    '<div class="w-full h-full flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-900/10 text-orange-400">' +
+                    '<span class="material-symbols-outlined text-6xl mb-2">train</span>' +
+                    '<span class="font-bold text-lg px-6 w-full text-center truncate">' + ticketName + '</span>' +
+                    '</div>'
+                );
+
+                // 顯示 QR Code 區塊
+                $('#modal-ticket-section').removeClass('hidden');
+
+                // 🔑 直接指向後端 API
+                $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticketId);
+
+                // 如果從 ticketDataMap 找得到這張票，判斷是否已使用
+                const ticketKey = 'detail_' + ticketId;
+                if (ticketDataMap[ticketKey] && ticketDataMap[ticketKey].ticketUsed) {
+                    $('#modal-ticket-status')
+                        .text('⚠️ 此票券已使用過')
+                        .removeClass('text-primary/70').addClass('text-red-400');
+                } else {
+                    $('#modal-ticket-status')
+                        .text('請在入口處出示此 QR Code 進行掃描驗證。')
+                        .removeClass('text-red-400').addClass('text-primary/70');
+                }
+
+                // 顯示 Modal
+                $('#spotModal').removeClass('hidden').addClass('flex');
             });
 
             //

@@ -94,30 +94,16 @@
                             <div>
                                 <h3 th:text="${plan.planName}"
                                     class="text-2xl font-black text-slate-800 dark:text-white">該作品5天的行程</h3>
-                                <p th:text="${plan.planCity}" 
-                                class="text-primary text-sm font-bold">精華版聖地巡禮</p>
+                                <p th:text="${plan.planCity}" class="text-primary text-sm font-bold">精華版聖地巡禮</p>
                             </div>
                         </div>
-                        <div class="space-y-6 mb-10 flex-1">
+                        <div class="space-y-6 mb-10 flex-1" th:each="dayEntry : ${plan.groupedDays}">
                             <div class="flex gap-4">
-                                <div class="text-primary font-bold whitespace-nowrap">Day 1</div>
-                                <div class="text-slate-600 dark:text-slate-400">抵達東京、入住新宿區</div>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="text-primary font-bold whitespace-nowrap">Day 2</div>
-                                <div class="text-slate-600 dark:text-slate-400">新宿巡禮：須賀神社階梯、信濃町天橋、國立新美術館</div>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="text-primary font-bold whitespace-nowrap">Day 3</div>
-                                <div class="text-slate-600 dark:text-slate-400">前往飛驒、參觀飛驒市圖書館、古川站</div>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="text-primary font-bold whitespace-nowrap">Day 4</div>
-                                <div class="text-slate-600 dark:text-slate-400">糸守町原型探訪：諏訪湖全景攝影</div>
-                            </div>
-                            <div class="flex gap-4">
-                                <div class="text-primary font-bold whitespace-nowrap">Day 5</div>
-                                <div class="text-slate-600 dark:text-slate-400">秋葉原周邊購物、返程</div>
+                                <div th:text="'Day ' + ${dayEntry.key}"
+                                    class="text-primary font-bold whitespace-nowrap">Day 1</div>
+                                <div th:text="${dayEntry.value}" 
+                                    class="text-slate-600 dark:text-slate-400">抵達東京、入住新宿區
+                                </div>
                             </div>
                         </div>
                         <button

@@ -2,6 +2,8 @@ package com.example.FinalWeb.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,9 +13,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalWeb.entity.JourneyPlanEntity;
+import com.example.FinalWeb.entity.MapEntity;
 import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.repo.JourneyPlanRepo;
 import com.example.FinalWeb.repo.WorkDetailRepo;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class WorkService {
@@ -57,8 +62,40 @@ public class WorkService {
     }
 
     // Detail 下方行程用
-    public List<JourneyPlanEntity> getPlan(int workId){
-        return jourepo.findByWorkDetail_WorkId(workId);
+    @Transactional
+    public List<JourneyPlanEntity> getPlan(int workId) {
+
+        List<JourneyPlanEntity> plans = jourepo.findByWorkDetail_WorkId(workId);
+
+        // 2. 故意去摸一下每個行程的 maps，強迫管家去資料庫把景點撈出來
+        for (JourneyPlanEntity plan : plans) {
+            plan.getMaps().size(); // 💡 這就是「喚醒」的關鍵動作！
+            
+            // 準備一個會「自動從小排到大」的分類盒，準備裝這個行程的景點
+            Map<Integer, String> dayMap = new TreeMap<>();
+
+            // 3. 第二層迴圈：把這個行程底下的「所有散落景點」拿出來
+            for (MapEntity map : plan.getMaps()) {
+
+                Integer day = map.getDayNumber(); // 取得這是第幾天 (例如 1)
+                String loc = map.getLocationName(); // 取得景點名稱 (例如 "抵達東京")
+
+                // 🌟 核心邏輯：判斷盒子裡有沒有這天的紀錄了？
+                if (dayMap.containsKey(day)) {
+                    // 如果有：把原本盒子裡的字串拿出來，加上「、」，再接上新景點，放回去
+                    String oldString = dayMap.get(day);
+                    dayMap.put(day, oldString + "、" + loc);
+                } else {
+                    // 如果沒有：代表這是這天的第一個景點，直接放進去
+                    dayMap.put(day, loc);
+                }
+            }
+
+            // 4. 這個行程的景點都分類串好後，把整個分類盒塞進我們剛剛做的「隱形口袋」裡
+            plan.setGroupedDays(dayMap);
+        }
+
+        return plans;
     }
 
     // 新增：根據關鍵字搜尋作品（支援分頁與排序）

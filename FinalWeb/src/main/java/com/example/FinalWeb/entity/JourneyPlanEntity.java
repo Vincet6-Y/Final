@@ -1,6 +1,7 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,6 +30,9 @@ public class JourneyPlanEntity {
     private Integer daysCount;
     private String planName;
     private String planCity;
+
+    @Transient
+    private Map<Integer, String> groupedDays; // Key 是第幾天 (1, 2, 3...)，Value 是串好的字串 ("地點A、地點B")
 
     // 拉關連線到 workDetail
     @ManyToOne(fetch = FetchType.LAZY)

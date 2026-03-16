@@ -36,7 +36,12 @@ async function loadPlanData(planId) {
         }
 
         if (itineraryData[1].length > 0) {
-            map.setCenter({ lat: itineraryData[1][0].lat, lng: itineraryData[1][0].lng });
+            const firstLat = itineraryData[1][0].lat;
+            const firstLng = itineraryData[1][0].lng;
+            // 🌟 加上防呆：確定經緯度不是 NaN 才設定中心點
+            if (!isNaN(firstLat) && !isNaN(firstLng)) {
+                map.setCenter({ lat: firstLat, lng: firstLng });
+            }
         }
         calculateAndDisplayRoute(1);
         selectDay(1);

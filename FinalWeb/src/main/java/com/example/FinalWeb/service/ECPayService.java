@@ -31,20 +31,25 @@ public class ECPayService {
         Map<String, String> params = new TreeMap<>();
         String time = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 
-        // 產生唯一交易編號: OD + ID + T + 時間戳，並儲存至訂單供後續對應
-        String merchantTradeNo = "OD" + order.getOrderId() + "T" + System.currentTimeMillis();
+        // 將時間戳轉成 36 進制，會從 13 位數字變成約 8-9 位的英文+數字
+        // 組合：前綴(2) + 訂單ID(可變) + 縮時字串(9)，存入資料庫並送出
+        String compactTime = Long.toString(System.currentTimeMillis(), 36).toUpperCase();
+        String merchantTradeNo = "OD" + order.getOrderId() + compactTime;
         order.setTradeNo(merchantTradeNo);
         ordersRepo.save(order);
 
+        // 訂單明細加總
         int totalAmount = 0;
         if (order.getOrderDetails() != null) {
             totalAmount = order.getOrderDetails().stream()
                     .mapToInt(detail -> detail.getTicketPrice() != null ? detail.getTicketPrice() : 0)
                     .sum();
         }
+        // 綠界 不允許 0 元交易，所以最小設1
         if (totalAmount <= 0)
             totalAmount = 1;
 
+        // 綠界參數-綠界商店編號、商家交易編號、交易時間、交易金額、交易描述
         params.put("MerchantID", "3002607");
         params.put("MerchantTradeNo", merchantTradeNo);
         params.put("MerchantTradeDate", time);
@@ -68,7 +73,7 @@ public class ECPayService {
         }
         params.put("ItemName", itemName);
         params.put("ReturnURL", "http://localhost:8080/payment/callback"); // 綠界 Server-to-Server 背景回傳
-        params.put("ClientBackURL", "http://localhost:8080"); // 綠界付款畫面上的「返回商店」會導回首頁
+        params.put("ClientBackURL", "http://localhost:8080/"); // TODO:綠界付款畫面上的「返回商店」會導回首頁
         params.put("OrderResultURL", "http://localhost:8080/payment/success"); // 綠界付款完成後轉跳頁面
         params.put("ChoosePayment", "Credit");
         params.put("EncryptType", "1");
