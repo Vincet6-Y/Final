@@ -27,15 +27,66 @@ async function initMap() {
 }
 
 // ==========================================
-// 🌟 終極版：專為獨旅設計的大眾運輸計算 (加入時間參數)
+// 🌟 終極版：專為獨旅設計的大眾運輸計算 (含動態景點數字標記)
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
     
-    // 1. 先清除地圖上舊的路線
+    // 1. 先清除地圖上舊的路線與標記
     dayRouteRenderers.forEach(renderer => renderer.setMap(null));
     dayRouteRenderers = [];
 
+    // 🌟 清除前一次畫出的景點數字標記
+    if (routeMarkers) {
+        routeMarkers.forEach(m => m.setMap(null));
+        routeMarkers = [];
+    }
+
+    // 🌟 新增：如果當天有景點，就畫上帶有順序數字的自訂標記
+    if (places && places.length > 0) {
+        places.forEach((place, index) => {
+            const isFirst = index === 0;
+            const isLast = index === places.length - 1;
+
+            // 設定標記顏色：起點(橘)、終點(藍)、中間點(紅)
+            let bgColor = "#ea4335"; 
+            if (isFirst) bgColor = "#ff8c00"; 
+            else if (isLast) bgColor = "#008ccf";
+
+            // 建立地圖標記 (圓形 + 數字)
+            const stopMarker = new google.maps.Marker({
+                position: { lat: place.lat, lng: place.lng },
+                map: map,
+                label: {
+                    text: String(index + 1), // 顯示 1, 2, 3...
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: "14px"
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: bgColor,
+                    fillOpacity: 1,
+                    strokeColor: "white",
+                    strokeWeight: 2,
+                    scale: 14 // 圓圈的大小
+                },
+                title: place.name,
+                zIndex: 999 // 確保標記會浮在路線的上面
+            });
+
+            // 🌟 點擊地圖上的數字標記，可以直接打開側邊欄的景點詳情！
+            stopMarker.addListener("click", () => {
+                if (typeof fetchAndShowDetails === 'function') {
+                    fetchAndShowDetails(place.place_id);
+                }
+            });
+
+            routeMarkers.push(stopMarker);
+        });
+    }
+
+    // 若景點不足 2 個，就不需計算路線，直接更新畫面
     if (!places || places.length < 2) {
         routeLegs[dayToCalculate] = [];
         recalculateTimes(dayToCalculate);
@@ -49,8 +100,6 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         const origin = { lat: places[i].lat, lng: places[i].lng };
         const destination = { lat: places[i + 1].lat, lng: places[i + 1].lng };
 
-        // 🌟 關鍵魔法：設定明確的「白天出發時間」
-        // 強制給它一個明天早上 8 點的基準時間來查時刻表，避免半夜測試抓不到車
         const transitTime = new Date();
         transitTime.setDate(transitTime.getDate() + 1); // 確保是明天
         transitTime.setHours(8, 0, 0, 0); // 早上 8 點
@@ -67,13 +116,11 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                 if (status === "OK") {
                     resolve(response);
                 } else {
-                    // 🌟 關鍵修改：從 WALKING 改為 DRIVING
-                    // 因為日本大眾運輸常不回傳資料，我們改用「開車」來估算，時間最接近真實火車車程！
                     console.warn(`[${places[i].name}] 大眾運輸無解，改以開車(DRIVING)估算。`);
                     directionsService.route({
                         origin: origin,
                         destination: destination,
-                        travelMode: google.maps.TravelMode.DRIVING // 🚗 改用開車來拿時間
+                        travelMode: google.maps.TravelMode.DRIVING 
                     }, (fallbackRes, fallbackStatus) => {
                         if (fallbackStatus === "OK") resolve(fallbackRes);
                         else resolve(null);
@@ -83,20 +130,20 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         }));
     }
 
-    // 3. 等待所有分段的路線都計算完畢
+    // 等待所有分段的路線都計算完畢
     const results = await Promise.all(promises);
 
-    // 4. 儲存結果供側邊欄使用
+    // 儲存結果供側邊欄使用
     routeLegs[dayToCalculate] = results.map(res => res ? res.routes[0].legs[0] : null);
 
-    // 5. 畫出漂亮的多段路線
+    // 畫出漂亮的多段路線
     results.forEach((res, index) => {
         if (res) {
             const renderer = new google.maps.DirectionsRenderer({
                 map: map,
-                suppressMarkers: true,
+                suppressMarkers: true, // 🌟 保持 true，隱藏預設的 ABC，因為我們已經畫了自己漂亮的數字標記
                 polylineOptions: { 
-                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00", // 藍橘交錯，方便辨識轉乘點
+                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00", 
                     strokeWeight: 5,
                     strokeOpacity: 0.8
                 }
@@ -106,7 +153,7 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         }
     });
 
-    // 6. 重新推算抵達時間並更新畫面
+    // 重新推算抵達時間並更新畫面
     recalculateTimes(dayToCalculate);
     renderItineraryPanel(dayToCalculate);
 }
