@@ -20,16 +20,20 @@ $(function () {
                 <div class="text-slate-400 text-sm">目前沒有購買品項資料</div>
             `);
         } else {
-            items.forEach(function (item) {
+            items.forEach(function (item, index) {
+                const isLast = index === items.length - 1;
+
                 $itemsWrap.append(`
-                    <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
-                        <div class="text-lg font-medium text-slate-100">
-                            ${item.name}
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm text-slate-400 mb-1">小計：</div>
-                            <div class="text-base font-semibold text-primary">
-                                ${item.subtotal}
+                    <div class="${isLast ? 'border-b-2 border-white/20 pb-5 mb-5' : 'pb-5'}">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="text-lg font-medium text-slate-100">
+                                ${item.name}
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-slate-400 mb-1">小計：</div>
+                                <div class="text-base font-semibold text-primary">
+                                    ${item.subtotal}
+                                </div>
                             </div>
                         </div>
                     </div>
