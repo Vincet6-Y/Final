@@ -1,25 +1,23 @@
 // ==========================================
-// 全域資料
+// 全域資料與購物車狀態
 // ==========================================
 const checkoutState = {
-    baseTotal: window.checkoutData?.totalAmount || 0,
-    myPlanId: window.checkoutData?.myPlanId || null
+    baseTotal: window.checkoutData?.totalAmount || 0, // 初始訂單總額
+    myPlanId: window.checkoutData?.myPlanId || null,  // 行程 ID
+    addedTickets: [],     // 存放加購的景點門票
+    addedTransports: []   // 存放加購的交通票
 };
 
 // ==========================================
 // 工具函式
 // ==========================================
 
-// 安全解析日期 (如果 HTML 用 data-raw-date 才需要)
-function parseDateSafe(dateStr) {
-    if (!dateStr) return null;
-    const normalized = dateStr.replace(/-/g, "/");
-    const d = new Date(normalized);
-    if (isNaN(d.getTime())) return null;
-    return d;
+// 金額格式化 (加上 NT$ 與千分位逗號)
+function formatCurrency(num) {
+    return "NT$ " + Number(num).toLocaleString();
 }
 
-// 轉 yyyy-mm-dd
+// 轉成 yyyy-mm-dd 格式 (給 input[type="date"] 用)
 function formatDateInput(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -27,31 +25,27 @@ function formatDateInput(date) {
     return `${y}-${m}-${d}`;
 }
 
-// 數字格式化
-function formatCurrency(num) {
-    return "NT$ " + Number(num).toLocaleString();
-}
-
 // ==========================================
-// 🌟 日期限制與初始化
+// 🌟 日期限制與連動初始化
 // ==========================================
 function initTravelDate() {
     const travelDateInput = document.getElementById("travelDate");
-    if (!travelDateInput) return;
+    const displayStartDate = document.getElementById("displayStartDate"); // 抓取上方顯示用的文字標籤
 
-    // 設定最小日期為 3 天後
-    const today = new Date();
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() + 3);
-    travelDateInput.min = formatDateInput(minDate);
+    if (travelDateInput) {
+        // 設定最小日期為今天算起的 3 天後
+        const today = new Date();
+        const minDate = new Date(today);
+        minDate.setDate(today.getDate() + 3);
+        travelDateInput.min = formatDateInput(minDate);
 
-    // 如果 HTML 用的是 th:value，下面這段其實不會生效，但留著防呆很安全
-    const rawDateStr = travelDateInput.getAttribute("data-raw-date");
-    if (rawDateStr) {
-        const parsed = parseDateSafe(rawDateStr);
-        if (parsed) {
-            travelDateInput.value = formatDateInput(parsed);
-        }
+        // 🌟 日期連動事件：當下方輸入框改變時，上方文字跟著變更
+        travelDateInput.addEventListener('change', function () {
+            if (this.value && displayStartDate) {
+                // 將 2026-03-25 轉成 2026/03/25 的漂亮格式
+                displayStartDate.textContent = this.value.replace(/-/g, '/');
+            }
+        });
     }
 }
 
@@ -59,28 +53,29 @@ function initTravelDate() {
 // ✏️ 行程名稱編輯
 // ==========================================
 function initPlanNameEditor() {
+    // 點擊編輯按鈕：隱藏純文字，顯示輸入框
     window.editPlanName = function () {
         $("#planNameDisplayBlock").hide();
         $("#planNameEditBlock").removeClass("hidden").addClass("flex");
         $("#planNameInput").focus().select();
     };
 
+    // 點擊取消：隱藏輸入框，顯示純文字
     window.cancelEditPlanName = function () {
         $("#planNameEditBlock").removeClass("flex").addClass("hidden");
         $("#planNameDisplayBlock").show();
         $("#planNameInput").val($("#planNameDisplay").text().trim());
     };
 
+    // 點擊儲存：透過 AJAX 更新資料庫的行程名稱
     window.savePlanName = function () {
         const newName = $("#planNameInput").val().trim();
-
         if (!newName) {
             alert("名稱不可為空");
             return;
         }
 
         const myPlanId = checkoutState.myPlanId;
-
         if (!myPlanId) {
             alert("找不到行程 ID");
             cancelEditPlanName();
@@ -94,6 +89,7 @@ function initPlanNameEditor() {
             data: JSON.stringify({ name: newName }),
             success: function (res) {
                 if (res.success) {
+                    // 更新成功後，修改畫面上的文字並關閉編輯框
                     $("#planNameDisplay").text(res.newName);
                     cancelEditPlanName();
                 } else {
@@ -108,139 +104,172 @@ function initPlanNameEditor() {
 }
 
 // ==========================================
-// 🎫 加購邏輯
+// 🎫 多選購物車核心邏輯
 // ==========================================
 function initAddonSystem() {
-    const $ticketSelect = $("#ticketSelect");
-    const $transportSelect = $("#transportSelect");
 
-    $(".addon-select").on("change", recalculateTotal);
-
-    // 刪除加購票
-    $(".remove-ticket-btn").click(function () {
-        $ticketSelect.val("0").trigger("change");
+    // 🌟 1. 監聽景點票下拉選單
+    $("#ticketSelect").on("change", function () {
+        const price = Number($(this).val());
+        if (price > 0) {
+            const name = $(this).find("option:selected").data("name");
+            // 將選中的票券加入購物車陣列 (加入 uid 確保每張票都是獨立的)
+            checkoutState.addedTickets.push({ name: name, price: price, uid: Date.now() });
+            $(this).val("0"); // 選完後將下拉選單歸零
+            renderAddons();   // 重新渲染畫面
+        }
     });
-    $(".remove-transport-btn").click(function () {
-        $transportSelect.val("").trigger("change");
+
+    // 🌟 2. 監聽交通票下拉選單
+    $("#transportSelect").on("change", function () {
+        const id = $(this).val(); // 取得交通票專屬的 ticketId
+        if (id !== "") {
+            const price = Number($(this).find("option:selected").data("price"));
+            const name = $(this).find("option:selected").data("name");
+            // 將選中的票券加入購物車陣列
+            checkoutState.addedTransports.push({ id: id, name: name, price: price, uid: Date.now() });
+            $(this).val(""); // 選完後將下拉選單歸零
+            renderAddons();  // 重新渲染畫面
+        }
     });
 
-    // 🌟 新增：刪除「來自行程規劃」的舊票券
+    // 🌟 3. 點擊 X 刪除剛剛動態加購的項目
+    $(document).on("click", ".remove-added-ticket-btn", function () {
+        const uid = $(this).data("uid");
+        // 透過 filter 濾掉被點擊的那一張票
+        checkoutState.addedTickets = checkoutState.addedTickets.filter(t => t.uid !== uid);
+        renderAddons();
+    });
+
+    $(document).on("click", ".remove-added-transport-btn", function () {
+        const uid = $(this).data("uid");
+        checkoutState.addedTransports = checkoutState.addedTransports.filter(t => t.uid !== uid);
+        renderAddons();
+    });
+
+    // 🌟 4. 刪除資料庫原本就包含的舊票券
     let removedDbTicketIds = [];
     $(".remove-db-ticket-btn").click(function () {
         const $row = $(this).closest('.db-ticket-row');
         const detailId = $(this).data('id');
         const price = Number($(this).data('price')) || 0;
 
-        // 1. 把要刪除的 ID 記下來，塞進隱藏欄位傳給後端
+        // 把要刪除的 ID 記錄下來，並塞入隱藏欄位供後端讀取
         removedDbTicketIds.push(detailId);
         $('#removeDetailIds').val(removedDbTicketIds.join(','));
 
-        // 2. 從總金額基數中扣除
+        // 從總金額基數中扣除
         checkoutState.baseTotal -= price;
 
-        // 3. 用動畫隱藏左邊和右邊的明細，然後徹底移除
+        // 隱藏並徹底移除畫面元素
         $row.fadeOut(200, function () { $(this).remove(); });
         $('#summary-db-' + detailId).fadeOut(200, function () { $(this).remove(); });
 
-        // 4. 重新計算總金額
-        recalculateTotal();
+        renderAddons(); // 重新算錢
     });
 
-    // 初始化時先算一次總額
-    recalculateTotal();
+    // 初始化時先渲染一次
+    renderAddons();
 }
+
 // ==========================================
-// 💰 金額計算
+// 🎨 動態渲染購物車畫面與計算總額
 // ==========================================
-function recalculateTotal() {
-    const $ticketSelect = $("#ticketSelect");
-    const $transportSelect = $("#transportSelect");
+function renderAddons() {
+    let ticketHtml = '';
+    let summaryTicketHtml = '';
+    let ticketTotal = 0;
 
-    // 取值
-    const ticketPrice = Number($ticketSelect.val()) || 0;
-    const ticketName = $ticketSelect.find("option:selected").data("name") || "";
+    // 迴圈讀取所有加購的景點票，組合出左側與右側的 HTML
+    checkoutState.addedTickets.forEach(t => {
+        ticketTotal += t.price;
+        // 左側明細
+        ticketHtml += `
+            <div class="flex justify-between items-center text-sm text-orange-600 dark:text-orange-400 mt-2">
+                <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">confirmation_number</span>${t.name}</span>
+                <div class="flex items-center gap-3">
+                    <span class="font-bold">${formatCurrency(t.price)}</span>
+                    <button type="button" class="remove-added-ticket-btn text-gray-400 hover:text-red-500 transition-colors" data-uid="${t.uid}"><span class="material-symbols-outlined text-lg">cancel</span></button>
+                </div>
+            </div>`;
+        // 右側表單明細
+        summaryTicketHtml += `
+            <div class="flex justify-between items-center text-orange-500 text-sm mb-2">
+                <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">add_circle</span>${t.name}</span>
+                <span class="font-medium">${formatCurrency(t.price)}</span>
+            </div>`;
+    });
 
-    const transId = $transportSelect.val() || "";
-    const transportPrice = Number($transportSelect.find("option:selected").data("price")) || 0;
-    const transportName = $transportSelect.find("option:selected").data("name") || "";
+    // 將組好的 HTML 塞入對應的容器
+    $("#ticket-list-container").html(ticketHtml);
+    $("#summary-ticket-list").html(summaryTicketHtml);
 
-    // ------------------------
-    // UI 更新：景點票
-    // ------------------------
-    if (ticketPrice > 0) {
-        // 🌟 加上 flex 確保 Tailwind 排版正確
-        $("#addon-ticket-row,#summary-addon-ticket").removeClass("hidden").addClass("flex");
-        $("#addon-ticket-name,#summary-ticket-name").text(ticketName);
-        $("#addon-ticket-price,#summary-ticket-price").text(formatCurrency(ticketPrice));
-    } else {
-        $("#addon-ticket-row,#summary-addon-ticket").addClass("hidden").removeClass("flex");
-    }
+    let transportHtml = '';
+    let summaryTransportHtml = '';
+    let transportTotal = 0;
 
-    // ------------------------
-    // UI 更新：交通票
-    // ------------------------
-    if (transportPrice > 0) {
-        // 🌟 加上 flex 確保 Tailwind 排版正確
-        $("#addon-transport-row,#summary-addon-transport").removeClass("hidden").addClass("flex");
-        $("#addon-transport-name,#summary-transport-name").text(transportName);
-        $("#addon-transport-price,#summary-transport-price").text(formatCurrency(transportPrice));
-    } else {
-        $("#addon-transport-row,#summary-addon-transport").addClass("hidden").removeClass("flex");
-    }
+    // 迴圈讀取所有加購的交通票，組合出左側與右側的 HTML
+    checkoutState.addedTransports.forEach(t => {
+        transportTotal += t.price;
+        transportHtml += `
+            <div class="flex justify-between items-center text-sm text-blue-600 dark:text-blue-400 mt-2">
+                <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">train</span>${t.name}</span>
+                <div class="flex items-center gap-3">
+                    <span class="font-bold">${formatCurrency(t.price)}</span>
+                    <button type="button" class="remove-added-transport-btn text-gray-400 hover:text-red-500 transition-colors" data-uid="${t.uid}"><span class="material-symbols-outlined text-lg">cancel</span></button>
+                </div>
+            </div>`;
+        summaryTransportHtml += `
+            <div class="flex justify-between items-center text-blue-500 text-sm mb-2">
+                <span class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">add_circle</span>${t.name}</span>
+                <span class="font-medium">${formatCurrency(t.price)}</span>
+            </div>`;
+    });
 
-    // ------------------------
-    // 顯示/隱藏 addon summary 區塊
-    // ------------------------
-    if (ticketPrice > 0 || transportPrice > 0) {
+    $("#transport-list-container").html(transportHtml);
+    $("#summary-transport-list").html(summaryTransportHtml);
+
+    // 結算總金額：原本剩下的舊票總額 + 新加的景點票 + 新加的交通票
+    const grandTotal = checkoutState.baseTotal + ticketTotal + transportTotal;
+    $("#display-total").text(formatCurrency(grandTotal));
+
+    // 控制左側加購明細外框的顯示與隱藏 (如果購物車是空的就隱藏)
+    if (checkoutState.addedTickets.length > 0 || checkoutState.addedTransports.length > 0) {
         $("#addon-summary").removeClass("hidden");
     } else {
         $("#addon-summary").addClass("hidden");
     }
-
-    // ------------------------
-    // 計算與更新總額
-    // ------------------------
-    const grandTotal = checkoutState.baseTotal + ticketPrice + transportPrice;
-    $("#display-total").text(formatCurrency(grandTotal));
-
-    // ------------------------
-    // 同步 hidden 欄位 (供表單送出)
-    // ------------------------
-    $("#addonTicketName").val(ticketName);
-    $("#addonTicketPrice").val(ticketPrice);
-    $("#transportId").val(transId);
 }
 
 // ==========================================
-// 🧾 Checkout 驗證
+// 🧾 Checkout 表單送出前動態組裝
 // ==========================================
 function initCheckoutValidation() {
     $("#checkoutForm").on("submit", function (e) {
-        // 先同步目前畫面上的值到 hidden 欄位
         const planName = $("#planNameInput").val().trim();
         const startDate = $("#travelDate").val();
 
-        if (!planName) {
-            alert("請輸入行程名稱");
-            e.preventDefault();
-            return false;
-        }
+        // 基本驗證
+        if (!planName) { alert("請輸入行程名稱"); e.preventDefault(); return false; }
+        if (!startDate) { alert("請選擇出發日期"); e.preventDefault(); return false; }
+        if (!$("#agreeCheckbox").is(":checked")) { alert("請先同意服務條款"); e.preventDefault(); return false; }
 
-        if (!startDate) {
-            alert("請選擇出發日期");
-            e.preventDefault();
-            return false;
-        }
-
-        if (!$("#agreeCheckbox").is(":checked")) {
-            alert("請先同意服務條款");
-            e.preventDefault();
-            return false;
-        }
-
-        // 把最新的值塞進隱藏欄位，準備送出
+        // 同步修改後的資料
         $("#checkoutPlanName").val(planName);
         $("#checkoutStartDate").val(startDate);
+
+        // 🌟 核心：在送出前，自動將購物車陣列轉換為隱藏的 <input>，讓後端 Controller 接收
+        $(".dynamic-addon-input").remove(); // 先清空舊的，避免重複塞入
+
+        checkoutState.addedTickets.forEach(t => {
+            $(this).append(`<input type="hidden" name="addonTicketName" value="${t.name}" class="dynamic-addon-input">`);
+            $(this).append(`<input type="hidden" name="addonTicketPrice" value="${t.price}" class="dynamic-addon-input">`);
+        });
+
+        checkoutState.addedTransports.forEach(t => {
+            // 變數名稱 transportIds 與後端 Controller 接的參數一致！
+            $(this).append(`<input type="hidden" name="transportIds" value="${t.id}" class="dynamic-addon-input">`);
+        });
     });
 }
 

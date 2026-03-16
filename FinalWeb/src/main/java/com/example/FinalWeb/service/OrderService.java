@@ -15,6 +15,7 @@ import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.repo.OrdersRepo;
 import com.example.FinalWeb.repo.OrdersDetailRepo;
+import com.example.FinalWeb.dto.TicketDto;
 
 @Service
 public class OrderService {
@@ -60,13 +61,13 @@ public class OrderService {
     }
 
     /**
-     * 🌟 修改重點：【邏輯】處理前端傳來的加購門票與交通票
+     * 🌟 處理前端傳來的加購門票與交通票 (支援購物車多選！)
      */
     @Transactional
     public void processAddonTickets(OrdersEntity order, List<String> ticketNames, List<Integer> ticketPrices,
-            String transportId) {
+            List<String> transportIds) {
 
-        // --- 1. 處理多張景點門票 (邏輯不變) ---
+        // --- 1. 處理多張景點門票 ---
         if (ticketNames != null && ticketPrices != null && ticketNames.size() == ticketPrices.size()) {
             for (int i = 0; i < ticketNames.size(); i++) {
                 String tName = ticketNames.get(i);
@@ -78,22 +79,21 @@ public class OrderService {
             }
         }
 
-        // --- 2. 🌟 安全地處理單張交通票 ---
-        if (transportId != null && !transportId.isEmpty()) {
-            // 從我們寫好的 TicketService 去撈出絕對安全的名稱與價格
-            TicketService.TicketInfo tInfo = ticketService.getTicketById(transportId);
-
-            // 如果 tInfo 不是 null，代表這個 ID 是合法的，我們才幫他建立訂單明細
-            if (tInfo != null) {
-                OrdersDetailEntity transportDetail = createNewTicketDetail(order, tInfo.getTicketName(),
-                        tInfo.getPrice());
-                ordersDetailRepo.save(transportDetail);
+        // --- 2. 安全地處理「多張」交通票 ---
+        if (transportIds != null && !transportIds.isEmpty()) {
+            for (String tId : transportIds) {
+                TicketDto tInfo = ticketService.getTicketById(tId);
+                if (tInfo != null) {
+                    OrdersDetailEntity transportDetail = createNewTicketDetail(order, tInfo.getTicketName(),
+                            tInfo.getPrice());
+                    ordersDetailRepo.save(transportDetail);
+                }
             }
         }
     }
 
     /**
-     * 🌟 新增：刪除使用者在結帳頁面取消的「舊票券」
+     * 刪除使用者在結帳頁面取消的「舊票券」
      */
     @Transactional
     public void removeOrderDetails(List<Integer> detailIds) {
@@ -140,7 +140,7 @@ public class OrderService {
                 } else if (detail.getTicketType() != null && order.getMyPlan() != null
                         && order.getMyPlan().getMyMaps() != null) {
                     for (MyMapEntity m : order.getMyPlan().getMyMaps()) {
-                        TicketService.TicketInfo tInfo = ticketService.getTicketByPlaceId(m.getGooglePlaceId());
+                        TicketDto tInfo = ticketService.getTicketByPlaceId(m.getGooglePlaceId());
                         if (tInfo != null && detail.getTicketType().equals(tInfo.getTicketName())) {
                             ticketSpotIds.add(m.getSpotId());
                             isSpotTicket = true;

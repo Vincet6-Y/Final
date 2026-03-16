@@ -131,10 +131,10 @@ async function openPlaceDetails(day, index) {
         fetchAndShowDetails(placeId);
     } else {
         console.log(`[${placeNode.name}] 缺少或無效 ID (${placeId})，啟動新版 API 即時搜尋...`);
-        
+
         try {
             const { Place } = await google.maps.importLibrary("places");
-            
+
             // 🌟 使用新版 API 的 searchByText
             const request = {
                 textQuery: placeNode.name,
@@ -146,14 +146,14 @@ async function openPlaceDetails(day, index) {
             };
 
             const { places } = await Place.searchByText(request);
-            
+
             if (places && places.length > 0) {
                 const foundPlaceId = places[0].id;
                 console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
-        
+
                 // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
                 placeNode.place_id = foundPlaceId;
-        
+
                 // 呼叫 API 顯示彈窗
                 fetchAndShowDetails(foundPlaceId);
             } else {
@@ -202,19 +202,19 @@ async function confirmAddToItinerary() {
                 lng: tempSelectedPlace.location.lng()
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // 2. 資料庫儲存成功後，才把帶有真實 spotId 的資料塞進畫面陣列中
             itineraryData[day].push({
-                spotId: data.spotId, 
-                place_id: tempSelectedPlace.id, 
-                lat: tempSelectedPlace.location.lat(), 
+                spotId: data.spotId,
+                place_id: tempSelectedPlace.id,
+                lat: tempSelectedPlace.location.lat(),
                 lng: tempSelectedPlace.location.lng(),
                 name: tempSelectedPlace.displayName,
                 arrivals: "08:00",
-                duration: "1", 
+                duration: "1",
                 hasTicketOffer: Math.random() > 0.5
             });
 
@@ -460,7 +460,40 @@ function handleDrop(e, day, dropIndex) {
     // 重新計算路線與渲染列表
     calculateAndDisplayRoute(day);
     draggedItemInfo = null;
+
+    // 🌟 新增：將移動後的新順序傳送給後端儲存
+    syncOrderToDatabase(day);
+
     return false;
+}
+
+// 🌟 核心功能：將移動後的順序同步至資料庫
+async function syncOrderToDatabase(day) {
+    const list = itineraryData[day];
+    
+    // 1. 整理出該天所有景點的新順序 (對應資料庫的 spotId 與新的 visitOrder)
+    const payload = list.map((item, index) => ({
+        spotId: item.spotId,
+        visitOrder: index + 1 // 順序改為 1, 2, 3...
+    })).filter(i => i.spotId); // 過濾掉尚未存入資料庫的臨時點
+
+    if (payload.length === 0) return;
+
+    try {
+        console.log(`正在同步 Day ${day} 的新順序...`);
+        const response = await fetch('/api/plan/updateOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        if (!data.success) {
+            console.error("順序儲存失敗:", data.message);
+        }
+    } catch (error) {
+        console.error("同步順序時發生連線錯誤:", error);
+    }
 }
 
 function handleDragEnd(e) {
@@ -591,9 +624,34 @@ function renderItineraryPanel(day) {
     }
 }
 
-function removeItineraryItem(day, index) {
-    itineraryData[day].splice(index, 1);
-    calculateAndDisplayRoute(day);
+// 🌟 修正版：刪除景點並同步資料庫
+async function removeItineraryItem(day, index) {
+    const item = itineraryData[day][index];
+    
+    // 如果是剛從地圖加入、尚未取得 spotId 的點，直接從陣列移除即可
+    if (!item.spotId) {
+        itineraryData[day].splice(index, 1);
+        calculateAndDisplayRoute(day);
+        return;
+    }
+
+    if (confirm(`確定要從 Day ${day} 移除「${item.name}」嗎？`)) {
+        try {
+            const response = await fetch(`/api/plan/deleteNode/${item.spotId}`, { method: 'DELETE' });
+            const data = await response.json();
+
+            if (data.success) {
+                // 資料庫刪除成功後，才移除畫面顯示
+                itineraryData[day].splice(index, 1);
+                calculateAndDisplayRoute(day);
+                console.log("資料庫同步刪除成功");
+            } else {
+                alert("資料庫同步失敗：" + data.message);
+            }
+        } catch (error) {
+            console.error("刪除錯誤:", error);
+        }
+    }
 }
 
 function toggleMobileView() {
@@ -781,8 +839,17 @@ function goToPayment() {
         return false;
     }
 
-    // 打 API 給後端建立真實訂單
-    fetch(`/payment/createOrderFromPlan?myPlanId=${myPlanId}`, {
+    // 🌟 核心修改：抓出畫面上隱藏的日期輸入框的值 (也就是使用者選好的最新出發日期)
+    // 因為在你的「動態加入出發日期選擇器」功能中，那個 input 的 type 是 date
+    const dateInput = document.querySelector('input[type="date"]');
+    let startDateParam = "";
+    if (dateInput && dateInput.value) {
+        // 確保格式是 yyyy-MM-dd
+        startDateParam = `&startDate=${dateInput.value}`;
+    }
+
+    // 打 API 給後端建立真實訂單 (🌟 加上了 startDateParam)
+    fetch(`/payment/createOrderFromPlan?myPlanId=${myPlanId}${startDateParam}`, {
         method: 'POST'
     })
         .then(response => response.json())
