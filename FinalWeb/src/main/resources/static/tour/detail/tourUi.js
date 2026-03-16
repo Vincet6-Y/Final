@@ -30,6 +30,10 @@ function updateDayButtonsAndLists(totalDays) {
     }
 }
 
+// 切換目前顯示的行程 Day
+// 1. 更新按鈕樣式
+// 2. 顯示對應 Day 的行程列表
+// 3. 呼叫路線計算與列表渲染
 function selectDay(day) {
     currentDay = day;
     document.querySelectorAll('[id^="btn-day-"]').forEach(btn => {
@@ -57,6 +61,7 @@ function selectDay(day) {
 
 // ==========================================
 // 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
+// 從 Google Places API 取得景點詳細資訊，並開啟資訊 Modal
 // ==========================================
 async function fetchAndShowDetails(placeId) {
     if (!placeId || placeId === 'undefined' || placeId === 'null') {
@@ -110,6 +115,8 @@ async function fetchAndShowDetails(placeId) {
     }
 }
 
+// 顯示景點詳細資訊的 Modal 視窗
+// 將 Google Places API 回傳資料填入 UI
 function showRichModal(place) {
     tempSelectedPlace = place;
 
@@ -254,10 +261,12 @@ async function openPlaceDetails(day, index) {
     }
 }
 
+// 關閉景點詳細資訊視窗
 function closeRichModal() {
     document.getElementById('rich-place-modal').classList.add('hidden');
 }
 
+// 將使用者在地圖選取的景點加入行程
 function confirmAddToItinerary() {
     if (!tempSelectedPlace) return;
 
@@ -286,6 +295,8 @@ function confirmAddToItinerary() {
 
 // ==========================================
 // 🌟時間自動推算引擎
+// 根據交通時間與停留時間
+// 自動推算每個景點的抵達時間
 // ==========================================
 function recalculateTimes(day) {
     const places = itineraryData[day];
@@ -321,12 +332,14 @@ function recalculateTimes(day) {
 }
 
 // 🌟使用者編輯時間的觸發事件
+// 使用者修改停留時間
 function updateDuration(day, index, newDuration) {
     itineraryData[day][index].duration = parseFloat(newDuration) || 1;
     recalculateTimes(day); // 重新推算下方所有行程
     renderItineraryPanel(day); // 重新渲染畫面
 }
 
+// 使用者手動修改抵達時間
 function updateArrivalTime(day, index, newTime) {
     itineraryData[day][index].arrivals = newTime;
     recalculateTimes(day); // 重新推算下方所有行程
@@ -335,6 +348,7 @@ function updateArrivalTime(day, index, newTime) {
 
 // ==========================================
 // 🌟 拖曳事件處理函數 (Drag and Drop Logic)
+// 拖曳開始
 // ==========================================
 function handleDragStart(e, day, index) {
     draggedItemInfo = { day, index };
@@ -515,6 +529,7 @@ function removeItineraryItem(day, index) {
     calculateAndDisplayRoute(day);
 }
 
+// 手機版切換地圖 / 行程
 function toggleMobileView() {
     const panel = document.getElementById('itinerary-panel');
     const icon = document.getElementById('toggle-icon');
@@ -533,6 +548,7 @@ function toggleMobileView() {
     }
 }
 
+// 取得行程天數
 function getTotalDaysFromPage(defaultDays = 10) {
     const fromDom = document.querySelector('[data-total-days]') || document.getElementById('total-days');
 
@@ -549,6 +565,9 @@ function getTotalDaysFromPage(defaultDays = 10) {
     return defaultDays;
 }
 
+// 建立 Day 按鈕與對應的行程列表容器
+// 用於初始化行程頁面 UI
+// totalDays 來自行程總天數
 function updateDayButtonsAndLists(totalDays) {
     const buttonContainer = document.getElementById('day-buttons-container');
     const listContainer = document.getElementById('itinerary-lists-container');
@@ -580,6 +599,7 @@ function updateDayButtonsAndLists(totalDays) {
     }
 }
 
+// 初始化 Day Tab 滑動
 function initDayTabsScroll() {
     const buttonContainer = document.getElementById('day-buttons-container');
     if (!buttonContainer || !buttonContainer.parentNode) return;
