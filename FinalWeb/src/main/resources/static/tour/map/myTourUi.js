@@ -460,7 +460,40 @@ function handleDrop(e, day, dropIndex) {
     // 重新計算路線與渲染列表
     calculateAndDisplayRoute(day);
     draggedItemInfo = null;
+
+    // 🌟 新增：將移動後的新順序傳送給後端儲存
+    syncOrderToDatabase(day);
+
     return false;
+}
+
+// 🌟 核心功能：將移動後的順序同步至資料庫
+async function syncOrderToDatabase(day) {
+    const list = itineraryData[day];
+    
+    // 1. 整理出該天所有景點的新順序 (對應資料庫的 spotId 與新的 visitOrder)
+    const payload = list.map((item, index) => ({
+        spotId: item.spotId,
+        visitOrder: index + 1 // 順序改為 1, 2, 3...
+    })).filter(i => i.spotId); // 過濾掉尚未存入資料庫的臨時點
+
+    if (payload.length === 0) return;
+
+    try {
+        console.log(`正在同步 Day ${day} 的新順序...`);
+        const response = await fetch('/api/plan/updateOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        if (!data.success) {
+            console.error("順序儲存失敗:", data.message);
+        }
+    } catch (error) {
+        console.error("同步順序時發生連線錯誤:", error);
+    }
 }
 
 function handleDragEnd(e) {
@@ -591,9 +624,34 @@ function renderItineraryPanel(day) {
     }
 }
 
-function removeItineraryItem(day, index) {
-    itineraryData[day].splice(index, 1);
-    calculateAndDisplayRoute(day);
+// 🌟 修正版：刪除景點並同步資料庫
+async function removeItineraryItem(day, index) {
+    const item = itineraryData[day][index];
+    
+    // 如果是剛從地圖加入、尚未取得 spotId 的點，直接從陣列移除即可
+    if (!item.spotId) {
+        itineraryData[day].splice(index, 1);
+        calculateAndDisplayRoute(day);
+        return;
+    }
+
+    if (confirm(`確定要從 Day ${day} 移除「${item.name}」嗎？`)) {
+        try {
+            const response = await fetch(`/api/plan/deleteNode/${item.spotId}`, { method: 'DELETE' });
+            const data = await response.json();
+
+            if (data.success) {
+                // 資料庫刪除成功後，才移除畫面顯示
+                itineraryData[day].splice(index, 1);
+                calculateAndDisplayRoute(day);
+                console.log("資料庫同步刪除成功");
+            } else {
+                alert("資料庫同步失敗：" + data.message);
+            }
+        } catch (error) {
+            console.error("刪除錯誤:", error);
+        }
+    }
 }
 
 function toggleMobileView() {
