@@ -85,59 +85,71 @@ function createMarker(place) {
 function clearMarkers() { markers.forEach(m => m.setMap(null)); markers = []; }
 
 // ==========================================
-// 🌟 終極版：專為獨旅設計的大眾運輸計算 (加入時間參數與防呆機制)
+// 🌟 官方行程版：大眾運輸計算 (含動態景點數字標記)
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
-
-    // 1. 先清除地圖上舊的路線與舊的圖釘
+    
+    // 1. 清除地圖上舊的路線
     dayRouteRenderers.forEach(renderer => renderer.setMap(null));
     dayRouteRenderers = [];
-    clearMarkers(); // 🌟 新增：確保切換行程時，畫面上的舊圖釘會被清空
 
-    // 防呆：如果這天連一個景點都沒有，就直接結束
-    if (!places || places.length === 0) { 
-        return; 
+    // 🌟 2. 清除前一次畫出的景點數字標記
+    if (typeof routeMarkers !== 'undefined' && routeMarkers) {
+        routeMarkers.forEach(m => m.setMap(null));
+        routeMarkers = [];
     }
 
-    // ==========================================
-    // 🌟 保底機制：不管有沒有路線，先把所有景點的圖釘插上去！
-    // ==========================================
-    const bounds = new google.maps.LatLngBounds(); // 準備一個隱形的「框框」來包裝所有景點
+    // 🌟 3. 新增：畫上帶有順序數字的自訂標記
+    if (places && places.length > 0) {
+        places.forEach((place, index) => {
+            const isFirst = index === 0;
+            const isLast = index === places.length - 1;
 
-    places.forEach((place) => {
-        const position = { lat: place.lat, lng: place.lng };
-        
-        // 手動把每個景點畫上地圖
-        const marker = new google.maps.Marker({
-            map: map,
-            position: position,
-            title: place.name,
-            animation: google.maps.Animation.DROP
+            // 設定標記顏色：起點(橘)、終點(藍)、中間點(紅)
+            let bgColor = "#ea4335"; 
+            if (isFirst) bgColor = "#ff8c00"; 
+            else if (isLast) bgColor = "#008ccf";
+
+            // 建立地圖標記 (圓形 + 數字)
+            const stopMarker = new google.maps.Marker({
+                position: { lat: place.lat, lng: place.lng },
+                map: map,
+                label: {
+                    text: String(index + 1), // 顯示 1, 2, 3...
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: "14px"
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    fillColor: bgColor,
+                    fillOpacity: 1,
+                    strokeColor: "white",
+                    strokeWeight: 2,
+                    scale: 14
+                },
+                title: place.name,
+                zIndex: 999 
+            });
+
+            // 點擊官方行程的地圖標記，一樣可以打開景點詳情
+            stopMarker.addListener("click", () => {
+                if (typeof fetchAndShowDetails === 'function') {
+                    fetchAndShowDetails(place.place_id);
+                }
+            });
+
+            routeMarkers.push(stopMarker);
         });
-        markers.push(marker); // 存進陣列，下次切換行程時才能呼叫 clearMarkers() 清掉
-        
-        // 把這個景點的座標加進「框框」裡
-        bounds.extend(position); 
-    });
-
-    // 🌟 自動調整地圖視角，讓所有圖釘都能剛好塞進畫面中
-    if (places.length === 1) {
-        // 如果這天只有一個景點，就直接飛過去並放大
-        map.setCenter({ lat: places[0].lat, lng: places[0].lng });
-        map.setZoom(15);
-    } else {
-        // 如果有多個景點，讓地圖自動縮放到能看見所有景點的完美比例
-        map.fitBounds(bounds);
     }
-    // ==========================================
 
-
-    // 如果景點少於兩個（算不出路線），就更新側邊欄後提早結束
-    if (places.length < 2) {
+    // 若景點不足 2 個，就不需計算路線，直接更新畫面
+    if (!places || places.length < 2) {
         routeLegs[dayToCalculate] = [];
-        recalculateTimes(dayToCalculate);
-        renderItineraryPanel(dayToCalculate);
+        if (typeof renderItineraryPanel === 'function') {
+            renderItineraryPanel(dayToCalculate);
+        }
         return;
     }
 
@@ -147,25 +159,16 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         const origin = { lat: places[i].lat, lng: places[i].lng };
         const destination = { lat: places[i + 1].lat, lng: places[i + 1].lng };
 
-        // 🌟 設定明確的「白天出發時間」
-        const transitTime = new Date();
-        transitTime.setDate(transitTime.getDate() + 1); // 確保是明天
-        transitTime.setHours(8, 0, 0, 0); // 早上 8 點
-
         promises.push(new Promise((resolve) => {
             directionsService.route({
                 origin: origin,
                 destination: destination,
-                travelMode: google.maps.TravelMode.TRANSIT,
-                transitOptions: {
-                    departureTime: transitTime
-                }
+                travelMode: google.maps.TravelMode.TRANSIT // 預設大眾運輸
             }, (response, status) => {
                 if (status === "OK") {
                     resolve(response);
                 } else {
-                    // 🌟 降級機制：改用「開車(DRIVING)」估算
-                    console.warn(`[${places[i].name}] 大眾運輸無解，改以開車(DRIVING)估算。`);
+                    console.warn(`[${places[i].name}] 大眾運輸無解，改以開車估算。`);
                     directionsService.route({
                         origin: origin,
                         destination: destination,
@@ -180,20 +183,20 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         }));
     }
 
-    // 3. 等待所有分段的路線都計算完畢
+    // 等待所有分段的路線都計算完畢
     const results = await Promise.all(promises);
 
-    // 4. 儲存結果供側邊欄使用
+    // 儲存結果供 UI 使用
     routeLegs[dayToCalculate] = results.map(res => res ? res.routes[0].legs[0] : null);
 
-    // 5. 畫出漂亮的多段路線
+    // 畫出漂亮的多段路線
     results.forEach((res, index) => {
         if (res) { // 🌟 只有 res 不是 null 的時候，才會畫線
             const renderer = new google.maps.DirectionsRenderer({
                 map: map,
-                suppressMarkers: true, // 因為我們前面已經手動插好圖釘了，所以這裡隱藏預設圖釘
-                polylineOptions: {
-                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00", // 藍橘交錯
+                suppressMarkers: true, // 🌟 隱藏預設 ABC，因為我們有自己的數字了
+                polylineOptions: { 
+                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00", 
                     strokeWeight: 5,
                     strokeOpacity: 0.8
                 }
@@ -203,7 +206,8 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         }
     });
 
-    // 6. 重新推算抵達時間並更新畫面
-    recalculateTimes(dayToCalculate);
-    renderItineraryPanel(dayToCalculate);
+    // 更新左側的行程面板
+    if (typeof renderItineraryPanel === 'function') {
+        renderItineraryPanel(dayToCalculate);
+    }
 }
