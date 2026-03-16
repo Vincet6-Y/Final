@@ -212,6 +212,21 @@
 
         <div id="map" class="absolute inset-0 z-0 h-full w-full bg-slate-100 dark:bg-[#1a140d]"></div>
 
+        <div class="flex-1 relative h-full">
+            <div id="map" class="w-full h-full"></div>
+
+            <button id="ai-sort-btn" onclick="aiSortItinerary()"
+                class="absolute bottom-8 right-6 md:bottom-10 md:right-10 z-[40] flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 text-primary border border-slate-200 dark:border-slate-700 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.2)] font-bold text-sm transition-all duration-300 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white hover:scale-105 active:scale-95 group cursor-pointer">
+
+                <span class="material-symbols-outlined text-xl group-hover:rotate-12 transition-transform duration-300">
+                    auto_fix_high
+                </span>
+
+                <span class="hidden sm:inline">AI 一鍵順路</span>
+                <span class="sm:hidden">一鍵優化</span>
+            </button>
+        </div>
+
         <div class="flex-1 relative pointer-events-none z-10 h-full">
             <div
                 class="hidden md:flex flex-col gap-2 absolute top-6 right-6 w-full max-w-sm pointer-events-auto items-end">
@@ -300,20 +315,20 @@
                     <input
                         class="w-full h-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400"
                         type="text" id="pac-input-mobile" placeholder="搜尋並加入景點..." />
-                        <div id="map" class="w-full h-full ..."></div>
-                
-                        <button id="ai-sort-btn" onclick="aiSortItinerary()"
-                            class="absolute bottom-24 right-4 md:bottom-8 md:right-8 z-40 flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-800 text-primary border border-slate-100 dark:border-slate-700 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] font-bold text-sm transition-all duration-300 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white hover:scale-105 active:scale-95 group cursor-pointer">
-                
-                            <span class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform duration-300">
-                                auto_fix_high
-                            </span>
-                
-                            <span class="hidden sm:inline">AI 一鍵順路</span>
-                            <span class="sm:hidden">一鍵優化</span>
-                        </button>
+                    <div id="map" class="w-full h-full ..."></div>
+
+                    <button id="ai-sort-btn" onclick="aiSortItinerary()"
+                        class="absolute bottom-24 right-4 md:bottom-8 md:right-8 z-40 flex items-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-800 text-primary border border-slate-100 dark:border-slate-700 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] font-bold text-sm transition-all duration-300 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white hover:scale-105 active:scale-95 group cursor-pointer">
+
+                        <span class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform duration-300">
+                            auto_fix_high
+                        </span>
+
+                        <span class="hidden sm:inline">AI 一鍵順路</span>
+                        <span class="sm:hidden">一鍵優化</span>
+                    </button>
                 </div>
-                
+
 
             </div>
         </div>
@@ -334,6 +349,10 @@
     <script th:src="@{/tour/map/myTourUi.js}"></script>
 
     <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
+    <script th:inline="javascript">
+        window.currentMyPlanId = /*[[${myPlan?.myPlanId}]]*/ null;
+        console.log("從伺服器取得的行程 ID:", window.currentMyPlanId);
+    </script>
 </body>
 
 </html>

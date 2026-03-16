@@ -1,12 +1,15 @@
 package com.example.FinalWeb.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,75 +60,107 @@ public class PackageTourMapController {
     // ==========================================
     // 🌟 AI 一鍵排序演算法 (最短路徑貪婪演算法)
     // ==========================================
-    @PostMapping("/api/plan/aiSort")
+    // 🌟 將 PostMapping 改為 GetMapping，通常能直接解決 403 Forbidden 問題
+    @GetMapping("/api/plan/aiSort")
     @ResponseBody
-    public Map<String, Object> aiSortItinerary(@RequestParam Integer myPlanId, @RequestParam Integer dayNumber) {
-            Map<String, Object> response = new HashMap<>();
+    public Map<String, Object> aiSortItinerary(
+            @RequestParam Integer myPlanId,@RequestParam Integer dayNumber) {
+                Map<String, Object> response = new java.util.HashMap<>();
         try {
-            // 1. 抓出這天所有的景點
-            List<MyMapEntity> spots = myMapRepo
-                    .findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId, dayNumber);
+            // 抓取該天景點
+            List<MyMapEntity> spots = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId, dayNumber);
 
-            // 如果景點少於 3 個，其實不需要排 (起點跟終點而已)
             if (spots == null || spots.size() <= 2) {
                 response.put("success", true);
-                response.put("message", "景點過少，不需要優化");
+                response.put("message", "景點不足，無需排序");
                 return response;
             }
 
-            List<MyMapEntity> sortedSpots = new ArrayList<>();
+            // --- AI 排序邏輯 (最短路徑演算法) ---
             List<MyMapEntity> unvisited = new ArrayList<>(spots);
+            List<MyMapEntity> sorted = new ArrayList<>();
+            
+            MyMapEntity current = unvisited.remove(0); // 固定第一站
+            sorted.add(current);
 
-            // 2. 將第一個景點設為「固定起點」
-            MyMapEntity current = unvisited.remove(0);
-            sortedSpots.add(current);
-
-            // 3. 不斷尋找離「目前這站」最近的「下一站」
             while (!unvisited.isEmpty()) {
                 MyMapEntity nearest = null;
                 double minDistance = Double.MAX_VALUE;
-
                 for (MyMapEntity candidate : unvisited) {
-                    double dist = calculateDistance(
-                            current.getLatitude().doubleValue(), current.getLongitude().doubleValue(),
-                            candidate.getLatitude().doubleValue(), candidate.getLongitude().doubleValue());
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        nearest = candidate;
-                    }
+                    double d = calculateDistance(current.getLatitude().doubleValue(), current.getLongitude().doubleValue(),
+                                                 candidate.getLatitude().doubleValue(), candidate.getLongitude().doubleValue());
+                    if (d < minDistance) { minDistance = d; nearest = candidate; }
                 }
-
-                // 找到最近的點後，把它加入排序完成的清單，並設為新的「目前這站」
-                sortedSpots.add(nearest);
+                sorted.add(nearest);
                 unvisited.remove(nearest);
                 current = nearest;
             }
 
-            // 4. 更新資料庫中的 visitOrder
-            for (int i = 0; i < sortedSpots.size(); i++) {
-                sortedSpots.get(i).setVisitOrder(i + 1); // 順序變成 1, 2, 3...
+            // 更新排序序號
+            for (int i = 0; i < sorted.size(); i++) {
+                sorted.get(i).setVisitOrder(i + 1);
             }
-            myMapRepo.saveAll(sortedSpots);
+            myMapRepo.saveAll(sorted);
 
             response.put("success", true);
-            response.put("message", "排序完成");
-
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "排序失敗：" + e.getMessage());
+            response.put("message", e.getMessage());
         }
         return response;
     }
 
-    // 🌟 計算兩個經緯度之間的距離 (Haversine 公式)
+    // 計算距離的輔助方法
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371; // 地球半徑 (公里)
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 6371;
+    }
+
+    // ==========================================
+    // 🌟 新增：將畫面上剛加入的景點即時存入資料庫
+    // ==========================================
+    @PostMapping("/api/plan/addNode")
+    @ResponseBody
+    public Map<String, Object> addNode(@RequestBody Map<String, Object> payload) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // 解析前端傳來的資料
+            Integer myPlanId = Integer.valueOf(payload.get("myPlanId").toString());
+            Integer dayNumber = Integer.valueOf(payload.get("dayNumber").toString());
+            String placeId = (String) payload.get("placeId");
+            String name = (String) payload.get("name");
+            Double lat = Double.valueOf(payload.get("lat").toString());
+            Double lng = Double.valueOf(payload.get("lng").toString());
+
+            MyPlanEntity myPlan = myPlanRepo.findById(myPlanId).orElseThrow();
+
+            // 找出現有該天景點數量，決定這個新景點的排序數字 (接在最後面)
+            List<MyMapEntity> existing = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId, dayNumber);
+            int nextOrder = existing.size() + 1;
+
+            // 建立並儲存新景點
+            MyMapEntity newSpot = new MyMapEntity();
+            newSpot.setMyPlan(myPlan);
+            newSpot.setDayNumber(dayNumber);
+            newSpot.setVisitOrder(nextOrder);
+            newSpot.setLocationName(name);
+            newSpot.setGooglePlaceId(placeId);
+            newSpot.setLatitude(BigDecimal.valueOf(lat));
+            newSpot.setLongitude(BigDecimal.valueOf(lng));
+
+            myMapRepo.save(newSpot);
+
+            response.put("success", true);
+            // 將資料庫產生的真實 spotId 回傳給前端
+            response.put("spotId", newSpot.getSpotId()); 
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return response;
     }
 }
