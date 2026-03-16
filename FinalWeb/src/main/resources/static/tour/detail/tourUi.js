@@ -503,13 +503,33 @@ function toggleMobileView() {
 }
 
 // ==========================================
-// 🌟 新增功能：動態加入「出發日期選擇器」+ Day 按鈕左右滑動箭頭
+// 🌟 新增功能：動態加入「// ...existing code...
+    // 取得 packagetourdetail.html 上設定的天數（優先用 data-total-days / id=total-days / URL 參數 totalDays）
+    const totalDays = (() => {
+        const fromDom =
+            document.querySelector('[data-total-days]') ||
+            document.getElementById('total-days');
+
+        if (fromDom) {
+            const val = fromDom.dataset.totalDays || fromDom.value || fromDom.innerText;
+            const parsed = parseInt(val, 10);
+            if (!Number.isNaN(parsed) && parsed > 0) return parsed;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlDays = parseInt(urlParams.get('totalDays'), 10);
+        if (!Number.isNaN(urlDays) && urlDays > 0) return urlDays;
+
+        return 10; // 預設 10 天
+    })();
+    const daysToAdd = totalDays - 1;
+    // ...existing code...箭頭
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
 
-    const totalDays = 5;
-    const daysToAdd = totalDays - 1;
+  //  const totalDays = 10;
+   // const daysToAdd = totalDays - 1;
 
 
     // ✅ 新增這段魔法：用計時器每 0.1 秒確認一次地圖醒了沒
@@ -582,46 +602,73 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // ✨ 動態生成 Day 按鈕與列表
     // ==========================================
-    function updateDayButtonsAndLists() {
-        // 抓取 HTML 中專門用來放行程列表的容器
-        const listContainerWrapper = document.getElementById('itinerary-lists-container');
-        buttonContainer.innerHTML = '';
+ // ✅ 1. 讓函式獨立在最外面，並接收 actualDays 參數
+// ...existing code...
 
-        for (let i = 1; i <= totalDays; i++) {
-            // 1. 建立 Day 按鈕
-            const btn = document.createElement('button');
-            btn.id = `btn-day-${i}`;
-            btn.setAttribute('onclick', `selectDay(${i})`);
-            btn.className = (i === currentDay)
-                ? "px-5 py-2 rounded-full bg-primary text-white font-bold text-sm whitespace-nowrap transition shadow-md shrink-0"
-                : "px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0";
-
-            btn.innerText = `Day ${i}`; // 乾淨俐落，只顯示 Day X
-            buttonContainer.appendChild(btn);
-
-            // 2. 建立對應的行程列表區塊
-            let listContainer = document.getElementById(`list-day-${i}`);
-            if (!listContainer) {
-                listContainer = document.createElement('div');
-                listContainer.id = `list-day-${i}`;
-                listContainer.className = "day-list p-4 flex flex-col pb-24 pt-0 hidden";
-                listContainer.innerHTML = `
-                        <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
-                            <div class="w-1.5 h-full bg-slate-300 dark:bg-slate-600 absolute left-0 top-0"></div>
-                            <div class="ml-2">
-                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Day ${i} 行程載入中...</h3>
-                            </div>
-                        </div>`;
-                listContainerWrapper.appendChild(listContainer);
-            }
-            if (!itineraryData[i]) itineraryData[i] = [];
-        }
-        // 重新檢查左右箭頭是否需要顯示
-        setTimeout(checkArrows, 100);
+// 🌟 取得行程天數（優先用 data-total-days / id=total-days / 再用 URL 參數 totalDays）
+function getTotalDaysFromPage(defaultDays = 10) {
+    const fromDom = document.querySelector('[data-total-days]') || document.getElementById('total-days');
+    if (fromDom) {
+        const val = fromDom.dataset.totalDays || fromDom.value || fromDom.innerText;
+        const parsed = parseInt(val, 10);
+        if (!Number.isNaN(parsed) && parsed > 0) return parsed;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlDays = parseInt(urlParams.get('totalDays'), 10);
+    if (!Number.isNaN(urlDays) && urlDays > 0) return urlDays;
+
+    return defaultDays;
+}
+
+// ...existing code...
+
+document.addEventListener("DOMContentLoaded", () => {
+    const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
+
+    // ✅ 改用動態天數，不再固定 10 天
+    const totalDays = getTotalDaysFromPage();
+    updateDayButtonsAndLists(totalDays);
+
+    // ✅ 新增這段魔法：用計時器每 0.1 秒確認一次地圖醒了沒
+    const checkReady = setInterval(() => {
+        // 確認 directionsService 已經被 initMap 給初始化了
+        if (typeof directionsService !== 'undefined' && directionsService !== null) {
+            clearInterval(checkReady); // 確認雙方都準備好，停止計時器
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('planId');
+
+            if (planId) {
+                console.log("🟢 畫面與地圖皆已就緒，開始載入資料 ID:", planId);
+                loadPlanData(planId);
+            } else {
+                selectDay(1); // 如果沒有 planId，安全地顯示 Day 1 空畫面
+            }
+        }
+    }, 100);
+
+    // ...existing code...
+});
+
+// ✅ 2. 修改後的 DOMContentLoaded (刪除寫死的 10 天邏輯)
+document.addEventListener("DOMContentLoaded", () => {
+    // 這裡原本寫死 totalDays = 10 的地方全部刪掉！
+    // 這裡原本呼叫 updateDayButtonsAndLists() 的地方也刪掉！
+
+    const checkReady = setInterval(() => {
+        if (typeof directionsService !== 'undefined' && directionsService !== null) {
+            clearInterval(checkReady);
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('planId');
+            if (planId) {
+                loadPlanData(planId); // 讓 API 抓完資料後去決定天數
+            }
+        }
+    }, 100);
+                      
     // 🔴 關鍵修正：呼叫時不要再傳入任何參數 (把原本括號裡的 defaultStart 拿掉)
-    updateDayButtonsAndLists();
+   // updateDayButtonsAndLists();
 }); // 這裡是 DOMContentLoaded 的結尾
 
 // 完善規劃按鈕點擊事件
