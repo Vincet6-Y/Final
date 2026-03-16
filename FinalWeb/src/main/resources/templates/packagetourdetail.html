@@ -189,12 +189,14 @@
                 </button>
             </a>
 
-            <div th:if="${session.loginMember != null}" class="flex items-center gap-4">
-                <span class="text-sm font-bold text-slate-700 dark:text-slate-200" th:text="${session.loginMember.name}">使用者名稱</span>
-                <a th:href="@{/auth/logout}">
-                    <button class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
-                        登出
-                    </button>
+            <div th:if="${session.loginMember != null}" class="flex items-center gap-3">
+                <span class="text-sm font-medium text-neutral-800 dark:text-white">
+                    <span th:text="${session.loginMember.name}"></span>
+                </span>
+
+                <a th:href="@{/member}"
+                    class="bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 py-1.5 rounded-lg text-sm font-bold transition-all">
+                    會員中心
                 </a>
             </div>
 
@@ -274,7 +276,7 @@
     <script th:src="@{/tour/Detail/tourMap.js}" defer></script>
     <script th:src="@{/tour/Detail/tourUi.js}" defer></script>
 
-    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&callback=initMap'" defer></script>
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
 </body>
 
 </html>
