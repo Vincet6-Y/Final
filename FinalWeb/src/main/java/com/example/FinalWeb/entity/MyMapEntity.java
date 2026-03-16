@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,14 +26,17 @@ public class MyMapEntity {
     private Integer dayNumber;
     private Integer visitOrder;
     private String locationName;
+
+    @Column(name = "longitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal longitude;
+    @Column(name = "latitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal latitude;
     private String GooglePlaceId;
-    
+
     // 拉關連線到 myPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "myPlanId")
     @JsonIgnore
     private MyPlanEntity myPlan;
-    
+
 }
