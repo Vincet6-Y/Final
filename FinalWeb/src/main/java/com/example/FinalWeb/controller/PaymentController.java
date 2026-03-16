@@ -51,11 +51,19 @@ public class PaymentController {
     // 1. 建立未付款訂單
     @PostMapping("/createOrderFromPlan")
     @ResponseBody
-    public ResponseEntity<?> createOrderFromPlan(@RequestParam("myPlanId") Integer myPlanId, HttpSession session) {
+    public ResponseEntity<?> createOrderFromPlan(
+            @RequestParam("myPlanId") Integer myPlanId, HttpSession session,
+            @RequestParam(name = "startDate", required = false) String startDate) {
         try {
             MyPlanEntity myPlan = myPlanRepo.findById(myPlanId)
                     .orElseThrow(() -> new IllegalArgumentException("找不到對應的行程"));
 
+            // 🌟 2. 如果前端有傳最新的日期過來，我們就在建立訂單前，先幫行程更新日期！
+            if (startDate != null && !startDate.trim().isEmpty()) {
+                // 確保前端傳來的是 yyyy-MM-dd 格式
+                myPlan.setStartDate(LocalDate.parse(startDate.replace("/", "-")));
+                myPlanRepo.save(myPlan);
+            }
             OrdersEntity order = new OrdersEntity();
             order.setMyPlan(myPlan);
             order.setOrderTime(java.time.LocalDateTime.now());
