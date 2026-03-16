@@ -169,28 +169,73 @@ function closeRichModal() {
     document.getElementById('rich-place-modal').classList.add('hidden');
 }
 
-function confirmAddToItinerary() {
+// ==========================================
+// 🌟 修正：加入景點時，先存資料庫再更新畫面
+// ==========================================
+async function confirmAddToItinerary() {
     if (!tempSelectedPlace) return;
 
-    itineraryData[currentDay].push({
-        place_id: tempSelectedPlace.id, // 🌟 新版是 .id 不是 .place_id
-        lat: tempSelectedPlace.location.lat(), // 🌟 新版直接用 .location
-        lng: tempSelectedPlace.location.lng(),
-        name: tempSelectedPlace.displayName, // 🌟 新版是 .displayName
-        arrivals: "8:00",
-        duration: "1", 
-        hasTicketOffer: Math.random() > 0.5
-    });
+    const planId = window.currentMyPlanId;
+    const day = currentDay;
 
-    calculateAndDisplayRoute(currentDay);
+    if (!planId) {
+        alert("找不到行程 ID，無法加入景點");
+        return;
+    }
 
-    const scrollArea = document.getElementById('itinerary-scroll-area');
-    if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+    // 將按鈕文字改成載入中，避免使用者連點
+    const btnText = document.getElementById('modal-btn-text');
+    const originalText = btnText.innerText;
+    btnText.innerText = "加入中...";
 
-    closeRichModal();
+    try {
+        // 1. 呼叫後端 API，將景點存入資料庫
+        const response = await fetch('/api/plan/addNode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                myPlanId: planId,
+                dayNumber: day,
+                placeId: tempSelectedPlace.id,
+                name: tempSelectedPlace.displayName,
+                lat: tempSelectedPlace.location.lat(),
+                lng: tempSelectedPlace.location.lng()
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // 2. 資料庫儲存成功後，才把帶有真實 spotId 的資料塞進畫面陣列中
+            itineraryData[day].push({
+                spotId: data.spotId, 
+                place_id: tempSelectedPlace.id, 
+                lat: tempSelectedPlace.location.lat(), 
+                lng: tempSelectedPlace.location.lng(),
+                name: tempSelectedPlace.displayName,
+                arrivals: "08:00",
+                duration: "1", 
+                hasTicketOffer: Math.random() > 0.5
+            });
 
-    if (window.innerWidth <= 768 && isMapView) {
-        toggleMobileView();
+            calculateAndDisplayRoute(day);
+
+            const scrollArea = document.getElementById('itinerary-scroll-area');
+            if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+            closeRichModal();
+
+            if (window.innerWidth <= 768 && isMapView) {
+                toggleMobileView();
+            }
+        } else {
+            alert("加入失敗：" + data.message);
+        }
+    } catch (error) {
+        console.error("加入景點發生錯誤:", error);
+        alert("伺服器發生錯誤");
+    } finally {
+        // 恢復按鈕文字
+        btnText.innerText = originalText;
     }
 }
 
