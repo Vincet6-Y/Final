@@ -123,7 +123,7 @@
             });
 
             // =========================
-            // 🌟 側邊欄切換邏輯 (SPA 切換效果)
+            // 🌟 側邊欄切換邏輯 (SPA 切換效果 - 終極雙向版)
             // =========================
             const $navHome = $("#nav-home");
             const $navOrders = $("#nav-orders");
@@ -132,48 +132,56 @@
             const $sectionOrders = $("#section-orders");
             const $sectionFavs = $("#section-favs");
 
-            // 輔助函式：把側邊欄按鈕全部恢復成灰色未選取狀態
+            // 輔助函式：恢復側邊欄按鈕狀態
             function resetNav() {
                 [$navHome, $navOrders, $navFavs].forEach($el => {
                     $el.removeClass("text-primary bg-primary/10").addClass("text-slate-400 hover:text-slate-100");
                 });
             }
 
-            // 1. 點擊「會員首頁」：顯示全部區塊，但訂單只顯示前2筆
+            // --- 1. 處理【會員首頁】 ---
             $navHome.on("click", function () {
                 resetNav();
                 $(this).removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
 
+                // 顯示兩個區塊
                 $sectionOrders.fadeIn(200);
                 $sectionFavs.fadeIn(200);
 
-                $(".extra-order-card").addClass("hidden"); // 把第3筆之後的藏起來
-                $("#btn-view-all-orders").show(); // 恢復「查看全部」按鈕
+                // 恢復初始狀態：隱藏多餘卡片，顯示查看全部按鈕
+                $(".extra-order-card, .extra-fav-card").addClass("hidden");
+                $("#btn-view-all-orders, #btn-view-all-favs").show();
             });
 
-            // 2. 點擊「購買紀錄」或右邊的「查看全部」：隱藏收藏區塊，並展開所有訂單
+            // --- 2. 處理【購買紀錄】 ---
             function showAllOrders() {
                 resetNav();
                 $navOrders.removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
 
-                $sectionFavs.hide(); // 隱藏下方的收藏清單
+                $sectionFavs.hide(); // 隱藏收藏
                 $sectionOrders.fadeIn(200);
 
                 $(".extra-order-card").removeClass("hidden").hide().fadeIn(300); // 展開所有訂單
-                $("#btn-view-all-orders").hide(); // 隱藏「查看全部」按鈕
+                $("#btn-view-all-orders").hide(); // 隱藏按鈕
             }
 
             $navOrders.on("click", showAllOrders);
             $(document).on("click", "#btn-view-all-orders", showAllOrders);
 
-            // 3. 點擊「收藏行程」：隱藏訂單區塊，只顯示收藏
-            $navFavs.on("click", function () {
+            // --- 3. 處理【收藏行程】 ---
+            function showAllFavs() {
                 resetNav();
-                $(this).removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+                $navFavs.removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
 
-                $sectionOrders.hide();
+                $sectionOrders.hide(); // 隱藏訂單
                 $sectionFavs.fadeIn(200);
-            });
+
+                $(".extra-fav-card").removeClass("hidden").hide().fadeIn(300); // 展開所有收藏
+                $("#btn-view-all-favs").hide(); // 隱藏按鈕
+            }
+
+            $navFavs.on("click", showAllFavs);
+            $(document).on("click", "#btn-view-all-favs", showAllFavs);
         });
     </script>
     <script th:src="@{/member/js/accountModal.js}"></script>

@@ -51,6 +51,11 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("找不到該筆訂單 ID: " + orderId));
     }
 
+    // 🌟 給會員首頁用的，負責把這個會員的訂單撈出來並排序
+    public List<OrdersEntity> getMemberOrders(Integer memberId) {
+        return ordersRepo.findByMember_MemberIdOrderByOrderTimeDesc(memberId);
+    }
+
     public int calculateTotalAmount(OrdersEntity order) {
         if (order == null || order.getOrderDetails() == null) {
             return 0;
