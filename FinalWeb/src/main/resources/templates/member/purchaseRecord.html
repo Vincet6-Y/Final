@@ -3,12 +3,14 @@
         <h2 class="flex items-center gap-2 text-xl font-bold text-orange-500">
             <span class="material-symbols-outlined">receipt_long</span> 購買紀錄
         </h2>
-        <a href="#" class="text-sm text-slate-500 hover:text-orange-500 transition-colors">查看全部</a>
+        <a href="javascript:void(0)" id="btn-view-all-orders" th:if="${orders != null && orders.size() > 2}"
+            class="text-sm text-slate-500 hover:text-orange-500 transition-colors">查看全部</a>
     </div>
 
     <div th:if="${orders != null && !orders.isEmpty()}" class="space-y-4">
 
-        <div th:each="order : ${orders}"
+        <div th:each="order, iterStat : ${orders}"
+            th:classappend="${iterStat.index >= 2 ? 'hidden extra-order-card' : ''}"
             class="order-card bg-white/5 dark:bg-[#251d15] border border-slate-200 dark:border-white/10 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center gap-5 hover:border-orange-500/30 transition-colors shadow-sm">
 
             <div class="w-full md:w-40 h-28 rounded-xl overflow-hidden shrink-0 bg-black/20">
@@ -21,7 +23,6 @@
                     th:text="${order.myPlan != null ? order.myPlan.myPlanName : '自訂聖地巡禮'}">行程名稱</h3>
 
                 <div class="flex flex-wrap items-center gap-3 text-sm mt-1">
-
                     <th:block th:if="${order.payStatus != '未付款'}">
                         <span class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
                             <span class="material-symbols-outlined text-[16px]">receipt</span>

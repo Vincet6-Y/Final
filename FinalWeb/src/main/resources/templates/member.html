@@ -24,11 +24,11 @@
                             <span class="material-symbols-outlined text-sm">edit</span>
                         </div>
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-100"
-                        th:text="'聖地旅者 · ' + ${session.loginMember.name}">
+                    <h1 class="text-2xl font-bold text-slate-100" th:text="'聖地旅者 · ' + ${session.loginMember.name}">
                     </h1>
                     <div class="w-full mt-8 flex justify-center">
-                        <div class="w-full max-w-[130px] flex flex-col items-center py-3 bg-white/5 rounded-xl border border-white/5">
+                        <div
+                            class="w-full max-w-[130px] flex flex-col items-center py-3 bg-white/5 rounded-xl border border-white/5">
                             <span class="text-3xl font-bold text-primary leading-none">12</span>
                             <span class="text-[14px] tracking-wider text-slate-400 mt-1">已收藏行程</span>
                         </div>
@@ -42,7 +42,7 @@
 
                         <div class="relative w-1/2">
                             <button id="memberMenuBtn" type="button"
-                                    class="w-full py-3 bg-primary text-background-dark font-bold rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2">
+                                class="w-full py-3 bg-primary text-background-dark font-bold rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2">
                                 <span>帳戶設定</span>
                                 <span class="material-symbols-outlined text-[20px]">settings</span>
                             </button>
@@ -51,13 +51,13 @@
                                 class="absolute right-0 top-14 w-64 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden z-50">
 
                                 <button type="button" id="openAccountModal"
-                                        class="w-full flex items-center gap-3 px-4 py-4 text-sm text-left text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition border-b border-slate-200 dark:border-white/10">
+                                    class="w-full flex items-center gap-3 px-4 py-4 text-sm text-left text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition border-b border-slate-200 dark:border-white/10">
                                     <span class="material-symbols-outlined text-[20px]">settings</span>
                                     帳戶設定
                                 </button>
 
                                 <a th:href="@{/member/logout}"
-                                class="flex items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+                                    class="flex items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
                                     <span class="material-symbols-outlined text-[20px]">logout</span>
                                     登出
                                 </a>
@@ -67,17 +67,18 @@
                 </div>
                 <!-- Navigation List -->
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-2 hidden lg:flex flex-col">
-                    <a class="flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 rounded-lg" href="#">
+                    <a id="nav-home"
+                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 rounded-lg">
                         <span class="material-symbols-outlined">person</span>
                         <span class="font-medium">會員首頁</span>
                     </a>
-                    <a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 transition-colors"
-                        href="#">
+                    <a id="nav-orders"
+                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 transition-colors">
                         <span class="material-symbols-outlined">map</span>
                         <span class="font-medium">購買紀錄</span>
                     </a>
-                    <a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 transition-colors"
-                        href="#">
+                    <a id="nav-favs"
+                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 transition-colors">
                         <span class="material-symbols-outlined">history</span>
                         <span class="font-medium">收藏行程</span>
                     </a>
@@ -86,9 +87,14 @@
             <!-- Main Content -->
             <div class="lg:col-span-8 flex flex-col gap-8">
                 <!-- Purchase Records Section -->
-                <th:block th:replace="~{member/purchaseRecord :: purchaseRecord}"></th:block>
+                <div id="section-orders">
+                    <th:block th:replace="~{member/purchaseRecord :: purchaseRecord}"></th:block>
+                </div>
                 <!-- Saved List Section -->
-                <th:block th:replace="~{member/favoritePlan :: favoritePlan}"></th:block>
+
+                <div id="section-favs">
+                    <th:block th:replace="~{member/favoritePlan :: favoritePlan}"></th:block>
+                </div>
             </div>
         </main>
         <!-- Footer Footer -->
@@ -99,6 +105,9 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         $(function () {
+            // =========================
+            // 帳戶設定的下拉選單
+            // =========================
             const $memberMenuBtn = $("#memberMenuBtn");
             const $memberMenu = $("#memberMenu");
 
@@ -111,6 +120,59 @@
                 if (!$(e.target).closest("#memberMenu, #memberMenuBtn").length) {
                     $memberMenu.stop(true, true).slideUp(180);
                 }
+            });
+
+            // =========================
+            // 🌟 側邊欄切換邏輯 (SPA 切換效果)
+            // =========================
+            const $navHome = $("#nav-home");
+            const $navOrders = $("#nav-orders");
+            const $navFavs = $("#nav-favs");
+
+            const $sectionOrders = $("#section-orders");
+            const $sectionFavs = $("#section-favs");
+
+            // 輔助函式：把側邊欄按鈕全部恢復成灰色未選取狀態
+            function resetNav() {
+                [$navHome, $navOrders, $navFavs].forEach($el => {
+                    $el.removeClass("text-primary bg-primary/10").addClass("text-slate-400 hover:text-slate-100");
+                });
+            }
+
+            // 1. 點擊「會員首頁」：顯示全部區塊，但訂單只顯示前2筆
+            $navHome.on("click", function () {
+                resetNav();
+                $(this).removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+
+                $sectionOrders.fadeIn(200);
+                $sectionFavs.fadeIn(200);
+
+                $(".extra-order-card").addClass("hidden"); // 把第3筆之後的藏起來
+                $("#btn-view-all-orders").show(); // 恢復「查看全部」按鈕
+            });
+
+            // 2. 點擊「購買紀錄」或右邊的「查看全部」：隱藏收藏區塊，並展開所有訂單
+            function showAllOrders() {
+                resetNav();
+                $navOrders.removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+
+                $sectionFavs.hide(); // 隱藏下方的收藏清單
+                $sectionOrders.fadeIn(200);
+
+                $(".extra-order-card").removeClass("hidden").hide().fadeIn(300); // 展開所有訂單
+                $("#btn-view-all-orders").hide(); // 隱藏「查看全部」按鈕
+            }
+
+            $navOrders.on("click", showAllOrders);
+            $(document).on("click", "#btn-view-all-orders", showAllOrders);
+
+            // 3. 點擊「收藏行程」：隱藏訂單區塊，只顯示收藏
+            $navFavs.on("click", function () {
+                resetNav();
+                $(this).removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+
+                $sectionOrders.hide();
+                $sectionFavs.fadeIn(200);
             });
         });
     </script>
