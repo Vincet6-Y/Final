@@ -39,55 +39,53 @@
               搜尋
             </button>
           </div>
-         <div class="flex flex-wrap justify-center gap-4">
+          <div class="flex flex-wrap justify-center gap-4">
           <a th:href="@{/workList(page=0, size=4, workClass='電影')}"
             class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">      
               <span class="material-symbols-outlined text-sm">movie</span>
-        電影場景巡禮
-    </a>
-
-    <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
-       class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
-        <span class="material-symbols-outlined text-sm">animation</span>
-        動畫場景巡禮
-     </a>
-    </div>
+            電影場景巡禮
+          </a>
+          <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
+            class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
+              <span class="material-symbols-outlined text-sm">animation</span>
+              動畫場景巡禮
+          </a>
+          </div>
         </div>
       </section>
-       <section class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors">
+      <section class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors">
         <div class="flex items-center justify-between mb-10">
           <h3 class="text-slate-900 dark:text-white text-3xl font-bold border-l-4 border-primary pl-4">
             精選作品
           </h3>
-        <a th:href="@{/workList}" class="text-[#FF9D1C] hover:text-[#FFB34D] hover:underline text-sm font-medium transition-colors">
-  查看更多作品
-</a>
+          <a th:href="@{/workList}" class="text-[#FF9D1C] hover:text-[#FFB34D] hover:underline text-sm font-medium transition-colors">
+            查看更多作品
+          </a>
         </div>
         <div class="flex overflow-x-auto gap-6 pb-8 no-scrollbar">
-        <div th:each="work : ${featuredList}" class="flex-shrink-0 w-80 group">
-            <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                <img th:alt="${work.workName}"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    th:src="${work.workImg}" /> 
-                <span class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
-                      th:text="${work.workClass}">分類</span>
-            </div>
-            
-            <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1" th:text="${work.workName}">
-                作品名稱
-            </h4>
-            
-            <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2" th:text="${work.description}">
-                作品簡介...
-            </p>
+          <div th:each="work : ${featuredList}" class="flex-shrink-0 w-80 group">
+              <div class="relative h-48 rounded-xl overflow-hidden mb-4">
+                  <img th:alt="${work.workName}"
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      th:src="${work.workImg}" /> 
+                  <span class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
+                        th:text="${work.workClass}">分類</span>
+              </div>
+              
+              <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1" th:text="${work.workName}">
+                  作品名稱
+              </h4>
+              
+              <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2" th:text="${work.description}">
+                  作品簡介...
+              </p>
 
-            <a th:href="@{/workListDetail(workId=${work.workId})}"
-              class="block w-full py-2 text-center border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all no-underline">
-                查看詳情
-            </a>
+              <a th:href="@{/workListDetail(workId=${work.workId})}"
+                class="block w-full py-2 text-center border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all no-underline">
+                  查看詳情
+              </a>
+          </div>
         </div>
-        </div>
-        
       </section>
 
       <section class="py-16 px-6 lg:px-20 bg-slate-50 dark:bg-background-dark transition-colors">
@@ -115,43 +113,44 @@
                 </div>
                 
               </div>
+              <span class="text-slate-900 dark:text-white text-xl font-bold leading-relaxed tracking-widest">日本景點<br />活動情報</span>
             </div>
+          </div>
 
-            <div id="content-mofa"
-              class="hidden w-full h-full min-h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 overflow-y-auto text-slate-700 dark:text-slate-300">
-              <h4 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined">gavel</span> 外交部領事事務局：日本入境重點
-              </h4>
-              <div class="space-y-6">
-                <div class="p-4 bg-slate-50 dark:bg-white/5 rounded-lg border-l-4 border-primary">
-                  <p class="font-bold text-slate-900 dark:text-white mb-2">📌 簽證與入境</p>
-                  <p>目前持中華民國護照（有身分證字號）可享 **90 天免簽證** 待遇。建議旅客出發前至「Visit Japan Web」完成申報，節省通關時間。</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
-                    <p class="font-bold text-slate-900 dark:text-white mb-2">🩺 醫療保險</p>
-                    <p class="text-sm leading-relaxed">
-                      日本醫療費昂貴，曾發生國人突發疾病後須支付數百萬日幣醫療費。外交部強烈建議國人出國前投保包含「<span
-                        class="font-bold text-primary">海外突發疾病醫療附加險</span>」之旅遊平安險。
-                    </p>
-                  </div>
-                  <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
-                    <p class="font-bold text-slate-900 dark:text-white mb-2">🚨 緊急求助</p>
-                    <p class="text-sm">警察局撥 110、救護車/火警撥 119。若需駐外館處協助，請聯絡駐日代表處。</p>
-                    <p class="mt-4 text-xs">台北駐日經濟文化代表處（東京）：</p>
-                    <p class="font-bold text-primary">(+81) 3-3280-7811</p>
-                    <p class="text-xs">外交部領事事務局急難救助專線：</p>
-                    <p class="font-bold text-primary">0800-085-095</p>
-                  </div>
-                </div>
+          <div id="content-mofa"
+            class="hidden w-full h-full min-h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 overflow-y-auto text-slate-700 dark:text-slate-300">
+            <h4 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+              <span class="material-symbols-outlined">gavel</span> 外交部領事事務局：日本入境重點
+            </h4>
+            <div class="space-y-6">
+              <div class="p-4 bg-slate-50 dark:bg-white/5 rounded-lg border-l-4 border-primary">
+                <p class="font-bold text-slate-900 dark:text-white mb-2">📌 簽證與入境</p>
+                <p>目前持中華民國護照（有身分證字號）可享 **90 天免簽證** 待遇。建議旅客出發前至「Visit Japan Web」完成申報，節省通關時間。</p>
               </div>
-                <p class="text-sm opacity-70 italic text-right">資料來源：外交部領事事務局 (2026 更新)</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
+                  <p class="font-bold text-slate-900 dark:text-white mb-2">🩺 醫療保險</p>
+                  <p class="text-sm leading-relaxed">
+                    日本醫療費昂貴，曾發生國人突發疾病後須支付數百萬日幣醫療費。外交部強烈建議國人出國前投保包含「<span
+                      class="font-bold text-primary">海外突發疾病醫療附加險</span>」之旅遊平安險。
+                  </p>
+                </div>
+                <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
+                  <p class="font-bold text-slate-900 dark:text-white mb-2">🚨 緊急求助</p>
+                  <p class="text-sm">警察局撥 110、救護車/火警撥 119。若需駐外館處協助，請聯絡駐日代表處。</p>
+                  <p class="mt-4 text-xs">台北駐日經濟文化代表處（東京）：</p>
+                  <p class="font-bold text-primary">(+81) 3-3280-7811</p>
+                  <p class="text-xs">外交部領事事務局急難救助專線：</p>
+                  <p class="font-bold text-primary">0800-085-095</p>
+                </div>
               </div>
             </div>
+            <p class="text-sm opacity-70 italic text-right">資料來源：外交部領事事務局 (2026 更新)</p>
           </div>
         </div>
       </section>
     </main>
+  </div>
 
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
   </div>

@@ -1,5 +1,6 @@
 package com.example.FinalWeb.controller;
 
+import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.MyMapEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.entity.MyPlanEntity;
@@ -12,6 +13,7 @@ import com.example.FinalWeb.repo.MyPlanRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +65,8 @@ public class PaymentController {
             order.setPayStatus("未付款");
 
             Object memberObj = session.getAttribute("loginMember");
-            if (memberObj != null && memberObj instanceof com.example.FinalWeb.entity.MemberEntity) {
-                order.setMember((com.example.FinalWeb.entity.MemberEntity) memberObj);
+            if (memberObj != null && memberObj instanceof MemberEntity) {
+                order.setMember((MemberEntity) memberObj);
             } else if (myPlan.getMember() != null) {
                 order.setMember(myPlan.getMember());
             }
@@ -72,7 +75,7 @@ public class PaymentController {
             return ResponseEntity.ok(Map.of("success", true, "orderId", savedOrder.getOrderId()));
 
         } catch (Exception e) {
-            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
@@ -86,17 +89,25 @@ public class PaymentController {
                     : new OrdersEntity();
             model.addAttribute("order", order);
 
-            // 🌟 呼叫 Service 算錢，一行解決！
+            // 呼叫 Service 算錢
             model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
             List<TicketService.TicketInfo> availableTickets = new ArrayList<>();
             if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
-                for (MyMapEntity myMap : order.getMyPlan().getMyMaps()) {
+                List<MyMapEntity> planSpots = order.getMyPlan().getMyMaps();
+
+                // 抓取對應景點的門票
+                for (MyMapEntity myMap : planSpots) {
                     TicketService.TicketInfo ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
                     if (ticket != null) {
                         availableTickets.add(ticket);
                     }
                 }
+
+                // 呼叫 TicketService 取得智慧推薦的交通票，並傳給前端 Model
+                List<TicketService.TicketInfo> recommendedTransports = ticketService
+                        .recommendTransportTickets(planSpots);
+                model.addAttribute("recommendedTransports", recommendedTransports);
             }
             model.addAttribute("availableTickets", availableTickets);
         }
@@ -109,8 +120,9 @@ public class PaymentController {
             @RequestParam(name = "newPlanName", required = false) String newPlanName,
             @RequestParam(name = "addonTicketName", required = false) List<String> addonTicketNames,
             @RequestParam(name = "addonTicketPrice", required = false) List<Integer> addonTicketPrices,
-            @RequestParam(name = "addonTransportName", required = false) String addonTransportName,
-            @RequestParam(name = "addonTransportPrice", required = false) Integer addonTransportPrice) {
+            @RequestParam(name = "transportId", required = false) String transportId,
+            @RequestParam(name = "newStartDate", required = false) String newStartDate,
+            @RequestParam(name = "removeDetailIds", required = false) List<Integer> removeDetailIds) {
 
         // 取得訂單
         OrdersEntity order = orderService.getOrderById(orderId);
@@ -120,12 +132,18 @@ public class PaymentController {
             order.getMyPlan().setMyPlanName(newPlanName.trim());
             myPlanRepo.save(order.getMyPlan());
         }
+        // 修改預計出發日期
+        if (newStartDate != null && !newStartDate.isEmpty() && order.getMyPlan() != null) {
+            order.getMyPlan().setStartDate(LocalDate.parse(newStartDate));
+            myPlanRepo.save(order.getMyPlan());
+        }
+        // 呼叫 Service 把不要的舊票券刪掉
+        orderService.removeOrderDetails(removeDetailIds);
 
-        // 🌟 呼叫 Service 處理所有加購票券的存檔工作
-        orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, addonTransportName,
-                addonTransportPrice);
+        // 處理加購票券
+        orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, transportId);
 
-        // 🌟 重新去資料庫抓最新的訂單(包含剛剛加購的明細)，再呼叫 Service 算出最新總金額
+        // 重新去資料庫抓最新的訂單(包含剛剛加購的明細)
         OrdersEntity updatedOrder = orderService.getOrderById(orderId);
         int currentTotalAmount = orderService.calculateTotalAmount(updatedOrder);
 
@@ -142,7 +160,7 @@ public class PaymentController {
         return ecpayService.ecpayCheckout(orderId);
     }
 
-    // 4. 綠界背景回傳 (保持不變)
+    // 4. 綠界背景回傳
     @PostMapping("/callback")
     @ResponseBody
     public String ecpayCallback(@RequestParam Map<String, String> params) {
@@ -197,7 +215,7 @@ public class PaymentController {
             ordersRepo.findById(orderId).ifPresent(order -> {
                 model.addAttribute("order", order);
 
-                // 🌟 呼叫 Service 算總金額
+                // 呼叫 Service 算總金額
                 model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
                 if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
@@ -205,16 +223,22 @@ public class PaymentController {
                     model.addAttribute("myPlan", order.getMyPlan());
                     model.addAttribute("myMaps", allMaps);
 
-                    // 🌟 呼叫 Service 取得分組好的行程表
+                    // 呼叫 Service 取得分組好的行程表
                     model.addAttribute("groupedByDay", orderService.groupMapsByDay(allMaps));
 
                     // 計算最大天數
                     int maxDay = allMaps.stream().mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1).max()
                             .orElse(1);
                     model.addAttribute("maxDay", maxDay);
+                    // 根據 startDate 跟 maxDay 算出結束日期
+                    if (order.getMyPlan().getStartDate() != null) {
+                        // 結束日期 = 出發日期 + (總天數 - 1) 天
+                        LocalDate endDate = order.getMyPlan().getStartDate().plusDays(maxDay - 1);
+                        model.addAttribute("endDate", endDate);
+                    }
                 }
 
-                // 🌟 呼叫 Service 一次取得分類好的實體票與交通票
+                // 呼叫 Service 一次取得分類好的實體票與交通票
                 Map<String, Object> classifiedTickets = orderService.classifyTickets(order);
 
                 // 因為 Service 回傳的是 Object，我們需要做個安全的強制轉型再塞給 Model

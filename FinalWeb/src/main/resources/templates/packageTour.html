@@ -26,14 +26,14 @@
                                     <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">全部行程</span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="radio" name="dayCount" value="3"
-                                        class="day-filter w-4 h-4 border-slate-300 text-primary focus:ring-primary dark:border-white/10 dark:bg-white/5" />
-                                    <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">3天</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="radio" name="dayCount" value="5"
                                         class="day-filter w-4 h-4 border-slate-300 text-primary focus:ring-primary dark:border-white/10 dark:bg-white/5" />
                                     <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">5天</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="radio" name="dayCount" value="10"
+                                        class="day-filter w-4 h-4 border-slate-300 text-primary focus:ring-primary dark:border-white/10 dark:bg-white/5" />
+                                    <span class="text-sm text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">10天</span>
                                 </label>
                             </div>
                         </div>
@@ -99,6 +99,37 @@
     </div>
 
     <script th:src="@{/tour/packageTour.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const filters = document.querySelectorAll('.day-filter');
+    const cards = document.querySelectorAll('.tour-card');
+
+    filters.forEach(filter => {
+        filter.addEventListener('change', function() {
+            const selectedValue = this.value; // "all", "5", "10"
+
+            cards.forEach(card => {
+                const cardDays = card.getAttribute('data-days');
+                
+                // 判斷是否符合條件
+                const isMatch = (selectedValue === 'all' || cardDays === selectedValue);
+
+                if (isMatch) {
+                    card.style.display = 'flex';
+                    // 增加一個微小的動畫效果
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transition = 'opacity 0.3s ease';
+                    }, 10);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+    </script>
 </body>
 
 </html>
