@@ -3,7 +3,7 @@
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
-<body
+<body th:data-order-id="${order != null ? order.orderId : 0}"
     class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
         <header th:replace="~{ fragments/header :: myHeader}"> </header>
@@ -171,26 +171,30 @@
                             <li th:each="ticket : ${transportTickets}"
                                 class="transport-card cursor-pointer group bg-white dark:bg-black/20 rounded-xl border border-orange-200/50 dark:border-orange-900/50 p-4 shadow-sm hover:shadow-md hover:border-orange-400/50 transition-all flex flex-col gap-2"
                                 th:data-ticket-id="${ticket.orderDetailId}" th:data-ticket-name="${ticket.ticketType}">
-                                <div class="flex items-center justify-between">
-                                    <span class="flex items-center gap-2">
+
+                                <div class="flex items-center justify-between gap-4">
+
+                                    <span class="flex items-center gap-2 flex-1 min-w-0">
                                         <span
-                                            class="material-symbols-outlined text-orange-500 text-base group-hover:scale-110 transition-transform">local_offer</span>
-                                        <span
-                                            class="text-sm text-slate-700 dark:text-slate-200 font-bold group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors"
-                                            th:text="${ticket.ticketType}">票券名稱</span>
-                                    </span>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs font-bold text-orange-600 dark:text-orange-400 mr-1"
-                                            th:text="'NT$ ' + ${#numbers.formatInteger(ticket.ticketPrice, 0, 'COMMA')}">NT$
-                                            0
-                                        </span>
+                                            class="material-symbols-outlined text-orange-500 text-base group-hover:scale-110 transition-transform shrink-0">local_offer</span>
 
                                         <span
-                                            class="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-orange-500/20">
-                                            <span class="material-symbols-outlined text-[10px]">local_activity</span>
-                                            付費
+                                            class="text-sm text-slate-700 dark:text-slate-200 font-bold group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors truncate"
+                                            th:title="${ticket.ticketType}" th:text="${ticket.ticketType}">票券名稱</span>
+                                    </span>
+
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span
+                                            class="text-xs font-bold text-orange-600 dark:text-orange-400 mr-1 whitespace-nowrap"
+                                            th:text="'NT$ ' + ${#numbers.formatInteger(ticket.ticketPrice, 0, 'COMMA')}">NT$
+                                            0</span>
+
+                                        <span
+                                            class="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-orange-500/20 whitespace-nowrap">
+                                            <span class="material-symbols-outlined text-[10px]">local_activity</span> 付費
                                         </span>
                                     </div>
+
                                 </div>
                             </li>
                         </ul>
@@ -282,236 +286,9 @@
     <script th:if="${apiKey != null && apiKey != 'NONE'}"
         th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly'"></script>
 
-    <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script th:inline="javascript">
-        // ==========================================
-        // 🎫 jQuery 驅動的 QR Code & 行程互動邏輯
-        // ==========================================
-
-        $(document).ready(function () {
-
-            // 從 Thymeleaf 注入訂單 ID
-            const orderId = /*[[${order != null ? order.orderId : 0}]]*/ 0;
-
-            // ==========================================
-            // 📦 頁面載入時，從後端撈取所有票券資料
-            // ==========================================
-            let ticketDataMap = {}; // key: spotId, value: ticket info
-
-            if (orderId > 0) {
-                $.ajax({
-                    url: '/api/ticket/byOrder/' + orderId,
-                    method: 'GET',
-                    dataType: 'json',
-                    success: function (tickets) {
-                        console.log('📦 載入票券資料:', tickets);
-                        // 建立 spotId → ticket 的對照表
-                        tickets.forEach(function (ticket) {
-                            if (ticket.spotId) {
-                                ticketDataMap[ticket.spotId] = ticket;
-                            }
-                            // 同時建立 orderDetailId 的對照表
-                            ticketDataMap['detail_' + ticket.orderDetailId] = ticket;
-                        });
-
-                        // 把所有 ticket 也用 orderDetailId 建立索引
-                        window.allTickets = tickets;
-                    },
-                    error: function (xhr) {
-                        console.warn('票券資料載入失敗:', xhr.status);
-                    }
-                });
-            }
-
-            // ==========================================
-            // 📅 Day 分頁切換 (jQuery)
-            // ==========================================
-            $('.day-tab').on('click', function () {
-                const day = $(this).data('day');
-
-                // 切換 Tab 樣式
-                $('.day-tab')
-                    .removeClass('bg-primary text-white shadow-lg shadow-primary/30')
-                    .addClass('bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300');
-                $(this)
-                    .removeClass('bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300')
-                    .addClass('bg-primary text-white shadow-lg shadow-primary/30');
-
-                // 切換 Panel
-                $('.day-panel').addClass('hidden');
-                $('[data-day-panel="' + day + '"]').removeClass('hidden');
-            });
-
-            // Day 左右滾動
-            $('#day-scroll-left').on('click', function () {
-                $('#day-tabs').animate({ scrollLeft: '-=150' }, 300);
-            });
-            $('#day-scroll-right').on('click', function () {
-                $('#day-tabs').animate({ scrollLeft: '+=150' }, 300);
-            });
-
-            // ==========================================
-            // 🏛️ 景點 Modal — 點擊景點卡片
-            // ==========================================
-            $(document).on('click', '.spot-card', function () {
-                const $card = $(this);
-                const spotName = $card.data('spot-name');
-                const placeId = $card.data('place-id');
-                const hasTicket = $card.data('has-ticket') === true || $card.data('has-ticket') === 'true';
-                const spotId = $card.data('spot-id');
-                const day = $card.data('day');
-                const visitOrder = $card.data('order');
-
-                // 設定 Modal 基本資訊
-                $('#modal-name').text(spotName);
-                $('#modal-description').text('載入中...');
-                $('#modal-detail').text('');
-                $('#modal-photo').html(
-                    '<span class="material-symbols-outlined text-4xl text-slate-300 animate-pulse">photo_camera</span>'
-                );
-
-                // ==========================================
-                // 🎫 QR Code 區塊：用 jQuery AJAX 從後端取得
-                // ==========================================
-                if (hasTicket && ticketDataMap[spotId]) {
-                    const ticket = ticketDataMap[spotId];
-                    $('#modal-ticket-section').removeClass('hidden');
-                    $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticket.orderDetailId);
-
-                    if (ticket.ticketUsed) {
-                        $('#modal-ticket-status')
-                            .text('⚠️ 此票券已使用過')
-                            .removeClass('text-primary/70').addClass('text-red-400');
-                    } else {
-                        $('#modal-ticket-status')
-                            .text('請在入口處出示此 QR Code 進行掃描驗證。')
-                            .removeClass('text-red-400').addClass('text-primary/70');
-                    }
-                } else if (hasTicket) {
-                    $('#modal-ticket-section').removeClass('hidden');
-                    $('#modal-qrcode').attr('src', 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
-                    $('#modal-ticket-status').text('票券資訊載入中...');
-
-                    if (window.allTickets && window.allTickets.length > 0) {
-                        const matchedTicket = window.allTickets.find(function (t) {
-                            return t.ticketType && t.ticketType.includes(spotName);
-                        }) || window.allTickets[0];
-
-                        if (matchedTicket) {
-                            $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + matchedTicket.orderDetailId);
-                            $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。');
-                        }
-                    }
-                } else {
-                    $('#modal-ticket-section').addClass('hidden');
-                }
-
-                // 顯示 Modal
-                $('#spotModal').removeClass('hidden').addClass('flex');
-
-                // ==========================================
-                // 📸 Google Places API 載入照片 (新版安全寫法)
-                // ==========================================
-                if (placeId && typeof google !== 'undefined' && google.maps && google.maps.places) {
-                    if (google.maps.places.Place) {
-                        const place = new google.maps.places.Place({ id: placeId });
-
-                        place.fetchFields({ fields: ['photos', 'editorialSummary', 'formattedAddress'] })
-                            .then(() => {
-                                if (place.photos && place.photos.length > 0) {
-                                    const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
-                                    $('#modal-photo').html(
-                                        '<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />'
-                                    );
-                                }
-
-                                const desc = place.editorialSummary ? place.editorialSummary.text : '';
-                                $('#modal-description').text(desc || spotName + ' — 值得一遊的景點！');
-                                $('#modal-detail').text(place.formattedAddress || '');
-                            })
-                            .catch((error) => {
-                                console.error("載入照片或地點細節失敗：", error);
-                                $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                                $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
-                            });
-                    } else {
-                        console.warn("找不到新版 Place API，請確認你的 script tag 有加上 v=weekly");
-                        $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                    }
-                } else {
-                    $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
-                    $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
-                }
-            });
-
-            // ==========================================
-            // 🎫 交通票券 Modal — 點擊交通票卡片
-            // ==========================================
-            $(document).on('click', '.transport-card', function () {
-                const $card = $(this);
-                const ticketName = $card.data('ticket-name');
-                const ticketId = $card.data('ticket-id');
-
-                // 設定 Modal 基本資訊
-                $('#modal-name').text(ticketName);
-                $('#modal-description').text('交通票券 & 附加項目');
-                $('#modal-detail').text('請妥善保存您的電子票券。');
-                $('#modal-photo').html(
-                    '<div class="w-full h-full flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-900/10 text-orange-400">' +
-                    '<span class="material-symbols-outlined text-6xl mb-2">train</span>' +
-                    '<span class="font-bold text-lg px-6 w-full text-center truncate">' + ticketName + '</span>' +
-                    '</div>'
-                );
-
-                // 顯示 QR Code 區塊
-                $('#modal-ticket-section').removeClass('hidden');
-
-                // 🔑 直接指向後端 API
-                $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticketId);
-
-                // 如果從 ticketDataMap 找得到這張票，判斷是否已使用
-                const ticketKey = 'detail_' + ticketId;
-                if (ticketDataMap[ticketKey] && ticketDataMap[ticketKey].ticketUsed) {
-                    $('#modal-ticket-status')
-                        .text('⚠️ 此票券已使用過')
-                        .removeClass('text-primary/70').addClass('text-red-400');
-                } else {
-                    $('#modal-ticket-status')
-                        .text('請在入口處出示此 QR Code 進行掃描驗證。')
-                        .removeClass('text-red-400').addClass('text-primary/70');
-                }
-
-                // 顯示 Modal
-                $('#spotModal').removeClass('hidden').addClass('flex');
-            });
-
-            //
-            // ==========================================
-            // ❌ 關閉 Modal
-            // ==========================================
-            $('#closeModalBtn').on('click', function () {
-                $('#spotModal').addClass('hidden').removeClass('flex');
-            });
-
-            // 點擊背景關閉
-            $('#spotModal').on('click', function (e) {
-                if (e.target === this) {
-                    $(this).addClass('hidden').removeClass('flex');
-                }
-            });
-
-            // ESC 鍵關閉
-            $(document).on('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    $('#spotModal').addClass('hidden').removeClass('flex');
-                }
-            });
-
-        }); // end $(document).ready
-    </script>
-
+    <script th:src="@{/payment/paymentsuccess.js}"></script>
 </body>
 
 </html>
