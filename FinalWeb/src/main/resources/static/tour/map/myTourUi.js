@@ -131,10 +131,10 @@ async function openPlaceDetails(day, index) {
         fetchAndShowDetails(placeId);
     } else {
         console.log(`[${placeNode.name}] 缺少或無效 ID (${placeId})，啟動新版 API 即時搜尋...`);
-        
+
         try {
             const { Place } = await google.maps.importLibrary("places");
-            
+
             // 🌟 使用新版 API 的 searchByText
             const request = {
                 textQuery: placeNode.name,
@@ -146,14 +146,14 @@ async function openPlaceDetails(day, index) {
             };
 
             const { places } = await Place.searchByText(request);
-            
+
             if (places && places.length > 0) {
                 const foundPlaceId = places[0].id;
                 console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
-        
+
                 // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
                 placeNode.place_id = foundPlaceId;
-        
+
                 // 呼叫 API 顯示彈窗
                 fetchAndShowDetails(foundPlaceId);
             } else {
@@ -202,19 +202,19 @@ async function confirmAddToItinerary() {
                 lng: tempSelectedPlace.location.lng()
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // 2. 資料庫儲存成功後，才把帶有真實 spotId 的資料塞進畫面陣列中
             itineraryData[day].push({
-                spotId: data.spotId, 
-                place_id: tempSelectedPlace.id, 
-                lat: tempSelectedPlace.location.lat(), 
+                spotId: data.spotId,
+                place_id: tempSelectedPlace.id,
+                lat: tempSelectedPlace.location.lat(),
                 lng: tempSelectedPlace.location.lng(),
                 name: tempSelectedPlace.displayName,
                 arrivals: "08:00",
-                duration: "1", 
+                duration: "1",
                 hasTicketOffer: Math.random() > 0.5
             });
 
@@ -781,8 +781,17 @@ function goToPayment() {
         return false;
     }
 
-    // 打 API 給後端建立真實訂單
-    fetch(`/payment/createOrderFromPlan?myPlanId=${myPlanId}`, {
+    // 🌟 核心修改：抓出畫面上隱藏的日期輸入框的值 (也就是使用者選好的最新出發日期)
+    // 因為在你的「動態加入出發日期選擇器」功能中，那個 input 的 type 是 date
+    const dateInput = document.querySelector('input[type="date"]');
+    let startDateParam = "";
+    if (dateInput && dateInput.value) {
+        // 確保格式是 yyyy-MM-dd
+        startDateParam = `&startDate=${dateInput.value}`;
+    }
+
+    // 打 API 給後端建立真實訂單 (🌟 加上了 startDateParam)
+    fetch(`/payment/createOrderFromPlan?myPlanId=${myPlanId}${startDateParam}`, {
         method: 'POST'
     })
         .then(response => response.json())
