@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,11 +66,12 @@ public class PackageTourMapController {
     @GetMapping("/api/plan/aiSort")
     @ResponseBody
     public Map<String, Object> aiSortItinerary(
-            @RequestParam Integer myPlanId,@RequestParam Integer dayNumber) {
-                Map<String, Object> response = new java.util.HashMap<>();
+            @RequestParam Integer myPlanId, @RequestParam Integer dayNumber) {
+        Map<String, Object> response = new java.util.HashMap<>();
         try {
             // 抓取該天景點
-            List<MyMapEntity> spots = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId, dayNumber);
+            List<MyMapEntity> spots = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId,
+                    dayNumber);
 
             if (spots == null || spots.size() <= 2) {
                 response.put("success", true);
@@ -79,7 +82,7 @@ public class PackageTourMapController {
             // --- AI 排序邏輯 (最短路徑演算法) ---
             List<MyMapEntity> unvisited = new ArrayList<>(spots);
             List<MyMapEntity> sorted = new ArrayList<>();
-            
+
             MyMapEntity current = unvisited.remove(0); // 固定第一站
             sorted.add(current);
 
@@ -87,9 +90,13 @@ public class PackageTourMapController {
                 MyMapEntity nearest = null;
                 double minDistance = Double.MAX_VALUE;
                 for (MyMapEntity candidate : unvisited) {
-                    double d = calculateDistance(current.getLatitude().doubleValue(), current.getLongitude().doubleValue(),
-                                                 candidate.getLatitude().doubleValue(), candidate.getLongitude().doubleValue());
-                    if (d < minDistance) { minDistance = d; nearest = candidate; }
+                    double d = calculateDistance(current.getLatitude().doubleValue(),
+                            current.getLongitude().doubleValue(),
+                            candidate.getLatitude().doubleValue(), candidate.getLongitude().doubleValue());
+                    if (d < minDistance) {
+                        minDistance = d;
+                        nearest = candidate;
+                    }
                 }
                 sorted.add(nearest);
                 unvisited.remove(nearest);
@@ -115,8 +122,8 @@ public class PackageTourMapController {
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                   Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
         return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 6371;
     }
 
@@ -139,7 +146,8 @@ public class PackageTourMapController {
             MyPlanEntity myPlan = myPlanRepo.findById(myPlanId).orElseThrow();
 
             // 找出現有該天景點數量，決定這個新景點的排序數字 (接在最後面)
-            List<MyMapEntity> existing = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId, dayNumber);
+            List<MyMapEntity> existing = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId,
+                    dayNumber);
             int nextOrder = existing.size() + 1;
 
             // 建立並儲存新景點
@@ -156,10 +164,47 @@ public class PackageTourMapController {
 
             response.put("success", true);
             // 將資料庫產生的真實 spotId 回傳給前端
-            response.put("spotId", newSpot.getSpotId()); 
+            response.put("spotId", newSpot.getSpotId());
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    // 🌟 新增：刪除特定行程節點
+    @DeleteMapping("/api/plan/deleteNode/{spotId}")
+    @ResponseBody
+    public Map<String, Object> deleteNode(@PathVariable Integer spotId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            myMapRepo.deleteById(spotId);
+            response.put("success", true);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "刪除失敗：" + e.getMessage());
+        }
+        return response;
+    }
+
+    // 🌟 新增：批次更新某一天的景點順序
+    @PostMapping("/api/plan/updateOrder")
+    @ResponseBody
+    public Map<String, Object> updateOrder(@RequestBody List<Map<String, Integer>> nodeOrders) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            for (Map<String, Integer> item : nodeOrders) {
+                Integer spotId = item.get("spotId");
+                Integer newOrder = item.get("visitOrder");
+                myMapRepo.findById(spotId).ifPresent(node -> {
+                    node.setVisitOrder(newOrder);
+                    myMapRepo.save(node);
+                });
+            }
+            response.put("success", true);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "順序更新失敗");
         }
         return response;
     }
