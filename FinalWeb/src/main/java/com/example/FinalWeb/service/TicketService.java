@@ -43,22 +43,28 @@ public class TicketService {
         TICKET_CACHE.put("ChIJQSDrYJu4GGARD_broFBjNUM", new TicketInfo("幸運☆星 鷲宮神社參拜套票", 500));
         TICKET_CACHE.put("ChIJCcRjTTnKGGARLtY-7WEX5aI", new TicketInfo("幸運☆星 久喜市立鷲宮圖書館門票", 300));
         TICKET_CACHE.put("ChIJIRZ85hZPGGARffzavFo4QRk", new TicketInfo("灌籃高手 平交道拍照觀景台門票", 200));
-        TICKET_CACHE.put("ChIJ___DnVrgCl8RruTc290c3p8", new TicketInfo("情書 北一硝子三號館（星空咖啡店）門票", 200));
+        TICKET_CACHE.put("ChIJ___DnVrgCl8RruTc290c3p8", new TicketInfo("情書 北一硝子三號館門票", 200));
         TICKET_CACHE.put("ChIJNZSPr8LgCl8R_ro2ttgpg7U", new TicketInfo("情書 小樽天狗山滑雪場門票", 300));
-        TICKET_CACHE.put("ChIJW_hH73EMAWAR3DLfYrSpmdA", new TicketInfo("神劍闖江湖 真人版 三井寺（園城寺）門票", 300));
+        TICKET_CACHE.put("ChIJW_hH73EMAWAR3DLfYrSpmdA", new TicketInfo("神劍闖江湖 真人版 園城寺門票", 300));
         TICKET_CACHE.put("ChIJceHc0AmoAWARLsqeCrglA1o", new TicketInfo("神劍闖江湖 真人版 上賀茂神社門票", 300));
         TICKET_CACHE.put("ChIJA-xD_h4ORDURYiAz8lXTUeo", new TicketInfo("解憂雜貨店 昭和之町展示館門票", 300));
         TICKET_CACHE.put("ChIJX36g4vZFGGARGocG2lY-Gko", new TicketInfo("海街日記 成就院門票", 300));
+        TICKET_CACHE.put("ChIJa52KgsWBEzURhgFh5S2SZVg", new TicketInfo("惡人 大瀨崎燈塔門票", 300));
+        TICKET_CACHE.put("EhlQTTQzK0MzLCBZYW1hbmFzaGksIEphcGFuIiY6JAoKDRFQSBUVm7ikUhAKGhQKEgn1beWlPgAcYBHDJMaulw_CFw",
+                new TicketInfo("搖曳露營 Hottarakashi 溫泉門票", 800));
+        TICKET_CACHE.put(
+                "EiNNSlg0K0hDLCBIYW1hbWF0c3UsIFNoaXp1b2thLCBKYXBhbiImOiQKCg0_o64UFdEEBVIQChoUChIJkZcH5S0WG2ARI_bt4jmbpGc",
+                new TicketInfo("搖曳露營 渚園露營場門票", 1200));
 
-        // 以下為假GooglePlaceId
-        TICKET_CACHE.put("ChIJ0xwB58aGGGAR1a99aA4pZ5g", new TicketInfo("搖曳露營 富士山絕景露營門票", 1200));
-        TICKET_CACHE.put("ChIJU-R-Qj7xGGART2Q70wN38l0", new TicketInfo("涼宮春日 咖啡廳聯名餐飲券", 400));
+        TICKET_CACHE.put(
+                "EiJRODNSKzQyLCBOaXNoaW5vbWl5YSwgSHlvZ28sIEphcGFuIiY6JAoKDb3bthQVMUGrUBAKGhQKEgmLym3lqPQAYBFwWl1yeC2MwQ",
+                new TicketInfo("涼宮春日的憂鬱 廣田神社門票", 400));
 
         // --- 🚆 交通票券 (Key 為我們自訂的 ID) ---
         TICKET_CACHE.put("TRANS_TOKYO_SUBWAY_24H", new TicketInfo("東京地鐵 24 小時券", 800));
         TICKET_CACHE.put("TRANS_TOKYO_SUBWAY_72H", new TicketInfo("東京地鐵 72 小時券", 1500));
         TICKET_CACHE.put("TRANS_SKYLINER", new TicketInfo("京成電鐵 Skyliner 單程票 (成田機場特快)", 2570));
-        TICKET_CACHE.put("TRANS_JR_PASS_7D", new TicketInfo("JR Pass 全日本鐵路周遊券 7日", 50000));
+        TICKET_CACHE.put("TRANS_JR_PASS_7D", new TicketInfo("JR Pass 全日本鐵路周遊券 7日", 5000));
         TICKET_CACHE.put("TRANS_OSAKA_AMAZING_1D", new TicketInfo("大阪周遊卡 1 日券", 2800));
         TICKET_CACHE.put("TRANS_KYOTO_BUS_1D", new TicketInfo("京都地下鐵・巴士 1 日券", 1100));
         TICKET_CACHE.put("TRANS_HAKONE_FREE_PASS", new TicketInfo("箱根周遊券 2 日", 6100));
