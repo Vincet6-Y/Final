@@ -1,7 +1,7 @@
 <th:block th:fragment="favoritePlan">
     <section>
         <div class="flex items-center justify-between mb-4 px-1">
-            <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary">favorite</span>
                 收藏行程
             </h2>
@@ -13,37 +13,47 @@
 
             <div th:each="fav, iterStat : ${favorites}"
                 th:classappend="${iterStat.index >= 2 ? 'hidden extra-fav-card' : ''}"
-                class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col hover:shadow-xl hover:shadow-primary/5 transition-all">
+                class="fav-card bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col hover:shadow-xl hover:shadow-primary/5 transition-all">
 
-                <div class="relative h-48 bg-black/20">
+                <div class="relative h-48 bg-slate-100 dark:bg-black/20">
                     <img class="w-full h-full object-cover"
-                        th:src="${fav.journeyPlan != null && fav.journeyPlan.workDetail != null && fav.journeyPlan.workDetail.workImg != null ? fav.journeyPlan.workDetail.workImg : 'https://lh3.googleusercontent.com/aida-public/AB6AXuA9geycgzxAiJsH00kQBcoYEFav3NH5IJxoJbP2FLzAx3klwhIw8bwjKDhmMQGqlvmbMnClJog56HvxfDHJJebV1-oYZCDiyMqyK8PU0OWfSk7JNsJypMXaRMBMgzFFvP6anvXvp-79IMbj6P2-XawU5FnirwtGjTPvWWOsilGQtmOQzLV4Sf72uVgRikpBB42sNpTnjOKnlsO0-7ilXNMKdj1w-48Vdz9XuuoRg6g1acWtMjGLBdw5eW5T7et--8QZZxOmOsDnz44'}"
+                        th:src="${fav.journeyPlan != null && fav.journeyPlan.workDetail != null && fav.journeyPlan.workDetail.workImg != null ? fav.journeyPlan.workDetail.workImg : '/images/default-tour.jpg'}"
                         alt="行程封面" />
+
+                    <button type="button"
+                        class="btn-remove-fav absolute top-3 right-3 text-red-500 hover:scale-125 transition-transform drop-shadow-md"
+                        th:data-plan-id="${fav.journeyPlan != null ? fav.journeyPlan.planId : ''}" title="取消收藏">
+                        <span class="material-symbols-outlined text-2xl"
+                            style="font-variation-settings: 'FILL' 1;">favorite</span>
+                    </button>
                 </div>
 
                 <div class="p-5 flex flex-col flex-1">
-                    <h3 class="font-bold text-slate-100 text-lg mb-2 line-clamp-1"
+                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg mb-2 line-clamp-1"
                         th:text="${fav.journeyPlan != null ? fav.journeyPlan.planName : '未命名行程'}">
                     </h3>
 
-                    <div class="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
-                        <span class="text-slate-500 text-xs font-medium uppercase">
+                    <div
+                        class="mt-auto pt-4 border-t border-slate-200 dark:border-white/5 flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase">
                             待完善計畫
                         </span>
-
-                        <a th:href="@{/map(planId=${fav.journeyPlan != null ? fav.journeyPlan.planId : ''})}"
-                            class="px-4 py-2 bg-primary/20 text-primary hover:bg-primary hover:text-background-dark rounded-lg text-xs font-bold transition-all text-center cursor-pointer">
-                            完善規劃
+                        <!-- TODO: 導向完善行程頁面 -->
+                        <a th:href="@{/packageTourDetail(planId=${fav.journeyPlan != null ? fav.journeyPlan.planId : ''})}"
+                            class="px-4 py-2 bg-primary/10 dark:bg-primary/20 text-primary hover:bg-primary hover:text-white dark:hover:text-background-dark rounded-lg text-xs font-bold transition-all text-center cursor-pointer">
+                            完善行程
                         </a>
                     </div>
                 </div>
             </div>
+
         </div>
 
-        <div th:if="${favorites == null || favorites.isEmpty()}"
-            class="bg-white/5 border border-white/10 rounded-2xl p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
+        <div id="empty-fav-state" th:if="${favorites == null || favorites.isEmpty()}"
+            class="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center gap-3">
             <span class="material-symbols-outlined text-4xl opacity-50">favorite_border</span>
             <p>目前還沒有收藏任何行程喔！去發掘喜歡的聖地吧！</p>
         </div>
+
     </section>
 </th:block>
