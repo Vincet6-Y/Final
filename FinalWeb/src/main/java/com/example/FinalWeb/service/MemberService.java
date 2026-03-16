@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.repo.MemberRepo;
+import com.example.FinalWeb.util.BCrypt;
 
 @Service
 public class MemberService {
@@ -25,8 +26,9 @@ public class MemberService {
         }
 
         MemberEntity member = memberEntity.get();
-        
-        if (!member.getPasswd().equals(passwd)) {
+
+        // 用 BCrypt 比對輸入密碼與資料庫雜湊密碼
+        if (!BCrypt.checkpw(passwd, member.getPasswd())) {
             return null;
         }
 
@@ -53,7 +55,9 @@ public class MemberService {
         member.setEmail(register.email());
         member.setPhone(register.phone());
         member.setBirthday(register.birthday());
-        member.setPasswd(register.passwd());
+        // 註冊時先加密再存入資料庫
+        String hashedPasswd = BCrypt.hashpw(register.passwd(), BCrypt.gensalt());
+        member.setPasswd(hashedPasswd);
 
         // 預設為一般會員
         member.setRole("USER");
