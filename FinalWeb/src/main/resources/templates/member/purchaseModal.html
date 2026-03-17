@@ -23,26 +23,24 @@
                             class="inline-flex px-3 py-1 rounded-md bg-green-500/10 text-green-400 text-sm font-semibold">
                         </span>
                     </div>
-                    <!-- 右側：關閉按鈕 -->
-                    <button id="closePurchaseDetailModal" type="button"
-                        class="shrink-0 text-slate-300 hover:text-white transition">
-                    </button>
                 </div>
             </div>
 
-            <div class="w-full h-52 md:h-72 rounded-[1.5rem] overflow-hidden border border-white/10 bg-white/5 mb-8">
-                <img id="purchaseDetailImage" src="" alt="購買明細封面圖" class="w-full h-full object-cover">
+            <div class="px-6 md:px-8 mb-8">
+                <div class="w-full h-40 md:h-56 rounded-[1.5rem] overflow-hidden border border-white/10 bg-white/5">
+                    <img id="purchaseDetailImage" src="" alt="購買明細封面圖" class="w-full h-full object-cover">
+                </div>
             </div>
             <!-- 景點票券列表 (JS 動態生成) -->
-            <div id="purchaseDetailItems" class="mb-8"></div>
+            <div id="purchaseDetailItems" class="px-6 md:px-8 mb-8"></div>
 
-            <div class="pt-6 relative flex items-center justify-center">
+            <div class="px-6 md:px-8 pt-6 relative flex items-center justify-center">
                 <button id="modalActionBtn" type="button"
                     class="px-5 py-3 bg-primary text-background-dark font-bold rounded-xl hover:opacity-90 transition">
                     前往付款查看行程
                 </button>
 
-                <div class="absolute right-0 text-lg md:text-xl font-bold whitespace-nowrap">
+                <div class="absolute right-6 md:right-8 text-lg md:text-xl font-bold whitespace-nowrap">
                     購買價格：<span id="purchaseDetailPrice" class="text-primary"></span>
                 </div>
             </div>
