@@ -223,4 +223,21 @@ public class MemberAuthController {
             return "redirect:/auth";
         }
     }
+
+
+    // 點擊「立即綁定 LINE」時，導向 LINE OAuth 授權頁
+    @GetMapping("/line/link")
+    public String lineLink(HttpSession session,
+                        RedirectAttributes redirectAttr) {
+
+        // 必須先登入會員，才能綁定 LINE
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
+            return "redirect:/auth";
+        }
+
+        String linkUrl = lineLoginService.getLineLinkUrl(session);
+        return "redirect:" + linkUrl;
+    }
 }

@@ -36,10 +36,19 @@ public class LineLoginService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // 產生 LINE 登入授權網址
+    // 這裡會把本次動作記成 login，callback 時就知道要走登入流程
     public String getLineLoginUrl(HttpSession session, String redirect) {
 
         String state = UUID.randomUUID().toString();
         session.setAttribute("lineLoginState", state);
+
+        // 標記這次 LINE OAuth 是登入流程
+        session.setAttribute("lineAction", "login");
+
+        if (redirect != null && !redirect.isBlank()) {
+            session.setAttribute("lineLoginRedirect", redirect);
+        }
 
         return "https://access.line.me/oauth2/v2.1/authorize"
                 + "?response_type=code"
@@ -125,7 +134,7 @@ public class LineLoginService {
 
 
 
-
+    // 依 LINE userId 查詢是否已綁定本站會員
     public MemberEntity findLinkedMember(String lineUserId) {
         Optional<MemberOauthEntity> oauthOpt =
                 memberOauthRepo.findByProviderAndProviderId("LINE", lineUserId);
