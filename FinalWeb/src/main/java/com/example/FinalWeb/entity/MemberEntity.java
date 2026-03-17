@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +31,9 @@ public class MemberEntity {
     private LocalDate birthday;
     private String role;
 
+    @Column(length = 500)
+    private String memberImgUrl;
+
     // 一對多關聯
     // 會員擁有多個收藏
     @OneToMany(mappedBy = "member")
@@ -51,5 +55,12 @@ public class MemberEntity {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<OrdersEntity> orders;
+
+    // 會員擁有多個第三方登入帳號
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<MemberOauthEntity> memberOauths;
 
 }
