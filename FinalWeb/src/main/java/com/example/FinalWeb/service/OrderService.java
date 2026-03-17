@@ -171,20 +171,24 @@ public class OrderService {
 public Map<String, Object> getAdminDashboardStats() {
     Map<String, Object> stats = new HashMap<>();
     
-    // 獲取待處理訂單數 (假設 payStatus 為 "未付款" 或 "待處理")
-    long pendingCount = ordersRepo.countByPayStatus("未付款");
+    // 1. 待處理訂單：通常指「已付款」但「尚未完成服務/核銷」或「待處理」狀態的訂單
+    long pendingCount = ordersRepo.countByPayStatus("待處理");
     
-    // 獲取退款請求數 (假設 payStatus 為 "已退款" 或 "退款中")
+    // 2. 退款請求：計算狀態為「退款中」的數量
     long refundCount = ordersRepo.countByPayStatus("退款中");
     
-    // 獲取今日發放憑證數 (呼叫我們在 Repo 定義的 Query)
-    long todayIssued = ordersRepo.findMemberOrdersWithPlan(1).size(); // 假設要查詢 ID 為 1 的會員
+    // 3. 今日發放憑證：統計今日「已付款」的訂單總數
+    // 這裡建議在 Repo 新增一個查詢今日成功的計算，或者先用 findAll 篩選
+    long todayIssued = ordersRepo.findAll().stream()
+            .filter(o -> "已付款".equals(o.getPayStatus()) && 
+                    o.getOrderTime().toLocalDate().equals(java.time.LocalDate.now()))
+            .count();
 
     stats.put("pendingOrders", pendingCount);
     stats.put("refundRequests", refundCount);
     stats.put("todayIssued", todayIssued);
     
-    // 這裡可以加上漲跌幅的計算邏輯 (+5%, -2% 等)
+    // 漲跌幅暫時回傳固定值或不回傳，等資料庫資料變多再寫計算邏輯
     return stats;
 }
 
