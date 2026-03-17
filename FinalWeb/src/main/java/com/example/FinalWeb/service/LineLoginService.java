@@ -49,68 +49,91 @@ public class LineLoginService {
                 + "&scope=profile%20openid%20email";
     }
 
+    // 用 LINE callback 回傳的 code 取得使用者資料
+    // 會回傳：userId、displayName、email（若 LINE 沒提供則為 null）
+    public JsonNode getLineProfile(String code) throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
 
-    public MemberEntity loginWithLine(String code) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
+        // 1. 用 code 向 LINE 換 access_token / id_token
+        String tokenUrl = "https://api.line.me/oauth2/v2.1/token";
 
-            // 1. 用 code 換 access_token
-            String tokenUrl = "https://api.line.me/oauth2/v2.1/token";
+        HttpHeaders tokenHeaders = new HttpHeaders();
+        tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            HttpHeaders tokenHeaders = new HttpHeaders();
-            tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> tokenBody = new LinkedMultiValueMap<>();
+        tokenBody.add("grant_type", "authorization_code");
+        tokenBody.add("code", code);
+        tokenBody.add("redirect_uri", callbackUrl);
+        tokenBody.add("client_id", channelId);
+        tokenBody.add("client_secret", channelSecret);
 
-            MultiValueMap<String, String> tokenBody = new LinkedMultiValueMap<>();
-            tokenBody.add("grant_type", "authorization_code");
-            tokenBody.add("code", code);
-            tokenBody.add("redirect_uri", callbackUrl);
-            tokenBody.add("client_id", channelId);
-            tokenBody.add("client_secret", channelSecret);
+        HttpEntity<MultiValueMap<String, String>> tokenRequest =
+                new HttpEntity<>(tokenBody, tokenHeaders);
 
-            HttpEntity<MultiValueMap<String, String>> tokenRequest =
-                    new HttpEntity<>(tokenBody, tokenHeaders);
+        ResponseEntity<String> tokenResponse = restTemplate.postForEntity(
+                tokenUrl,
+                tokenRequest,
+                String.class
+        );
 
-            ResponseEntity<String> tokenResponse = restTemplate.postForEntity(
-                    tokenUrl,
-                    tokenRequest,
-                    String.class
-            );
+        JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
+        String accessToken = tokenJson.get("access_token").asText();
 
-            JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
-            String accessToken = tokenJson.get("access_token").asText();
+        // 2. 用 access_token 取得 LINE 基本資料（userId、displayName）
+        String profileUrl = "https://api.line.me/v2/profile";
 
-            // 2. 用 access_token 取得 LINE profile
-            String profileUrl = "https://api.line.me/v2/profile";
+        HttpHeaders profileHeaders = new HttpHeaders();
+        profileHeaders.setBearerAuth(accessToken);
 
-            HttpHeaders profileHeaders = new HttpHeaders();
-            profileHeaders.setBearerAuth(accessToken);
+        HttpEntity<String> profileRequest = new HttpEntity<>(profileHeaders);
 
-            HttpEntity<String> profileRequest = new HttpEntity<>(profileHeaders);
+        ResponseEntity<String> profileResponse = restTemplate.exchange(
+                profileUrl,
+                HttpMethod.GET,
+                profileRequest,
+                String.class
+        );
 
-            ResponseEntity<String> profileResponse = restTemplate.exchange(
-                    profileUrl,
-                    HttpMethod.GET,
-                    profileRequest,
-                    String.class
-            );
+        JsonNode profileJson = objectMapper.readTree(profileResponse.getBody());
 
-            JsonNode profileJson = objectMapper.readTree(profileResponse.getBody());
-            String lineUserId = profileJson.get("userId").asText();
+        // 3. email 不在 /v2/profile，而是在 id_token 裡
+        //    先預設為 null，若 LINE 沒回傳 email 就保持 null
+        String email = null;
 
-            // 3. 用 provider + providerId 查 memberoauth
-            Optional<MemberOauthEntity> oauthOpt =
-                    memberOauthRepo.findByProviderAndProviderId("LINE", lineUserId);
+        if (tokenJson.has("id_token")) {
+            String idToken = tokenJson.get("id_token").asText();
 
-            if (oauthOpt.isPresent()) {
-                return oauthOpt.get().getMember();
+            // JWT 的 payload 在第二段，需做 Base64 URL 解碼
+            String[] parts = idToken.split("\\.");
+            if (parts.length >= 2) {
+                String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
+                JsonNode idTokenJson = objectMapper.readTree(payload);
+
+                if (idTokenJson.has("email") && !idTokenJson.get("email").isNull()) {
+                    email = idTokenJson.get("email").asText();
+                }
             }
-
-            // 尚未綁定 LINE 帳號
-            return null;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+
+        // 4. 把 email 補回 profileJson，讓 controller 可以統一用同一份資料取值
+        com.fasterxml.jackson.databind.node.ObjectNode result =
+                (com.fasterxml.jackson.databind.node.ObjectNode) profileJson;
+        result.put("email", email);
+
+        return result;
+    }
+
+
+
+
+    public MemberEntity findLinkedMember(String lineUserId) {
+        Optional<MemberOauthEntity> oauthOpt =
+                memberOauthRepo.findByProviderAndProviderId("LINE", lineUserId);
+
+        if (oauthOpt.isPresent()) {
+            return oauthOpt.get().getMember();
+        }
+
+        return null;
     }
 }
