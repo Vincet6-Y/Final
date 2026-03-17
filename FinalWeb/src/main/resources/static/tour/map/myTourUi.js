@@ -289,6 +289,9 @@ function updateArrivalTime(day, index, newTime) {
 
 // 🌟 輔助函式：將出發日期與天數組合為 LocalDateTime 格式
 function getFullDateTimeStr(day, timeStr) {
+    // 🌟 防呆：如果 timeStr 是空的，強制給 08:00
+    if (!timeStr || timeStr === "undefined" || timeStr === "null") timeStr = "08:00";
+
     const startDateInput = document.getElementById('db-startDate');
     let dateObj = (startDateInput && startDateInput.value) ? new Date(startDateInput.value) : new Date();
     dateObj.setDate(dateObj.getDate() + (day - 1));
@@ -332,9 +335,11 @@ async function syncOrderToDatabase(day) {
         // 抓取上一站到這一站的 Google 車程與距離
         if (index > 0 && legs[index - 1]) {
             const leg = legs[index - 1];
-            tTime = leg.duration.value; // 秒
-            dist = leg.distance.value;  // 公尺
-            tMode = (dist > 1000) ? 'DRIVING' : 'WALKING'; 
+            // 🌟 加上安全判斷，如果有值就取 value，沒有就給 0
+            tTime = leg.duration ? leg.duration.value : 0; 
+            dist = leg.distance ? leg.distance.value : 0;  
+            
+            tMode = leg._mode || ((dist > 1000) ? 'DRIVING' : 'WALKING'); 
         }
 
         return {
@@ -350,13 +355,19 @@ async function syncOrderToDatabase(day) {
     if (payload.length === 0) return;
 
     try {
-        await fetch('/api/plan/updateOrder', {
+        console.log(`正在同步 Day ${day} 的新順序與交通時間...`);
+        const response = await fetch('/api/plan/updateOrder', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        console.log(`Day ${day} 順序與時間已同步`);
-    } catch (error) { console.error("同步失敗:", error); }
+        const data = await response.json();
+        if(!data.success) {
+            console.error("順序與時間儲存失敗:", data.message);
+        }
+    } catch (error) { 
+        console.error("同步順序時發生連線錯誤:", error); 
+    }
 }
 
 // ==========================================
@@ -536,35 +547,6 @@ function handleDrop(e, day, dropIndex) {
     draggedItemInfo = null;
 
     return false;
-}
-
-// 🌟 核心功能：將移動後的順序同步至資料庫
-async function syncOrderToDatabase(day) {
-    const list = itineraryData[day];
-    
-    // 1. 整理出該天所有景點的新順序 (對應資料庫的 spotId 與新的 visitOrder)
-    const payload = list.map((item, index) => ({
-        spotId: item.spotId,
-        visitOrder: index + 1 // 順序改為 1, 2, 3...
-    })).filter(i => i.spotId); // 過濾掉尚未存入資料庫的臨時點
-
-    if (payload.length === 0) return;
-
-    try {
-        console.log(`正在同步 Day ${day} 的新順序...`);
-        const response = await fetch('/api/plan/updateOrder', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        const data = await response.json();
-        if (!data.success) {
-            console.error("順序儲存失敗:", data.message);
-        }
-    } catch (error) {
-        console.error("同步順序時發生連線錯誤:", error);
-    }
 }
 
 function handleDragEnd(e) {
