@@ -18,8 +18,6 @@ public class SecurityConfig {
         // 加上這一行，告訴警衛先不要檢查 CSRF Token
                 .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(
-                                
-                        
                 auth -> auth.requestMatchers("/backend/**").hasRole("ADMIN")
                         // .requestMatchers("/main/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/**", "/article/**", "/article_img/**", "/assets/**", "/images/**", "/member/**", "/news/**", "/payment/**", "/tour/**", "/js/**", "/api/**").permitAll()

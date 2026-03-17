@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import com.example.FinalWeb.dto.MemberLoginDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
@@ -19,6 +20,7 @@ import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.service.MemberService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -34,7 +36,8 @@ public class MemberAuthController {
             HttpSession session,
             @RequestParam(required = false) String redirect,
             RedirectAttributes redirectAttr,
-            Model model) {
+            Model model,
+            HttpServletRequest request) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
@@ -56,8 +59,7 @@ public class MemberAuthController {
         // return "redirect" + errorUrl;
         // }
 
-        session.setAttribute("loginMember", member);
-        // 1. 準備權限清單 (Spring Security 規定角色必須加上 ROLE_ 前綴)
+        // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
 
         // 2. 建立一個官方認可的身份憑證 (Authentication)
@@ -65,6 +67,16 @@ public class MemberAuthController {
 
         // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
         SecurityContextHolder.getContext().setAuthentication(auth);
+
+        // 4. 將狀態綁定到 Session 中 (最關鍵的一步！)
+        session = request.getSession(true);
+
+        // 這是你原本存放使用者資料的地方，保留著完全沒問題，方便你前端畫面使用
+        session.setAttribute("loginMember", member);
+
+        // 🌟 新增這行：把安管中心的安全狀態，用 Spring Security 指定的專屬名稱存進 Session 裡！
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext());
 
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
 
