@@ -3,6 +3,7 @@ $(function () {
     const $purchaseDetailBackdrop = $("#purchaseDetailBackdrop");
     const $purchaseDetailPanel = $("#purchaseDetailPanel");
     const $closePurchaseDetailModal = $("#closePurchaseDetailModal");
+    const $modalActionBtn = $("#modalActionBtn");
 
     function openPurchaseDetailModal(data) {
         $("#purchaseDetailTitle").text(data.title);
@@ -11,7 +12,21 @@ $(function () {
         $("#purchaseDetailPrice").text(data.price);
         $("#purchaseDetailImage").attr("src", data.image);
 
-        const items = JSON.parse(data.items || "[]");
+        // 🌟 判斷狀態改變按鈕行為
+        if (data.status === '未付款') {
+            $modalActionBtn.text("前往結帳付款");
+            $modalActionBtn.off('click').on('click', function () {
+                window.location.href = '/payment?orderId=' + data.orderId;
+            });
+        } else {
+            $modalActionBtn.text("查看票券與行程");
+            $modalActionBtn.off('click').on('click', function () {
+                window.location.href = '/payment/paymentsuccess?orderId=' + data.orderId;
+            });
+        }
+
+        // 🌟 直接接收陣列，不需再 JSON.parse
+        const items = data.items || [];
         const $itemsWrap = $("#purchaseDetailItems");
         $itemsWrap.empty();
 
@@ -61,19 +76,31 @@ $(function () {
             $purchaseDetailModal
                 .addClass("hidden")
                 .css("display", "");
-
             $("body").removeClass("overflow-hidden");
         }, 300);
     }
 
-    $(".openPurchaseDetailModal").on("click", function () {
+    $(document).on("click", ".openPurchaseDetailModal", function () {
+        const $btn = $(this);
+        const $card = $btn.closest('.order-card'); // 找到父層卡片
+
+        // 抓取隱藏的明細資料
+        const itemsArray = [];
+        $card.find('.order-item-data').each(function () {
+            itemsArray.push({
+                name: $(this).data('name'),
+                subtotal: $(this).data('subtotal')
+            });
+        });
+
         openPurchaseDetailModal({
-            title: $(this).data("title"),
-            date: $(this).data("date"),
-            status: $(this).data("status"),
-            price: $(this).data("price"),
-            image: $(this).data("image"),
-            items: $(this).attr("data-items")
+            orderId: $btn.data("order-id"), // 傳遞 orderId 給彈窗導航用
+            title: $btn.data("title"),
+            date: $btn.data("date"),
+            status: $btn.data("status"),
+            price: $btn.data("price"),
+            image: $btn.data("image"),
+            items: itemsArray // 直接把乾淨的陣列送進去
         });
     });
 
