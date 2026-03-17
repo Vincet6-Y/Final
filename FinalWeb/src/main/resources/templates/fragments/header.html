@@ -108,45 +108,9 @@
                 // 如果現在是 dark 模式，就存 'dark'，否則存 'light'
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
             }
-
-            document.addEventListener("DOMContentLoaded", function () {
-                const memberDropdownBtn = document.getElementById("memberDropdownBtn");
-                const memberDropdownMenu = document.getElementById("memberDropdownMenu");
-                const memberDropdownArrow = document.getElementById("memberDropdownArrow");
-
-                function openDropdown() {
-                    memberDropdownMenu.classList.remove("opacity-0", "-translate-y-2", "pointer-events-none");
-                    memberDropdownMenu.classList.add("opacity-100", "translate-y-0");
-                    memberDropdownArrow.classList.add("rotate-180");
-                }
-
-                function closeDropdown() {
-                    memberDropdownMenu.classList.add("opacity-0", "-translate-y-2", "pointer-events-none");
-                    memberDropdownMenu.classList.remove("opacity-100", "translate-y-0");
-                    memberDropdownArrow.classList.remove("rotate-180");
-                }
-
-                if (memberDropdownBtn && memberDropdownMenu) {
-                    memberDropdownBtn.addEventListener("click", function (e) {
-                        e.stopPropagation();
-
-                        const isClosed = memberDropdownMenu.classList.contains("pointer-events-none");
-
-                        if (isClosed) {
-                            openDropdown();
-                        } else {
-                            closeDropdown();
-                        }
-                    });
-
-                    document.addEventListener("click", function (e) {
-                        if (!memberDropdownBtn.contains(e.target) && !memberDropdownMenu.contains(e.target)) {
-                            closeDropdown();
-                        }
-                    });
-                }
-            });
         </script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script th:src="@{/member/js/headerMemberDropdown.js}"></script>
     </header>
 </body>
 
