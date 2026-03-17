@@ -11,6 +11,7 @@ import com.example.FinalWeb.dto.MemberLoginDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
 import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.MemberEntity;
+import com.example.FinalWeb.service.LineLoginService;
 import com.example.FinalWeb.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
@@ -21,6 +22,10 @@ public class MemberAuthController {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private LineLoginService lineLoginService;
+
 
     // 處理登入
     @PostMapping("/login")
@@ -91,4 +96,34 @@ public class MemberAuthController {
     }
 
 
+
+    @GetMapping("/line/login")
+    public String lineLogin(@RequestParam(required = false) String redirect) {
+        String loginUrl = lineLoginService.getLineLoginUrl();
+        return "redirect:" + loginUrl;
+    }
+
+
+
+    @GetMapping("/line/callback")
+    public String lineCallback(@RequestParam String code,
+                                @RequestParam String state,
+                                HttpSession session,
+                                RedirectAttributes redirectAttr) {
+                                    
+        MemberEntity member = lineLoginService.loginWithLine(code);
+
+        if (member == null) {
+            redirectAttr.addFlashAttribute("toast",
+                        ToastInfoDTO.error("LINE登入失敗"));
+            return "redirect:/auth";
+        }
+
+        session.setAttribute("loginMember", member);
+
+        redirectAttr.addFlashAttribute("toast", 
+                    ToastInfoDTO.success("LINE登入成功"));
+
+        return "redirect:/home";
+    }
 }
