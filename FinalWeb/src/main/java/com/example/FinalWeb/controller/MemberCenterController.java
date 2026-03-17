@@ -75,24 +75,24 @@ public class MemberCenterController {
         return "member";
     }
 
-    // 處理前端 AJAX 修改密碼的請求
+    // 處理前端 AJAX 修改密碼的請求(Toast)
     @PostMapping("/change-passwd")
     @ResponseBody
-    public ResponseEntity<String> changePasswd(@RequestBody PasswdChangeDto dto, HttpSession session) {
-        // 1. 用你原本的寫法，從 Session 拿出登入的會員
+    // 1. 將泛型從 String 改為 ToastInfoDTO
+    public ResponseEntity<ToastInfoDTO> changePasswd(@RequestBody PasswdChangeDto dto, HttpSession session) {
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
         if (loginMember == null) {
-            return ResponseEntity.status(401).body("請先登入");
+            // 2. 登入失敗：回傳 401 狀態碼，並打包 error 類型的 DTO
+            return ResponseEntity.status(401).body(ToastInfoDTO.error("請先登入"));
         }
-        // 2. 拿出該會員的 Email，呼叫我們剛剛寫好的 Service
         String result = memberService.changePasswd(loginMember.getEmail(), dto);
-        // 3. 判斷 Service 的回傳結果
         if ("密碼修改成功".equals(result)) {
-            // 回傳 HTTP 200 (Success)
-            return ResponseEntity.ok(result);
+            // 3. 修改成功：回傳 200 狀態碼，並打包 success 類型的 DTO
+            return ResponseEntity.ok(ToastInfoDTO.success(result));
         } else {
-            // 回傳 HTTP 400 (Bad Request)，並把錯誤訊息傳給前端
-            return ResponseEntity.badRequest().body(result);
+            // 4. 修改失敗（例如舊密碼錯誤）：回傳 400，並打包 error 類型的 DTO
+            return ResponseEntity.badRequest().body(ToastInfoDTO.error(result));
         }
     }
 }
