@@ -245,7 +245,7 @@ public class MemberAuthController {
 
                 session.removeAttribute("lineAction");
                 redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 綁定成功"));
-                return "redirect:/home";
+                return "redirect:/member";
             }
 
             // =========================
@@ -322,19 +322,18 @@ public class MemberAuthController {
         }
 
         boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
-                loginMember.getMemberId(), "LINE");
-
-        if (!lineBound) {
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("尚未綁定 LINE"));
-            return "redirect:/home";
-        }
-
-        memberOauthRepo.deleteByMember_MemberIdAndProvider(
                 loginMember.getMemberId(), "LINE"
         );
 
+        if (!lineBound) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("尚未綁定 LINE"));
+            return "redirect:/member";
+        }
+
+        lineLoginService.unlinkLine(loginMember.getMemberId());
+
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
-        return "redirect:/home";
+        return "redirect:/member";
     }
-    
+
 }

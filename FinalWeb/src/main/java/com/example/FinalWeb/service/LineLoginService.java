@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -152,7 +153,6 @@ public class LineLoginService {
     }
 
 
-
     // 依 LINE userId 查詢是否已綁定本站會員
     public MemberEntity findLinkedMember(String lineUserId) {
         Optional<MemberOauthEntity> oauthOpt =
@@ -161,7 +161,11 @@ public class LineLoginService {
         if (oauthOpt.isPresent()) {
             return oauthOpt.get().getMember();
         }
-
         return null;
+    }
+
+    @Transactional
+    public void unlinkLine(Integer memberId) {
+        memberOauthRepo.deleteByMember_MemberIdAndProvider(memberId, "LINE");
     }
 }

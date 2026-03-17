@@ -16,6 +16,7 @@ import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.FavoritesEntity;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
+import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.example.FinalWeb.service.FavoritesService;
 import com.example.FinalWeb.service.MemberService;
 import com.example.FinalWeb.service.OrderService;
@@ -31,6 +32,9 @@ public class MemberCenterController {
     private OrderService orderService;
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberOauthRepo memberOauthRepo;
 
     // 處理登出
     @GetMapping("/logout")
@@ -67,14 +71,16 @@ public class MemberCenterController {
         }
         // 4. 撈出這個會員的收藏清單 (交給 FavoritesService)
         List<FavoritesEntity> myFavorites = favoritesService.getMemberFavorites(memberId);
+
+        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "LINE");
+        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "GOOGLE");
+        
         // 5. 把資料丟給前端 (讓前端的 HTML 可以跑迴圈)
         model.addAttribute("orders", myOrders);
         model.addAttribute("orderTotals", orderTotals);
         model.addAttribute("favorites", myFavorites);
-
-        // 避免 Thymeleaf 判斷 null
-        model.addAttribute("lineBound", false);
-        model.addAttribute("googleBound", false);
+        model.addAttribute("lineBound", lineBound);
+        model.addAttribute("googleBound", googleBound);
 
         return "member";
     }
