@@ -58,6 +58,25 @@ public class LineLoginService {
                 + "&scope=profile%20openid%20email";
     }
 
+    // 產生 LINE 綁定授權網址
+    // 這裡把本次動作記成 link，callback 時就知道要走綁定流程
+    public String getLineLinkUrl(HttpSession session) {
+
+        String state = UUID.randomUUID().toString();
+        session.setAttribute("lineLoginState", state);
+
+        // 標記這次 LINE OAuth 是綁定流程
+        session.setAttribute("lineAction", "link");
+
+        return "https://access.line.me/oauth2/v2.1/authorize"
+                + "?response_type=code"
+                + "&client_id=" + channelId
+                + "&redirect_uri=" + callbackUrl
+                + "&state=" + state
+                + "&scope=profile%20openid%20email";
+    }
+
+
     // 用 LINE callback 回傳的 code 取得使用者資料
     // 會回傳：userId、displayName、email（若 LINE 沒提供則為 null）
     public JsonNode getLineProfile(String code) throws Exception {

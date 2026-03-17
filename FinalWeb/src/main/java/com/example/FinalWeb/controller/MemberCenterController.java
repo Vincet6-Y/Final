@@ -72,6 +72,10 @@ public class MemberCenterController {
         model.addAttribute("orderTotals", orderTotals);
         model.addAttribute("favorites", myFavorites);
 
+        // 避免 Thymeleaf 判斷 null
+        model.addAttribute("lineBound", false);
+        model.addAttribute("googleBound", false);
+
         return "member";
     }
 

@@ -42,19 +42,19 @@
                                         </div>
                                         <div class="min-w-0">
                                             <p class="text-sm text-slate-500 dark:text-slate-400"
-                                            th:text="${lineBound} ? '已綁定' : '未綁定'">未綁定</p>
+                                               th:text="${lineBound == true} ? '已綁定' : '未綁定'"></p>
                                         </div>
                                     </div>
 
                                     <!-- 未綁定：立即綁定 -->
-                                    <a th:if="${!lineBound}"
-                                    th:href="@{/auth/line/link}"
-                                    class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
-                                        立即綁定
+                                    <a th:if="${lineBound != true}"
+                                       th:href="@{/auth/line/link}"
+                                       class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
+                                       立即綁定
                                     </a>
 
                                     <!-- 已綁定：解除綁定 -->
-                                    <form th:if="${lineBound}" th:action="@{/auth/line/unlink}" method="post" class="shrink-0">
+                                    <form th:if="${lineBound == true}" th:action="@{/auth/line/unlink}" method="post" class="shrink-0">
                                         <button type="submit"
                                             class="px-4 py-2 rounded-lg border border-red-300 text-sm font-medium text-red-600 hover:bg-red-50 dark:border-red-400/30 dark:text-red-400 dark:hover:bg-red-500/10 transition">
                                             解除綁定
@@ -72,12 +72,12 @@
                                         </div>
                                         <div class="min-w-0">
                                             <p class="text-sm text-slate-500 dark:text-slate-400"
-                                                th:text="${googleBound} ? '已綁定' : '未綁定'">未綁定</p>
+                                                th:text="${googleBound == true} ? '已綁定' : '未綁定'"></p>
                                         </div>
                                     </div>
                                     <button type="button"
                                         class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                                        th:text="${googleBound} ? '解除綁定' : '立即綁定'">
+                                        th:text="${googleBound == true} ? '解除綁定' : '立即綁定'">
                                     </button>
                                 </div>
                             </div>

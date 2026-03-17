@@ -118,8 +118,14 @@ public class MemberAuthController {
                 model.addAttribute("toast", ToastInfoDTO.error("兩次輸入的密碼不一致"));
             }
 
+            // 保持註冊面板開啟
             model.addAttribute("openPanel", "register");
             model.addAttribute("registerData", register);
+
+            // 如果這次是 LINE 第一次登入後補資料註冊，失敗時要把 LINE 預填資料再帶回畫面
+            model.addAttribute("lineName", session.getAttribute("lineName"));
+            model.addAttribute("lineEmail", session.getAttribute("lineEmail"));
+
             return "auth";
         }
 
@@ -129,18 +135,29 @@ public class MemberAuthController {
             MemberEntity member = memberRepo.findByEmail(register.email()).orElse(null);
 
             if (member != null) {
-                MemberOauthEntity oauth = new MemberOauthEntity();
-                oauth.setMember(member);
-                oauth.setProvider("LINE");
-                oauth.setProviderId(lineUserId);
-                memberOauthRepo.save(oauth);
+                // 避免重複綁定同一個 LINE 帳號
+                boolean alreadyLinked = memberOauthRepo
+                        .findByProviderAndProviderId("LINE", lineUserId)
+                        .isPresent();
+
+                if (!alreadyLinked) {
+                    MemberOauthEntity oauth = new MemberOauthEntity();
+                    oauth.setMember(member);
+                    oauth.setProvider("LINE");
+                    oauth.setProviderId(lineUserId);
+                    memberOauthRepo.save(oauth);
+                }
             }
 
+            // 清除 LINE 註冊流程暫存資料
             session.removeAttribute("lineUserId");
             session.removeAttribute("lineName");
+            session.removeAttribute("lineEmail");
             session.removeAttribute("lineLoginRedirect");
             session.removeAttribute("lineLoginState");
+            session.removeAttribute("lineAction");
         }
+
         return "redirect:/auth";
     }
 
@@ -165,7 +182,7 @@ public class MemberAuthController {
         // 1. 驗證 state，避免 CSRF
         String savedState = (String) session.getAttribute("lineLoginState");
         if (savedState == null || !savedState.equals(state)) {
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE登入驗證失敗"));
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE 驗證失敗"));
             return "redirect:/auth";
         }
 
@@ -176,22 +193,74 @@ public class MemberAuthController {
             String lineUserId = profile.get("userId").asText();
             String lineName = profile.get("displayName").asText();
 
-            // LINE 有 email 就取值，沒有就給空字串
+            // LINE 有 email 就取值，沒有就留空
             String lineEmail = "";
             if (profile.has("email") && !profile.get("email").isNull()) {
                 lineEmail = profile.get("email").asText();
             }
 
-            // 3. 先查這個 LINE 帳號是否已綁定本站會員
-            MemberEntity member = lineLoginService.findLinkedMember(lineUserId);
+            // 3. 判斷這次是登入還是綁定
+            String lineAction = (String) session.getAttribute("lineAction");
 
-            // state 用完就先清掉
+            // 用完先清掉 state
             session.removeAttribute("lineLoginState");
 
-            // 4. 已綁定：直接登入
+            // =========================
+            // 綁定流程
+            // =========================
+            if ("link".equals(lineAction)) {
+
+                // 必須先登入會員，才能綁定
+                MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+                if (loginMember == null) {
+                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
+                    session.removeAttribute("lineAction");
+                    return "redirect:/auth";
+                }
+
+                // 檢查這個 LINE 帳號是否已被別的會員綁定
+                MemberEntity linkedMember = lineLoginService.findLinkedMember(lineUserId);
+                if (linkedMember != null) {
+                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此 LINE 帳號已綁定其他會員"));
+                    session.removeAttribute("lineAction");
+                    return "redirect:/home";
+                }
+
+                // 檢查自己是否已經綁定 LINE
+                boolean alreadyBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
+                        loginMember.getMemberId(), "LINE");
+
+                if (alreadyBound) {
+                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此會員已綁定 LINE"));
+                    session.removeAttribute("lineAction");
+                    return "redirect:/home";
+                }
+
+                // 建立 member_oauth 綁定資料
+                MemberOauthEntity oauth = new MemberOauthEntity();
+                oauth.setMember(loginMember);
+                oauth.setProvider("LINE");
+                oauth.setProviderId(lineUserId);
+                memberOauthRepo.save(oauth);
+
+                session.removeAttribute("lineAction");
+                redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 綁定成功"));
+                return "redirect:/home";
+            }
+
+            // =========================
+            // 登入 / 第一次註冊流程
+            // =========================
+
+            // 先查這個 LINE 帳號是否已綁定本站會員
+            MemberEntity member = lineLoginService.findLinkedMember(lineUserId);
+
+            // 已綁定：直接登入
             if (member != null) {
                 session.setAttribute("loginMember", member);
-                redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE登入成功"));
+                session.removeAttribute("lineAction");
+
+                redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 登入成功"));
 
                 String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
                 session.removeAttribute("lineLoginRedirect");
@@ -203,13 +272,12 @@ public class MemberAuthController {
                 return "redirect:/home";
             }
 
-            // 5. 第一次 LINE 登入：把 LINE 資料暫存到 session
-            //    之後回同一個 auth 頁，直接打開 register 面板
+            // 第一次 LINE 登入：把資料暫存到 session，回註冊面板補資料
             session.setAttribute("lineUserId", lineUserId);
             session.setAttribute("lineName", lineName);
             session.setAttribute("lineEmail", lineEmail);
+            session.removeAttribute("lineAction");
 
-            // 6. 把註冊面板打開，並預填名稱 / email
             model.addAttribute("openPanel", "register");
             model.addAttribute("lineName", lineName);
             model.addAttribute("lineEmail", lineEmail);
@@ -219,7 +287,8 @@ public class MemberAuthController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE登入失敗"));
+            session.removeAttribute("lineAction");
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE 流程失敗"));
             return "redirect:/auth";
         }
     }
@@ -240,4 +309,32 @@ public class MemberAuthController {
         String linkUrl = lineLoginService.getLineLinkUrl(session);
         return "redirect:" + linkUrl;
     }
+
+    // 解除目前會員的 LINE 綁定
+    @PostMapping("/line/unlink")
+    public String lineUnlink(HttpSession session,
+                            RedirectAttributes redirectAttr) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
+            return "redirect:/auth";
+        }
+
+        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
+                loginMember.getMemberId(), "LINE");
+
+        if (!lineBound) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("尚未綁定 LINE"));
+            return "redirect:/home";
+        }
+
+        memberOauthRepo.deleteByMember_MemberIdAndProvider(
+                loginMember.getMemberId(), "LINE"
+        );
+
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
+        return "redirect:/home";
+    }
+    
 }
