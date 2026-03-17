@@ -24,10 +24,10 @@ public class SecurityConfig {
                         .passwordParameter("passwd")
                         .loginProcessingUrl("/doLogin")
                         .defaultSuccessUrl("/main")
-                        .failureUrl("/login?error")
+                        .failureUrl("/auth?error")
                         .permitAll())
                 .logout(logout -> logout.logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/home")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID"))
                 .exceptionHandling(e -> e.accessDeniedPage("/page403"));
