@@ -223,7 +223,7 @@ public class MemberAuthController {
                 if (linkedMember != null) {
                     redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此 LINE 帳號已綁定其他會員"));
                     session.removeAttribute("lineAction");
-                    return "redirect:/home";
+                    return "redirect:/member";
                 }
 
                 // 檢查自己是否已經綁定 LINE
@@ -233,7 +233,7 @@ public class MemberAuthController {
                 if (alreadyBound) {
                     redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此會員已綁定 LINE"));
                     session.removeAttribute("lineAction");
-                    return "redirect:/home";
+                    return "redirect:/member";
                 }
 
                 // 建立 member_oauth 綁定資料
