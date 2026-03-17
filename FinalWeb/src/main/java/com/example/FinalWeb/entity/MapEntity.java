@@ -32,10 +32,6 @@ public class MapEntity {
     private BigDecimal latitude;
     private String GooglePlaceID;
 
-    private LocalDateTime visitTime;
-    private String transitMode;
-    private Integer stayTime, transitTime, distance;
-
     // 拉關連線到 journeyPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "planId")

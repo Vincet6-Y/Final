@@ -143,8 +143,14 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         }
     });
 
+    // 6. 重新推算抵達時間並更新畫面
     recalculateTimes(dayToCalculate);
     renderItineraryPanel(dayToCalculate);
+
+    // 🌟 7. 新增：等地圖路線計算、時間推算都完成後，才將所有包含車程的數據一次同步進資料庫
+    if (typeof syncOrderToDatabase === 'function') {
+        syncOrderToDatabase(dayToCalculate);
+    }
 }
 
 // ==========================================
