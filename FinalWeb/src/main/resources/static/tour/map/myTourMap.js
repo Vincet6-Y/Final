@@ -33,7 +33,7 @@ async function initMap() {
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
-
+    
     // 1. 先清除地圖上舊的路線與標記
     dayRouteRenderers.forEach(renderer => renderer.setMap(null));
     dayRouteRenderers = [];
@@ -50,8 +50,8 @@ async function calculateAndDisplayRoute(dayToCalculate) {
             const isFirst = index === 0;
             const isLast = index === places.length - 1;
 
-            let bgColor = "#ea4335";
-            if (isFirst) bgColor = "#ff8c00";
+            let bgColor = "#ea4335"; 
+            if (isFirst) bgColor = "#ff8c00"; 
             else if (isLast) bgColor = "#008ccf";
 
             const stopMarker = new google.maps.Marker({
@@ -92,74 +92,48 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         return;
     }
 
-    const results = [];
+    const promises = [];
     for (let i = 0; i < places.length - 1; i++) {
         const origin = { lat: places[i].lat, lng: places[i].lng };
         const destination = { lat: places[i + 1].lat, lng: places[i + 1].lng };
 
-        // 🌟 修正 1：保證大眾運輸時間絕對是「未來時間」 (一律用 7 天後來推算車程)
         const transitTime = new Date();
-        transitTime.setDate(transitTime.getDate() + 7);
+        transitTime.setDate(transitTime.getDate() + 1);
         transitTime.setHours(8, 0, 0, 0);
 
-        // 🌟 修正 2：改為「排隊等待(await)」，取代 Promise.all 轟炸
-        const res = await new Promise((resolve) => {
-            setTimeout(() => { // 🌟 加上 300 毫秒延遲，讓 Google 覺得我們是真人
-                directionsService.route({
-                    origin: origin,
-                    destination: destination,
-                    travelMode: google.maps.TravelMode.TRANSIT,
-                    transitOptions: { departureTime: transitTime }
-                }, (res, status) => {
-                    if (status === "OK") {
-                        res._mode = 'TRANSIT'; resolve(res);
-                    } else {
-                        directionsService.route({
-                            origin: origin, destination: destination, travelMode: google.maps.TravelMode.DRIVING
-                        }, (resD, statusD) => {
-                            if (statusD === "OK") {
-                                resD._mode = 'DRIVING'; resolve(resD);
-                            } else {
-                                directionsService.route({
-                                    origin: origin, destination: destination, travelMode: google.maps.TravelMode.WALKING
-                                }, (resW, statusW) => {
-                                    if (statusW === "OK") {
-                                        resW._mode = 'WALKING'; resolve(resW);
-                                    } else {
-                                        // 🌟 終極保底：連走路都算不出來（地點太近或海跨島），強制給予 0 秒與 0 公尺
-                                        resolve({
-                                            routes: [{ legs: [{ duration: { value: 0, text: '0 分鐘' }, distance: { value: 0, text: '0 公尺' } }] }],
-                                            _mode: 'WALKING'
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }, 300); // 延遲 0.3 秒
-        });
-
-        results.push(res);
+        promises.push(new Promise((resolve) => {
+            directionsService.route({
+                origin: origin,
+                destination: destination,
+                travelMode: google.maps.TravelMode.TRANSIT, 
+                transitOptions: { departureTime: transitTime }
+            }, (response, status) => {
+                if (status === "OK") {
+                    resolve(response);
+                } else {
+                    directionsService.route({
+                        origin: origin,
+                        destination: destination,
+                        travelMode: google.maps.TravelMode.DRIVING 
+                    }, (fallbackRes, fallbackStatus) => {
+                        if (fallbackStatus === "OK") resolve(fallbackRes);
+                        else resolve(null);
+                    });
+                }
+            });
+        }));
     }
 
-    // 🌟 把成功的交通方式 (_mode) 傳遞進去 routeLegs
-    routeLegs[dayToCalculate] = results.map(res => {
-        if (res) {
-            const leg = res.routes[0].legs[0];
-            leg._mode = res._mode;
-            return leg;
-        }
-        return null;
-    });
+    const results = await Promise.all(promises);
+    routeLegs[dayToCalculate] = results.map(res => res ? res.routes[0].legs[0] : null);
 
     results.forEach((res, index) => {
         if (res) {
             const renderer = new google.maps.DirectionsRenderer({
                 map: map,
                 suppressMarkers: true,
-                polylineOptions: {
-                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00",
+                polylineOptions: { 
+                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00", 
                     strokeWeight: 5,
                     strokeOpacity: 0.8
                 }
@@ -169,14 +143,8 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         }
     });
 
-    // 6. 重新推算抵達時間並更新畫面
     recalculateTimes(dayToCalculate);
     renderItineraryPanel(dayToCalculate);
-
-    // 🌟 7. 新增：等地圖路線計算、時間推算都完成後，才將所有包含車程的數據一次同步進資料庫
-    if (typeof syncOrderToDatabase === 'function') {
-        syncOrderToDatabase(dayToCalculate);
-    }
 }
 
 // ==========================================
@@ -207,7 +175,7 @@ function setupAutocomplete(inputId) {
 
 function createMarker(place) {
     const marker = new google.maps.Marker({
-        map,
+        map, 
         position: place.location,
         title: place.displayName,
         animation: google.maps.Animation.DROP
@@ -224,7 +192,7 @@ function createMarker(place) {
 
 async function searchNearby(type) {
     const { Place } = await google.maps.importLibrary("places");
-
+    
     const request = {
         fields: ['id', 'displayName', 'location'],
         locationRestriction: {
@@ -253,13 +221,13 @@ async function searchNearby(type) {
 // ==========================================
 
 // 1. 內部清理函式：搜尋新分類時自動執行
-function clearMarkers() {
+function clearMarkers() { 
     if (markers) {
-        markers.forEach(m => m.setMap(null));
+        markers.forEach(m => m.setMap(null)); 
     }
-    markers = [];
+    markers = []; 
     // 同步清空全域紀錄盒，避免新舊標記混亂
-    window.currentSearchMarkers = [];
+    window.currentSearchMarkers = []; 
 }
 
 // 2. 外部清除函式：點擊「總叉叉」按鈕時執行
