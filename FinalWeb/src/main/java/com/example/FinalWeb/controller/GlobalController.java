@@ -24,7 +24,7 @@ public class GlobalController {
     // @Autowired
     // private JdbcTemplate jdbcTemplate;
 
-    @RequestMapping("/test")
+    // @RequestMapping("/test")
     public String test() {
         // try {
         // // 我們請小弟去執行一句最廢話的 SQL：「SELECT 1」
@@ -124,25 +124,5 @@ public class GlobalController {
     // public String paymentsuccess() {
     // return "paymentsuccess";
     // }
-
-    @RequestMapping("/backendhome")
-    public String backendhome() {
-        return "backendhome";
-    }
-
-    @RequestMapping("/backendorder")
-    public String backendorder() {
-        return "backendorder";
-    }
-
-    @RequestMapping("/backendoperation")
-    public String backendoperation() {
-        return "backendoperation";
-    }
-
-    @RequestMapping("/backendcontentmanagement")
-    public String backendcontentmanagement() {
-        return "backendcontentmanagement";
-    }
 
 }
