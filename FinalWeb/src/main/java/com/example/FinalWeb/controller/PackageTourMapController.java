@@ -1,6 +1,7 @@
 package com.example.FinalWeb.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,24 +188,77 @@ public class PackageTourMapController {
         return response;
     }
 
-    // 🌟 新增：批次更新某一天的景點順序
-    @PostMapping("/api/plan/updateOrder")
+    // ==========================================
+    // 🌟 新增：更新單一景點的時間與停留時長 (前端改時間時觸發)
+    // ==========================================
+    @PostMapping("/api/plan/updateNodeTime")
     @ResponseBody
-    public Map<String, Object> updateOrder(@RequestBody List<Map<String, Integer>> nodeOrders) {
+    public Map<String, Object> updateNodeTime(@RequestBody Map<String, Object> payload) {
         Map<String, Object> response = new HashMap<>();
         try {
-            for (Map<String, Integer> item : nodeOrders) {
-                Integer spotId = item.get("spotId");
-                Integer newOrder = item.get("visitOrder");
+            Integer spotId = Integer.valueOf(payload.get("spotId").toString());
+            String visitTimeStr = (String) payload.get("visitTime"); // 格式：YYYY-MM-DDTHH:mm:00
+            Integer stayTime = Integer.valueOf(payload.get("stayTime").toString());
+
+            myMapRepo.findById(spotId).ifPresent(node -> {
+                if (visitTimeStr != null && !visitTimeStr.isEmpty()) {
+                    node.setVisitTime(LocalDateTime.parse(visitTimeStr));
+                }
+                node.setStayTime(stayTime);
+                myMapRepo.save(node);
+            });
+            response.put("success", true);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
+
+    // ==========================================
+    // 🌟 升級：批次更新景點順序、交通時間與距離 (拖曳或增刪時觸發)
+    // ==========================================
+    @PostMapping("/api/plan/updateOrder")
+    @ResponseBody
+    public Map<String, Object> updateOrder(@RequestBody List<Map<String, Object>> nodeOrders) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            for (Map<String, Object> item : nodeOrders) {
+                Integer spotId = Integer.valueOf(item.get("spotId").toString());
+                Integer newOrder = Integer.valueOf(item.get("visitOrder").toString());
+                
                 myMapRepo.findById(spotId).ifPresent(node -> {
                     node.setVisitOrder(newOrder);
+                    
+                    // 寫入精確的出發/抵達時間
+                    if (item.get("visitTime") != null) {
+                        node.setVisitTime(LocalDateTime.parse((String) item.get("visitTime")));
+                    }
+                    
+                    // 寫入 Google 算出的車程 (秒) 與距離 (公尺)
+                    if (item.get("transitTime") != null) {
+                        node.setTransitTime(Integer.valueOf(item.get("transitTime").toString()));
+                    } else {
+                        node.setTransitTime(null);
+                    }
+                    
+                    if (item.get("distance") != null) {
+                        node.setDistance(Integer.valueOf(item.get("distance").toString()));
+                    } else {
+                        node.setDistance(null);
+                    }
+                    
+                    if (item.get("transitMode") != null) {
+                        node.setTransitMode((String) item.get("transitMode"));
+                    }
+                    
                     myMapRepo.save(node);
                 });
             }
             response.put("success", true);
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "順序更新失敗");
+            response.put("message", "順序與時間更新失敗：" + e.getMessage());
         }
         return response;
     }

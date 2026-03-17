@@ -68,14 +68,25 @@ async function loadMyPlanData(myPlanId, targetDay = null) { // 🌟 新增 targe
             if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5) safePlaceId = "undefined";
 
             const day = node.dayNumber || 1;
+            
+            // 🌟 解析 LocalDateTime 字串 (例如 "2026-03-23T08:30:00" -> 取出 "08:30")
+            let arrivalStr = "08:00"; 
+            if (node.visitTime) {
+                const timePart = node.visitTime.split('T')[1];
+                if (timePart) arrivalStr = timePart.substring(0, 5); 
+            }
+            
+            // 🌟 將資料庫的分鐘數轉換為畫面的小時數 (例如 90 分鐘 -> 1.5)
+            const durationHours = node.stayTime ? (node.stayTime / 60) : 1;
+
             itineraryData[day].push({
                 spotId: node.spotId,
                 place_id: safePlaceId, 
                 lat: parseFloat(node.latitude),
                 lng: parseFloat(node.longitude),
                 name: node.locationName,
-                arrivals: "08:00", 
-                duration: "1"      
+                arrivals: arrivalStr,      // 從資料庫讀取
+                duration: durationHours    // 從資料庫讀取
             });
         }
 
