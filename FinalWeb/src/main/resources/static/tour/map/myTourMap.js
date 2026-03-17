@@ -197,7 +197,7 @@ async function searchNearby(type) {
         fields: ['id', 'displayName', 'location'],
         locationRestriction: {
             center: map.getCenter(),
-            radius: 3000,
+            radius: 1000,
         },
         includedTypes: [type],
         maxResultCount: 20,
