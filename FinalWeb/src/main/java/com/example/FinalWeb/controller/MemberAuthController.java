@@ -65,15 +65,6 @@ public class MemberAuthController {
             return "auth";
         }
 
-        // if(member == null){
-        // // 登入失敗時，把 redirect 參數帶回去，以免使用者重試登入後迷路
-        // String errorUrl = "/auth?error";
-        // if (redirect != null && !redirect.isEmpty()) {
-        // errorUrl += "&redirect=" + redirect;
-        // }
-        // return "redirect" + errorUrl;
-        // }
-
         // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
 
