@@ -1,7 +1,13 @@
 package com.example.FinalWeb.controller;
 
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +31,10 @@ public class MemberAuthController {
     // 處理登入
     @PostMapping("/login")
     public String login(MemberLoginDTO login,
-                        HttpSession session,
-                        @RequestParam(required = false) String redirect,
-                        RedirectAttributes redirectAttr,
-                        Model model) {
+            HttpSession session,
+            @RequestParam(required = false) String redirect,
+            RedirectAttributes redirectAttr,
+            Model model) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
@@ -42,15 +48,23 @@ public class MemberAuthController {
         }
 
         // if(member == null){
-        //     // 登入失敗時，把 redirect 參數帶回去，以免使用者重試登入後迷路
-        //     String errorUrl = "/auth?error";
-        //     if (redirect != null && !redirect.isEmpty()) {
-        //         errorUrl += "&redirect=" + redirect;
-        //     }
-        //     return "redirect" + errorUrl;
+        // // 登入失敗時，把 redirect 參數帶回去，以免使用者重試登入後迷路
+        // String errorUrl = "/auth?error";
+        // if (redirect != null && !redirect.isEmpty()) {
+        // errorUrl += "&redirect=" + redirect;
+        // }
+        // return "redirect" + errorUrl;
         // }
 
         session.setAttribute("loginMember", member);
+        // 1. 準備權限清單 (Spring Security 規定角色必須加上 ROLE_ 前綴)
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
+
+        // 2. 建立一個官方認可的身份憑證 (Authentication)
+        Authentication auth = new UsernamePasswordAuthenticationToken(member.getEmail(), null, authorities);
+
+        // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
 
@@ -65,7 +79,7 @@ public class MemberAuthController {
     // 處理註冊
     @PostMapping("/register")
     public String register(MemberRegisterDTO register,
-                        Model model) {
+            Model model) {
 
         String result = memberService.register(register);
 
@@ -89,6 +103,5 @@ public class MemberAuthController {
 
         return "auth";
     }
-
 
 }

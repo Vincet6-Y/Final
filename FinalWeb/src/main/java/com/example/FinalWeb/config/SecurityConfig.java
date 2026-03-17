@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -12,7 +14,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) {
-        httpSecurity.authorizeHttpRequests(
+        httpSecurity
+        // 加上這一行，告訴警衛先不要檢查 CSRF Token
+                .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(
+                                
+                        
                 auth -> auth.requestMatchers("/backend/**").hasRole("ADMIN")
                         // .requestMatchers("/main/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/**", "/article/**", "/article_img/**", "/assets/**", "/images/**", "/member/**", "/news/**", "/payment/**", "/tour/**", "/js/**", "/api/**").permitAll()
@@ -20,9 +27,9 @@ public class SecurityConfig {
                 .formLogin(form -> form.loginPage("/auth")
                         .usernameParameter("email")
                         .passwordParameter("passwd")
-                        .loginProcessingUrl("/doLogin")
-                        .defaultSuccessUrl("/main")
-                        .failureUrl("/login?error")
+                        // .loginProcessingUrl("/auth/login")
+                        .defaultSuccessUrl("/")
+                        .failureUrl("/auth?error")
                         .permitAll())
                 .logout(logout -> logout.logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
@@ -35,7 +42,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authorizationManager(AuthenticationConfiguration config) {
-        return config.getAuthenticationManager();
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
     }
+
 }
