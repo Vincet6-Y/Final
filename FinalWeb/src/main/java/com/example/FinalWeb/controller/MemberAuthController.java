@@ -17,7 +17,12 @@ import com.example.FinalWeb.dto.MemberLoginDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
 import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.MemberEntity;
+import com.example.FinalWeb.entity.MemberOauthEntity;
+import com.example.FinalWeb.repo.MemberOauthRepo;
+import com.example.FinalWeb.repo.MemberRepo;
+import com.example.FinalWeb.service.LineLoginService;
 import com.example.FinalWeb.service.MemberService;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,6 +32,16 @@ public class MemberAuthController {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private LineLoginService lineLoginService;
+
+    @Autowired
+    private MemberRepo memberRepo;
+
+    @Autowired
+    private MemberOauthRepo memberOauthRepo;
+
 
     // 處理登入
     @PostMapping("/login")
@@ -79,29 +94,121 @@ public class MemberAuthController {
     // 處理註冊
     @PostMapping("/register")
     public String register(MemberRegisterDTO register,
-            Model model) {
+                        HttpSession session,
+                        Model model) {
 
         String result = memberService.register(register);
 
-        if ("註冊成功".equals(result)) {
+        if (!"註冊成功".equals(result)) {
+            if ("Email已註冊".equals(result)) {
+                model.addAttribute("toast", ToastInfoDTO.error("此 Email 已註冊"));
+            } else if ("密碼不一致".equals(result)) {
+                model.addAttribute("toast", ToastInfoDTO.error("兩次輸入的密碼不一致"));
+            }
+
+            model.addAttribute("openPanel", "register");
+            model.addAttribute("registerData", register);
+            return "auth";
+        }
+
+        // 一般註冊成功後，若是 LINE 流程，就補建立 member_oauth
+        String lineUserId = (String) session.getAttribute("lineUserId");
+        if (lineUserId != null) {
+            MemberEntity member = memberRepo.findByEmail(register.email()).orElse(null);
+
+            if (member != null) {
+                MemberOauthEntity oauth = new MemberOauthEntity();
+                oauth.setMember(member);
+                oauth.setProvider("LINE");
+                oauth.setProviderId(lineUserId);
+                memberOauthRepo.save(oauth);
+            }
+
+            session.removeAttribute("lineUserId");
+            session.removeAttribute("lineName");
+            session.removeAttribute("lineLoginRedirect");
+            session.removeAttribute("lineLoginState");
+        }
+        return "redirect:/auth";
+    }
+
+
+
+    @GetMapping("/line/login")
+    public String lineLogin(@RequestParam(required = false) String redirect,
+                            HttpSession session) {
+        String loginUrl = lineLoginService.getLineLoginUrl(session, redirect);
+        return "redirect:" + loginUrl;
+    }
+
+
+
+    @GetMapping("/line/callback")
+    public String lineCallback(@RequestParam String code,
+                            @RequestParam String state,
+                            HttpSession session,
+                            RedirectAttributes redirectAttr,
+                            Model model) {
+
+        // 1. 驗證 state，避免 CSRF
+        String savedState = (String) session.getAttribute("lineLoginState");
+        if (savedState == null || !savedState.equals(state)) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE登入驗證失敗"));
             return "redirect:/auth";
         }
 
-        if ("Email已註冊".equals(result)) {
-            model.addAttribute("toast", ToastInfoDTO.error("此 Email 已註冊"));
-            model.addAttribute("openPanel", "register");
-            model.addAttribute("registerData", register);
-            return "auth";
-        }
+        try {
+            // 2. 取得 LINE 使用者資料
+            JsonNode profile = lineLoginService.getLineProfile(code);
 
-        if ("密碼不一致".equals(result)) {
-            model.addAttribute("toast", ToastInfoDTO.error("兩次輸入的密碼不一致"));
-            model.addAttribute("openPanel", "register");
-            model.addAttribute("registerData", register);
-            return "auth";
-        }
+            String lineUserId = profile.get("userId").asText();
+            String lineName = profile.get("displayName").asText();
 
-        return "auth";
+            // LINE 有 email 就取值，沒有就給空字串
+            String lineEmail = "";
+            if (profile.has("email") && !profile.get("email").isNull()) {
+                lineEmail = profile.get("email").asText();
+            }
+
+            // 3. 先查這個 LINE 帳號是否已綁定本站會員
+            MemberEntity member = lineLoginService.findLinkedMember(lineUserId);
+
+            // state 用完就先清掉
+            session.removeAttribute("lineLoginState");
+
+            // 4. 已綁定：直接登入
+            if (member != null) {
+                session.setAttribute("loginMember", member);
+                redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE登入成功"));
+
+                String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
+                session.removeAttribute("lineLoginRedirect");
+
+                if (redirectUrl != null && !redirectUrl.isBlank()) {
+                    return "redirect:" + redirectUrl;
+                }
+
+                return "redirect:/home";
+            }
+
+            // 5. 第一次 LINE 登入：把 LINE 資料暫存到 session
+            //    之後回同一個 auth 頁，直接打開 register 面板
+            session.setAttribute("lineUserId", lineUserId);
+            session.setAttribute("lineName", lineName);
+            session.setAttribute("lineEmail", lineEmail);
+
+            // 6. 把註冊面板打開，並預填名稱 / email
+            model.addAttribute("openPanel", "register");
+            model.addAttribute("lineName", lineName);
+            model.addAttribute("lineEmail", lineEmail);
+            model.addAttribute("redirect", session.getAttribute("lineLoginRedirect"));
+
+            return "auth";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE登入失敗"));
+            return "redirect:/auth";
+        }
     }
-
 }

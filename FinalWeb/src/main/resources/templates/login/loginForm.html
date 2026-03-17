@@ -68,17 +68,19 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-                <button
-                    class="flex items-center justify-center gap-2 border border-neutral-border rounded-lg py-3 hover:bg-white/5 transition-colors"
-                    type="button">
-                    <span class="material-symbols-outlined text-lg text-white">google</span>
-                </button>
+                <a
+                    th:href="@{/auth/google/login(redirect=${redirect != null ? redirect : param.redirect})}"
+                    class="flex items-center justify-center gap-3 bg-white text-black border border-neutral-border rounded-lg py-3 hover:bg-gray-100 transition-colors">
+                    <img th:src="@{/images/web_light_sq_na.svg}" class="w-6 h-6" alt="Google">
+                    <span class="text-sm font-medium"> Google 登入</span>
+                </a>
 
-                <button
-                    class="flex items-center justify-center gap-2 border border-neutral-border rounded-lg py-3 hover:bg-white/5 transition-colors"
-                    type="button">
-                    <span class="text-sm text-white">ＬＩＮＥ</span>
-                </button>
+                <a
+                    th:href="@{/auth/line/login(redirect=${redirect != null ? redirect : param.redirect})}"
+                    class="flex items-center justify-center gap-2 rounded-lg py-3 bg-[#06C755] hover:brightness-110 text-white font-semibold">
+                    <img th:src="@{/images/LINE_icon.png}" class="w-6 h-6" alt="LINE">
+                    <span> LINE 登入</span>
+                </a>
             </div>
 
         </form>
