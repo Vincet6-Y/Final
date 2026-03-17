@@ -1,4 +1,3 @@
-// TODO: 行程無法對應到 DayX 上面
 function updateDayButtonsAndLists(totalDays) {
     const buttonContainer = document.getElementById('day-buttons-container');
     const listContainer = document.getElementById('itinerary-lists-container');

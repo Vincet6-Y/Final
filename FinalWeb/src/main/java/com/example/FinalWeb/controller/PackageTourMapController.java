@@ -161,6 +161,13 @@ public class PackageTourMapController {
             newSpot.setLatitude(BigDecimal.valueOf(lat));
             newSpot.setLongitude(BigDecimal.valueOf(lng));
 
+            // ==========================================
+            // 🌟 補強：確保手動加入的景點，也有預設的時間，避免產生 NULL
+            // ==========================================
+            java.time.LocalDate startDate = (myPlan.getStartDate() != null) ? myPlan.getStartDate() : java.time.LocalDate.now();
+            newSpot.setVisitTime(startDate.atTime(8, 0).plusDays(dayNumber - 1));
+            newSpot.setStayTime(60); // 預設 60 分鐘
+
             myMapRepo.save(newSpot);
 
             response.put("success", true);

@@ -48,9 +48,9 @@ async function fetchAndShowDetails(placeId) {
 }
 
 // ==========================================
-// 🌟 修正：支援指定天數，不再永遠跳回 Day 1
+// 🌟 載入資料與觸發方案 A 的核心
 // ==========================================
-async function loadMyPlanData(myPlanId, targetDay = null) { // 🌟 新增 targetDay 參數
+async function loadMyPlanData(myPlanId, targetDay = null) {
     try {
         console.log("正在發起請求，讀取個人行程 ID:", myPlanId);
         const res = await fetch(`/api/plan/myPlanNodes/${myPlanId}`);
@@ -68,38 +68,41 @@ async function loadMyPlanData(myPlanId, targetDay = null) { // 🌟 新增 targe
             if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5) safePlaceId = "undefined";
 
             const day = node.dayNumber || 1;
-            
-            // 🌟 解析 LocalDateTime 字串 (例如 "2026-03-23T08:30:00" -> 取出 "08:30")
-            let arrivalStr = "08:00"; 
+
+            let arrivalStr = "08:00";
             if (node.visitTime) {
                 const timePart = node.visitTime.split('T')[1];
-                if (timePart) arrivalStr = timePart.substring(0, 5); 
+                if (timePart) arrivalStr = timePart.substring(0, 5);
             }
-            
-            // 🌟 將資料庫的分鐘數轉換為畫面的小時數 (例如 90 分鐘 -> 1.5)
+
             const durationHours = node.stayTime ? (node.stayTime / 60) : 1;
 
             itineraryData[day].push({
                 spotId: node.spotId,
-                place_id: safePlaceId, 
+                place_id: safePlaceId,
                 lat: parseFloat(node.latitude),
                 lng: parseFloat(node.longitude),
                 name: node.locationName,
-                arrivals: arrivalStr,      // 從資料庫讀取
-                duration: durationHours    // 從資料庫讀取
+                arrivals: arrivalStr,
+                duration: durationHours,
+                // 🌟 新增：讀取資料庫的交通數據狀態，用來判斷是否需要自動補全
+                transitTime: node.transitTime || null
             });
         }
 
-        // 🌟 決定畫面要停在哪一天 (優先用傳入的目標天數，其次是當下天數，最後才預設 1)
         const dayToSelect = targetDay || currentDay || 1;
 
         if (itineraryData[dayToSelect].length > 0) {
             map.setCenter({ lat: itineraryData[dayToSelect][0].lat, lng: itineraryData[dayToSelect][0].lng });
         }
 
-        // 🌟 改用動態變數，不再寫死 1
         calculateAndDisplayRoute(dayToSelect);
         selectDay(dayToSelect);
+
+        // 🌟 方案 A 啟動：延遲 3 秒執行背景自動補全，不卡住使用者當下的畫面操作
+        setTimeout(() => {
+            backgroundSyncMissingTransit(dayToSelect);
+        }, 3000);
 
     } catch (error) {
         console.error("🔥 載入個人行程錯誤：", error);
@@ -107,7 +110,81 @@ async function loadMyPlanData(myPlanId, targetDay = null) { // 🌟 新增 targe
 }
 
 // ==========================================
-// 🌟 輔助函式 (必須放在最外層)
+// 🌟 方案 A：背景默默計算與同步 (不影響地圖與畫面)
+// ==========================================
+async function backgroundSyncMissingTransit(currentActiveDay) {
+    for (let d in itineraryData) {
+        d = parseInt(d);
+        if (d === parseInt(currentActiveDay)) continue;
+
+        const places = itineraryData[d];
+        if (!places || places.length < 2) continue;
+
+        const needsSync = places.some((p, index) => index > 0 && p.transitTime === null);
+        if (!needsSync) continue;
+
+        console.log(`🔍 偵測到 Day ${d} 缺少交通數據，啟動背景自動補全 (方案 A)...`);
+
+        const results = [];
+        for (let i = 0; i < places.length - 1; i++) {
+            const origin = { lat: places[i].lat, lng: places[i].lng };
+            const destination = { lat: places[i + 1].lat, lng: places[i + 1].lng };
+
+            // 保證時間是未來
+            const transitTime = new Date();
+            transitTime.setDate(transitTime.getDate() + 7);
+            transitTime.setHours(8, 0, 0, 0);
+
+            // 背景同步更需要慢慢來，間隔 500 毫秒
+            const res = await new Promise((resolve) => {
+                setTimeout(() => {
+                    directionsService.route({
+                        origin: origin, destination: destination,
+                        travelMode: google.maps.TravelMode.TRANSIT, transitOptions: { departureTime: transitTime }
+                    }, (res, status) => {
+                        if (status === "OK") { res._mode = 'TRANSIT'; resolve(res); }
+                        else {
+                            directionsService.route({ origin, destination, travelMode: google.maps.TravelMode.DRIVING }, (resD, statusD) => {
+                                if (statusD === "OK") { resD._mode = 'DRIVING'; resolve(resD); }
+                                else {
+                                    directionsService.route({ origin, destination, travelMode: google.maps.TravelMode.WALKING }, (resW, statusW) => {
+                                        if (statusW === "OK") {
+                                            resW._mode = 'WALKING'; resolve(resW);
+                                        } else {
+                                            // 🌟 終極保底：強制給 0
+                                            resolve({
+                                                routes: [{ legs: [{ duration: { value: 0, text: '0 分鐘' }, distance: { value: 0, text: '0 公尺' } }] }],
+                                                _mode: 'WALKING'
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }, 500); // 延遲 0.5 秒
+            });
+            results.push(res);
+        }
+
+        routeLegs[d] = results.map(res => {
+            if (res) {
+                const leg = res.routes[0].legs[0];
+                leg._mode = res._mode;
+                return leg;
+            }
+            return null;
+        });
+
+        if (typeof recalculateTimes === 'function') recalculateTimes(d);
+        if (typeof syncOrderToDatabase === 'function') {
+            await syncOrderToDatabase(d);
+        }
+    }
+}
+
+// ==========================================
+// 🌟 輔助函式
 // ==========================================
 function findPlaceIdByCoords(lat, lng) {
     return new Promise((resolve) => {
@@ -132,23 +209,22 @@ async function updateDatabasePlaceId(spotId, newPlaceId) {
 }
 
 // ==========================================
-// 🌟 修正：排序後停留在原本的 Day
+// 🌟 AI 排序
 // ==========================================
 async function aiSortItinerary() {
     const planId = window.currentMyPlanId;
-    const day = currentDay; // 🌟 記住使用者現在正在看哪一天
+    const day = currentDay;
 
     if (!planId) return alert("找不到行程 ID");
 
     const btn = document.getElementById("ai-sort-btn");
-    if(btn) btn.disabled = true;
+    if (btn) btn.disabled = true;
 
     try {
         const response = await fetch(`/api/plan/aiSort?myPlanId=${planId}&dayNumber=${day}`);
         const data = await response.json();
 
         if (data.success) {
-            // 🌟 傳入 day，告訴讀取函式：「資料更新完了，請把我留在 Day X，不要踢我回 Day 1」
             await loadMyPlanData(planId, day);
             alert(`Day ${day} 路線已為您最佳化完成！`);
         } else {
@@ -157,6 +233,6 @@ async function aiSortItinerary() {
     } catch (error) {
         console.error("AI 排序錯誤:", error);
     } finally {
-        if(btn) btn.disabled = false;
+        if (btn) btn.disabled = false;
     }
 }
