@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Entity
@@ -38,5 +39,15 @@ public class MyMapEntity {
     @JoinColumn(name = "myPlanId")
     @JsonIgnore
     private MyPlanEntity myPlan;
+
+    @Transient
+public String getOrderItemsName() {
+    if (this.myPlan != null) {
+        // 確保 MyPlanEntity 有 planName 字段和 getPlanName() 方法
+        // 如果 MyPlanEntity 的字段名稱不同，請替換為正確的名稱，例如 getName()
+        return this.myPlan.getMyPlanName();
+    }
+    return "自訂行程";
+}
 
 }

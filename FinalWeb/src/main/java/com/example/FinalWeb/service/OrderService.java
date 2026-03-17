@@ -166,4 +166,49 @@ public class OrderService {
         result.put("transportTickets", transportTickets);
         return result;
     }
+
+    // 🌟 3. 給管理後台：獲取儀表板統計數據
+public Map<String, Object> getAdminDashboardStats() {
+    Map<String, Object> stats = new HashMap<>();
+    
+    // 獲取待處理訂單數 (假設 payStatus 為 "未付款" 或 "待處理")
+    long pendingCount = ordersRepo.countByPayStatus("未付款");
+    
+    // 獲取退款請求數 (假設 payStatus 為 "已退款" 或 "退款中")
+    long refundCount = ordersRepo.countByPayStatus("退款中");
+    
+    // 獲取今日發放憑證數 (呼叫我們在 Repo 定義的 Query)
+    long todayIssued = ordersRepo.findMemberOrdersWithPlan(1).size(); // 假設要查詢 ID 為 1 的會員
+
+    stats.put("pendingOrders", pendingCount);
+    stats.put("refundRequests", refundCount);
+    stats.put("todayIssued", todayIssued);
+    
+    // 這裡可以加上漲跌幅的計算邏輯 (+5%, -2% 等)
+    return stats;
+}
+
+// 🌟 4. 給管理後台：獲取所有訂單列表 (包含篩選功能)
+    public List<OrdersEntity> getAllOrdersForAdmin(String status, String keyword) {
+    // 🌟 修正：處理關鍵字搜尋
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        return ordersRepo.findByTradeNoContaining(keyword.trim()); 
+    }
+    
+    // 處理狀態篩選
+    if (status != null && !status.equals("全部")) {
+        return ordersRepo.findByPayStatusOrderByOrderTimeDesc(status);
+    }
+    
+    // 預設回傳全部
+    return ordersRepo.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "orderTime"));
+}
+
+// 🌟 5. 給管理後台：更新訂單狀態 (退款、出貨等操作)
+@Transactional
+public void updateOrderStatus(Integer orderId, String newStatus) {
+    OrdersEntity order = getOrderById(orderId);
+    order.setPayStatus(newStatus);
+    ordersRepo.save(order);
+}
 }

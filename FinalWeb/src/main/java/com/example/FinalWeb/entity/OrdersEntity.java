@@ -2,8 +2,11 @@
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import jakarta.persistence.Transient;
+// ... 其他匯入
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -22,6 +25,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "orders")
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OrdersEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +41,13 @@ public class OrdersEntity {
     // 拉關連線到 member
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
+    @JsonIgnore
     private MemberEntity member;
 
     // 拉關連線到 myPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "myPlanId")
+    @JsonIgnore
     private MyPlanEntity myPlan;
 
     // 一對多關聯
@@ -53,4 +59,27 @@ public class OrdersEntity {
     @EqualsAndHashCode.Exclude
     private List<OrdersDetailEntity> orderDetails;
 
+    
+
+   // 🌟 修正：加上 JsonProperty 讓前端 order.orderItemsName 抓得到值
+    @Transient
+    @JsonProperty("orderItemsName")
+    public String getOrderItemsName() {
+        if (this.myPlan != null) {
+            return this.myPlan.getMyPlanName(); 
+        }
+        return "自訂行程";
+    }
+
+    // 🌟 修正：加上 JsonProperty 讓前端 order.totalPrice 抓得到值
+    @Transient
+    @JsonProperty("totalPrice")
+    public int getTotalPrice() {
+        if (this.orderDetails == null || this.orderDetails.isEmpty()) return 0;
+        return this.orderDetails.stream()
+                .mapToInt(d -> d.getTicketPrice() != null ? d.getTicketPrice() : 0)
+                .sum();
+    }
 }
+
+
