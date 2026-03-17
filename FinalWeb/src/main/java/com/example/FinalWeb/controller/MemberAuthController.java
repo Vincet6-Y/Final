@@ -98,8 +98,9 @@ public class MemberAuthController {
 
 
     @GetMapping("/line/login")
-    public String lineLogin(@RequestParam(required = false) String redirect) {
-        String loginUrl = lineLoginService.getLineLoginUrl();
+    public String lineLogin(@RequestParam(required = false) String redirect,
+                            HttpSession session) {
+        String loginUrl = lineLoginService.getLineLoginUrl(session, redirect);
         return "redirect:" + loginUrl;
     }
 
@@ -110,19 +111,30 @@ public class MemberAuthController {
                                 @RequestParam String state,
                                 HttpSession session,
                                 RedirectAttributes redirectAttr) {
-                                    
+
+        String savedState = (String) session.getAttribute("lineLoginState");
+        if (savedState == null || !savedState.equals(state)) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE登入驗證失敗"));
+            return "redirect:/auth";
+        }
+
         MemberEntity member = lineLoginService.loginWithLine(code);
 
         if (member == null) {
-            redirectAttr.addFlashAttribute("toast",
-                        ToastInfoDTO.error("LINE登入失敗"));
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE登入失敗"));
             return "redirect:/auth";
         }
 
         session.setAttribute("loginMember", member);
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE登入成功"));
 
-        redirectAttr.addFlashAttribute("toast", 
-                    ToastInfoDTO.success("LINE登入成功"));
+        String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
+        session.removeAttribute("lineLoginState");
+        session.removeAttribute("lineLoginRedirect");
+
+        if (redirectUrl != null && !redirectUrl.isBlank()) {
+            return "redirect:" + redirectUrl;
+        }
 
         return "redirect:/home";
     }
