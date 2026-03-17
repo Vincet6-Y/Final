@@ -101,6 +101,22 @@
                                                 <!-- 景點名稱 -->
                                                 <h4 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors"
                                                     th:text="${spot.locationName}">景點名稱</h4>
+                                                <!-- 停留時間 + 車程 -->
+                                                <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                                                    <span class="flex items-center gap-1"
+                                                        th:if="${spot.stayTime != null}">
+                                                        <span
+                                                            class="material-symbols-outlined text-[14px]">hourglass_empty</span>
+                                                        停留 <span th:text="${spot.stayTime}">60</span> 分鐘
+                                                    </span>
+
+                                                    <span class="flex items-center gap-1"
+                                                        th:if="${spot.transitTime != null}">
+                                                        <span
+                                                            class="material-symbols-outlined text-[14px]">directions_car</span>
+                                                        車程約 <span th:text="${spot.transitTime / 60}">12</span> 分鐘
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <!-- 有門票標記 -->
