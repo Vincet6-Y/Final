@@ -98,14 +98,38 @@
                     <div
                         class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
                         <div class="space-y-3">
-                            <input type="password" placeholder="目前密碼"
-                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
-                            <input type="password" placeholder="新密碼"
-                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
-                            <input type="password" placeholder="確認新密碼"
-                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
-                            <button type="button"
-                                class="px-5 py-2.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition">
+                            <div class="relative">
+                                <input type="password" id="currentPasswd" placeholder="目前密碼"
+                                    class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent pl-4 pr-10 py-3 text-sm outline-none">
+                                <button type="button"
+                                    class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-orange-500 transition">
+                                    <span
+                                        class="material-symbols-outlined select-none text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+
+                            <div class="relative">
+                                <input type="password" id="newPasswd" placeholder="新密碼"
+                                    class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent pl-4 pr-10 py-3 text-sm outline-none">
+                                <button type="button"
+                                    class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-orange-500 transition">
+                                    <span
+                                        class="material-symbols-outlined select-none text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+
+                            <div class="relative">
+                                <input type="password" id="confirmPasswd" placeholder="確認新密碼"
+                                    class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent pl-4 pr-10 py-3 text-sm outline-none">
+                                <button type="button"
+                                    class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-orange-500 transition">
+                                    <span
+                                        class="material-symbols-outlined select-none text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+
+                            <button type="button" id="savePasswdBtn"
+                                class="px-5 py-2.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition mt-2">
                                 儲存密碼
                             </button>
                         </div>
@@ -131,7 +155,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
