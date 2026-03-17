@@ -277,12 +277,86 @@ function updateDuration(day, index, newDuration) {
     itineraryData[day][index].duration = parseFloat(newDuration) || 1;
     recalculateTimes(day);
     renderItineraryPanel(day);
+    syncTimeToDatabase(day, index); // 🌟 呼叫同步
 }
 
 function updateArrivalTime(day, index, newTime) {
     itineraryData[day][index].arrivals = newTime;
     recalculateTimes(day);
     renderItineraryPanel(day);
+    syncTimeToDatabase(day, index); // 🌟 呼叫同步
+}
+
+// 🌟 輔助函式：將出發日期與天數組合為 LocalDateTime 格式
+function getFullDateTimeStr(day, timeStr) {
+    const startDateInput = document.getElementById('db-startDate');
+    let dateObj = (startDateInput && startDateInput.value) ? new Date(startDateInput.value) : new Date();
+    dateObj.setDate(dateObj.getDate() + (day - 1));
+    
+    const yyyy = dateObj.getFullYear();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}T${timeStr}:00`;
+}
+
+// 🌟 同步「單一景點時間」至資料庫
+async function syncTimeToDatabase(day, index) {
+    const item = itineraryData[day][index];
+    if (!item.spotId) return;
+
+    // 將小時轉換為分鐘存入資料庫
+    const stayMins = Math.round(parseFloat(item.duration) * 60);
+    const fullDateTime = getFullDateTimeStr(day, item.arrivals);
+
+    try {
+        await fetch('/api/plan/updateNodeTime', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                spotId: item.spotId,
+                visitTime: fullDateTime,
+                stayTime: stayMins
+            })
+        });
+    } catch (err) { console.error("時間同步失敗:", err); }
+}
+
+// 🌟 升級版：將順序、時間、車程、距離一起批次同步
+async function syncOrderToDatabase(day) {
+    const list = itineraryData[day];
+    const legs = routeLegs[day] || [];
+    
+    const payload = list.map((item, index) => {
+        let tTime = null, dist = null, tMode = 'WALKING';
+        
+        // 抓取上一站到這一站的 Google 車程與距離
+        if (index > 0 && legs[index - 1]) {
+            const leg = legs[index - 1];
+            tTime = leg.duration.value; // 秒
+            dist = leg.distance.value;  // 公尺
+            tMode = (dist > 1000) ? 'DRIVING' : 'WALKING'; 
+        }
+
+        return {
+            spotId: item.spotId,
+            visitOrder: index + 1,
+            visitTime: getFullDateTimeStr(day, item.arrivals),
+            transitTime: tTime,
+            distance: dist,
+            transitMode: tMode
+        };
+    }).filter(i => i.spotId); 
+
+    if (payload.length === 0) return;
+
+    try {
+        await fetch('/api/plan/updateOrder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        console.log(`Day ${day} 順序與時間已同步`);
+    } catch (error) { console.error("同步失敗:", error); }
 }
 
 // ==========================================
@@ -460,9 +534,6 @@ function handleDrop(e, day, dropIndex) {
     // 重新計算路線與渲染列表
     calculateAndDisplayRoute(day);
     draggedItemInfo = null;
-
-    // 🌟 新增：將移動後的新順序傳送給後端儲存
-    syncOrderToDatabase(day);
 
     return false;
 }
