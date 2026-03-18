@@ -31,7 +31,8 @@
             <div
               class="flex-1 flex items-center px-4 gap-3 bg-black/30 dark:bg-background-dark/50 rounded-lg border border-white/10">
               <span class="material-symbols-outlined text-primary">search</span>
-              <input id="searchInput" class="bg-transparent border-none focus:ring-0 text-white w-full py-4 placeholder-slate-300"
+              <input id="searchInput"
+                class="bg-transparent border-none focus:ring-0 text-white w-full py-4 placeholder-slate-300"
                 placeholder="搜尋想去的聖地..." type="text" />
             </div>
             <button id="searchBtn"
@@ -39,55 +40,57 @@
               搜尋
             </button>
           </div>
-         <div class="flex flex-wrap justify-center gap-4">
-          <a th:href="@{/workList(page=0, size=4, workClass='電影')}"
-            class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">      
+          <div class="flex flex-wrap justify-center gap-4">
+            <a th:href="@{/workList(page=0, size=4, workClass='電影')}"
+              class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
               <span class="material-symbols-outlined text-sm">movie</span>
-        電影場景巡禮
-    </a>
+              電影場景巡禮
+            </a>
 
-    <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
-       class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
-        <span class="material-symbols-outlined text-sm">animation</span>
-        動畫場景巡禮
-     </a>
-    </div>
+            <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
+              class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
+              <span class="material-symbols-outlined text-sm">animation</span>
+              動畫場景巡禮
+            </a>
+          </div>
         </div>
       </section>
-       <section class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors">
+      <section class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors">
         <div class="flex items-center justify-between mb-10">
           <h3 class="text-slate-900 dark:text-white text-3xl font-bold border-l-4 border-primary pl-4">
             精選作品
           </h3>
-        <a th:href="@{/workList}" class="text-[#FF9D1C] hover:text-[#FFB34D] hover:underline text-sm font-medium transition-colors">
-  查看更多作品
-</a>
+          <a th:href="@{/workList}"
+            class="text-[#FF9D1C] hover:text-[#FFB34D] hover:underline text-sm font-medium transition-colors">
+            查看更多作品
+          </a>
         </div>
         <div class="flex overflow-x-auto gap-6 pb-8 no-scrollbar">
-        <div th:each="work : ${featuredList}" class="flex-shrink-0 w-80 group">
+          <div th:each="work : ${featuredList}" class="flex-shrink-0 w-80 group">
             <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-                <img th:alt="${work.workName}"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    th:src="${work.workImg}" /> 
-                <span class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
-                      th:text="${work.workClass}">分類</span>
+              <img th:alt="${work.workName}"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                th:src="${work.workImg}" />
+              <span
+                class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
+                th:text="${work.workClass}">分類</span>
             </div>
-            
+
             <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1" th:text="${work.workName}">
-                作品名稱
+              作品名稱
             </h4>
-            
+
             <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2" th:text="${work.description}">
-                作品簡介...
+              作品簡介...
             </p>
 
             <a th:href="@{/workListDetail(workId=${work.workId})}"
               class="block w-full py-2 text-center border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all no-underline">
-                查看詳情
+              查看詳情
             </a>
+          </div>
         </div>
-        </div>
-        
+
       </section>
 
       <section class="py-16 px-6 lg:px-20 bg-slate-50 dark:bg-background-dark transition-colors">
@@ -107,77 +110,79 @@
             </button>
           </div>
 
-            <div id="content-japan" class="flex overflow-x-auto no-scrollbar py-2 gap-5">
-              <div
-                class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm">
-                <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                  <span class="material-symbols-outlined text-primary text-3xl">event</span>
-                </div>
-                
+          <div id="content-japan" class="flex overflow-x-auto no-scrollbar py-2 gap-5">
+            <div
+              class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm">
+              <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-primary text-3xl">event</span>
               </div>
-            </div>
 
-            <div id="content-mofa"
-              class="hidden w-full h-full min-h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 overflow-y-auto text-slate-700 dark:text-slate-300">
-              <h4 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined">gavel</span> 外交部領事事務局：日本入境重點
-              </h4>
-              <div class="space-y-6">
-                <div class="p-4 bg-slate-50 dark:bg-white/5 rounded-lg border-l-4 border-primary">
-                  <p class="font-bold text-slate-900 dark:text-white mb-2">📌 簽證與入境</p>
-                  <p>目前持中華民國護照（有身分證字號）可享 **90 天免簽證** 待遇。建議旅客出發前至「Visit Japan Web」完成申報，節省通關時間。</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
-                    <p class="font-bold text-slate-900 dark:text-white mb-2">🩺 醫療保險</p>
-                    <p class="text-sm leading-relaxed">
-                      日本醫療費昂貴，曾發生國人突發疾病後須支付數百萬日幣醫療費。外交部強烈建議國人出國前投保包含「<span
-                        class="font-bold text-primary">海外突發疾病醫療附加險</span>」之旅遊平安險。
-                    </p>
-                  </div>
-                  <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
-                    <p class="font-bold text-slate-900 dark:text-white mb-2">🚨 緊急求助</p>
-                    <p class="text-sm">警察局撥 110、救護車/火警撥 119。若需駐外館處協助，請聯絡駐日代表處。</p>
-                    <p class="mt-4 text-xs">台北駐日經濟文化代表處（東京）：</p>
-                    <p class="font-bold text-primary">(+81) 3-3280-7811</p>
-                    <p class="text-xs">外交部領事事務局急難救助專線：</p>
-                    <p class="font-bold text-primary">0800-085-095</p>
-                  </div>
-                </div>
-              </div>
-                <p class="text-sm opacity-70 italic text-right">資料來源：外交部領事事務局 (2026 更新)</p>
-              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </main>
 
-    <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+          <div id="content-mofa"
+            class="hidden w-full h-full min-h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 overflow-y-auto text-slate-700 dark:text-slate-300">
+            <h4 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+              <span class="material-symbols-outlined">gavel</span> 外交部領事事務局：日本入境重點
+            </h4>
+            <div class="space-y-6">
+              <div class="p-4 bg-slate-50 dark:bg-white/5 rounded-lg border-l-4 border-primary">
+                <p class="font-bold text-slate-900 dark:text-white mb-2">📌 簽證與入境</p>
+                <p>目前持中華民國護照（有身分證字號）可享 **90 天免簽證** 待遇。建議旅客出發前至「Visit Japan Web」完成申報，節省通關時間。</p>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
+                  <p class="font-bold text-slate-900 dark:text-white mb-2">🩺 醫療保險</p>
+                  <p class="text-sm leading-relaxed">
+                    日本醫療費昂貴，曾發生國人突發疾病後須支付數百萬日幣醫療費。外交部強烈建議國人出國前投保包含「<span
+                      class="font-bold text-primary">海外突發疾病醫療附加險</span>」之旅遊平安險。
+                  </p>
+                </div>
+                <div class="p-4 border border-slate-100 dark:border-white/10 rounded-lg">
+                  <p class="font-bold text-slate-900 dark:text-white mb-2">🚨 緊急求助</p>
+                  <p class="text-sm">警察局撥 110、救護車/火警撥 119。若需駐外館處協助，請聯絡駐日代表處。</p>
+                  <p class="mt-4 text-xs">台北駐日經濟文化代表處（東京）：</p>
+                  <p class="font-bold text-primary">(+81) 3-3280-7811</p>
+                  <p class="text-xs">外交部領事事務局急難救助專線：</p>
+                  <p class="font-bold text-primary">0800-085-095</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm opacity-70 italic text-right">資料來源：外交部領事事務局 (2026 更新)</p>
+          </div>
+        </div>
   </div>
-  
+  </div>
+  </section>
+  </main>
+
+  <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+  </div>
+  <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+
+
   <script>
-// 定義非同步載入新聞的函式
-async function loadJapanNews() {
-    const container = document.getElementById('content-japan');
-    try {
+    // 定義非同步載入新聞的函式
+    async function loadJapanNews() {
+      const container = document.getElementById('content-japan');
+      try {
         // 1. 抓取後端 API 資料
         const response = await fetch('/api/news/japan');
         if (!response.ok) throw new Error("API 連線失敗");
         const data = await response.json();
-        
+
         // 2. 清空容器（移除原本的 loading 或預設佔位內容）
-        container.innerHTML = ''; 
+        container.innerHTML = '';
 
         if (data.length === 0) {
-            container.innerHTML = '<div class="text-slate-500 p-8">目前暫無最新新聞</div>';
-            return;
+          container.innerHTML = '<div class="text-slate-500 p-8">目前暫無最新新聞</div>';
+          return;
         }
 
         // 3. 渲染新聞卡片
         data.forEach(news => {
-            const cleanTitle = news.title.split(' - ')[0];
-            const newsCard = `
+          const cleanTitle = news.title.split(' - ')[0];
+          const newsCard = `
                 <div class="min-w-[280px] max-w-[320px] bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 shadow-sm hover:border-primary/50 transition-all flex flex-col justify-between group">
                     <div>
                         <div class="flex items-center gap-2 mb-3">
@@ -201,60 +206,64 @@ async function loadJapanNews() {
                     </div>
                 </div>
             `;
-            container.innerHTML += newsCard;
+          container.innerHTML += newsCard;
         });
-    } catch (error) {
+      } catch (error) {
         console.error('新聞載入錯誤:', error);
         container.innerHTML = '<div class="text-red-400 p-8 text-sm">無法獲取日本資訊，請稍後再試</div>';
+      }
     }
-}
 
-// 監聽頁面載入完成後執行
-document.addEventListener('DOMContentLoaded', function() {
-    // 執行新聞載入
-    loadJapanNews();
+    // 監聽頁面載入完成後執行
+    document.addEventListener('DOMContentLoaded', function () {
+      // 執行新聞載入
+      loadJapanNews();
 
-    // 搜尋按鈕功能
-    document.getElementById('searchBtn').addEventListener('click', function() {
+      // 搜尋按鈕功能
+      document.getElementById('searchBtn').addEventListener('click', function () {
         const keyword = document.getElementById('searchInput').value.trim();
         if (!keyword) return;
 
         fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`)
-            .then(response => {
-                if (!response.ok) throw new Error("找不到作品");
-                return response.json();
-            })
-            .then(work => {
-                window.location.href = `/workListDetail?workId=${work.workId}`;
-            })
-            .catch(error => {
-                console.warn(error);
-                window.location.href = `/workList?keyword=${encodeURIComponent(keyword)}`;
-            });
+          .then(response => {
+            if (!response.ok) throw new Error("找不到作品");
+            return response.json();
+          })
+          .then(work => {
+            window.location.href = `/workListDetail?workId=${work.workId}`;
+          })
+          .catch(error => {
+            console.warn(error);
+            window.location.href = `/workList?keyword=${encodeURIComponent(keyword)}`;
+          });
+      });
     });
-});
 
-// 切換 Tab 功能
-function showContent(tab) {
-    const japanContent = document.getElementById('content-japan');
-    const mofaContent = document.getElementById('content-mofa');
-    const btnJapan = document.getElementById('btn-japan');
-    const btnMofa = document.getElementById('btn-mofa');
+    // 切換 Tab 功能
+    function showContent(tab) {
+      const japanContent = document.getElementById('content-japan');
+      const mofaContent = document.getElementById('content-mofa');
+      const btnJapan = document.getElementById('btn-japan');
+      const btnMofa = document.getElementById('btn-mofa');
 
-    if (tab === 'japan') {
+      if (tab === 'japan') {
         japanContent.classList.remove('hidden');
         japanContent.classList.add('flex');
         mofaContent.classList.add('hidden');
         btnJapan.className = "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group";
         btnMofa.className = "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm";
-    } else {
+      } else {
         japanContent.classList.add('hidden');
         japanContent.classList.remove('flex');
         mofaContent.classList.remove('hidden');
         btnMofa.className = "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group";
         btnJapan.className = "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm";
+      }
     }
-}
   </script>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script th:src="@{/assets/toast.js}"></script>
 </body>
+
 </html>

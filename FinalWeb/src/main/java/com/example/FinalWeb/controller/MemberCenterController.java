@@ -16,6 +16,7 @@ import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.FavoritesEntity;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
+import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.example.FinalWeb.service.FavoritesService;
 import com.example.FinalWeb.service.MemberService;
 import com.example.FinalWeb.service.OrderService;
@@ -31,6 +32,9 @@ public class MemberCenterController {
     private OrderService orderService;
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberOauthRepo memberOauthRepo;
 
     // 處理登出
     @GetMapping("/logout")
@@ -67,32 +71,38 @@ public class MemberCenterController {
         }
         // 4. 撈出這個會員的收藏清單 (交給 FavoritesService)
         List<FavoritesEntity> myFavorites = favoritesService.getMemberFavorites(memberId);
+
+        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "LINE");
+        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "GOOGLE");
+        
         // 5. 把資料丟給前端 (讓前端的 HTML 可以跑迴圈)
         model.addAttribute("orders", myOrders);
         model.addAttribute("orderTotals", orderTotals);
         model.addAttribute("favorites", myFavorites);
+        model.addAttribute("lineBound", lineBound);
+        model.addAttribute("googleBound", googleBound);
 
         return "member";
     }
 
-    // 處理前端 AJAX 修改密碼的請求
+    // 處理前端 AJAX 修改密碼的請求(Toast)
     @PostMapping("/change-passwd")
     @ResponseBody
-    public ResponseEntity<String> changePasswd(@RequestBody PasswdChangeDto dto, HttpSession session) {
-        // 1. 用你原本的寫法，從 Session 拿出登入的會員
+    // 1. 將泛型從 String 改為 ToastInfoDTO
+    public ResponseEntity<ToastInfoDTO> changePasswd(@RequestBody PasswdChangeDto dto, HttpSession session) {
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
         if (loginMember == null) {
-            return ResponseEntity.status(401).body("請先登入");
+            // 2. 登入失敗：回傳 401 狀態碼，並打包 error 類型的 DTO
+            return ResponseEntity.status(401).body(ToastInfoDTO.error("請先登入"));
         }
-        // 2. 拿出該會員的 Email，呼叫我們剛剛寫好的 Service
         String result = memberService.changePasswd(loginMember.getEmail(), dto);
-        // 3. 判斷 Service 的回傳結果
         if ("密碼修改成功".equals(result)) {
-            // 回傳 HTTP 200 (Success)
-            return ResponseEntity.ok(result);
+            // 3. 修改成功：回傳 200 狀態碼，並打包 success 類型的 DTO
+            return ResponseEntity.ok(ToastInfoDTO.success(result));
         } else {
-            // 回傳 HTTP 400 (Bad Request)，並把錯誤訊息傳給前端
-            return ResponseEntity.badRequest().body(result);
+            // 4. 修改失敗（例如舊密碼錯誤）：回傳 400，並打包 error 類型的 DTO
+            return ResponseEntity.badRequest().body(ToastInfoDTO.error(result));
         }
     }
 }

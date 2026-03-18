@@ -104,20 +104,27 @@ $(document).ready(function () {
         };
         // 4. 發送 AJAX 請求
         $.ajax({
-            url: '/member/change-passwd', // 對應後端的 API 網址
+            url: '/member/change-passwd',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
                 // Controller 回傳 200 OK 會進來這裡
-                alert(response); // 顯示「密碼修改成功」
-                // 清空輸入框並關閉 Modal (視你的 UI 需求而定)
+                // 1. 這裡的 response 已經是一個 JSON 物件：{ type: "success", message: "密碼修改成功" }
+                showToast(response.type, response.message);
                 $('#currentPasswd, #newPasswd, #confirmPasswd').val('');
                 $('#closeAccountModal').click();
             },
             error: function (xhr) {
-                // Controller 回傳 400 Bad Request 會進來這裡
-                alert('錯誤：' + xhr.responseText);
+                // Controller 回傳 400 或 401 會進來這裡
+                const errorData = xhr.responseJSON;
+                // 防呆檢查：如果後端確實有回傳 JSON，就顯示 DTO 裡的 message
+                if (errorData && errorData.message) {
+                    showToast(errorData.type, errorData.message);
+                } else {
+                    // 如果發生預期外的錯誤（例如伺服器掛掉 500），顯示預設錯誤
+                    showToast('error', '系統發生錯誤，請稍後再試');
+                }
             }
         });
     });
