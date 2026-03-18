@@ -42,6 +42,68 @@
     <script th:src="@{/member/js/cardSlide.js}"></script>
     <script th:src="@{/member/js/passwdEyeIcon.js}"></script>
     <script th:src="@{/assets/toast.js}"></script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithRedirect,
+    getRedirectResult
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+    apiKey: "AIzaSyA6gE3Tlb97Gb6qLuhccu0EXdQnj_nVNcY",
+    authDomain: "anime-travel-website.firebaseapp.com",
+    projectId: "anime-travel-website",
+    storageBucket: "anime-travel-website.firebasestorage.app",
+    messagingSenderId: "756988685588",
+    appId: "1:756988685588:web:7f13d7c3f1f507f7dba601"
+    };
+
+    // 初始化
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // 👉 點擊 Google 登入
+    document.getElementById("googleLoginBtn")?.addEventListener("click", () => {
+    signInWithRedirect(auth, provider);
+    });
+
+    // 👉 回來後處理登入結果
+    window.addEventListener("load", async () => {
+    try {
+        const result = await getRedirectResult(auth);
+
+        if (!result) return;
+
+        const user = result.user;
+        const idToken = await user.getIdToken();
+
+        const response = await fetch("/auth/google/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            idToken: idToken
+        })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+        window.location.href = data.redirectUrl || "/home";
+        } else {
+        alert(data.message || "登入失敗");
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Google 登入失敗");
+    }
+    });
+    </script>
 </body>
 
 </html>

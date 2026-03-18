@@ -1,6 +1,7 @@
 package com.example.FinalWeb.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
+import com.example.FinalWeb.dto.GoogleLoginRequestDTO;
 import com.example.FinalWeb.dto.MemberLoginDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
 import com.example.FinalWeb.dto.SocialProfileDTO;
@@ -23,6 +25,7 @@ import com.example.FinalWeb.entity.MemberOauthEntity;
 import com.example.FinalWeb.enums.AuthProvider;
 import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.example.FinalWeb.repo.MemberRepo;
+import com.example.FinalWeb.service.GoogleLoginService;
 import com.example.FinalWeb.service.LineLoginService;
 import com.example.FinalWeb.service.MemberService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +42,9 @@ public class MemberAuthController {
 
     @Autowired
     private LineLoginService lineLoginService;
+
+    @Autowired
+    private GoogleLoginService googleLoginService;
 
     @Autowired
     private MemberRepo memberRepo;
@@ -78,7 +84,10 @@ public class MemberAuthController {
 
     // 處理註冊
     @PostMapping("/register")
-    public String register(MemberRegisterDTO register, HttpSession session, Model model) {
+    public String register(MemberRegisterDTO register,
+                        HttpSession session,
+                        Model model,
+                        HttpServletRequest request) {
 
         String result = memberService.register(register);
 
@@ -89,50 +98,91 @@ public class MemberAuthController {
                 model.addAttribute("toast", ToastInfoDTO.error("兩次輸入的密碼不一致"));
             }
 
-            // 保持註冊面板開啟
             model.addAttribute("openPanel", "register");
             model.addAttribute("registerData", register);
 
-            // 如果這次是 LINE 第一次登入後補資料註冊，失敗時要把 LINE 預填資料再帶回畫面
-            model.addAttribute("lineName", session.getAttribute("lineName"));
-            model.addAttribute("lineEmail", session.getAttribute("lineEmail"));
+            // 第三方登入第一次進來補資料時，失敗要把預填資料帶回去
+            model.addAttribute("socialName", session.getAttribute("socialName"));
+            model.addAttribute("socialEmail", session.getAttribute("socialEmail"));
 
             return "auth";
         }
 
-        // 一般註冊成功後，若是 LINE 流程，就補建立 member_oauth
-        String lineUserId = (String) session.getAttribute("lineUserId");
-        if (lineUserId != null) {
+        String socialId = (String) session.getAttribute("socialId");
+        AuthProvider socialProvider = (AuthProvider) session.getAttribute("socialProvider");
+
+        if (socialId != null && socialProvider != null) {
             MemberEntity member = memberRepo.findByEmail(register.email()).orElse(null);
 
             if (member != null) {
-                // 避免重複綁定同一個 LINE 帳號
                 boolean alreadyLinked = memberOauthRepo
-                        .findByProviderAndProviderId(AuthProvider.LINE, lineUserId)
+                        .findByProviderAndProviderId(socialProvider, socialId)
                         .isPresent();
 
                 if (!alreadyLinked) {
                     MemberOauthEntity oauth = new MemberOauthEntity();
                     oauth.setMember(member);
-                    oauth.setProvider(AuthProvider.LINE);
-                    oauth.setProviderId(lineUserId);
+                    oauth.setProvider(socialProvider);
+                    oauth.setProviderId(socialId);
                     memberOauthRepo.save(oauth);
                 }
+
+                // 註冊成功後直接登入
+                saveLoginSession(member, request);
             }
 
-            // 清除 LINE 註冊流程暫存資料
-            session.removeAttribute("lineUserId");
-            session.removeAttribute("lineName");
-            session.removeAttribute("lineEmail");
-            session.removeAttribute("lineLoginRedirect");
-            session.removeAttribute("lineLoginState");
-            session.removeAttribute("lineAction");
+            // 清除第三方登入暫存資料
+            session.removeAttribute("socialProvider");
+            session.removeAttribute("socialId");
+            session.removeAttribute("socialName");
+            session.removeAttribute("socialEmail");
+            session.removeAttribute("socialRedirect");
         }
 
-        return "redirect:/auth";
+        return "redirect:/home";
     }
 
+    @PostMapping("/google/login")
+    @ResponseBody
+    public Map<String, Object> googleLogin(@RequestBody GoogleLoginRequestDTO req,
+                                        HttpSession session,
+                                        HttpServletRequest request) {
 
+        try {
+            SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
+
+            MemberEntity member = memberOauthRepo
+                    .findByProviderAndProviderId(AuthProvider.GOOGLE, profile.providerId())
+                    .map(MemberOauthEntity::getMember)
+                    .orElse(null);
+
+            if (member != null) {
+                saveLoginSession(member, request);
+
+                return Map.of(
+                        "success", true,
+                        "redirectUrl", "/home"
+                );
+            }
+
+            session.setAttribute("socialProvider", AuthProvider.GOOGLE);
+            session.setAttribute("socialId", profile.providerId());
+            session.setAttribute("socialName", profile.name());
+            session.setAttribute("socialEmail", profile.email());
+
+            return Map.of(
+                    "success", true,
+                    "redirectUrl", "/auth"
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of(
+                    "success", false,
+                    "message", "Google 登入失敗"
+            );
+        }
+    }
 
     @GetMapping("/line/login")
     public String lineLogin(@RequestParam(required = false) String redirect, HttpSession session) {
@@ -324,14 +374,15 @@ public class MemberAuthController {
                 .map(MemberOauthEntity::getMember)
                 .orElse(null);
 
+        // 已綁定 → 直接登入
         if (member != null) {
             saveLoginSession(member, request);
             session.removeAttribute("lineAction");
 
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success(providerName + " 登入成功"));
 
-            String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
-            session.removeAttribute("lineLoginRedirect");
+            String redirectUrl = (String) session.getAttribute("socialRedirect");
+            session.removeAttribute("socialRedirect");
 
             if (redirectUrl != null && !redirectUrl.isBlank()) {
                 return "redirect:" + redirectUrl;
@@ -340,16 +391,17 @@ public class MemberAuthController {
             return "redirect:/home";
         }
 
-        session.setAttribute("lineUserId", profile.providerId());
-        session.setAttribute("lineName", profile.name());
-        session.setAttribute("lineEmail", profile.email());
+        // 未綁定 → 暫存第三方資料，導到註冊頁補資料
+        session.setAttribute("socialProvider", provider);
+        session.setAttribute("socialId", profile.providerId());
+        session.setAttribute("socialName", profile.name());
+        session.setAttribute("socialEmail", profile.email());
         session.removeAttribute("lineAction");
 
         model.addAttribute("openPanel", "register");
-        model.addAttribute("lineName", profile.name());
-        model.addAttribute("lineEmail", profile.email());
-        model.addAttribute("redirect", session.getAttribute("lineLoginRedirect"));
-
+        model.addAttribute("socialName", profile.name());
+        model.addAttribute("socialEmail", profile.email());
+        model.addAttribute("redirect", session.getAttribute("socialRedirect"));
         return "auth";
     }
 
