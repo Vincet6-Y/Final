@@ -65,15 +65,37 @@
                 </a>
             </div>
 
-            <div th:if="${session.loginMember != null}" class="flex items-center gap-3">
-                <span class="text-sm font-medium text-neutral-800 dark:text-white">
-                    <span th:text="${session.loginMember.name}"></span>
-                </span>
+            <div th:if="${session.loginMember != null}" class="relative">
+                <button id="memberDropdownBtn"
+                    class="flex items-center gap-2 bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 h-9 rounded-lg text-sm font-bold transition-all">
 
-                <a th:href="@{/member}"
-                    class="bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 py-1.5 rounded-lg text-sm font-bold transition-all">
-                    會員中心
-                </a>
+                    <span class="material-symbols-outlined text-[18px] leading-none">
+                        account_circle
+                    </span>
+
+                    <span th:text="${session.loginMember.name}"></span>
+
+                    <span id="memberDropdownArrow"
+                        class="material-symbols-outlined text-[18px] leading-none transition-transform duration-200">
+                        keyboard_arrow_down
+                    </span>
+                </button>
+
+                <div id="memberDropdownMenu"
+                    class="absolute right-0 top-full mt-2 w-40 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-800 shadow-xl z-50 opacity-0 -translate-y-2 pointer-events-none transition-all duration-200">
+                    
+                    <a th:href="@{/member}"
+                        class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-t-xl">
+                        會員中心
+                    </a>
+
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit"
+                            class="block w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-b-xl">
+                            登出
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -87,6 +109,8 @@
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
             }
         </script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script th:src="@{/member/js/headerMemberDropdown.js}"></script>
     </header>
 </body>
 

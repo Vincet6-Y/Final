@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -36,10 +37,19 @@ public class LineLoginService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // 產生 LINE 登入授權網址
+    // 這裡會把本次動作記成 login，callback 時就知道要走登入流程
     public String getLineLoginUrl(HttpSession session, String redirect) {
 
         String state = UUID.randomUUID().toString();
         session.setAttribute("lineLoginState", state);
+
+        // 標記這次 LINE OAuth 是登入流程
+        session.setAttribute("lineAction", "login");
+
+        if (redirect != null && !redirect.isBlank()) {
+            session.setAttribute("lineLoginRedirect", redirect);
+        }
 
         return "https://access.line.me/oauth2/v2.1/authorize"
                 + "?response_type=code"
@@ -48,6 +58,25 @@ public class LineLoginService {
                 + "&state=" + state
                 + "&scope=profile%20openid%20email";
     }
+
+    // 產生 LINE 綁定授權網址
+    // 這裡把本次動作記成 link，callback 時就知道要走綁定流程
+    public String getLineLinkUrl(HttpSession session) {
+
+        String state = UUID.randomUUID().toString();
+        session.setAttribute("lineLoginState", state);
+
+        // 標記這次 LINE OAuth 是綁定流程
+        session.setAttribute("lineAction", "link");
+
+        return "https://access.line.me/oauth2/v2.1/authorize"
+                + "?response_type=code"
+                + "&client_id=" + channelId
+                + "&redirect_uri=" + callbackUrl
+                + "&state=" + state
+                + "&scope=profile%20openid%20email";
+    }
+
 
     // 用 LINE callback 回傳的 code 取得使用者資料
     // 會回傳：userId、displayName、email（若 LINE 沒提供則為 null）
@@ -124,8 +153,7 @@ public class LineLoginService {
     }
 
 
-
-
+    // 依 LINE userId 查詢是否已綁定本站會員
     public MemberEntity findLinkedMember(String lineUserId) {
         Optional<MemberOauthEntity> oauthOpt =
                 memberOauthRepo.findByProviderAndProviderId("LINE", lineUserId);
@@ -133,7 +161,11 @@ public class LineLoginService {
         if (oauthOpt.isPresent()) {
             return oauthOpt.get().getMember();
         }
-
         return null;
+    }
+
+    @Transactional
+    public void unlinkLine(Integer memberId) {
+        memberOauthRepo.deleteByMember_MemberIdAndProvider(memberId, "LINE");
     }
 }
