@@ -49,12 +49,9 @@ public class MemberAuthController {
 
     // 處理登入
     @PostMapping("/login")
-    public String login(MemberLoginDTO login,
-            HttpSession session,
-            @RequestParam(required = false) String redirect,
-            RedirectAttributes redirectAttr,
-            Model model,
-            HttpServletRequest request) {
+    public String login(
+        MemberLoginDTO login, HttpSession session, @RequestParam(required = false) String redirect,
+        RedirectAttributes redirectAttr, Model model, HttpServletRequest request) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
@@ -67,24 +64,7 @@ public class MemberAuthController {
             return "auth";
         }
 
-        // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
-
-        // 2. 建立一個官方認可的身份憑證 (Authentication)
-        Authentication auth = new UsernamePasswordAuthenticationToken(member.getEmail(), null, authorities);
-
-        // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        // 4. 將狀態綁定到 Session 中 (最關鍵的一步！)
-        session = request.getSession(true);
-
-        // 這是你原本存放使用者資料的地方，保留著完全沒問題，方便你前端畫面使用
-        session.setAttribute("loginMember", member);
-
-        // 🌟 新增這行：把安管中心的安全狀態，用 Spring Security 指定的專屬名稱存進 Session 裡！
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext());
+        saveLoginSession(member, request);
 
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
 
@@ -98,9 +78,7 @@ public class MemberAuthController {
 
     // 處理註冊
     @PostMapping("/register")
-    public String register(MemberRegisterDTO register,
-                        HttpSession session,
-                        Model model) {
+    public String register(MemberRegisterDTO register, HttpSession session, Model model) {
 
         String result = memberService.register(register);
 
@@ -157,8 +135,7 @@ public class MemberAuthController {
 
 
     @GetMapping("/line/login")
-    public String lineLogin(@RequestParam(required = false) String redirect,
-                            HttpSession session) {
+    public String lineLogin(@RequestParam(required = false) String redirect, HttpSession session) {
         String loginUrl = lineLoginService.getLineLoginUrl(session, redirect);
         return "redirect:" + loginUrl;
     }
@@ -167,7 +144,7 @@ public class MemberAuthController {
 
     @GetMapping("/line/callback")
     public String lineCallback(@RequestParam String code, @RequestParam String state, 
-        HttpSession session, RedirectAttributes redirectAttr, Model model) {
+        HttpSession session, RedirectAttributes redirectAttr, Model model, HttpServletRequest request) {
 
         if (!isValidLineState(session, state)) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE 驗證失敗"));
@@ -187,7 +164,7 @@ public class MemberAuthController {
             }
 
             return socialQuickLogin(
-                    AuthProvider.LINE, profile, session, redirectAttr, model
+                    AuthProvider.LINE, profile, session, redirectAttr, model, request
             );
 
         } catch (Exception e) {
@@ -201,8 +178,7 @@ public class MemberAuthController {
 
     // 點擊「立即綁定 LINE」時，導向 LINE OAuth 授權頁
     @GetMapping("/line/link")
-    public String lineLink(HttpSession session,
-                        RedirectAttributes redirectAttr) {
+    public String lineLink(HttpSession session, RedirectAttributes redirectAttr) {
 
         // 必須先登入會員，才能綁定 LINE
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
@@ -217,8 +193,7 @@ public class MemberAuthController {
 
     // 解除目前會員的 LINE 綁定
     @PostMapping("/line/unlink")
-    public String lineUnlink(HttpSession session,
-                            RedirectAttributes redirectAttr) {
+    public String lineUnlink(HttpSession session, RedirectAttributes redirectAttr) {
 
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
         if (loginMember == null) {
@@ -239,6 +214,37 @@ public class MemberAuthController {
 
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
         return "redirect:/member";
+    }
+
+
+
+    // ==================== 以下是 helper 方法 ====================
+
+    // 建立登入後的 Session 與 Spring Security 驗證資訊
+    private void saveLoginSession(MemberEntity member, HttpServletRequest request) {
+
+        // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
+        List<GrantedAuthority> authorities =
+                AuthorityUtils.createAuthorityList(member.getRole());
+
+        // 2. 建立一個官方認可的身份憑證 (Authentication)
+        Authentication auth =
+                new UsernamePasswordAuthenticationToken(member.getEmail(), null, authorities);
+
+        // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        // 4. 將狀態綁定到 Session 中 (最關鍵的一步！)
+        HttpSession session = request.getSession(true);
+
+        // 這是你原本存放使用者資料的地方，保留著完全沒問題，方便你前端畫面使用
+        session.setAttribute("loginMember", member);
+
+        // 🌟 新增這行：把安管中心的安全狀態，用 Spring Security 指定的專屬名稱存進 Session 裡！
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
     }
 
     // 驗證 LINE callback 的 state 是否與 session 中保存的一致，避免 CSRF 攻擊
@@ -263,11 +269,11 @@ public class MemberAuthController {
     }
 
     // 綁定第三方登入帳號到目前登入的會員
-    private String bindSocialAccount(AuthProvider provider,
-                                String providerId,
-                                HttpSession session,
-                                RedirectAttributes redirectAttr) {
+    private String bindSocialAccount(
+        AuthProvider provider, String providerId, 
+        HttpSession session, RedirectAttributes redirectAttr) {
 
+        String providerName = provider.name();
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
         if (loginMember == null) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
@@ -281,7 +287,7 @@ public class MemberAuthController {
                 .orElse(null);
 
         if (linkedMember != null) {
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此 LINE 帳號已綁定其他會員"));
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此 " + providerName + " 帳號已綁定其他會員"));
             session.removeAttribute("lineAction");
             return "redirect:/member";
         }
@@ -291,7 +297,7 @@ public class MemberAuthController {
         );
 
         if (alreadyBound) {
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此會員已綁定 LINE"));
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此會員已綁定 " + providerName));
             session.removeAttribute("lineAction");
             return "redirect:/member";
         }
@@ -303,27 +309,26 @@ public class MemberAuthController {
         memberOauthRepo.save(oauth);
 
         session.removeAttribute("lineAction");
-        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 綁定成功"));
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success(providerName + " 綁定成功"));
         return "redirect:/member";
     }
 
     // 第三方快速登入流程：已綁定則直接登入，未綁定則帶入註冊頁補齊資料
-    private String socialQuickLogin(AuthProvider provider,
-                                SocialProfileDTO profile,
-                                HttpSession session,
-                                RedirectAttributes redirectAttr,
-                                Model model) {
+    private String socialQuickLogin(
+        AuthProvider provider, SocialProfileDTO profile, HttpSession session,
+        RedirectAttributes redirectAttr, Model model,  HttpServletRequest request) {
 
+        String providerName = provider.name();
         MemberEntity member = memberOauthRepo
                 .findByProviderAndProviderId(provider, profile.providerId())
                 .map(MemberOauthEntity::getMember)
                 .orElse(null);
 
         if (member != null) {
-            session.setAttribute("loginMember", member);
+            saveLoginSession(member, request);
             session.removeAttribute("lineAction");
 
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 登入成功"));
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success(providerName + " 登入成功"));
 
             String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
             session.removeAttribute("lineLoginRedirect");
