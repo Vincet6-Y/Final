@@ -1,31 +1,31 @@
 <th:block th:fragment="accountModal">
-    <div id="accountModal"
-        class="hidden fixed inset-0 z-[999] flex items-center justify-center px-4">
-        
-        <div id="accountModalBackdrop"
-            class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+    <div id="accountModal" class="hidden fixed inset-0 z-[999] flex items-center justify-center px-4">
 
-        <div class="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl overflow-hidden">            
+        <div id="accountModalBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <div
+            class="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl overflow-hidden">
             <!-- header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
                 <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">帳戶設定</h2>
                 <button type="button" id="closeAccountModal"
-                        class="size-10 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center transition">
+                    class="size-10 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 flex items-center justify-center transition">
                     <span class="material-symbols-outlined text-slate-700 dark:text-slate-200">close</span>
                 </button>
             </div>
 
             <!-- content -->
             <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                
+
                 <!-- accordion 1 -->
                 <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
                     <button type="button"
-                            class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
+                        class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
                         <span class="font-bold text-slate-900 dark:text-slate-100">帳號管理</span>
                         <span class="material-symbols-outlined accordion-icon">expand_more</span>
                     </button>
-                    <div class="accordion-content px-5 py-5 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                    <div
+                        class="accordion-content px-5 py-5 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
                         <!-- 帳號綁定 -->
                         <div>
                             <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 mb-4">
@@ -33,10 +33,13 @@
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- LINE 綁定 -->
-                                <div class="rounded-2xl border border-slate-300 dark:border-white/10 p-4 flex items-center justify-between gap-4">
+                                <div
+                                    class="rounded-2xl border border-slate-300 dark:border-white/10 p-4 flex items-center justify-between gap-4">
                                     <div class="flex items-center gap-4 min-w-0">
-                                        <div class="size-16 rounded-full border border-slate-300 dark:border-white/15 flex items-center justify-center shrink-0 bg-white dark:bg-zinc-800">
-                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">LINE</span>
+                                        <div
+                                            class="size-16 rounded-full border border-slate-300 dark:border-white/15 flex items-center justify-center shrink-0 bg-white dark:bg-zinc-800">
+                                            <span
+                                                class="text-sm font-medium text-slate-700 dark:text-slate-200">LINE</span>
                                         </div>
                                         <div class="min-w-0">
                                             <p class="text-sm text-slate-500 dark:text-slate-400"
@@ -44,15 +47,18 @@
                                         </div>
                                     </div>
                                     <button type="button"
-                                            class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                                            th:text="${lineBound} ? '解除綁定' : '立即綁定'">
+                                        class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                                        th:text="${lineBound} ? '解除綁定' : '立即綁定'">
                                     </button>
                                 </div>
                                 <!-- Google 綁定 -->
-                                <div class="rounded-2xl border border-slate-300 dark:border-white/10 p-4 flex items-center justify-between gap-4">
+                                <div
+                                    class="rounded-2xl border border-slate-300 dark:border-white/10 p-4 flex items-center justify-between gap-4">
                                     <div class="flex items-center gap-4 min-w-0">
-                                        <div class="size-16 rounded-full border border-slate-300 dark:border-white/15 flex items-center justify-center shrink-0 bg-white dark:bg-zinc-800">
-                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">Google</span>
+                                        <div
+                                            class="size-16 rounded-full border border-slate-300 dark:border-white/15 flex items-center justify-center shrink-0 bg-white dark:bg-zinc-800">
+                                            <span
+                                                class="text-sm font-medium text-slate-700 dark:text-slate-200">Google</span>
                                         </div>
                                         <div class="min-w-0">
                                             <p class="text-sm text-slate-500 dark:text-slate-400"
@@ -60,8 +66,8 @@
                                         </div>
                                     </div>
                                     <button type="button"
-                                            class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
-                                            th:text="${googleBound} ? '解除綁定' : '立即綁定'">
+                                        class="shrink-0 px-4 py-2 rounded-lg border border-slate-300 dark:border-white/15 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                                        th:text="${googleBound} ? '解除綁定' : '立即綁定'">
                                     </button>
                                 </div>
                             </div>
@@ -75,7 +81,7 @@
                                 刪除帳號後，相關會員資料將無法恢復，請確認後再執行此操作。
                             </p>
                             <button type="button"
-                                    class="px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition">
+                                class="px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition">
                                 刪除帳號
                             </button>
                         </div>
@@ -85,20 +91,45 @@
                 <!-- accordion 2 -->
                 <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
                     <button type="button"
-                            class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
+                        class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
                         <span class="font-bold text-slate-900 dark:text-slate-100">修改密碼</span>
                         <span class="material-symbols-outlined accordion-icon">expand_more</span>
                     </button>
-                    <div class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                    <div
+                        class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
                         <div class="space-y-3">
-                            <input type="password" placeholder="目前密碼"
-                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
-                            <input type="password" placeholder="新密碼"
-                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
-                            <input type="password" placeholder="確認新密碼"
-                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
-                            <button type="button"
-                                    class="px-5 py-2.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition">
+                            <div class="relative">
+                                <input type="password" id="currentPasswd" placeholder="目前密碼"
+                                    class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent pl-4 pr-10 py-3 text-sm outline-none">
+                                <button type="button"
+                                    class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-orange-500 transition">
+                                    <span
+                                        class="material-symbols-outlined select-none text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+
+                            <div class="relative">
+                                <input type="password" id="newPasswd" placeholder="新密碼"
+                                    class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent pl-4 pr-10 py-3 text-sm outline-none">
+                                <button type="button"
+                                    class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-orange-500 transition">
+                                    <span
+                                        class="material-symbols-outlined select-none text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+
+                            <div class="relative">
+                                <input type="password" id="confirmPasswd" placeholder="確認新密碼"
+                                    class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent pl-4 pr-10 py-3 text-sm outline-none">
+                                <button type="button"
+                                    class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-orange-500 transition">
+                                    <span
+                                        class="material-symbols-outlined select-none text-[20px]">visibility_off</span>
+                                </button>
+                            </div>
+
+                            <button type="button" id="savePasswdBtn"
+                                class="px-5 py-2.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition mt-2">
                                 儲存密碼
                             </button>
                         </div>
@@ -108,19 +139,22 @@
                 <!-- accordion 3 -->
                 <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
                     <button type="button"
-                            class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
+                        class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-white/5 text-left">
                         <span class="font-bold text-slate-900 dark:text-slate-100">服務條款與隱私聲明</span>
                         <span class="material-symbols-outlined accordion-icon">expand_more</span>
                     </button>
-                    <div class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                    <div
+                        class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
                         <div class="text-sm leading-7 text-slate-700 dark:text-slate-300 space-y-3">
-                            <p>這裡可以放服務條款摘要內容。</p>
-                            <p>這裡可以放隱私政策摘要內容。</p>
-                            <a href="#" class="text-primary hover:underline">查看完整條款</a>
+                            <h3>摘要內容：</h3>
+                            <p>我們致力於保護您的個人資料，絕不會在未經授權的情況下向第三方洩露</p>
+                            <p>我們會根據您的使用習慣優化服務體驗，您可以隨時在設定中關閉個人化推薦</p>
+                            <p>本平台服務僅限個人合法使用，嚴禁任何違反社群守則的行為</p>
+                            <a th:href="@{/member/terms}" target="_blank" rel="noopener noreferrer"
+                                class="text-primary hover:underline font-bold">查看完整條款</a>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

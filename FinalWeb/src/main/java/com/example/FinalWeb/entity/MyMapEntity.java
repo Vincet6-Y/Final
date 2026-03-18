@@ -1,7 +1,9 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -33,6 +35,12 @@ public class MyMapEntity {
     @Column(name = "latitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal latitude;
     private String GooglePlaceId;
+
+    // 🌟 修正 2：加上 JSON 格式化標籤
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime visitTime;
+    private String transitMode;
+    private Integer stayTime, transitTime, distance;
 
     // 拉關連線到 myPlan
     @ManyToOne(fetch = FetchType.LAZY)
