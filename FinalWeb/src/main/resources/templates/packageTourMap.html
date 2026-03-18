@@ -324,6 +324,9 @@
     <input type="hidden" id="db-startDate" th:value="${myPlan?.startDate}" />
     <input type="hidden" id="db-totalDays" th:value="${myPlan?.journeyPlan?.daysCount ?: 5}" />
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script th:src="@{/assets/toast.js}"></script>
+
     <script th:src="@{/tour/map/myTourGlobals.js}"></script>
     <script th:src="@{/tour/map/myTourApi.js}"></script>
     <script th:src="@{/tour/map/myTourMap.js}"></script>
@@ -333,9 +336,7 @@
     <script th:inline="javascript">
         window.currentMyPlanId = /*[[${myPlan?.myPlanId}]]*/ null;
         console.log("從伺服器取得的行程 ID:", window.currentMyPlanId);
-
     </script>
-
     
 </body>
 

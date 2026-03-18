@@ -109,7 +109,7 @@ async function fetchAndShowDetails(placeId) {
                 }
             }
         } else {
-            alert('無法從 Google 取得該地點的詳細資訊');
+            showToast('error', '無法從 Google 取得該地點的詳細資訊');
         }
     }
 }
@@ -252,7 +252,7 @@ async function openPlaceDetails(day, index) {
                 // 呼叫 API 顯示彈窗
                 fetchAndShowDetails(foundPlaceId);
             } else {
-                alert(`很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
+                showToast('error', `很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
             }
         } catch (error) {
             console.error("❌ 即時搜尋救援失敗:", error);
@@ -696,8 +696,10 @@ async function copyToMyPlan(officialPlanId) {
             const separator = currentPath.includes('?') ? '&' : '?';
             const targetUrl = encodeURIComponent(currentPath + separator + "autoCopy=true");
 
-            alert('請先登入會員，系統將於登入後自動為您複製行程！');
-            window.location.href = `/auth?redirect=${targetUrl}`;
+            showToast('error', '請先登入會員，登入後即可安排您的專屬行程！');
+            setTimeout(() => { 
+                window.location.href = `/auth?redirect=${targetUrl}`; 
+            }, 1000);
             return;
         }
 
@@ -705,7 +707,7 @@ async function copyToMyPlan(officialPlanId) {
         if (data.success) {
             window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
         } else {
-            alert('複製失敗：' + data.message);
+            showToast('error', '複製失敗：' + data.message);
         }
     } catch (error) {
         console.error("複製行程時出錯:", error);

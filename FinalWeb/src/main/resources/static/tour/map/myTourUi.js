@@ -157,7 +157,7 @@ async function openPlaceDetails(day, index) {
                 // 呼叫 API 顯示彈窗
                 fetchAndShowDetails(foundPlaceId);
             } else {
-                alert(`很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
+                showToast('error', `很抱歉，無法在 Google 地圖上尋找到「${placeNode.name}」的詳細資訊。`);
             }
         } catch (error) {
             console.error("❌ 即時搜尋救援失敗:", error);
@@ -179,7 +179,7 @@ async function confirmAddToItinerary() {
     const day = currentDay;
 
     if (!planId) {
-        alert("找不到行程 ID，無法加入景點");
+        showToast('error', '找不到行程 ID，無法加入景點');
         return;
     }
 
@@ -228,11 +228,11 @@ async function confirmAddToItinerary() {
                 toggleMobileView();
             }
         } else {
-            alert("加入失敗：" + data.message);
+            showToast('error', '加入失敗：' + data.message);
         }
     } catch (error) {
         console.error("加入景點發生錯誤:", error);
-        alert("伺服器發生錯誤");
+        showToast('error', '伺服器發生錯誤，請稍後再試');
     } finally {
         // 恢復按鈕文字
         btnText.innerText = originalText;
@@ -295,7 +295,7 @@ function getFullDateTimeStr(day, timeStr) {
     const startDateInput = document.getElementById('db-startDate');
     let dateObj = (startDateInput && startDateInput.value) ? new Date(startDateInput.value) : new Date();
     dateObj.setDate(dateObj.getDate() + (day - 1));
-    
+
     const yyyy = dateObj.getFullYear();
     const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
     const dd = String(dateObj.getDate()).padStart(2, '0');
@@ -328,18 +328,18 @@ async function syncTimeToDatabase(day, index) {
 async function syncOrderToDatabase(day) {
     const list = itineraryData[day];
     const legs = routeLegs[day] || [];
-    
+
     const payload = list.map((item, index) => {
         let tTime = null, dist = null, tMode = 'WALKING';
-        
+
         // 抓取上一站到這一站的 Google 車程與距離
         if (index > 0 && legs[index - 1]) {
             const leg = legs[index - 1];
             // 🌟 加上安全判斷，如果有值就取 value，沒有就給 0
-            tTime = leg.duration ? leg.duration.value : 0; 
-            dist = leg.distance ? leg.distance.value : 0;  
-            
-            tMode = leg._mode || ((dist > 1000) ? 'DRIVING' : 'WALKING'); 
+            tTime = leg.duration ? leg.duration.value : 0;
+            dist = leg.distance ? leg.distance.value : 0;
+
+            tMode = leg._mode || ((dist > 1000) ? 'DRIVING' : 'WALKING');
         }
 
         return {
@@ -350,7 +350,7 @@ async function syncOrderToDatabase(day) {
             distance: dist,
             transitMode: tMode
         };
-    }).filter(i => i.spotId); 
+    }).filter(i => i.spotId);
 
     if (payload.length === 0) return;
 
@@ -362,11 +362,11 @@ async function syncOrderToDatabase(day) {
             body: JSON.stringify(payload)
         });
         const data = await response.json();
-        if(!data.success) {
+        if (!data.success) {
             console.error("順序與時間儲存失敗:", data.message);
         }
-    } catch (error) { 
-        console.error("同步順序時發生連線錯誤:", error); 
+    } catch (error) {
+        console.error("同步順序時發生連線錯誤:", error);
     }
 }
 
@@ -680,30 +680,27 @@ function renderItineraryPanel(day) {
 // 🌟 修正版：刪除景點並同步資料庫
 async function removeItineraryItem(day, index) {
     const item = itineraryData[day][index];
-    
-    // 如果是剛從地圖加入、尚未取得 spotId 的點，直接從陣列移除即可
+
     if (!item.spotId) {
         itineraryData[day].splice(index, 1);
         calculateAndDisplayRoute(day);
         return;
     }
 
-    if (confirm(`確定要從 Day ${day} 移除「${item.name}」嗎？`)) {
-        try {
-            const response = await fetch(`/api/plan/deleteNode/${item.spotId}`, { method: 'DELETE' });
-            const data = await response.json();
+    try {
+        const response = await fetch(`/api/plan/deleteNode/${item.spotId}`, { method: 'DELETE' });
+        const data = await response.json();
 
-            if (data.success) {
-                // 資料庫刪除成功後，才移除畫面顯示
-                itineraryData[day].splice(index, 1);
-                calculateAndDisplayRoute(day);
-                console.log("資料庫同步刪除成功");
-            } else {
-                alert("資料庫同步失敗：" + data.message);
-            }
-        } catch (error) {
-            console.error("刪除錯誤:", error);
+        if (data.success) {
+            itineraryData[day].splice(index, 1);
+            calculateAndDisplayRoute(day);
+            showToast('success', `已移除「${item.name}」`);
+        } else {
+            showToast('error', '刪除失敗：' + data.message);
         }
+    } catch (error) {
+        console.error("刪除錯誤:", error);
+        showToast('error', '刪除失敗，請稍後再試');
     }
 }
 
@@ -888,7 +885,7 @@ function goToPayment() {
     const myPlanId = urlParams.get('myPlanId');
 
     if (!myPlanId) {
-        alert("找不到行程 ID，請先儲存行程或確認網址！");
+        showToast('error', '找不到行程 ID，請先儲存行程或確認網址！');
         return false;
     }
 
@@ -911,12 +908,12 @@ function goToPayment() {
                 // 成功取得真實 orderId，跳轉到付款頁面
                 window.location.href = '/payment?orderId=' + data.orderId;
             } else {
-                alert("建立訂單失敗：" + (data.message || "未知錯誤"));
+                showToast('error', "建立訂單失敗：" + (data.message || "未知錯誤"));
             }
         })
         .catch(error => {
             console.error("結帳建立失敗:", error);
-            alert("系統發生錯誤，無法建立訂單");
+            showToast('error', '系統發生錯誤，無法建立訂單');
         });
 
     // return false 阻止 <a> 標籤的預設行為
