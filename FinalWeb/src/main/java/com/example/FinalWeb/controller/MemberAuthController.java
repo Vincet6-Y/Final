@@ -16,9 +16,11 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 
 import com.example.FinalWeb.dto.MemberLoginDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
+import com.example.FinalWeb.dto.SocialProfileDTO;
 import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.MemberOauthEntity;
+import com.example.FinalWeb.enums.AuthProvider;
 import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.service.LineLoginService;
@@ -128,13 +130,13 @@ public class MemberAuthController {
             if (member != null) {
                 // 避免重複綁定同一個 LINE 帳號
                 boolean alreadyLinked = memberOauthRepo
-                        .findByProviderAndProviderId("LINE", lineUserId)
+                        .findByProviderAndProviderId(AuthProvider.LINE, lineUserId)
                         .isPresent();
 
                 if (!alreadyLinked) {
                     MemberOauthEntity oauth = new MemberOauthEntity();
                     oauth.setMember(member);
-                    oauth.setProvider("LINE");
+                    oauth.setProvider(AuthProvider.LINE);
                     oauth.setProviderId(lineUserId);
                     memberOauthRepo.save(oauth);
                 }
@@ -164,117 +166,29 @@ public class MemberAuthController {
 
 
     @GetMapping("/line/callback")
-    public String lineCallback(@RequestParam String code,
-                            @RequestParam String state,
-                            HttpSession session,
-                            RedirectAttributes redirectAttr,
-                            Model model) {
+    public String lineCallback(@RequestParam String code, @RequestParam String state, 
+        HttpSession session, RedirectAttributes redirectAttr, Model model) {
 
-        // 1. 驗證 state，避免 CSRF
-        String savedState = (String) session.getAttribute("lineLoginState");
-        if (savedState == null || !savedState.equals(state)) {
+        if (!isValidLineState(session, state)) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE 驗證失敗"));
             return "redirect:/auth";
         }
 
         try {
-            // 2. 取得 LINE 使用者資料
-            JsonNode profile = lineLoginService.getLineProfile(code);
-
-            String lineUserId = profile.get("userId").asText();
-            String lineName = profile.get("displayName").asText();
-
-            // LINE 有 email 就取值，沒有就留空
-            String lineEmail = "";
-            if (profile.has("email") && !profile.get("email").isNull()) {
-                lineEmail = profile.get("email").asText();
-            }
-
-            // 3. 判斷這次是登入還是綁定
+            SocialProfileDTO profile = getLineProfile(code);
             String lineAction = (String) session.getAttribute("lineAction");
 
-            // 用完先清掉 state
             session.removeAttribute("lineLoginState");
 
-            // =========================
-            // 綁定流程
-            // =========================
             if ("link".equals(lineAction)) {
-
-                // 必須先登入會員，才能綁定
-                MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
-                if (loginMember == null) {
-                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
-                    session.removeAttribute("lineAction");
-                    return "redirect:/auth";
-                }
-
-                // 檢查這個 LINE 帳號是否已被別的會員綁定
-                MemberEntity linkedMember = lineLoginService.findLinkedMember(lineUserId);
-                if (linkedMember != null) {
-                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此 LINE 帳號已綁定其他會員"));
-                    session.removeAttribute("lineAction");
-                    return "redirect:/member";
-                }
-
-                // 檢查自己是否已經綁定 LINE
-                boolean alreadyBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
-                        loginMember.getMemberId(), "LINE");
-
-                if (alreadyBound) {
-                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此會員已綁定 LINE"));
-                    session.removeAttribute("lineAction");
-                    return "redirect:/member";
-                }
-
-                // 建立 member_oauth 綁定資料
-                MemberOauthEntity oauth = new MemberOauthEntity();
-                oauth.setMember(loginMember);
-                oauth.setProvider("LINE");
-                oauth.setProviderId(lineUserId);
-                memberOauthRepo.save(oauth);
-
-                session.removeAttribute("lineAction");
-                redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 綁定成功"));
-                return "redirect:/member";
+                return bindSocialAccount(
+                    AuthProvider.LINE, profile.providerId(), session, redirectAttr
+                );
             }
 
-            // =========================
-            // 登入 / 第一次註冊流程
-            // =========================
-
-            // 先查這個 LINE 帳號是否已綁定本站會員
-            MemberEntity member = lineLoginService.findLinkedMember(lineUserId);
-
-            // 已綁定：直接登入
-            if (member != null) {
-                session.setAttribute("loginMember", member);
-                session.removeAttribute("lineAction");
-
-                redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 登入成功"));
-
-                String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
-                session.removeAttribute("lineLoginRedirect");
-
-                if (redirectUrl != null && !redirectUrl.isBlank()) {
-                    return "redirect:" + redirectUrl;
-                }
-
-                return "redirect:/home";
-            }
-
-            // 第一次 LINE 登入：把資料暫存到 session，回註冊面板補資料
-            session.setAttribute("lineUserId", lineUserId);
-            session.setAttribute("lineName", lineName);
-            session.setAttribute("lineEmail", lineEmail);
-            session.removeAttribute("lineAction");
-
-            model.addAttribute("openPanel", "register");
-            model.addAttribute("lineName", lineName);
-            model.addAttribute("lineEmail", lineEmail);
-            model.addAttribute("redirect", session.getAttribute("lineLoginRedirect"));
-
-            return "auth";
+            return socialQuickLogin(
+                    AuthProvider.LINE, profile, session, redirectAttr, model
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -313,7 +227,7 @@ public class MemberAuthController {
         }
 
         boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
-                loginMember.getMemberId(), "LINE"
+                loginMember.getMemberId(), AuthProvider.LINE
         );
 
         if (!lineBound) {
@@ -326,5 +240,113 @@ public class MemberAuthController {
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
         return "redirect:/member";
     }
+
+    // 驗證 LINE callback 的 state 是否與 session 中保存的一致，避免 CSRF 攻擊
+    private boolean isValidLineState(HttpSession session, String state) {
+        String savedState = (String) session.getAttribute("lineLoginState");
+        return savedState != null && savedState.equals(state);
+    }
+
+    // 向 LINE 取得使用者資料，並轉成共用的 SocialProfileDTO
+    private SocialProfileDTO getLineProfile(String code) throws Exception {
+        JsonNode profile = lineLoginService.getLineProfile(code);
+
+        String providerId = profile.get("userId").asText();
+        String name = profile.get("displayName").asText();
+
+        String email = "";
+        if (profile.has("email") && !profile.get("email").isNull()) {
+            email = profile.get("email").asText();
+        }
+
+        return new SocialProfileDTO(providerId, name, email);
+    }
+
+    // 綁定第三方登入帳號到目前登入的會員
+    private String bindSocialAccount(AuthProvider provider,
+                                String providerId,
+                                HttpSession session,
+                                RedirectAttributes redirectAttr) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
+            session.removeAttribute("lineAction");
+            return "redirect:/auth";
+        }
+
+        MemberEntity linkedMember = memberOauthRepo
+                .findByProviderAndProviderId(provider, providerId)
+                .map(MemberOauthEntity::getMember)
+                .orElse(null);
+
+        if (linkedMember != null) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此 LINE 帳號已綁定其他會員"));
+            session.removeAttribute("lineAction");
+            return "redirect:/member";
+        }
+
+        boolean alreadyBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
+                loginMember.getMemberId(), provider
+        );
+
+        if (alreadyBound) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("此會員已綁定 LINE"));
+            session.removeAttribute("lineAction");
+            return "redirect:/member";
+        }
+
+        MemberOauthEntity oauth = new MemberOauthEntity();
+        oauth.setMember(loginMember);
+        oauth.setProvider(provider);
+        oauth.setProviderId(providerId);
+        memberOauthRepo.save(oauth);
+
+        session.removeAttribute("lineAction");
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 綁定成功"));
+        return "redirect:/member";
+    }
+
+    // 第三方快速登入流程：已綁定則直接登入，未綁定則帶入註冊頁補齊資料
+    private String socialQuickLogin(AuthProvider provider,
+                                SocialProfileDTO profile,
+                                HttpSession session,
+                                RedirectAttributes redirectAttr,
+                                Model model) {
+
+        MemberEntity member = memberOauthRepo
+                .findByProviderAndProviderId(provider, profile.providerId())
+                .map(MemberOauthEntity::getMember)
+                .orElse(null);
+
+        if (member != null) {
+            session.setAttribute("loginMember", member);
+            session.removeAttribute("lineAction");
+
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 登入成功"));
+
+            String redirectUrl = (String) session.getAttribute("lineLoginRedirect");
+            session.removeAttribute("lineLoginRedirect");
+
+            if (redirectUrl != null && !redirectUrl.isBlank()) {
+                return "redirect:" + redirectUrl;
+            }
+
+            return "redirect:/home";
+        }
+
+        session.setAttribute("lineUserId", profile.providerId());
+        session.setAttribute("lineName", profile.name());
+        session.setAttribute("lineEmail", profile.email());
+        session.removeAttribute("lineAction");
+
+        model.addAttribute("openPanel", "register");
+        model.addAttribute("lineName", profile.name());
+        model.addAttribute("lineEmail", profile.email());
+        model.addAttribute("redirect", session.getAttribute("lineLoginRedirect"));
+
+        return "auth";
+    }
+
 
 }
