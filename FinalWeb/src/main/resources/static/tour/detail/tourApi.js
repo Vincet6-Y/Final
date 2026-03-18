@@ -90,8 +90,7 @@ function copyToMyPlan(officialPlanId) {
                 const currentPath = window.location.pathname + window.location.search;
                 const redirectTarget = encodeURIComponent(`${currentPath}&autoCopy=true`);
 
-                alert('系統提示：請先登入會員，才能將官方行程加入您的專屬規劃中！');
-                // 這裡改為 /auth (如果你的登入頁是別的網址請自行替換)
+                showToast('error', '請先登入會員，即可規劃您的專屬行程！');
                 window.location.href = `/auth?redirect=${redirectTarget}`;
                 throw new Error('Unauthorized');
             }
@@ -102,7 +101,7 @@ function copyToMyPlan(officialPlanId) {
             if (data.success) {
                 window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
             } else {
-                alert(data.message || '複製失敗');
+                showToast('error', data.message || '複製失敗');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }

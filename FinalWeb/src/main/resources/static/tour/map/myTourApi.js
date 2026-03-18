@@ -42,7 +42,7 @@ async function fetchAndShowDetails(placeId) {
                 }
             }
         } else {
-            alert('無法從 Google 取得該地點的詳細資訊');
+            showToast('error', '無法從 Google 取得該地點的詳細資訊');
         }
     }
 }
@@ -215,7 +215,7 @@ async function aiSortItinerary() {
     const planId = window.currentMyPlanId;
     const day = currentDay;
 
-    if (!planId) return alert("找不到行程 ID");
+    if (!planId) { showToast('error', '找不到行程 ID'); return; }
 
     const btn = document.getElementById("ai-sort-btn");
     if (btn) btn.disabled = true;
@@ -226,9 +226,9 @@ async function aiSortItinerary() {
 
         if (data.success) {
             await loadMyPlanData(planId, day);
-            alert(`Day ${day} 路線已為您最佳化完成！`);
+            showToast('success', `Day ${day} 路線已為您最佳化完成！`);
         } else {
-            alert("優化失敗：" + data.message);
+            showToast('error', "優化失敗：" + data.message);
         }
     } catch (error) {
         console.error("AI 排序錯誤:", error);

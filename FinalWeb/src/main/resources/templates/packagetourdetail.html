@@ -271,12 +271,14 @@
         </button>
 
     </main>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script th:src="@{/assets/toast.js}"></script>
 
     <script th:src="@{/tour/Detail/tourGlobals.js}" defer></script>
     <script th:src="@{/tour/Detail/tourApi.js}" defer></script>
     <script th:src="@{/tour/Detail/tourMap.js}" defer></script>
     <script th:src="@{/tour/Detail/tourUi.js}" defer></script>
-
+    
     <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
 </body>
 
