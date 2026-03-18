@@ -2,6 +2,8 @@ package com.example.FinalWeb.repo;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +19,17 @@ public interface OrdersRepo extends JpaRepository<OrdersEntity, Integer> {
     // 思考邏輯：會員登入後查看買過的景點票券，通常希望「最新買的」排在最上面，所以加上 OrderBy(依照) OrderTime(訂單時間)
     // Desc(降冪/由大到小)。
     List<OrdersEntity> findByMember_MemberIdOrderByOrderTimeDesc(Integer memberId);
+
+    // 3. 🌟 後台狀態過濾：根據 payStatus 查詢
+    List<OrdersEntity> findByPayStatusOrderByOrderTimeDesc(String payStatus);
+
+    // 4. 🌟 後台關鍵字搜尋：搜尋交易編號 (tradeNo)
+    List<OrdersEntity> findByTradeNoContaining(String tradeNo);
+
+    // 5. 🌟 後台統計：待處理訂單數
+    long countByPayStatus(String payStatus);
+    
+    // 6. 🌟 後台統計：今日發放憑證 (Query 中的欄位已改為 payStatus)
+    @Query("SELECT o FROM OrdersEntity o LEFT JOIN FETCH o.myPlan WHERE o.member.memberId = :memberId ORDER BY o.orderTime DESC")
+List<OrdersEntity> findMemberOrdersWithPlan(@Param("memberId") Integer memberId);
 }
