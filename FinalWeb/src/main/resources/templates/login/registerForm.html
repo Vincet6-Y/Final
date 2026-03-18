@@ -18,10 +18,10 @@
                     <input
                         name="name"
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                        placeholder="請輸入會員名稱"
+                        placeholder="請輸入真實姓名"
                         type="text"
                         required 
-                        th:value="${registerData != null ? registerData.name() : (lineName != null ? lineName : '')}" />
+                        th:value="${registerData != null ? registerData.name() : ''}" />
                 </div>
             </div>
 
@@ -39,7 +39,7 @@
                         placeholder="example@mail.com"
                         type="email"
                         required
-                        th:value="${registerData != null ? registerData.email() : (lineEmail != null ? lineEmail : '')}" />
+                        th:value="${registerData != null ? registerData.email() : ''}" />
                 </div>
             </div>
 

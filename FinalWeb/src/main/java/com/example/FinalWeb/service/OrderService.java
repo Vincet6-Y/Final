@@ -185,6 +185,7 @@ public Map<String, Object> getAdminDashboardStats() {
     stats.put("todayIssued", todayIssued);
     
     // 這裡可以加上漲跌幅的計算邏輯 (+5%, -2% 等)
+    // 漲跌幅暫時回傳固定值或不回傳，等資料庫資料變多再寫計算邏輯
     return stats;
 }
 

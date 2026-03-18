@@ -1,6 +1,5 @@
 package com.example.FinalWeb.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,27 +52,15 @@ public class packageTourDetailController {
             MyPlanEntity myPlan = new MyPlanEntity();
             myPlan.setJourneyPlan(official);
             myPlan.setMyPlanName(official.getPlanName() + " (我的自訂)");
-            
-            // 抓出預設出發日期 (預設為 7 天後)
-            java.time.LocalDate startDate = java.time.LocalDate.now().plusDays(7);
-            myPlan.setStartDate(startDate);
+            myPlan.setStartDate(java.time.LocalDate.now().plusDays(7));
 
             // 🌟 關鍵修正：將 Session 裡的會員物件轉型並設定給 myPlan
             myPlan.setMember((MemberEntity) member);
 
             myPlan = myPlanRepo.save(myPlan); // 先存，取得新的 myPlanId
 
-            // ==========================================
-            // 🌟 方案一核心：建立基礎出發時間 (預設每天早上 08:00)
-            // ==========================================
-            java.time.LocalDateTime startDateTime = startDate.atTime(8, 0);
-
             // D. 深拷貝：把官方景點 (Map) 複製到我的景點 (MyMap)
             List<MapEntity> nodes = mapRepo.findByJourneyPlan_PlanIdOrderByDayNumberAscVisitOrderAsc(officialPlanId);
-            
-            // 建立一個 List 裝所有新景點，最後再批次存檔以提升效能
-            List<MyMapEntity> newMyMapNodes = new ArrayList<>();
-            
             for (MapEntity n : nodes) {
                 MyMapEntity myMap = new MyMapEntity();
                 myMap.setMyPlan(myPlan); // 關聯到剛剛新產生的 myPlanId
@@ -83,23 +70,8 @@ public class packageTourDetailController {
                 myMap.setLatitude(n.getLatitude());
                 myMap.setLongitude(n.getLongitude());
                 myMap.setGooglePlaceId(n.getGooglePlaceID());
-                
-                // ==========================================
-                // 🌟 方案一核心：自動計算並填入預設時間資料
-                // ==========================================
-                // 1. visitTime (抵達時間)：基礎日期時間 + (第幾天 - 1) 天
-                //    例如：第 1 天就是 startDateTime，第 2 天就是 startDateTime 往後加 1 天
-                myMap.setVisitTime(startDateTime.plusDays(n.getDayNumber() - 1));
-                
-                // 2. stayTime (停留時間)：預設每個景點停留 60 分鐘
-                myMap.setStayTime(60); 
-
-                // 將景點加入待存清單
-                newMyMapNodes.add(myMap);
+                myMapRepo.save(myMap);
             }
-            
-            // 🌟 一次性批次寫入資料庫，效能比在迴圈裡面一筆一筆 save 快很多！
-            myMapRepo.saveAll(newMyMapNodes);
 
             // E. 成功！回傳新的 ID 給前端跳轉
             return ResponseEntity.ok(java.util.Map.of("success", true, "newMyPlanId", myPlan.getMyPlanId()));

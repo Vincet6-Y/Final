@@ -1,9 +1,7 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -15,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Entity
@@ -35,16 +34,20 @@ public class MyMapEntity {
     private BigDecimal latitude;
     private String GooglePlaceId;
 
-    // 🌟 修正 2：加上 JSON 格式化標籤
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime visitTime;
-    private String transitMode;
-    private Integer stayTime, transitTime, distance;
-
     // 拉關連線到 myPlan
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "myPlanId")
     @JsonIgnore
     private MyPlanEntity myPlan;
+
+    @Transient
+public String getOrderItemsName() {
+    if (this.myPlan != null) {
+        // 確保 MyPlanEntity 有 planName 字段和 getPlanName() 方法
+        // 如果 MyPlanEntity 的字段名稱不同，請替換為正確的名稱，例如 getName()
+        return this.myPlan.getMyPlanName();
+    }
+    return "自訂行程";
+}
 
 }

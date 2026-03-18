@@ -7,29 +7,28 @@
     <!-- Sidebar -->
     <aside th:replace="~{ fragments/backendaside :: backaside('order')}"> </aside>
     <!-- Main Content -->
-    <main class="flex-1 ml-64 min-h-screen">
+    <main class="flex-1 flex flex-col overflow-x-hidden">
       <!-- Header -->
       <header
-        class="flex items-center justify-between px-8 py-4 border-b border-neutral-700 bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
-        <div class="flex flex-col">
-          <h2 class="text-xl font-bold tracking-tight text-slate-100">訂單與憑證管理</h2>
+        class="h-16 border-b border-neutral-dark flex items-center justify-between px-8 bg-background-dark/80 backdrop-blur sticky top-0 z-10">
+        <div class="flex items-center gap-4">
+          <span class="material-symbols-outlined text-primary">analytics</span>
+          <h2 class="text-lg font-bold">訂單與憑證管理</h2>
         </div>
         <div class="flex items-center gap-4">
-          <div class="relative">
+          <div class="relative w-64">
             <span
-              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xl">search</span>
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-muted text-sm">search</span>
             <input
-              class="bg-neutral-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary text-slate-100"
+            id="orderSearchInput"
+              class="w-full bg-neutral-dark border-none rounded-lg py-2 pl-10 pr-4 text-sm text-black focus:ring-1 focus:ring-primary placeholder:text-neutral-muted"
               placeholder="搜索訂單編號..." type="text" />
           </div>
-          <button class="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white relative">
+          <button
+            class="size-10 rounded-lg bg-neutral-dark flex items-center justify-center text-slate-100 hover:bg-neutral-dark/80 transition-colors relative">
             <span class="material-symbols-outlined">notifications</span>
             <span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
           </button>
-          <div class="size-10 rounded-full border-2 border-neutral-600 bg-cover bg-center"
-            data-alt="Administrator profile avatar"
-            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUUTy1gTT3eSRCjNIclzcbEbKRvqQsrTLoRLVgxz83nD8zImAihi0VitbwTNQ-MAF2noeaQ4sXUQDiNlLyakkyYL_pge8xx6TpYpD-cKi5JCm_LfyI-aWFBKKwGF86HfTfEjxOoHvKGd_z3J4P5hR6Wdaw-Wz0mPw7alP_8996rrO0BFfc1Gob17sZvHf-l-cpFieDmMaBsHmuOlC6dhpPGjb7xpk7URi-Lbfd3fpzT_husXUTzMyYKhDa2tL14H_LLU0icqDIHdQ')">
-          </div>
         </div>
       </header>
       <!-- Content Area -->
@@ -50,49 +49,34 @@
           </a>
         </div>
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div
-            class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
-            <p class="text-neutral-muted text-sm font-medium mb-1">待處理訂單</p>
-            <div class="flex items-end justify-between">
-              <h3 class="text-3xl font-bold text-slate-100">128</h3>
-              <span class="text-green-500 text-sm font-bold flex items-center">+5% <span
-                  class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
-            </div>
-          </div>
-          <div
-            class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
-            <p class="text-neutral-muted text-sm font-medium mb-1">退款請求</p>
-            <div class="flex items-end justify-between">
-              <h3 class="text-3xl font-bold text-slate-100">12</h3>
-              <span class="text-red-500 text-sm font-bold flex items-center">-2% <span
-                  class="material-symbols-outlined text-sm ml-1">trending_down</span></span>
-            </div>
-          </div>
-          <div
-            class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
-            <p class="text-neutral-muted text-sm font-medium mb-1">今日發放憑證</p>
-            <div class="flex items-end justify-between">
-              <h3 class="text-3xl font-bold text-slate-100">45</h3>
-              <span class="text-green-500 text-sm font-bold flex items-center">+15% <span
-                  class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
-            </div>
-          </div>
-        </div>
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
+    <p class="text-neutral-muted text-sm font-medium mb-1">待處理訂單</p>
+    <div class="flex items-end justify-between">
+      <h3 id="stat-pending" class="text-3xl font-bold text-slate-100">0</h3>
+      <span class="text-green-500 text-sm font-bold flex items-center">+5% <span class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
+    </div>
+  </div>
+  <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
+    <p class="text-neutral-muted text-sm font-medium mb-1">退款請求</p>
+    <div class="flex items-end justify-between">
+      <h3 id="stat-refund" class="text-3xl font-bold text-slate-100">0</h3>
+      <span class="text-red-500 text-sm font-bold flex items-center">-2% <span class="material-symbols-outlined text-sm ml-1">trending_down</span></span>
+    </div>
+  </div>
+  <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
+    <p class="text-neutral-muted text-sm font-medium mb-1">今日發放憑證</p>
+    <div class="flex items-end justify-between">
+      <h3 id="stat-today" class="text-3xl font-bold text-slate-100">0</h3>
+      <span class="text-green-500 text-sm font-bold flex items-center">+15% <span class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
+    </div>
+  </div>
+</div>
         <!-- Order Table Container -->
         <div class="bg-neutral-dark/20 border border-neutral-dark rounded-xl overflow-hidden">
           <div class="p-6 border-b border-neutral-dark flex items-center justify-between">
             <h3 class="text-lg font-bold text-slate-100">最近訂單列表</h3>
-            <div class="flex gap-2">
-              <button
-                class="bg-neutral-dark px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-dark/70 transition-colors flex items-center gap-2">
-                <span class="material-symbols-outlined text-sm">filter_list</span> 篩選
-              </button>
-              <button
-                class="bg-primary px-4 py-2 rounded-lg text-sm font-bold text-background-dark hover:bg-primary/90 transition-colors">
-                批量處理
-              </button>
-            </div>
+            
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -186,8 +170,8 @@
             </table>
           </div>
           <div class="p-4 border-t border-neutral-dark flex items-center justify-between">
-            <p class="text-sm text-neutral-muted">顯示 1 到 5 項，共 128 項訂單</p>
-            <div class="flex gap-2">
+            <p  id="pagination-info" class="text-sm text-neutral-muted">顯示 1 到 5 項，共 128 項訂單</p>
+            <div  id="pagination-container" class="flex gap-2">
               <button
                 class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors disabled:opacity-50"
                 disabled="">
@@ -293,5 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 </body>
+
 
 </html>

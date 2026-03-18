@@ -80,16 +80,12 @@
                         <div class="flex-1 h-px bg-slate-200 dark:bg-white/10"></div>
                     </div>
                 </div>
-
-                <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-
-                    <div th:each="plan : ${plans}"
+                <div th:each=" plan : ${plans}" class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+                    <div
                         class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-8 hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden group">
-
                         <div
                             class="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all">
                         </div>
-
                         <div class="flex items-center gap-4 mb-8">
                             <div
                                 class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
@@ -101,27 +97,62 @@
                                 <p th:text="${plan.planCity}" class="text-primary text-sm font-bold">精華版聖地巡禮</p>
                             </div>
                         </div>
-
-                        <div class="space-y-6 mb-10 flex-1">
-                            <div th:each="dayEntry : ${plan.groupedDays}" class="flex gap-4">
+                        <div class="space-y-6 mb-10 flex-1" th:each="dayEntry : ${plan.groupedDays}">
+                            <div class="flex gap-4">
                                 <div th:text="'Day ' + ${dayEntry.key}"
                                     class="text-primary font-bold whitespace-nowrap">Day 1</div>
-                                <div th:text="${dayEntry.value}" class="text-slate-600 dark:text-slate-400">抵達東京、入住新宿區
+                                <div th:text="${dayEntry.value}" 
+                                    class="text-slate-600 dark:text-slate-400">抵達東京、入住新宿區
                                 </div>
                             </div>
                         </div>
-
-                        <a th:href="@{/packageTourDetail(planId=${plan.planId})}"
-                            class="block text-center w-full py-4 bg-primary hover:bg-primary/90 text-white dark:text-background-dark rounded-xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-95">
+                        <button
+                            class="w-full py-4 bg-primary hover:bg-primary/90 text-white dark:text-background-dark rounded-xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-95">
                             查看詳情
-                        </a>
-
+                        </button>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-8 hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden group">
+                        <div
+                            class="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all">
+                        </div>
+                        <div class="flex items-center gap-4 mb-8">
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined font-bold">event_available</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800 dark:text-white">該作品10天的行程</h3>
+                                <p class="text-primary text-sm font-bold">深度漫遊聖地巡禮</p>
+                            </div>
+                        </div>
+                        <div class="space-y-6 mb-10 flex-1">
+                            <div class="flex gap-4">
+                                <div class="text-primary font-bold whitespace-nowrap">Day 1-3</div>
+                                <div class="text-slate-600 dark:text-slate-400">東京深入巡禮、代代木大樓夜景、六本木Hills展望台</div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="text-primary font-bold whitespace-nowrap">Day 4-7</div>
+                                <div class="text-slate-600 dark:text-slate-400">岐阜/飛驒深度遊、白川鄉合掌村、高山古街攝影</div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="text-primary font-bold whitespace-nowrap">Day 8-9</div>
+                                <div class="text-slate-600 dark:text-slate-400">長野諏訪湖、立石公園日落、尋訪系守之美</div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="text-primary font-bold whitespace-nowrap">Day 10</div>
+                                <div class="text-slate-600 dark:text-slate-400">最終購物與返程準備</div>
+                            </div>
+                        </div>
+                        <button
+                            class="w-full py-4 bg-primary hover:bg-primary/90 text-white dark:text-background-dark rounded-xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-95">
+                            查看詳情
+                        </button>
                     </div>
                 </div>
-    </div>
-    </section>
-    </main>
-    <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+            </section>
+        </main>
+        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 
     </div>
 

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -24,7 +23,7 @@ public class GlobalController {
     // @Autowired
     // private JdbcTemplate jdbcTemplate;
 
-    // @RequestMapping("/test")
+    @RequestMapping("/test")
     public String test() {
         // try {
         // // 我們請小弟去執行一句最廢話的 SQL：「SELECT 1」
@@ -81,9 +80,9 @@ public class GlobalController {
     // 已寫在 PackageTourMapController
     // @RequestMapping("/packageTourMap")
     // public String packageTourMap(Model model) {
-    // // 將金鑰存入 model，這樣前端 Thymeleaf 才能抓到
-    // model.addAttribute("apiKey", googleMapsApiKey);
-    // return "packageTourMap";
+    //     // 將金鑰存入 model，這樣前端 Thymeleaf 才能抓到
+    //     model.addAttribute("apiKey", googleMapsApiKey);
+    //     return "packageTourMap";
     // }
 
     @RequestMapping("/member")
@@ -91,14 +90,9 @@ public class GlobalController {
         return "member";
     }
 
-    @RequestMapping("/member/terms")
-    public String terms() {
-        return "member/terms";
-    }
-
     @RequestMapping("/auth")
     public String authPage(@RequestParam(required = false) String redirect,
-            Model model) {
+                            Model model) {
         model.addAttribute("redirect", redirect);
         return "auth";
     }
@@ -124,5 +118,25 @@ public class GlobalController {
     // public String paymentsuccess() {
     // return "paymentsuccess";
     // }
+
+    @RequestMapping("/backendhome")
+    public String backendhome() {
+        return "backendhome";
+    }
+
+    @RequestMapping("/backendorder")
+    public String backendorder() {
+        return "backendorder";
+    }
+
+    @RequestMapping("/backendoperation")
+    public String backendoperation() {
+        return "backendoperation";
+    }
+
+    @RequestMapping("/backendcontentmanagement")
+    public String backendcontentmanagement() {
+        return "backendcontentmanagement";
+    }
 
 }

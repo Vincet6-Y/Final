@@ -88,35 +88,12 @@
 
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center gap-3">
-                                                <!-- 時間 (讀取資料庫時間) -->
-                                                <span class="text-primary font-bold text-sm min-w-[50px]">
-                                                    <th:block th:if="${spot.visitTime != null}"
-                                                        th:text="${#temporals.format(spot.visitTime, 'HH:mm')}">
-                                                    </th:block>
-
-                                                    <th:block th:if="${spot.visitTime == null}"
-                                                        th:text="${#strings.toString(8 + (spot.visitOrder != null ? (spot.visitOrder - 1) * 2 : 0)) + ':00'}">
-                                                    </th:block>
-                                                </span>
+                                                <!-- 時間 (用 visitOrder 推算簡易時間: 08:00 起每 2 小時) -->
+                                                <span class="text-primary font-bold text-sm min-w-[50px]"
+                                                    th:text="${#strings.toString(8 + (spot.visitOrder != null ? (spot.visitOrder - 1) * 2 : 0)) + ':00'}">09:00</span>
                                                 <!-- 景點名稱 -->
                                                 <h4 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors"
                                                     th:text="${spot.locationName}">景點名稱</h4>
-                                                <!-- 停留時間 + 車程 -->
-                                                <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                                                    <span class="flex items-center gap-1"
-                                                        th:if="${spot.stayTime != null}">
-                                                        <span
-                                                            class="material-symbols-outlined text-[14px]">hourglass_empty</span>
-                                                        停留 <span th:text="${spot.stayTime}">60</span> 分鐘
-                                                    </span>
-
-                                                    <span class="flex items-center gap-1"
-                                                        th:if="${spot.transitTime != null}">
-                                                        <span
-                                                            class="material-symbols-outlined text-[14px]">directions_car</span>
-                                                        車程約 <span th:text="${spot.transitTime / 60}">12</span> 分鐘
-                                                    </span>
-                                                </div>
                                             </div>
                                             <div class="flex items-center gap-2">
                                                 <!-- 有門票標記 -->
