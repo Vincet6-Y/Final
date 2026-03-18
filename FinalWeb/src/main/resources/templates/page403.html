@@ -1,0 +1,21 @@
+<!doctype html>
+<html class="dark" lang="zh-Hant">
+
+<head th:replace="~{ fragments/head :: myHead}"></head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <header th:replace="~{ fragments/header :: myHeader}"> </header>
+
+        <main class="flex-1 flex flex-col items-center justify-center px-4">
+            <h1 class="text-black dark:text-white text-5xl md:text-7xl font-black tracking-tighter">
+                你走錯地方囉
+            </h1>
+        </main>
+
+        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+    </div>
+</body>
+
+</html>

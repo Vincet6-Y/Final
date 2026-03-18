@@ -44,6 +44,11 @@ public class GlobalController {
         return "backendcontentmanagement";
     }
 
+    @GetMapping("/page403")
+    public String page403(){
+        return "page403";
+    }
+
     @RequestMapping("/home")
     public String home() {
         return "home";
