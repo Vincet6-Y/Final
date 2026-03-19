@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.FinalWeb.dto.WorkDTO;
 import com.example.FinalWeb.entity.JourneyPlanEntity;
 import com.example.FinalWeb.entity.MapEntity;
 import com.example.FinalWeb.entity.WorkDetailEntity;
@@ -70,7 +71,7 @@ public class WorkService {
         // 2. 故意去摸一下每個行程的 maps，強迫管家去資料庫把景點撈出來
         for (JourneyPlanEntity plan : plans) {
             plan.getMaps().size(); // 💡 這就是「喚醒」的關鍵動作！
-            
+
             // 準備一個會「自動從小排到大」的分類盒，準備裝這個行程的景點
             Map<Integer, String> dayMap = new TreeMap<>();
 
@@ -113,5 +114,26 @@ public class WorkService {
         // 這裡可以使用 repo 搜尋，並取結果的第一筆
         List<WorkDetailEntity> results = repo.findByWorkNameContaining(keyword, PageRequest.of(0, 1)).getContent();
         return results.isEmpty() ? null : results.get(0);
+    }
+
+    // 後台功能
+    public void addwork(WorkDTO wDto) {
+        WorkDetailEntity wEntity = new WorkDetailEntity();
+        wEntity.setWorkName(wDto.workName());
+        wEntity.setOnDate(wDto.onDate());
+        wEntity.setWorkClass(wDto.workClass());
+        wEntity.setWorkImg(wDto.workImg());
+        wEntity.setDescription(wDto.description());
+        wEntity.setDirector(wDto.director());
+        wEntity.setWriter(wDto.writer());
+        wEntity.setLocation(wDto.location());
+        if (wDto.workClass().equals("動畫")) {
+            wEntity.setEpisodes(wDto.episodes());
+        }
+        if (wDto.workClass().equals("電影")) {
+            wEntity.setMovielength(wDto.movielength());
+        }
+
+        repo.save(wEntity);
     }
 }
