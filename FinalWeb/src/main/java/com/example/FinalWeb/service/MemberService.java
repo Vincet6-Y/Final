@@ -97,6 +97,19 @@ public class MemberService {
         member.setName(dto.name());
         member.setPhone(dto.phone());
         member.setBirthday(dto.birthday());
+        if (dto.memberImgUrl() == null || dto.memberImgUrl().isBlank()) {
+            member.setMemberImgUrl(null);
+        } else {
+            member.setMemberImgUrl(dto.memberImgUrl());
+        }
+    }
+
+    @Transactional
+    public void updateMemberAvatar(Integer memberId, String avatarUrl) {
+
+        MemberEntity member = memberRepo.findById(memberId).orElseThrow();
+
+        member.setMemberImgUrl(avatarUrl);
     }
     
 }
