@@ -26,10 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @ControllerAdvice(assignableTypes = GlobalController.class)
@@ -108,11 +106,23 @@ public class PaymentController {
                 for (MyMapEntity myMap : planSpots) {
                     TicketDto ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
                     if (ticket != null) {
-                        availableTickets.add(ticket);
+                        // 檢查訂單中是否已經包含該票券
+                        boolean alreadyInOrder = false;
+                        if (order.getOrderDetails() != null) {
+                            alreadyInOrder = order.getOrderDetails().stream()
+                                    .anyMatch(detail -> ticket.getTicketName().equals(detail.getTicketType()));
+                        }
+                        if (!alreadyInOrder) {
+                            availableTickets.add(ticket);
+                        }
                     }
                 }
                 // 呼叫 TicketService 取得智慧推薦的交通票，並傳給前端 Model
                 List<TicketDto> recommendedTransports = ticketService.recommendTransportTickets(planSpots);
+                if (order.getOrderDetails() != null && recommendedTransports != null) {
+                    recommendedTransports.removeIf(transport -> order.getOrderDetails().stream()
+                            .anyMatch(detail -> transport.getTicketName().equals(detail.getTicketType())));
+                }
                 model.addAttribute("recommendedTransports", recommendedTransports);
             }
             model.addAttribute("availableTickets", availableTickets);
@@ -215,7 +225,6 @@ public class PaymentController {
     }
 
     // 6. 成功畫面展示
-    // 6. 成功畫面展示
     @RequestMapping("/paymentsuccess")
     public String paymentsuccess(@RequestParam(name = "orderId", required = false) Integer orderId, Model model) {
         model.addAttribute("apiKey", googleMapsApiKey);
@@ -243,12 +252,17 @@ public class PaymentController {
                     // 🌟 【重構核心】1. 把 Entity 轉換為前端專用的 DTO
                     List<MyMapDTO> dtoList = allMaps.stream()
                             .map(entity -> myMapService.convertToDto(entity, ticketSpotIds))
-                            .collect(java.util.stream.Collectors.toList());
+                            .collect(Collectors.toList());
 
                     // 🌟 【重構核心】2. 改用 DTO 來做分組！這樣前端拿到的就是處理好的資料了
                     Map<Integer, List<MyMapDTO>> groupedByDay = dtoList.stream()
-                            .collect(java.util.stream.Collectors
-                                    .groupingBy(MyMapDTO::getDayNumber));
+                            .sorted(Comparator
+                                    .comparingInt((MyMapDTO m) -> m.getDayNumber() != null ? m.getDayNumber() : 1)
+                                    .thenComparingInt(m -> m.getVisitOrder() != null ? m.getVisitOrder() : 0))
+                            .collect(Collectors.groupingBy(
+                                    m -> m.getDayNumber() != null ? m.getDayNumber() : 1,
+                                    TreeMap::new,
+                                    java.util.stream.Collectors.toList()));
 
                     // 把分組好的 DTO 傳給前端
                     model.addAttribute("groupedByDay", groupedByDay);
