@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.FinalWeb.repo.JourneyPlanRepo;
 
+import jakarta.servlet.http.HttpSession;
+
 @RequestMapping("/")
 @Controller
 public class GlobalController {
@@ -100,8 +102,25 @@ public class GlobalController {
 
     @RequestMapping("/auth")
     public String authPage(@RequestParam(required = false) String redirect,
-            Model model) {
+            HttpSession session, Model model) {
+
         model.addAttribute("redirect", redirect);
+
+        Object socialProvider = session.getAttribute("socialProvider");
+        String socialName = (String) session.getAttribute("socialName");
+        String socialEmail = (String) session.getAttribute("socialEmail");
+
+        if (socialProvider != null) {
+            model.addAttribute("openPanel", "register");
+            model.addAttribute("socialName", socialName);
+            model.addAttribute("socialEmail", socialEmail);
+        }
+
+        System.out.println("=== authPage session ===");
+        System.out.println("session id = " + session.getId());
+        System.out.println("socialProvider = " + session.getAttribute("socialProvider"));
+        System.out.println("socialName = " + session.getAttribute("socialName"));
+        System.out.println("socialEmail = " + session.getAttribute("socialEmail"));
         return "auth";
     }
 

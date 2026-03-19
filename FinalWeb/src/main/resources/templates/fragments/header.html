@@ -94,16 +94,14 @@
                         管理後台
                     </a>
 
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit"
-                            class="block w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-b-xl">
-                            登出
-                        </button>
-                    </form>
+                    <a th:href="@{/member/logout}"
+                        class="block w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-b-xl">
+                        登出
+                    </a>
                 </div>
             </div>
         </div>
-
+        <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
         <script>
             function toggleTheme() {
                 // 1. 執行切換
@@ -116,6 +114,7 @@
         </script>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script th:src="@{/member/js/headerMemberDropdown.js}"></script>
+        <script th:src="@{/assets/toast.js}"></script>
     </header>
 </body>
 

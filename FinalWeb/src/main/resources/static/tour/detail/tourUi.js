@@ -455,30 +455,79 @@ function renderItineraryPanel(day) {
 
     for (let i = 1; i < places.length; i++) {
         const destinationPlace = places[i];
+        const originPlace = places[i - 1]; // 🌟 新增：取得前一站，用於導航座標
         const leg = legs[i - 1];
 
         let travelMode = '無法計算路線';
         let travelIcon = 'warning';
         let durationText = '--';
+        let mapMode = 'driving'; // 🌟 新增：傳給 Google Maps 網址的參數預設值
 
         if (leg) {
-            const distanceKm = leg.distance.value / 1000;
-            // 如果距離大於 1 公里，統一顯示「車程估算」並給予車子圖示
-            if (distanceKm > WALK_THRESHOLD_KM) {
-                travelMode = '車程估算';
-                travelIcon = 'directions_car';
+            let travelMinutes = Math.ceil(leg.duration.value / 60);
+            let timeString = "";
+            if (travelMinutes < 60) {
+                timeString = `${travelMinutes} 分鐘`;
             } else {
-                travelMode = '走路';
-                travelIcon = 'directions_walk';
+                const hours = Math.floor(travelMinutes / 60);
+                const mins = travelMinutes % 60;
+                timeString = mins > 0 ? `${hours} 小時 ${mins} 分鐘` : `${hours} 小時`;
             }
-            durationText = `約 ${leg.duration.text}`;
+
+            if (leg._mode) {
+                switch (leg._mode) {
+                    case 'TRANSIT':
+                        travelMode = '大眾運輸';
+                        travelIcon = 'directions_subway'; 
+                        mapMode = 'transit'; // 對應 Google 網址的導航方式
+                        break;
+                    case 'FLIGHT':
+                        travelMode = '飛機航程';
+                        travelIcon = 'flight';            
+                        mapMode = 'transit'; 
+                        break;
+                    case 'WALKING':
+                        travelMode = '步行大約';
+                        travelIcon = 'directions_walk';   
+                        mapMode = 'walking';
+                        break;
+                    case 'DRIVING':
+                    default:
+                        travelMode = '車程估算';
+                        travelIcon = 'directions_car';    
+                        mapMode = 'driving';
+                        break;
+                }
+            } else {
+                const distanceKm = leg.distance.value / 1000;
+                if (distanceKm > 1) { // 🌟 UI 這裡也同步改為 1 公里
+                    travelMode = '車程估算';
+                    travelIcon = 'directions_car';
+                    mapMode = 'driving';
+                } else {
+                    travelMode = '走路';
+                    travelIcon = 'directions_walk';
+                    mapMode = 'walking';
+                }
+            }
+            
+            durationText = `約 ${timeString}`;
         }
 
+        // 🌟 產生 Google Maps 原生導航連結
+        const oLat = parseFloat(originPlace.latitude || originPlace.lat);
+        const oLng = parseFloat(originPlace.longitude || originPlace.lng);
+        const dLat = parseFloat(destinationPlace.latitude || destinationPlace.lat);
+        const dLng = parseFloat(destinationPlace.longitude || destinationPlace.lng);
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${oLat},${oLng}&destination=${dLat},${dLng}&travelmode=${mapMode}`;
+
+        // 🌟 將原本的 div 改為 a 標籤，並加上 hover 特效與跳轉小圖示
         const transportHTML = `
-              <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-sm ml-6 my-1 border-l-2 border-dashed border-slate-300 dark:border-slate-600 pl-4 py-3 animate-fade-in-up">
-                  <span class="material-symbols-outlined text-base bg-white dark:bg-background-dark p-1 rounded-full border border-slate-200 dark:border-slate-700">${travelIcon}</span>
-                  <span>${travelMode} ${durationText}</span>
-              </div>
+              <a href="${mapsUrl}" target="_blank" title="在 Google Maps 開啟導航" class="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-sm ml-6 my-1 border-l-2 border-dashed border-slate-300 dark:border-slate-600 pl-4 py-3 animate-fade-in-up hover:text-primary transition-colors cursor-pointer group">
+                  <span class="material-symbols-outlined text-base bg-white dark:bg-background-dark p-1 rounded-full border border-slate-200 dark:border-slate-700 group-hover:border-primary group-hover:text-primary transition-colors">${travelIcon}</span>
+                  <span class="group-hover:underline underline-offset-2">${travelMode} ${durationText}</span>
+                  <span class="material-symbols-outlined text-[16px] opacity-0 group-hover:opacity-100 transition-opacity ml-1">open_in_new</span>
+              </a>
             `;
 
         let ticketHTML = destinationPlace.hasTicketOffer ? `
