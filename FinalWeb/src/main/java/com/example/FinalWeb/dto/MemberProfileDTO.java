@@ -5,5 +5,6 @@ import java.time.LocalDate;
 public record MemberProfileDTO(
     String name,
     String phone,
-    LocalDate birthday
+    LocalDate birthday,
+    String memberImgUrl
 ) {}

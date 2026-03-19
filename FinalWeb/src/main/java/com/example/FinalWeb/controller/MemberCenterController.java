@@ -118,6 +118,7 @@ public class MemberCenterController {
         MemberEntity member = memberService.findById(loginMember.getMemberId());
 
         model.addAttribute("member", member);
+        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCWljJKr_SyYFR40yV_NF_kL4B5JpwjUgXJGZ1VEhcVXzSOhJ0MjReIhLWaHmsDlthO9ZHOdTEae6w0EY36BHJe0uk6YPVdAzvD2xFX0K0Vy3yVL8SqixlPlOorYg_CgTZaIDE53hsqspaovwl7shl65nMJ4Y3vFy7QPe8S_woLudGJfX6be-M0bOpLdDMNjDLbPHoSDDTfTBtwevz8xNA_LxXnzMmuE-4nomzjeSPPmEa3BRk4BmEn8kE61qvpqNvcgpSMkk6fGsw");
 
         return "memberProfile";
     }
@@ -127,8 +128,7 @@ public class MemberCenterController {
                                 HttpSession session,
                                 RedirectAttributes redirectAttr) {
 
-        MemberEntity loginMember =
-            (MemberEntity) session.getAttribute("loginMember");
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
 
         if (loginMember == null) {
             return "redirect:/auth";
@@ -141,7 +141,7 @@ public class MemberCenterController {
         loginMember.setName(dto.name());
         loginMember.setPhone(dto.phone());
         loginMember.setBirthday(dto.birthday());
-
+        loginMember.setMemberImgUrl(dto.memberImgUrl());
         session.setAttribute("loginMember", loginMember);
 
         // 3. toast
@@ -151,6 +151,29 @@ public class MemberCenterController {
         );
 
         return "redirect:/member/profile";
+    }
+
+
+    @PostMapping("/profile/avatar")
+    @ResponseBody
+    public ResponseEntity<?> updateAvatar(@RequestBody Map<String, String> body,
+                                        HttpSession session) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return ResponseEntity.status(401).body("請先登入");
+        }
+
+        String avatarUrl = body.get("avatarUrl");
+
+        memberService.updateMemberAvatar(loginMember.getMemberId(), avatarUrl);
+
+        // 同步 session（重要）
+        loginMember.setMemberImgUrl(avatarUrl);
+        session.setAttribute("loginMember", loginMember);
+
+        return ResponseEntity.ok().build();
     }
 
 }
