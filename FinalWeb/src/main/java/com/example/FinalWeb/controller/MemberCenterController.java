@@ -79,6 +79,7 @@ public class MemberCenterController {
         model.addAttribute("favorites", myFavorites);
         model.addAttribute("lineBound", lineBound);
         model.addAttribute("googleBound", googleBound);
+        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc");
 
         return "member";
     }
@@ -118,7 +119,7 @@ public class MemberCenterController {
         MemberEntity member = memberService.findById(loginMember.getMemberId());
 
         model.addAttribute("member", member);
-        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCWljJKr_SyYFR40yV_NF_kL4B5JpwjUgXJGZ1VEhcVXzSOhJ0MjReIhLWaHmsDlthO9ZHOdTEae6w0EY36BHJe0uk6YPVdAzvD2xFX0K0Vy3yVL8SqixlPlOorYg_CgTZaIDE53hsqspaovwl7shl65nMJ4Y3vFy7QPe8S_woLudGJfX6be-M0bOpLdDMNjDLbPHoSDDTfTBtwevz8xNA_LxXnzMmuE-4nomzjeSPPmEa3BRk4BmEn8kE61qvpqNvcgpSMkk6fGsw");
+        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc");
 
         return "memberProfile";
     }

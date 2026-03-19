@@ -15,9 +15,11 @@
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
                     <div class="relative mb-4">
                         <div class="size-32 rounded-full border-4 border-primary p-1">
-                            <img alt="Profile Picture" class="w-full h-full object-cover rounded-full"
-                                data-alt="Profile avatar of a happy young man"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc" />
+                            <img alt="Profile Picture"
+                                class="w-full h-full object-cover rounded-full"
+                                th:src="${session.loginMember.memberImgUrl != null and !#strings.isEmpty(session.loginMember.memberImgUrl)
+                                        ? session.loginMember.memberImgUrl
+                                        : defaultMemberImgUrl}" />
                         </div>
                         <div
                             class="absolute bottom-1 right-1 bg-primary text-background-dark size-8 rounded-full flex items-center justify-center border-4 border-background-dark">
