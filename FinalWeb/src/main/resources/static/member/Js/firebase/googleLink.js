@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup, signOut } from "./googleAuth.js";
+import { auth, provider, signInWithPopup, signOut } from "./firebase.js";
 
 $(function () {
 

@@ -1,10 +1,16 @@
 package com.example.FinalWeb.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.io.File;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.FinalWeb.entity.ArticleEntity;
 import com.example.FinalWeb.service.ArticleService;
@@ -36,8 +42,12 @@ public class AdminArticleController {
     // ------------------------------------------------
     @PostMapping
     public ResponseEntity<ArticleEntity> create(@RequestBody ArticleEntity article) {
+
+        article.setStatus("published");
+
         ArticleEntity saved = articleService.createArticle(article);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved); // HTTP 201
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     // ------------------------------------------------
@@ -57,5 +67,32 @@ public class AdminArticleController {
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         articleService.deleteArticle(id);
         return ResponseEntity.noContent().build(); // HTTP 204
+    }
+
+    // ------------------------------------------------
+    // 5. 上傳圖片 (Upload)
+    // ------------------------------------------------
+    @PostMapping("/upload")
+    public Map<String, String> uploadImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("articleClass") String articleClass) throws Exception {
+
+        String uploadDir = "src/main/resources/static/uploads/article/" + articleClass + "/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        File dest = new File(uploadDir + fileName);
+        file.transferTo(dest);
+        String url = "/uploads/article/" + articleClass + "/" + fileName;
+        Map<String, String> result = new HashMap<>();
+        result.put("url", url);
+        return result;
+    }
+
+    @GetMapping("/preview")
+    public String previewPage() {
+        return "article";
     }
 }

@@ -5,7 +5,8 @@
   <th:block th:replace="~{ fragments/head :: myHead}"></th:block>
   </head>
   
-  <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+  <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen"
+        th:attr="data-member-id=${session.loginMember.memberId}">
     <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
       <div class="layout-container flex h-full grow flex-col">
         <!-- Header -->
@@ -18,25 +19,26 @@
               <h1 class="text-primary tracking-tight text-3xl font-bold">
                 編輯個人資料
               </h1>
-              <p class="text-slate-400 text-sm">
-                管理您的帳號資訊與個人隱私設定，讓大家更認識您
-              </p>
             </div>
-            <form th:action="@{/member/profile}" method="post" class="space-y-8">
+            <form id="profileForm" th:action="@{/member/profile}" method="post" class="space-y-8">
+              <input type="hidden" id="memberImgUrl" name="memberImgUrl" th:value="${member.memberImgUrl}">
+              <input type="hidden" id="originalMemberImgUrl" th:value="${member.memberImgUrl}">
+              <input type="hidden" id="defaultMemberImgUrl" th:value="${defaultMemberImgUrl}">
               <!-- Profile Image Section -->
               <div class="bg-primary/5 p-6 rounded-xl border border-primary/10">
                 <div class="flex flex-col md:flex-row items-center gap-8">
                   <div class="relative group">
                     <div
+                      id="memberAvatarPreview"
                       class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 border-4 border-primary/30"
-                      data-alt="Large user avatar for editing"
-                      style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuCWljJKr_SyYFR40yV_NF_kL4B5JpwjUgXJGZ1VEhcVXzSOhJ0MjReIhLWaHmsDlthO9ZHOdTEae6w0EY36BHJe0uk6YPVdAzvD2xFX0K0Vy3yVL8SqixlPlOorYg_CgTZaIDE53hsqspaovwl7shl65nMJ4Y3vFy7QPe8S_woLudGJfX6be-M0bOpLdDMNjDLbPHoSDDTfTBtwevz8xNA_LxXnzMmuE-4nomzjeSPPmEa3BRk4BmEn8kE61qvpqNvcgpSMkk6fGsw&quot;);">
+                      th:style="|background-image: url('${member.memberImgUrl != null ? member.memberImgUrl : defaultMemberImgUrl}')|">
                     </div>
-                    <button
-                      class="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
-                      type="button">
-                      <span class="material-symbols-outlined text-sm">photo_camera</span>
-                    </button>
+                    <div
+                      class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-sm">
+                        photo_camera
+                      </span>
+                    </div>
                   </div>
                   <div class="flex flex-col items-center md:items-start gap-3">
                     <div class="text-center md:text-left">
@@ -46,12 +48,14 @@
                       </p>
                     </div>
                     <div class="flex gap-3">
-                      <button
+                      <input id="avatarFileInput" type="file" accept="image/png, image/jpeg" class="hidden">
+                      <button id="uploadAvatarBtn"
                         class="px-5 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors"
                         type="button">
                         上傳新照片
                       </button>
                       <button
+                        id="removeAvatarBtn"
                         class="px-5 py-2 bg-background-dark border border-slate-600 text-slate-300 text-sm font-bold rounded-lg hover:bg-slate-800 transition-colors"
                         type="button">
                         移除
@@ -122,5 +126,6 @@
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="module" th:src="@{/member/js/firebase/memberAvatarUpload.js}"></script>
   </body>
 </html>

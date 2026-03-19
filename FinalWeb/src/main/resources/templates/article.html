@@ -25,14 +25,13 @@
                     <div class="absolute inset-0 flex items-end pb-16">
                         <div class="w-full max-w-7xl mx-auto px-6 lg:px-20">
                             <div class="border-l-[12px] border-primary pl-8 md:pl-12">
-                                <span
+                                <span id="article-class"
                                     class="text-primary font-bold tracking-[0.2em] text-sm md:text-base uppercase mb-4 block"
-                                    th:text="${article.articleClass}">分類名稱</span>
+                                    th:text="${article?.articleClass}">分類名稱</span>
 
-                                <h1 class="text-white text-4xl md:text-7xl font-black leading-[1.1] tracking-tighter max-w-4xl"
-                                    th:text="${article.title}">
-                                    文章標題載入中...
-                                </h1>
+                                <h1 id="article-title"
+                                    class="text-white text-4xl md:text-7xl font-black leading-[1.1] tracking-tighter max-w-4xl"
+                                    th:text="${article?.title}">文章標題載入中...</h1>
                             </div>
                         </div>
                     </div>
@@ -50,37 +49,28 @@
                         </div>
                     </div>
 
-                    <div id="markdown-content" th:attr="data-markdown=${article.content}" class="prose prose-lg prose-slate dark:prose-invert max-w-none 
+                    <div id="markdown-content" th:attr="data-markdown=${article?.content}" class="prose prose-lg prose-slate dark:prose-invert max-w-none 
                         prose-headings:text-primary prose-headings:font-black prose-headings:mt-12 prose-headings:mb-6
                         prose-p:text-slate-300 prose-p:leading-loose prose-p:mb-6
-                        
                         prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-4 prose-blockquote:px-8
                         text-slate-300">
                     </div>
 
                     <div class="mt-20 pt-10 border-t border-white/10">
                         <a th:href="${article.articleClass == '特色活動'} ? @{/info} : @{/news}"
-                        class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
-                            <span class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
+                            class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
+                            <span
+                                class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
                             <span th:text="${article.articleClass == '特色活動'} ? '返回旅遊情報' : '返回最新消息'">返回</span>
-                </a>
-            </div>
-          </div>
+                        </a>
+                    </div>
+                </div>
             </main>
             <!-- Footer -->
             <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 
             <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    const contentEl = document.getElementById('markdown-content');
-                    // 思考邏輯：從 data-markdown 屬性拿資料，這比直接從 innerText 拿更穩定
-                    const rawMarkdown = contentEl.getAttribute('data-markdown');
-                    if (rawMarkdown) {
-                        contentEl.innerHTML = marked.parse(rawMarkdown);
-                    }
-                });
-            </script>
+            <script th:src="@{/article/js/article.js}"></script>
         </div>
     </div>
 </body>

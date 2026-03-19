@@ -79,6 +79,7 @@ public class MemberCenterController {
         model.addAttribute("favorites", myFavorites);
         model.addAttribute("lineBound", lineBound);
         model.addAttribute("googleBound", googleBound);
+        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc");
 
         return "member";
     }
@@ -118,6 +119,7 @@ public class MemberCenterController {
         MemberEntity member = memberService.findById(loginMember.getMemberId());
 
         model.addAttribute("member", member);
+        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc");
 
         return "memberProfile";
     }
@@ -127,8 +129,7 @@ public class MemberCenterController {
                                 HttpSession session,
                                 RedirectAttributes redirectAttr) {
 
-        MemberEntity loginMember =
-            (MemberEntity) session.getAttribute("loginMember");
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
 
         if (loginMember == null) {
             return "redirect:/auth";
@@ -141,7 +142,7 @@ public class MemberCenterController {
         loginMember.setName(dto.name());
         loginMember.setPhone(dto.phone());
         loginMember.setBirthday(dto.birthday());
-
+        loginMember.setMemberImgUrl(dto.memberImgUrl());
         session.setAttribute("loginMember", loginMember);
 
         // 3. toast
@@ -151,6 +152,29 @@ public class MemberCenterController {
         );
 
         return "redirect:/member/profile";
+    }
+
+
+    @PostMapping("/profile/avatar")
+    @ResponseBody
+    public ResponseEntity<?> updateAvatar(@RequestBody Map<String, String> body,
+                                        HttpSession session) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return ResponseEntity.status(401).body("請先登入");
+        }
+
+        String avatarUrl = body.get("avatarUrl");
+
+        memberService.updateMemberAvatar(loginMember.getMemberId(), avatarUrl);
+
+        // 同步 session（重要）
+        loginMember.setMemberImgUrl(avatarUrl);
+        session.setAttribute("loginMember", loginMember);
+
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -1,7 +1,7 @@
 <div th:fragment="purchaseRecord" class="w-full flex flex-col gap-4">
     <div class="flex items-center justify-between mb-2">
-        <h2 class="flex items-center gap-2 text-xl font-bold text-orange-500">
-            <span class="material-symbols-outlined">receipt_long</span> 購買紀錄
+        <h2 class="flex items-center gap-2 text-xl font-bold text-white">
+            <span class="material-symbols-outlined text-primary">receipt_long</span> 購買紀錄
         </h2>
         <a href="javascript:void(0)" id="btn-view-all-orders" th:if="${orders != null && orders.size() > 2}"
             class="text-sm text-primary hover:text-orange-500 transition-colors cursor-pointer">查看全部</a>
