@@ -55,4 +55,22 @@ public Page<com.example.FinalWeb.entity.MemberEntity> getAllMembers(
     Pageable pageable = PageRequest.of(page, size, Sort.by("memberId").ascending());
     return memberRepo.findAll(pageable);
 }
+@GetMapping("/monthly-revenue")
+public Map<Integer, Long> getMonthlyRevenue() {
+    // 建立一個 map，Key 是月份 (1-12)，Value 是該月總營收
+    Map<Integer, Long> monthlyData = new HashMap<>();
+    
+    // 初始化 12 個月為 0
+    for (int i = 1; i <= 12; i++) {
+        monthlyData.put(i, 0L);
+    }
+
+    // 💡 這裡呼叫你的 orderService 取得真實總額
+    // 假設目前全部算在 3 月 (你也可以根據訂單時間做更精細的 GROUP BY 查詢)
+    long currentRevenue = orderService.getTotalRevenue();
+    monthlyData.put(3, currentRevenue); 
+
+    return monthlyData;
+}
+
 }

@@ -34,15 +34,18 @@ public class AdminOrderController {
         orderService.updateOrderStatus(id, payload.get("status"));
         return ResponseEntity.ok("更新成功");
     }
-    // 在 AdminOrderController.java 中新增
-@GetMapping("/{id}")
+    
+@GetMapping("/detail/{id}")
 public ResponseEntity<?> getOrderDetail(@PathVariable Integer id) {
-    try {
-        // 使用 service 獲取訂單詳情
-        return ResponseEntity.ok(orderService.getOrderById(id));
-    } catch (Exception e) {
+    // 呼叫您剛剛寫的回傳 Map 的方法，這樣就不會被 Entity 上的 @JsonIgnore 擋掉
+    Map<String, Object> detail = orderService.getOrderDetailWithItems(id);
+    
+    if (detail != null) {
+        return ResponseEntity.ok(detail);
+    } else {
         return ResponseEntity.status(404).body("找不到該訂單");
     }
 }
 
 }
+

@@ -232,4 +232,32 @@ public void updateOrderStatus(Integer orderId, String newStatus) {
     public long getTotalMemberCount() {
         return memberRepo.count(); // 回傳資料庫會員總數
     }
+
+    //後台訂單詳細資訊
+   public Map<String, Object> getOrderDetailWithItems(Integer id) {
+    OrdersEntity order = ordersRepo.findById(id).orElse(null);
+    if (order == null) return null;
+
+    List<OrdersDetailEntity> details = ordersDetailRepo.findByOrders(order); 
+    
+    Map<String, Object> response = new HashMap<>();
+    response.put("orderId", order.getOrderId());
+    response.put("tradeNo", order.getTradeNo());
+    response.put("payStatus", order.getPayStatus());
+    response.put("orderTime", order.getOrderTime());
+    response.put("totalPrice", calculateTotalAmount(order)); 
+    response.put("orderItemsName", order.getOrderItemsName());
+    response.put("orderDetails", details); 
+
+    // 🌟 新增：購買人資訊 (從關聯的 MemberEntity 抓取)
+    if (order.getMember() != null) {
+        response.put("customerName", order.getMember().getName()); // 假設欄位是 name
+        response.put("customerEmail", order.getMember().getEmail()); // 假設欄位是 email
+    } else {
+        response.put("customerName", "訪客標記");
+        response.put("customerEmail", "無內容");
+    }
+
+    return response;
+}
 }
