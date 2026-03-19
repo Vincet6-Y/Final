@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.MemberOauthEntity;
+import com.example.FinalWeb.enums.AuthProvider;
 import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -156,7 +157,7 @@ public class LineLoginService {
     // 依 LINE userId 查詢是否已綁定本站會員
     public MemberEntity findLinkedMember(String lineUserId) {
         Optional<MemberOauthEntity> oauthOpt =
-                memberOauthRepo.findByProviderAndProviderId("LINE", lineUserId);
+                memberOauthRepo.findByProviderAndProviderId(AuthProvider.LINE, lineUserId);
 
         if (oauthOpt.isPresent()) {
             return oauthOpt.get().getMember();
@@ -166,6 +167,6 @@ public class LineLoginService {
 
     @Transactional
     public void unlinkLine(Integer memberId) {
-        memberOauthRepo.deleteByMember_MemberIdAndProvider(memberId, "LINE");
+        memberOauthRepo.deleteByMember_MemberIdAndProvider(memberId, AuthProvider.LINE);
     }
 }

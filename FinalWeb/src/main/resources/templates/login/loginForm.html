@@ -69,12 +69,13 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-                <a
-                    th:href="@{/auth/google/login(redirect=${redirect != null ? redirect : param.redirect})}"
-                    class="flex items-center justify-center gap-3 bg-white text-black border border-neutral-border rounded-lg py-3 hover:bg-gray-100 transition-colors">
+                <button
+                    type="button"
+                    id="googleLoginBtn"
+                    class="flex items-center justify-center gap-3 bg-white text-black border border-neutral-border rounded-lg py-3 hover:bg-gray-100 transition-colors w-full">
                     <img th:src="@{/images/google/web_light_sq_na.svg}" class="w-6 h-6" alt="Google">
                     <span class="text-sm font-medium"> Google 登入</span>
-                </a>
+                </button>
 
                 <a
                     th:href="@{/auth/line/login(redirect=${redirect != null ? redirect : param.redirect})}"

@@ -11,11 +11,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.FinalWeb.dto.MemberProfileDTO;
 import com.example.FinalWeb.dto.PasswdChangeDto;
 import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.FavoritesEntity;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
+import com.example.FinalWeb.enums.AuthProvider;
 import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.example.FinalWeb.service.FavoritesService;
 import com.example.FinalWeb.service.MemberService;
@@ -48,10 +50,6 @@ public class MemberCenterController {
         return "redirect:/home";
     }
 
-    @GetMapping("/profile")
-    public String memberProfile() {
-        return "memberProfile";
-    }
 
     // 🌟 會員首頁邏輯
     @GetMapping
@@ -72,8 +70,8 @@ public class MemberCenterController {
         // 4. 撈出這個會員的收藏清單 (交給 FavoritesService)
         List<FavoritesEntity> myFavorites = favoritesService.getMemberFavorites(memberId);
 
-        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "LINE");
-        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "GOOGLE");
+        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.LINE);
+        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.GOOGLE);
         
         // 5. 把資料丟給前端 (讓前端的 HTML 可以跑迴圈)
         model.addAttribute("orders", myOrders);
@@ -105,4 +103,54 @@ public class MemberCenterController {
             return ResponseEntity.badRequest().body(ToastInfoDTO.error(result));
         }
     }
+
+
+    @GetMapping("/profile")
+    public String getProfile(HttpSession session, Model model) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return "redirect:/auth";
+        }
+
+        // 重新抓 DB（避免 session 資料舊）
+        MemberEntity member = memberService.findById(loginMember.getMemberId());
+
+        model.addAttribute("member", member);
+
+        return "memberProfile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(MemberProfileDTO dto,
+                                HttpSession session,
+                                RedirectAttributes redirectAttr) {
+
+        MemberEntity loginMember =
+            (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return "redirect:/auth";
+        }
+
+        // 1. 更新 DB
+        memberService.updateMemberProfile(loginMember.getMemberId(), dto);
+
+        // 2. 同步 session（重點）
+        loginMember.setName(dto.name());
+        loginMember.setPhone(dto.phone());
+        loginMember.setBirthday(dto.birthday());
+
+        session.setAttribute("loginMember", loginMember);
+
+        // 3. toast
+        redirectAttr.addFlashAttribute(
+            "toast",
+            ToastInfoDTO.success("資料更新成功")
+        );
+
+        return "redirect:/member/profile";
+    }
+
 }

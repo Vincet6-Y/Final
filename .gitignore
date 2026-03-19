@@ -1,6 +1,8 @@
 /.metadata/
 src/main/resources/application.properties
+src/main/resources/firebase/firebase-key.json
 FinalWeb/src/main/resources/application.properties
 FinalWeb/src/main/resources/firebase/firebase-key.json
 
 .env
+FinalWeb/src/main/resources/firebase/firebase-key.json
