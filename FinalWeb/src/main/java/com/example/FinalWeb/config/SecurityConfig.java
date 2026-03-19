@@ -19,7 +19,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
                 auth -> auth.requestMatchers("/backend/**").hasRole("ADMIN")
                         // .requestMatchers("/main/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/**", "/article/**", "/article_img/**", "/assets/**", "/images/**", "/member/**", "/news/**", "/payment/**", "/tour/**", "/js/**", "/api/**").permitAll()
+                        .requestMatchers("/**", "/article/**", "/article_img/**", "/assets/**", "/images/**", "/member/**", "/news/**", "/payment/**", "/tour/**", "/js/**", "/api/**", "/page403").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form.loginPage("/auth")
                         .usernameParameter("email")

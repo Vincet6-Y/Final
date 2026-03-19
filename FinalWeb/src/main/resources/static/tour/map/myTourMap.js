@@ -241,7 +241,7 @@ async function searchNearby(type) {
             clearMarkers();
             places.forEach(createMarker);
         } else {
-            alert('附近找不到相關結果，請移動地圖或縮放後再試一次！');
+            showToast('error', '附近找不到相關結果，請移動地圖或縮放後再試一次！');
         }
     } catch (e) {
         console.error("搜尋附近景點失敗:", e);

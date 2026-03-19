@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -38,6 +39,11 @@ public class GlobalController {
         // }
         // 🌟 步驟三：照常把網頁端給客人
         return "backendcontentmanagement";
+    }
+
+    @GetMapping("/page403")
+    public String page403(){
+        return "page403";
     }
 
     @RequestMapping("/home")

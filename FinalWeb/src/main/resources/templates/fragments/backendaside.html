@@ -11,10 +11,10 @@
                     class="size-12 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
                     <img alt="聖地圖鑑 Logo" class="w-full h-full object-cover"
                         data-alt="Circular orange and black abstract logo for Seichi Junrei"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuADe05v3mOWj_0h4KB97MjcbsMjhEBC4EpDI44jod9Dle2IDIm5xpu5VBqMc0IpjJfhI93LlzodEsYTdMQbNqSzMxq2E1brX3wm3DUwjUEnv33wxBNkG7gSaT7GLzkijHQ7-wIHGV0pkx6r-4eFJxl_n6B99YpGPfiwuniWsbASuhpNBUIgDdsc4cVRi_K7zpCva7v7d-yaL4IvJmy1u7vZVPLBzBAsNjCMj2-UEC4ZtutlO7Sf2f1zIX-VsGq1hXegUENZ3I0rxCw" />
+                        th:src="@{/images/LOGO.png}" />
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">聖地圖鑑 Admin</h1>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">聖地巡禮</h1>
                     <p class="text-xs text-primary font-medium uppercase tracking-wider">管理系統</p>
                 </div>
             </div>
@@ -22,27 +22,27 @@
             <nav class="flex flex-col gap-2">
                 <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
                     th:classappend="${currentPage == 'home'} ? 'active-link text-primary bg-primary/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100'"
-                    th:href="@{/backendhome}">
+                    th:href="@{/backend/home}">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span class="font-medium">資訊主頁</span>
                 </a>
                 <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
                     th:classappend="${currentPage == 'content'} ? 'active-link text-primary bg-primary/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100'"
-                    th:href="@{/backendcontentmanagement}">
+                    th:href="@{/backend/contentmanagement}">
                     <span class="material-symbols-outlined">description</span>
                     <span class="font-medium">內容管理</span>
                 </a>
                 <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
-                    th:classappend="${currentPage == 'opera'} ? 'active-link text-primary bg-primary/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100'"
-                    th:href="@{/backendoperation}">
-                    <span class="material-symbols-outlined">business_center</span>
-                    <span class="font-medium">營運管理</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
                     th:classappend="${currentPage == 'order'} ? 'active-link text-primary bg-primary/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100'"
-                    th:href="@{/backendorder}">
+                    th:href="@{/backend/order}">
                     <span class="material-symbols-outlined">shopping_cart</span>
                     <span class="font-medium">訂單處理</span>
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
+                    th:classappend="${currentPage == 'opera'} ? 'active-link text-primary bg-primary/10' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100'"
+                    th:href="@{/backend/operation}">
+                    <span class="material-symbols-outlined">business_center</span>
+                    <span class="font-medium">營運管理</span>
                 </a>
             </nav>
         </div>
@@ -52,16 +52,22 @@
                 <div class="size-10 rounded-full bg-slate-200 dark:bg-primary/20 flex items-center justify-center">
                     <span class="material-symbols-outlined text-primary">person</span>
                 </div>
-                <div class="flex flex-col">
-                    <span class="text-sm font-semibold text-slate-900 dark:text-white">管理員 A</span>
-                    <span class="text-xs text-slate-500 dark:text-slate-400">系統管理權限</span>
+                <div class="flex flex-col" th:if="${session.loginMember != null}">
+                    <span class="text-xl font-semibold text-slate-900 dark:text-white" th:text="${session.loginMember.name}">管理員 A</span>
                 </div>
             </div>
-            <button
-                class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors w-full">
+            <a th:href="@{/home}"
+                class="flex items-center gap-3 px-4 py-2 rounded-lg text-yellow-500 hover:bg-yellow-50 dark:hover:bg-red-500/10 transition-colors w-full">
                 <span class="material-symbols-outlined">logout</span>
-                <span class="font-medium">登出系統</span>
-            </button>
+                <span class="font-medium">回首頁</span>
+            </a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors w-full">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-medium">登出系統</span>
+                </button>
+            </form>
         </div>
     </aside>
 </body>
