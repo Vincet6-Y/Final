@@ -14,9 +14,11 @@ $(function () {
 
   const $memberImgUrl = $("#memberImgUrl");
   const $defaultMemberImgUrl = $("#defaultMemberImgUrl");
-  const $originalMemberImgUrl = $("#originalMemberImgUrl");
+  const $profileForm = $("#profileForm");
 
   const memberId = $("body").data("member-id");
+
+  let isAvatarRemoved = false;
 
   function setPreviewImage(url) {
     $preview.css("background-image", `url("${url}")`);
@@ -26,12 +28,10 @@ $(function () {
     return url && url.trim() ? url : $defaultMemberImgUrl.val();
   }
 
-  // 開啟檔案選擇
   $uploadBtn.on("click", function () {
     $fileInput.trigger("click");
   });
 
-  // 上傳圖片
   $fileInput.on("change", async function (e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -53,49 +53,41 @@ $(function () {
       await uploadBytes(avatarRef, file);
       const downloadURL = await getDownloadURL(avatarRef);
 
-      // 只更新前端（尚未寫入 DB）
+      isAvatarRemoved = false;
       $memberImgUrl.val(downloadURL);
       setPreviewImage(downloadURL);
 
     } catch (error) {
-      console.error("avatar upload error =", error);
+      console.error("avatar upload error =", error.code, error.message, error);
       alert("圖片上傳失敗");
     } finally {
       $fileInput.val("");
     }
   });
 
-  let isAvatarRemoved = false;
-  // 移除頭像（只改前端，不刪 Firebase）
   $removeBtn.on("click", function () {
     isAvatarRemoved = true;
     $memberImgUrl.val("");
     setPreviewImage($defaultMemberImgUrl.val());
   });
 
-  // 送出表單時才決定是否刪 Firebase
-  $("#profileForm").on("submit", async function () {
-      try {
-          if (isAvatarRemoved) {
-              console.log("刪除 Firebase 圖片");
-              const avatarRef = ref(storage, `avatars/${memberId}/profile.jpg`);
-              await deleteObject(avatarRef);
-          }
-      } catch (error) {
-          console.error("delete error =", error.code, error.message);
+  $profileForm.on("submit", async function (e) {
+    if (!isAvatarRemoved) {
+      return;
+    }
+
+    try {
+      console.log("準備刪除 Firebase 圖片:", `avatars/${memberId}/profile.jpg`);
+      const avatarRef = ref(storage, `avatars/${memberId}/profile.jpg`);
+      await deleteObject(avatarRef);
+      console.log("Firebase 圖片刪除成功");
+    } catch (error) {
+      console.error("delete error =", error.code, error.message, error);
+
+      if (error.code !== "storage/object-not-found") {
+        e.preventDefault();
+        alert("Firebase 圖片刪除失敗：" + error.message);
       }
-  });
-
-  // 取消 → 還原原始資料（不動 Firebase）
-  $("#cancelBtn").on("click", function () {
-    const originalUrl = $originalMemberImgUrl.val();
-
-    if (originalUrl) {
-      $memberImgUrl.val(originalUrl);
-      setPreviewImage(originalUrl);
-    } else {
-      $memberImgUrl.val("");
-      setPreviewImage($defaultMemberImgUrl.val());
     }
   });
 

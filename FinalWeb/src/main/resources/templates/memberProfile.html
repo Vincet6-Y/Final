@@ -23,7 +23,7 @@
                 管理您的帳號資訊與個人隱私設定，讓大家更認識您
               </p>
             </div>
-            <form th:action="@{/member/profile}" method="post" class="space-y-8">
+            <form id="profileForm" th:action="@{/member/profile}" method="post" class="space-y-8">
               <input type="hidden" id="memberImgUrl" name="memberImgUrl" th:value="${member.memberImgUrl}">
               <input type="hidden" id="originalMemberImgUrl" th:value="${member.memberImgUrl}">
               <input type="hidden" id="defaultMemberImgUrl" th:value="${defaultMemberImgUrl}">
