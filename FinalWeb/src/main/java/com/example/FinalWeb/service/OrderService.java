@@ -14,6 +14,7 @@ import com.example.FinalWeb.entity.MyPlanEntity;
 import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.repo.OrdersRepo;
+import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.repo.OrdersDetailRepo;
 import com.example.FinalWeb.dto.TicketDto;
 
@@ -193,18 +194,17 @@ public Map<String, Object> getAdminDashboardStats() {
 }
 
 // 🌟 4. 給管理後台：獲取所有訂單列表 (包含篩選功能)
-    public List<OrdersEntity> getAllOrdersForAdmin(String status, String keyword) {
-    // 🌟 修正：處理關鍵字搜尋
+   // 修改 OrderService.java 中的 getAllOrdersForAdmin 方法
+public List<OrdersEntity> getAllOrdersForAdmin(String status, String keyword) {
     if (keyword != null && !keyword.trim().isEmpty()) {
-        return ordersRepo.findByTradeNoContaining(keyword.trim()); 
+        // 🌟 改用剛才寫的多欄位搜尋方法
+        return ordersRepo.searchOrders(keyword.trim());
     }
     
-    // 處理狀態篩選
     if (status != null && !status.equals("全部")) {
         return ordersRepo.findByPayStatusOrderByOrderTimeDesc(status);
     }
     
-    // 預設回傳全部
     return ordersRepo.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "orderTime"));
 }
 
@@ -215,4 +215,21 @@ public void updateOrderStatus(Integer orderId, String newStatus) {
     order.setPayStatus(newStatus);
     ordersRepo.save(order);
 }
+    // 🌟 新增：計算所有訂單的總營收
+    public long getTotalRevenue() {
+    // 1. 取得所有訂單
+    List<OrdersEntity> allOrders = ordersRepo.findAll(); 
+    
+    // 2. 篩選已付款訂單並加總金額
+    return allOrders.stream()
+            .filter(o -> "已付款".equals(o.getPayStatus()))
+            .mapToLong(o -> (long) calculateTotalAmount(o)) 
+            .sum();
+}
+    @Autowired
+    private MemberRepo memberRepo; // 記得注入 MemberRepo
+
+    public long getTotalMemberCount() {
+        return memberRepo.count(); // 回傳資料庫會員總數
+    }
 }

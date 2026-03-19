@@ -43,7 +43,7 @@
                         <span class="material-symbols-outlined text-primary">payments</span>
                     </div>
                     <div class="flex items-end gap-3">
-                        <span class="text-3xl font-bold text-slate-100">$1,284,500</span>
+                        <span id="display-total-revenue" class="text-3xl font-bold text-slate-100">$1,284,500</span>
                         <span class="text-green-500 text-sm font-bold flex items-center mb-1">
                             <span class="material-symbols-outlined text-sm">trending_up</span> 12.5%
                         </span>
@@ -55,7 +55,7 @@
                         <span class="material-symbols-outlined text-primary">group</span>
                     </div>
                     <div class="flex items-end gap-3">
-                        <span class="text-3xl font-bold text-slate-100">42,891</span>
+                        <span id="display-active-users" class="text-3xl font-bold text-slate-100">42,891</span>
                         <span class="text-green-500 text-sm font-bold flex items-center mb-1">
                             <span class="material-symbols-outlined text-sm">trending_up</span> 8.2%
                         </span>
@@ -137,7 +137,7 @@
                                 </th>
                                 <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶名稱
                                 </th>
-                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">註冊日期
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">電子郵件
                                 </th>
                                 <th
                                     class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-center">
@@ -147,86 +147,28 @@
                                     操作</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-neutral-700">
-                            <tr class="hover:bg-neutral-700/30 transition-colors">
-                                <td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-2024-001</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-8 rounded-full bg-neutral-700 overflow-hidden"
-                                            data-alt="User profile avatar 1"
-                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuApLVjx-nZBtPLTIXnpbUoVtkxjFaKztErhkl8fznlV7TLUSJtoiSFKjjZ9FI_gcpbdoKly71Zwnbp6ZIRVDN3KUcYYRh0qiblNN0cFxNUrwj5puSduJLLEee8xPLw8dzJ4wB8ruIFWA-LiOoPbOJkVML0JMoZs5hYuckTbfTIOVXXIfpzGAN5UnoPRL45819zZsT7zU5GNEYa0dm_VB0CoHuIWfYc0ZKKXcQSER8pbdClO9Hd27iOJMp_nnUys0FqsXwlfPG1M1ec')">
-                                        </div>
-                                        <span class="text-sm font-medium text-slate-100">聖地巡禮者 A</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-neutral-400">2023-10-01</td>
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="px-2 py-1 text-[10px] font-bold bg-green-500/20 text-green-500 rounded uppercase tracking-wider">活躍中</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-neutral-700/30 transition-colors">
-                                <td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-2024-042</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-8 rounded-full bg-neutral-700 overflow-hidden"
-                                            data-alt="User profile avatar 2"
-                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACGcybqTEAuz6kLizUTLLScif11amHVbG9-bHfkNLRd5tbzcFOSxmq7DisUXSS72SysB0oShUHitXKIBv_EreCfACt14vQiXPY6YnoUtkot3VZqlnh6P8AMPaaA8_43ZaC6QAKfYLPFhcjn_1PGg_uNLj8V0MV-h205cjBnJPhf1HwcBAYuDwlRTZ5B4IfvJJAew0Gpp33aVk2oVJETQQ7XTzzAaCrQOIMitB0hx4cDF1O5LHV8ry8s9Fv3iZhz8t8Mkki6eJvKB8')">
-                                        </div>
-                                        <span class="text-sm font-medium text-slate-100">動漫迷 B</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-neutral-400">2023-11-15</td>
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="px-2 py-1 text-[10px] font-bold bg-neutral-600 text-neutral-400 rounded uppercase tracking-wider">停用</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-neutral-700/30 transition-colors">
-                                <td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-2024-108</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="size-8 rounded-full bg-neutral-700 overflow-hidden"
-                                            data-alt="User profile avatar 3"
-                                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC1KeCQe6TEsrbOVk-7mmJ-OoUOYIaw6H6eRlRqM6QToomlj1fPpiVOEggtUH9sOd6orc0yhcpNbzxsrwa5mLtd8gb6QoZkRFXlUwCXbyQ_syWoTjDvBzT_SJeKDi-nGZ80Kaat1c2Jv4qomRdLunihqTBJhLKqDVllr7E239gGtwtLc9PYa7HUAf1Zigv5uxmQrecpCYB_ve6StI7DbxAyM1Fl0hvLczdK2AoYR47DogTGJVrJeZwZqr6YIJ5xpeLpSEktqLrnxs4')">
-                                        </div>
-                                        <span class="text-sm font-medium text-slate-100">攝影愛好者 C</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-neutral-400">2023-12-20</td>
-                                <td class="px-6 py-4 text-center">
-                                    <span
-                                        class="px-2 py-1 text-[10px] font-bold bg-green-500/20 text-green-500 rounded uppercase tracking-wider">活躍中</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
-                                </td>
-                            </tr>
+                        <tbody id="member-table-body" class="divide-y divide-neutral-700">
+                           
                         </tbody>
                     </table>
-                    <div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
-                        <p class="text-xs text-neutral-400">顯示 1 到 3 之 1,248 位用戶</p>
-                        <div class="flex gap-2">
-                            <button
-                                class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors">
-                                <span class="material-symbols-outlined text-sm">chevron_left</span>
-                            </button>
-                            <button
-                                class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors">
-                                <span class="material-symbols-outlined text-sm">chevron_right</span>
-                            </button>
-                        </div>
-                    </div>
+             <div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
+                    <p id="pagination-info" class="text-xs text-neutral-400">載入中...</p>
+                    
+                 <div class="flex gap-2">
+                    <button id="prev-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    </button>
+                    <button id="next-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
                 </div>
+             </div>
+        </div>
             </section>
         </div>
     </main>
+
+    <script src="/backend/operation.js"></script>
 </body>
 
 </html>
