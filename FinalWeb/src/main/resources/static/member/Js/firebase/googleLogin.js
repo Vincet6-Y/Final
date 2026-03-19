@@ -1,4 +1,4 @@
-import { auth, provider, signInWithPopup } from "./googleAuth.js";
+import { auth, provider, signInWithPopup } from "./firebase.js";
 
 $(function () {
     $("#googleLoginBtn").on("click", async function () {
