@@ -12,3 +12,5 @@ let routeLegs = {};
 let draggedItemInfo = null;
 
 let routeMarkers = [];
+
+window.currentSearchMarkers = [];
