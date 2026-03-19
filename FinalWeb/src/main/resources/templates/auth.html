@@ -42,55 +42,7 @@
     <script th:src="@{/member/js/cardSlide.js}"></script>
     <script th:src="@{/member/js/passwdEyeIcon.js}"></script>
     <script th:src="@{/assets/toast.js}"></script>
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-    import {
-    getAuth,
-    GoogleAuthProvider,
-    signInWithPopup
-    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-
-    const firebaseConfig = {
-    apiKey: "AIzaSyA6gE3Tlb97Gb6qLuhccu0EXdQnj_nVNcY",
-    authDomain: "anime-travel-website.firebaseapp.com",
-    projectId: "anime-travel-website",
-    storageBucket: "anime-travel-website.firebasestorage.app",
-    messagingSenderId: "756988685588",
-    appId: "1:756988685588:web:7f13d7c3f1f507f7dba601"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    document.getElementById("googleLoginBtn")?.addEventListener("click", async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        const idToken = await result.user.getIdToken();
-
-        const response = await fetch("/auth/google/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify({ idToken })
-        });
-
-        const data = await response.json();
-        console.log("google login response =", data);
-
-        if (data.success) {
-        window.location.href = data.redirectUrl || "/home";
-        } else {
-        alert(data.message || "登入失敗");
-        }
-    } catch (e) {
-        console.error("google popup error =", e);
-        alert("Google 登入失敗");
-    }
-    });
-    </script>
+    <script type="module" th:src="@{/member/js/firebase/googleLogin.js}"></script>
 </body>
 
 </html>
