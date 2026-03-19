@@ -69,7 +69,7 @@ function createMarker(place) {
 function clearMarkers() { markers.forEach(m => m.setMap(null)); markers = []; }
 
 // ==========================================
-// 🌟 終極版：支援 大眾運輸 + 飛機 + 走路 自動判斷 (精準起終點防飄移版)
+// 🌟 終極版：支援 大眾運輸 + 飛機 + 走路 自動判斷 (精準起終點防飄移版) + 自動對焦
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
@@ -77,6 +77,9 @@ async function calculateAndDisplayRoute(dayToCalculate) {
     dayRouteRenderers.forEach(renderer => renderer.setMap(null));
     dayRouteRenderers = [];
     if (routeMarkers) { routeMarkers.forEach(m => m.setMap(null)); routeMarkers = []; }
+
+    // 🌟 1. 在最外層宣告 bounds，準備裝載所有座標
+    const bounds = new google.maps.LatLngBounds();
 
     if (places && places.length > 0) {
         places.forEach((place, index) => {
@@ -89,6 +92,9 @@ async function calculateAndDisplayRoute(dayToCalculate) {
             const markerLat = parseFloat(place.latitude || place.lat);
             const markerLng = parseFloat(place.longitude || place.lng);
 
+            // 🌟 2. 將景點標記座標加入 bounds
+            bounds.extend({ lat: markerLat, lng: markerLng });
+
             const stopMarker = new google.maps.Marker({
                 position: { lat: markerLat, lng: markerLng },
                 map: map,
@@ -97,14 +103,27 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                 title: place.name, zIndex: 999
             });
 
+            // 🌟 確保能抓取到任何命名格式的 GooglePlaceID
             stopMarker.addListener("click", () => {
-                if (typeof fetchAndShowDetails === 'function') fetchAndShowDetails(place.GooglePlaceID || place.googlePlaceId || place.place_id);
+                const targetPlaceId = place.GooglePlaceID || place.googlePlaceId || place.googlePlaceID || place.place_id;
+                if (targetPlaceId && typeof fetchAndShowDetails === 'function') {
+                    fetchAndShowDetails(targetPlaceId);
+                }
             });
             routeMarkers.push(stopMarker);
         });
     }
 
     if (!places || places.length < 2) {
+        // 🌟 防呆：如果當天只有一個景點，也要對焦
+        if (places && places.length === 1 && !bounds.isEmpty()) {
+            map.fitBounds(bounds);
+            // 避免只有一個點時地圖縮放得太近
+            const listener = google.maps.event.addListener(map, "idle", function () {
+                if (map.getZoom() > 16) map.setZoom(16);
+                google.maps.event.removeListener(listener);
+            });
+        }
         routeLegs[dayToCalculate] = [];
         if (typeof recalculateTimes === 'function') recalculateTimes(dayToCalculate);
         if (typeof renderItineraryPanel === 'function') renderItineraryPanel(dayToCalculate);
@@ -146,7 +165,6 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                         directionsService.route({
                             origin: originPrecise, destination: destPrecise, travelMode: google.maps.TravelMode.WALKING
                         }, (resW, statusW) => {
-                            // 🌟 變更點：門檻降回 1000m (1公里)
                             if (statusW === "OK" && resW.routes[0].legs[0].distance.value <= 1000) {
                                 resW._mode = 'WALKING'; resolve(resW);
                             } else {
@@ -209,6 +227,12 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                     strokeColor: res._color, strokeWeight: 4, map: map
                 });
                 dayRouteRenderers.push(polyline);
+                
+                // 🌟 3. 將虛線 (Fake Route) 的路徑點也加入 bounds！
+                if (res._path) {
+                    res._path.forEach(point => bounds.extend(point));
+                }
+
             } else {
                 let routeColor = res._mode === 'WALKING' ? "#008ccf" : (res._mode === 'DRIVING' ? "#ea4335" : "#ff8c00");
                 const renderer = new google.maps.DirectionsRenderer({
@@ -219,6 +243,9 @@ async function calculateAndDisplayRoute(dayToCalculate) {
 
                 const path = res.routes[0].overview_path;
                 if (path && path.length > 0) {
+                    // 🌟 4. 將真實路線 (Google Directions) 的路徑點加入 bounds！
+                    path.forEach(point => bounds.extend(point));
+
                     const markerStart = { lat: parseFloat(places[index].latitude || places[index].lat), lng: parseFloat(places[index].longitude || places[index].lng) };
                     const markerEnd = { lat: parseFloat(places[index + 1].latitude || places[index + 1].lat), lng: parseFloat(places[index + 1].longitude || places[index + 1].lng) };
 
@@ -236,6 +263,11 @@ async function calculateAndDisplayRoute(dayToCalculate) {
             }
         }
     });
+
+    // 🌟 5. 等所有路線跟標記都畫完後，執行最終對焦
+    if (!bounds.isEmpty()) {
+        map.fitBounds(bounds);
+    }
 
     if (typeof recalculateTimes === 'function') recalculateTimes(dayToCalculate);
     if (typeof renderItineraryPanel === 'function') renderItineraryPanel(dayToCalculate);
