@@ -47,8 +47,7 @@
     import {
     getAuth,
     GoogleAuthProvider,
-    signInWithRedirect,
-    getRedirectResult
+    signInWithPopup
     } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -60,46 +59,34 @@
     appId: "1:756988685588:web:7f13d7c3f1f507f7dba601"
     };
 
-    // 初始化
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // 👉 點擊 Google 登入
-    document.getElementById("googleLoginBtn")?.addEventListener("click", () => {
-    signInWithRedirect(auth, provider);
-    });
-
-    // 👉 回來後處理登入結果
-    window.addEventListener("load", async () => {
+    document.getElementById("googleLoginBtn")?.addEventListener("click", async () => {
     try {
-        const result = await getRedirectResult(auth);
-
-        if (!result) return;
-
-        const user = result.user;
-        const idToken = await user.getIdToken();
+        const result = await signInWithPopup(auth, provider);
+        const idToken = await result.user.getIdToken();
 
         const response = await fetch("/auth/google/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-            idToken: idToken
-        })
+        credentials: "include",
+        body: JSON.stringify({ idToken })
         });
 
         const data = await response.json();
+        console.log("google login response =", data);
 
         if (data.success) {
         window.location.href = data.redirectUrl || "/home";
         } else {
         alert(data.message || "登入失敗");
         }
-
     } catch (e) {
-        console.error(e);
+        console.error("google popup error =", e);
         alert("Google 登入失敗");
     }
     });

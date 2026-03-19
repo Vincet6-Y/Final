@@ -2,6 +2,7 @@ package com.example.FinalWeb.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -159,9 +161,12 @@ public class MemberAuthController {
             if (member != null) {
                 saveLoginSession(member, request);
 
+                String redirectUrl = (String) session.getAttribute("socialRedirect");
+                session.removeAttribute("socialRedirect");
+
                 return Map.of(
                         "success", true,
-                        "redirectUrl", "/home"
+                        "redirectUrl", (redirectUrl != null && !redirectUrl.isBlank()) ? redirectUrl : "/home"
                 );
             }
 
@@ -169,6 +174,12 @@ public class MemberAuthController {
             session.setAttribute("socialId", profile.providerId());
             session.setAttribute("socialName", profile.name());
             session.setAttribute("socialEmail", profile.email());
+
+            System.out.println("=== googleLogin set session ===");
+            System.out.println("session id = " + session.getId());
+            System.out.println("socialProvider = " + session.getAttribute("socialProvider"));
+            System.out.println("socialName = " + session.getAttribute("socialName"));
+            System.out.println("socialEmail = " + session.getAttribute("socialEmail"));
 
             return Map.of(
                     "success", true,
@@ -180,6 +191,107 @@ public class MemberAuthController {
             return Map.of(
                     "success", false,
                     "message", "Google 登入失敗"
+            );
+        }
+    }
+
+    @PostMapping("/member/oauth/unlink/google")
+    @ResponseBody
+    @Transactional
+    public Map<String, Object> unlinkGoogle(HttpSession session) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return Map.of(
+                    "success", false,
+                    "message", "請先登入"
+            );
+        }
+
+        Integer memberId = loginMember.getMemberId();
+
+        // 防呆：避免把唯一登入方式解除掉
+        if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
+            return Map.of(
+                    "success", false,
+                    "message", "請先設定密碼後再解除 Google 綁定"
+            );
+        }
+
+        boolean linked = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.GOOGLE);
+
+        if (!linked) {
+            return Map.of(
+                    "success", false,
+                    "message", "尚未綁定 Google"
+            );
+        }
+
+        memberOauthRepo.deleteByMember_MemberIdAndProvider(memberId, AuthProvider.GOOGLE);
+
+        return Map.of(
+                "success", true,
+                "message", "已解除 Google 綁定"
+        );
+    }
+
+    @PostMapping("/google/link")
+    @ResponseBody
+    public Map<String, Object> googleLink(@RequestBody GoogleLoginRequestDTO req,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttr) {
+
+        try {
+            MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+            if (loginMember == null) {
+                return Map.of(
+                        "success", false,
+                        "message", "請先登入會員"
+                );
+            }
+
+            SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
+
+            MemberEntity linkedMember = memberOauthRepo
+                    .findByProviderAndProviderId(AuthProvider.GOOGLE, profile.providerId())
+                    .map(MemberOauthEntity::getMember)
+                    .orElse(null);
+
+            if (linkedMember != null) {
+                return Map.of(
+                        "success", false,
+                        "message", "此 GOOGLE 帳號已綁定其他會員"
+                );
+            }
+
+            boolean alreadyBound = memberOauthRepo.existsByMember_MemberIdAndProvider(
+                    loginMember.getMemberId(), AuthProvider.GOOGLE
+            );
+
+            if (alreadyBound) {
+                return Map.of(
+                        "success", false,
+                        "message", "此會員已綁定 GOOGLE"
+                );
+            }
+
+            MemberOauthEntity oauth = new MemberOauthEntity();
+            oauth.setMember(loginMember);
+            oauth.setProvider(AuthProvider.GOOGLE);
+            oauth.setProviderId(profile.providerId());
+            memberOauthRepo.save(oauth);
+
+            return Map.of(
+                    "success", true,
+                    "message", "Google 綁定成功"
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of(
+                    "success", false,
+                    "message", "Google 綁定失敗"
             );
         }
     }
