@@ -2,6 +2,7 @@ $(document).ready(function () {
 
     // 【宣告全域變數】放在最頂端，讓底下的「上傳圖」、「發布」、「草稿」都能共用這個變數
     let coverImageUrl = "";
+    let currentArticleId = null; // 紀錄目前文章的 ID，避免重複新增
 
     // ==========================================
     // 1. 初始化 UI Editor
@@ -32,6 +33,9 @@ $(document).ready(function () {
 
         const formData = new FormData();
         formData.append("file", file);
+        // 上傳圖片需要告知後端分類資料，不然 controller 會報錯 (Missing required parameter 'articleClass')
+        const currentClass = $("#articleClass").val() || "未分類";
+        formData.append("articleClass", currentClass);
 
         $.ajax({
             url: "/admin/articles/upload",
@@ -42,7 +46,7 @@ $(document).ready(function () {
             success: function (res) {
                 coverImageUrl = res.url; // 將後端回傳的網址存入全域變數
                 $("#coverPreview").attr("src", res.url).removeClass("hidden"); // 顯示預覽圖
-                showToast("封面上傳成功");
+                showToast("success", "封面上傳成功");
             }
         });
     });
@@ -67,17 +71,25 @@ $(document).ready(function () {
         if (!title && !content) return; // 如果都沒填，就不自動存
 
         const data = {
-            title: title,
+            title: title || "未命名草稿",
             content: content,
+            articleClass: $("#articleClass").val(),
+            articleImageUrl: coverImageUrl,
             status: "draft"
         };
 
+        const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
+        const ajaxMethod = currentArticleId ? "PUT" : "POST";
+
         $.ajax({
-            url: "/admin/articles",
-            method: "POST",
+            url: ajaxUrl,
+            method: ajaxMethod,
             contentType: "application/json",
             data: JSON.stringify(data),
-            success: function () {
+            success: function (res) {
+                if (!currentArticleId && res && res.articleId) {
+                    currentArticleId = res.articleId;
+                }
                 updateSaveTime();
             }
         });
@@ -88,33 +100,48 @@ $(document).ready(function () {
     // ==========================================
     // 預覽
     $("#previewBtn").click(function () {
-        const html = editor.getHTML();
-        const previewWindow = window.open("", "_blank");
-        previewWindow.document.write(`
-            <html>
-                <head><title>文章預覽</title><style>body{max-width:800px;margin:auto;padding:40px;font-family:sans-serif;}img{max-width:100%}</style></head>
-                <body>${html}</body>
-            </html>
-        `);
+        // 1. 【新增這三行】先從畫面上把資料抓下來！
+        const title = $("#titleInput").val() || "未命名文章";
+        const articleClass = $("#articleClass").val() || "未分類";
+        const content = editor.getMarkdown() || "沒有內容...";
+
+        // 2. 將資料組裝成物件
+        const previewData = {
+            title: title,
+            articleClass: articleClass,
+            content: content
+        };
+
+        // 3. 存入瀏覽器的 sessionStorage
+        sessionStorage.setItem('articlePreview', JSON.stringify(previewData));
+
+        // 4. 開啟新分頁，導向 Controller 提供的預覽網址
+        window.open("/admin/articles/preview", "_blank");
     });
 
     // 儲存草稿
     $("#draftBtn").click(function () {
         const data = {
-            title: $("#titleInput").val(),
+            title: $("#titleInput").val() || "未命名草稿",
             content: editor.getMarkdown(),
             articleClass: $("#articleClass").val(),
-            articleImageUrl: coverImageUrl, // 這裡就能正確讀取到上方宣告的變數了
+            articleImageUrl: coverImageUrl,
             status: "draft"
         };
 
+        const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
+        const ajaxMethod = currentArticleId ? "PUT" : "POST";
+
         $.ajax({
-            url: "/admin/articles",
-            method: "POST",
+            url: ajaxUrl,
+            method: ajaxMethod,
             contentType: "application/json",
             data: JSON.stringify(data),
-            success: function () {
-                showToast("草稿已儲存");
+            success: function (res) {
+                if (!currentArticleId && res && res.articleId) {
+                    currentArticleId = res.articleId;
+                }
+                showToast("success", "草稿已儲存");
                 updateSaveTime();
             }
         });
@@ -127,9 +154,9 @@ $(document).ready(function () {
         const articleClass = $("#articleClass").val();
 
         // 基本的防呆檢查
-        if (!title.trim()) return showToast("請輸入文章標題");
-        if (!content.trim()) return showToast("請輸入文章內容");
-        if (!articleClass) return showToast("請選擇文章分類");
+        if (!title.trim()) return showToast("warning", "請輸入文章標題");
+        if (!content.trim()) return showToast("warning", "請輸入文章內容");
+        if (!articleClass) return showToast("warning", "請選擇文章分類");
 
         const data = {
             title: title,
@@ -139,17 +166,23 @@ $(document).ready(function () {
             status: "published" // 發布狀態
         };
 
+        const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
+        const ajaxMethod = currentArticleId ? "PUT" : "POST";
+
         $.ajax({
-            url: "/admin/articles",
-            method: "POST",
+            url: ajaxUrl,
+            method: ajaxMethod,
             contentType: "application/json",
             data: JSON.stringify(data),
-            success: function () {
-                showToast("文章發布成功");
-                setTimeout(() => { window.location.href = "/admin/articles"; }, 1200);
+            success: function (res) {
+                if (!currentArticleId && res && res.articleId) {
+                    currentArticleId = res.articleId;
+                }
+                showToast("success", "文章發布成功");
+                setTimeout(() => { window.location.href = "/backend/contentmanagement"; }, 1200);
             },
             error: function () {
-                showToast("文章發布失敗");
+                showToast("error", "文章發布失敗");
             }
         });
     });

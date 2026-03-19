@@ -49,6 +49,7 @@ public class WeatherController {
 
         // --- 2. 處理文章資料邏輯 ---
         List<ArticleDTO> travelSection = articleService.findAll().stream()
+            .filter(a -> !"draft".equals(a.getStatus())) // Filter drafts
             .map(ArticleDTO::new)
             .filter(a -> "特色活動".equals(a.getArticleClass()))
             .collect(Collectors.toList());

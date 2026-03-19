@@ -46,7 +46,7 @@ public class BackEndController {
         return "/backend/backendcontentmanagement";
     }
 
-    @RequestMapping("/contentmanagement/backendarticle")
+    @RequestMapping("/backendarticle")
     public String backendarticle() {
         return "/backend/backendarticle";
     }

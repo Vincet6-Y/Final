@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const contentEl = document.getElementById('markdown-content');
 
     // 判斷網址是不是包含 "preview" (代表現在是預覽模式)
-    const isPreviewMode = window.location.href.includes("preview");
+    // 使用 pathname 檢查，避免一般文章標題剛好有 preview 時也誤判
+    const isPreviewMode = window.location.pathname.includes("/admin/articles/preview");
 
     if (isPreviewMode) {
         // ==========================================

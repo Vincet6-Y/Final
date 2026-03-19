@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.example.FinalWeb.entity.ArticleEntity;
 import com.example.FinalWeb.service.ArticleService;
@@ -42,11 +43,10 @@ public class AdminArticleController {
     // ------------------------------------------------
     @PostMapping
     public ResponseEntity<ArticleEntity> create(@RequestBody ArticleEntity article) {
-
-        article.setStatus("published");
-
+        if (article.getStatus() == null || article.getStatus().isEmpty()) {
+            article.setStatus("draft");
+        }
         ArticleEntity saved = articleService.createArticle(article);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -91,8 +91,9 @@ public class AdminArticleController {
         return result;
     }
 
+    // 後台文章預覽
     @GetMapping("/preview")
-    public String previewPage() {
-        return "article";
+    public ModelAndView previewPage() {
+        return new ModelAndView("article");
     }
 }
