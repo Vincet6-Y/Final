@@ -102,20 +102,31 @@
                                                 <h4 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors"
                                                     th:text="${spot.locationName}">景點名稱</h4>
                                                 <!-- 停留時間 + 車程 -->
-                                                <div class="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                                                    <span class="flex items-center gap-1"
+                                                <div class="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
+                                                    <!-- 停留時間 -->
+                                                    <span class="flex items-center gap-1 bg-slate-100 dark:bg-black/30 px-2 py-1 rounded"
                                                         th:if="${spot.stayTime != null}">
-                                                        <span
-                                                            class="material-symbols-outlined text-[14px]">hourglass_empty</span>
+                                                        <span class="material-symbols-outlined text-[13px]">hourglass_empty</span>
                                                         停留 <span th:text="${spot.stayTime}">60</span> 分鐘
                                                     </span>
 
-                                                    <span class="flex items-center gap-1"
-                                                        th:if="${spot.transitTime != null}">
-                                                        <span
-                                                            class="material-symbols-outlined text-[14px]">directions_car</span>
-                                                        車程約 <span th:text="${spot.transitTime / 60}">12</span> 分鐘
-                                                    </span>
+                                                    <!-- 交通工具/時間/距離 -->
+                                                    <th:block th:if="${spot.transitTime != null && spot.transitTime > 0}" 
+                                                        th:with="transitMins=${(spot.transitTime + 59) / 60},
+                                                                 travelMode=${spot.transitMode == 'TRANSIT' ? '大眾運輸' : (spot.transitMode == 'FLIGHT' ? '飛機航程' : (spot.transitMode == 'WALKING' ? '步行大約' : '車程估算'))},
+                                                                 travelIcon=${spot.transitMode == 'TRANSIT' ? 'directions_subway' : (spot.transitMode == 'FLIGHT' ? 'flight' : (spot.transitMode == 'WALKING' ? 'directions_walk' : 'directions_car'))}">
+                                                        
+                                                        <span class="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded">
+                                                            <span class="material-symbols-outlined text-[13px]" th:text="${travelIcon}">directions_car</span>
+                                                            <span th:text="${travelMode}"></span>
+                                                            <span th:if="${transitMins < 60}" th:text="'約 ' + ${transitMins} + ' 分鐘'"></span>
+                                                            <span th:if="${transitMins >= 60}" th:text="'約 ' + (${transitMins / 60}) + ' 小時 ' + (${transitMins % 60 > 0 ? (transitMins % 60) + ' 分鐘' : ''})"></span>
+                                                            
+                                                            <span th:if="${spot.distance != null && spot.distance > 0}" 
+                                                                  class="ml-1 text-[10px] text-primary/70 font-bold tracking-wider" 
+                                                                  th:text="'(' + (${spot.distance >= 1000 ? (#numbers.formatDecimal(spot.distance / 1000.0, 1, 1) + ' km') : (spot.distance + ' m')}) + ')'"></span>
+                                                        </span>
+                                                    </th:block>
                                                 </div>
                                             </div>
                                             <div class="flex items-center gap-2">
