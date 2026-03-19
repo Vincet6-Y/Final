@@ -16,6 +16,7 @@ import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.FavoritesEntity;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
+import com.example.FinalWeb.enums.AuthProvider;
 import com.example.FinalWeb.repo.MemberOauthRepo;
 import com.example.FinalWeb.service.FavoritesService;
 import com.example.FinalWeb.service.MemberService;
@@ -72,8 +73,8 @@ public class MemberCenterController {
         // 4. 撈出這個會員的收藏清單 (交給 FavoritesService)
         List<FavoritesEntity> myFavorites = favoritesService.getMemberFavorites(memberId);
 
-        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "LINE");
-        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, "GOOGLE");
+        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.LINE);
+        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.GOOGLE);
         
         // 5. 把資料丟給前端 (讓前端的 HTML 可以跑迴圈)
         model.addAttribute("orders", myOrders);
