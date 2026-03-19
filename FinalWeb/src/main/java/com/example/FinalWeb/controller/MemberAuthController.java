@@ -195,7 +195,7 @@ public class MemberAuthController {
         }
     }
 
-    @PostMapping("/member/oauth/unlink/google")
+    @PostMapping("/google/unlink")
     @ResponseBody
     @Transactional
     public Map<String, Object> unlinkGoogle(HttpSession session) {

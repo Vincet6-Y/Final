@@ -21,7 +21,9 @@ import lombok.Data;
 @Entity
 @Table(name = "memberoauth", uniqueConstraints = {
         // 確保同一個第三方帳號不會被多個會員綁定
-        @UniqueConstraint(columnNames = {"provider", "providerId"})}
+        @UniqueConstraint(columnNames = {"provider", "providerId"}),
+        // 確保同一會員在同一第三方平台（如 Google / LINE）不會綁定多個帳號
+        @UniqueConstraint(columnNames = {"memberId", "provider"})}
     )
 @Data
 public class MemberOauthEntity {
