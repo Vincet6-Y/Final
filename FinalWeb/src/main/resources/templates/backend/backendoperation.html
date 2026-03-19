@@ -58,42 +58,12 @@
                         <span class="material-symbols-outlined">bar_chart</span> 營收統計趨勢 (2024)
                     </h3>
                     <div class="flex bg-neutral-800 rounded-lg p-1">
-                        <button class="px-4 py-1.5 text-xs font-bold bg-neutral-700 text-white rounded-md">月報</button>
-                        <button class="px-4 py-1.5 text-xs font-bold text-neutral-400 hover:text-white">季報</button>
+                        <button id="btn-monthly" class="px-4 py-1.5 text-xs font-bold bg-neutral-700 text-white rounded-md hover:bg-neutral-600 transition-colors">月報</button>
+                        <button id="btn-quarterly" class="px-4 py-1.5 text-xs font-bold text-neutral-400 hover:text-white transition-colors">季報</button>
                     </div>
                 </div>
-                <div class="h-64 flex items-end justify-between gap-4 px-4">
-                    <!-- Simple Bar Chart -->
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
-                            style="height: 40%"></div>
-                        <span class="text-xs text-neutral-400">1月</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
-                            style="height: 55%"></div>
-                        <span class="text-xs text-neutral-400">2月</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
-                            style="height: 75%"></div>
-                        <span class="text-xs text-neutral-400">3月</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
-                            style="height: 60%"></div>
-                        <span class="text-xs text-neutral-400">4月</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
-                            style="height: 90%"></div>
-                        <span class="text-xs text-neutral-400">5月</span>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-2">
-                        <div class="w-full bg-primary transition-all rounded-t-lg shadow-[0_0_15px_rgba(255,140,0,0.3)]"
-                            style="height: 100%"></div>
-                        <span class="text-xs text-slate-100 font-bold">6月</span>
-                    </div>
+                <div class="h-64 w-full">
+                    <canvas id="revenueChart"></canvas>
                 </div>
             </section>
             <!-- Account Maintenance Table -->
@@ -125,26 +95,27 @@
                             </tr>
                         </thead>
                         <tbody id="member-table-body" class="divide-y divide-neutral-700">
-                           
+
                         </tbody>
                     </table>
-             <div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
-                    <p id="pagination-info" class="text-xs text-neutral-400">載入中...</p>
-                    
-                 <div class="flex gap-2">
-                    <button id="prev-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
-                    <span class="material-symbols-outlined text-sm">chevron_left</span>
-                    </button>
-                    <button id="next-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
-                    <span class="material-symbols-outlined text-sm">chevron_right</span>
-                    </button>
+                    <div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
+                        <p id="pagination-info" class="text-xs text-neutral-400">載入中...</p>
+
+                        <div class="flex gap-2">
+                            <button id="prev-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                                <span class="material-symbols-outlined text-sm">chevron_left</span>
+                            </button>
+                            <button id="next-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                                <span class="material-symbols-outlined text-sm">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-             </div>
-        </div>
             </section>
         </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/backend/operation.js"></script>
 </body>
 

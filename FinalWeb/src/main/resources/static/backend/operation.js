@@ -125,3 +125,104 @@ function updatePaginationUI(data) {
     if (prevBtn) prevBtn.disabled = data.first;
     if (nextBtn) nextBtn.disabled = data.last;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 加上當前年份顯示
+    const yearSpan = document.getElementById('current-year');
+    if(yearSpan) yearSpan.innerText = new Date().getFullYear();
+
+    updateDashboardStats();
+    fetchMembers(currentPage);
+    
+    // ★ 新增這行：初始化圖表
+    initRevenueChart(); 
+    
+    // ... 原本的分頁按鈕事件綁定 ...
+});
+
+/**
+ * 抓取每月營收並繪製 Chart.js 圖表
+ */
+let currentChartMode = 'monthly'; // 預設月報
+let revenueChartInstance = null;
+
+function initRevenueChart(mode = 'monthly') {
+    currentChartMode = mode;
+    const url = mode === 'monthly' ? '/api/admin/revenue-chart' : '/api/admin/revenue-chart/quarterly';
+    const labels = mode === 'monthly' 
+        ? ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+        : ['第一季 (Q1)', '第二季 (Q2)', '第三季 (Q3)', '第四季 (Q4)'];
+
+    // ★ 視覺優化：動態切換按鈕的顏色樣式
+    const btnMonthly = document.getElementById('btn-monthly');
+    const btnQuarterly = document.getElementById('btn-quarterly');
+    
+    if (mode === 'monthly') {
+        btnMonthly.className = "px-4 py-1.5 text-xs font-bold bg-neutral-700 text-white rounded-md transition-colors";
+        btnQuarterly.className = "px-4 py-1.5 text-xs font-bold text-neutral-400 hover:text-white transition-colors cursor-pointer";
+    } else {
+        btnQuarterly.className = "px-4 py-1.5 text-xs font-bold bg-neutral-700 text-white rounded-md transition-colors";
+        btnMonthly.className = "px-4 py-1.5 text-xs font-bold text-neutral-400 hover:text-white transition-colors cursor-pointer";
+    }
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            const ctx = document.getElementById('revenueChart');
+            if (!ctx) return;
+
+            // 如果已經有圖表，先銷毀才能畫新的
+            if (revenueChartInstance) {
+                revenueChartInstance.destroy();
+            }
+
+            revenueChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: mode === 'monthly' ? '月營收 (NTD)' : '季營收 (NTD)',
+                        data: data,
+                        // ★ 視覺優化：月報用橘色，季報用紫色，讓畫面更豐富
+                        backgroundColor: mode === 'monthly' ? 'rgba(255, 140, 0, 0.8)' : 'rgba(168, 85, 247, 0.8)',
+                        hoverBackgroundColor: mode === 'monthly' ? 'rgba(255, 165, 0, 1)' : 'rgba(192, 132, 252, 1)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#9ca3af' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(err => console.error("圖表資料抓取失敗:", err));
+}
+
+// 綁定按鈕點擊事件
+document.getElementById('btn-monthly').addEventListener('click', () => {
+    if (currentChartMode !== 'monthly') initRevenueChart('monthly');
+});
+document.getElementById('btn-quarterly').addEventListener('click', () => {
+    if (currentChartMode !== 'quarterly') initRevenueChart('quarterly');
+});
