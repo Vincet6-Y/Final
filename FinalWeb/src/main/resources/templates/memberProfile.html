@@ -22,7 +22,7 @@
                 管理您的帳號資訊與個人隱私設定，讓大家更認識您
               </p>
             </div>
-            <form class="space-y-8">
+            <form th:action="@{/member/profile}" method="post" class="space-y-8">
               <!-- Profile Image Section -->
               <div class="bg-primary/5 p-6 rounded-xl border border-primary/10">
                 <div class="flex flex-col md:flex-row items-center gap-8">
@@ -63,12 +63,13 @@
               <!-- Basic Information -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <label class="flex flex-col gap-2">
-                  <span class="text-slate-300 text-sm font-medium px-1">暱稱</span>
+                  <span class="text-slate-300 text-sm font-medium px-1">會員名稱</span>
                   <input
                     class="w-full rounded-lg border border-slate-700 bg-background-dark/50 text-white focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 text-base"
-                    placeholder="請輸入暱稱"
+                    placeholder="請輸入會員名稱"
                     type="text"
-                    value="朝聖小行者" />
+                    name="name" 
+                    th:value="${member.name}" />
                 </label>
                 <label class="flex flex-col gap-2">
                   <span class="text-slate-300 text-sm font-medium px-1 flex items-center gap-1">
@@ -79,7 +80,7 @@
                     class="w-full rounded-lg border border-slate-700 bg-slate-800/50 text-slate-400 cursor-not-allowed p-3.5 text-base"
                     disabled=""
                     type="email"
-                    value="pilgrim@example.com"/>
+                    th:value="${member.email}"/>
                 </label>
                 <label class="flex flex-col gap-2">
                   <span class="text-slate-300 text-sm font-medium px-1">手機號碼</span>
@@ -87,53 +88,18 @@
                     class="w-full rounded-lg border border-slate-700 bg-background-dark/50 text-white focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 text-base"
                     placeholder="09XX-XXX-XXX"
                     type="tel"
-                    value="0912345678" />
+                    name="phone"
+                    th:value="${member.phone}" />
                 </label>
                 <label class="flex flex-col gap-2">
                   <span class="text-slate-300 text-sm font-medium px-1">出生日期</span>
                   <input
                     class="w-full rounded-lg border border-slate-700 bg-background-dark/50 text-white focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 text-base"
                     type="date"
-                    value="1995-05-20" />
+                    name="birthday" 
+                    th:value="${member.birthday}" />
                 </label>
-                <div class="flex flex-col gap-2">
-                  <span class="text-slate-300 text-sm font-medium px-1">性別</span>
-                  <div class="flex gap-4">
-                    <label class="flex-1 flex items-center justify-center gap-2 p-3.5 border border-slate-700 rounded-lg cursor-pointer bg-background-dark/50 hover:bg-primary/10 transition-colors">
-                      <input
-                        checked=""
-                        class="text-primary focus:ring-primary bg-transparent border-slate-500"
-                        name="gender"
-                        type="radio"/>
-                      <span class="text-white">男性</span>
-                    </label>
-                    <label class="flex-1 flex items-center justify-center gap-2 p-3.5 border border-slate-700 rounded-lg cursor-pointer bg-background-dark/50 hover:bg-primary/10 transition-colors">
-                      <input
-                        class="text-primary focus:ring-primary bg-transparent border-slate-500"
-                        name="gender"
-                        type="radio" />
-                      <span class="text-white">女性</span>
-                    </label>
-                    <label class="flex-1 flex items-center justify-center gap-2 p-3.5 border border-slate-700 rounded-lg cursor-pointer bg-background-dark/50 hover:bg-primary/10 transition-colors">
-                      <input
-                        class="text-primary focus:ring-primary bg-transparent border-slate-500"
-                        name="gender"
-                        type="radio" />
-                      <span class="text-white">其他</span>
-                    </label>
-                  </div>
-                </div>
               </div>
-              <!-- Bio Section -->
-              <label class="flex flex-col gap-2">
-                <span class="text-slate-300 text-sm font-medium px-1">個人簡介 / 座右銘</span>
-                <textarea
-                  class="w-full rounded-lg border border-slate-700 bg-background-dark/50 text-white focus:ring-2 focus:ring-primary focus:border-transparent p-3.5 text-base resize-none"
-                  placeholder="分享你的朝聖故事或是心情語錄..."
-                  rows="4">
-                    熱愛日本動漫，正在規劃下一次的聖地巡禮之旅。希望能遇到志同道合的朋友！
-                </textarea>
-              </label>
               <!-- Action Buttons -->
               <div
                 class="flex flex-col md:flex-row gap-4 pt-6 border-t border-slate-800">
@@ -142,11 +108,10 @@
                   type="submit">
                   儲存變更
                 </button>
-                <button
-                  class="flex-1 md:flex-none md:min-w-[120px] py-4 bg-slate-800 text-slate-300 font-bold rounded-xl hover:bg-slate-700 transition-all"
-                  type="button">
+                <a th:href="@{/member}" 
+                  class="flex-1 md:flex-none md:min-w-[120px] py-4 bg-slate-800 text-slate-300 font-bold rounded-xl hover:bg-slate-700 transition-all text-center">
                   取消
-                </button>
+                </a>
               </div>
             </form>
           </div>

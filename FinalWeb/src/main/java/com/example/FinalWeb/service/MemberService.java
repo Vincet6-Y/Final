@@ -4,7 +4,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.FinalWeb.dto.MemberProfileDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
 import com.example.FinalWeb.dto.PasswdChangeDto;
 import com.example.FinalWeb.entity.MemberEntity;
@@ -81,4 +83,20 @@ public class MemberService {
 
         return "密碼修改成功";
     }
+
+    public MemberEntity findById(Integer memberId) {
+        return memberRepo.findById(memberId).orElse(null);
+    }
+
+    @Transactional
+    public void updateMemberProfile(Integer memberId, MemberProfileDTO dto) {
+
+        MemberEntity member = memberRepo.findById(memberId)
+            .orElseThrow();
+
+        member.setName(dto.name());
+        member.setPhone(dto.phone());
+        member.setBirthday(dto.birthday());
+    }
+    
 }

@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.FinalWeb.dto.MemberProfileDTO;
 import com.example.FinalWeb.dto.PasswdChangeDto;
 import com.example.FinalWeb.dto.ToastInfoDTO;
 import com.example.FinalWeb.entity.FavoritesEntity;
@@ -49,10 +50,6 @@ public class MemberCenterController {
         return "redirect:/home";
     }
 
-    @GetMapping("/profile")
-    public String memberProfile() {
-        return "memberProfile";
-    }
 
     // 🌟 會員首頁邏輯
     @GetMapping
@@ -106,4 +103,54 @@ public class MemberCenterController {
             return ResponseEntity.badRequest().body(ToastInfoDTO.error(result));
         }
     }
+
+
+    @GetMapping("/profile")
+    public String getProfile(HttpSession session, Model model) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return "redirect:/auth";
+        }
+
+        // 重新抓 DB（避免 session 資料舊）
+        MemberEntity member = memberService.findById(loginMember.getMemberId());
+
+        model.addAttribute("member", member);
+
+        return "memberProfile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(MemberProfileDTO dto,
+                                HttpSession session,
+                                RedirectAttributes redirectAttr) {
+
+        MemberEntity loginMember =
+            (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return "redirect:/auth";
+        }
+
+        // 1. 更新 DB
+        memberService.updateMemberProfile(loginMember.getMemberId(), dto);
+
+        // 2. 同步 session（重點）
+        loginMember.setName(dto.name());
+        loginMember.setPhone(dto.phone());
+        loginMember.setBirthday(dto.birthday());
+
+        session.setAttribute("loginMember", loginMember);
+
+        // 3. toast
+        redirectAttr.addFlashAttribute(
+            "toast",
+            ToastInfoDTO.success("資料更新成功")
+        );
+
+        return "redirect:/member/profile";
+    }
+
 }
