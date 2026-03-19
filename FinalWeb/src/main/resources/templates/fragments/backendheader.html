@@ -1,0 +1,9 @@
+<header th:fragment="backendheader(Title, description)"
+    class="flex items-center justify-between px-8 py-4 border-b border-neutral-700 bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
+    <div class="flex flex-col">
+        <h2 th:text="${Title}" class="text-xl font-bold tracking-tight text-slate-100">作品與行程管理</h2>
+        <p th:if="${not #strings.isEmpty(description)}" th:text="${description}" class="text-neutral-400 text-sm">
+            即時監控、編輯與優化您的聖地巡禮內容資源。
+        </p>
+    </div>
+</header>
