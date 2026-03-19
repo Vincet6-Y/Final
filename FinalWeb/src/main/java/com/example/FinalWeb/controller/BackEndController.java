@@ -35,7 +35,7 @@ public class BackEndController {
         return "/backend/backendcontentmanagement";
     }
 
-    @RequestMapping("/contentmanagement/backendarticle")
+    @RequestMapping("/backendarticle")
     public String backendarticle() {
         return "/backend/backendarticle";
     }
@@ -46,7 +46,7 @@ public class BackEndController {
     }
 
     @PostMapping("/contentmanagement/work/add")
-    public String workupload(WorkDTO wDto){
+    public String workupload(WorkDTO wDto) {
         service.addwork(wDto);
 
         return "redirect:/backend/contentmanagement/work";
