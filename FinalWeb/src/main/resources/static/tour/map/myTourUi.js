@@ -676,16 +676,6 @@ function renderItineraryPanel(day) {
               </a>
             `;
 
-        let ticketHTML = destinationPlace.hasTicketOffer ? `
-                <div onclick="window.location.href='/payment'" class="mt-4 bg-[#ff8c00]/10 border border-[#ff8c00]/30 rounded-lg p-2.5 flex items-center justify-between hover:bg-[#ff8c00]/20 transition cursor-pointer group">
-                    <div class="flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-sm">local_activity</span>
-                        <span class="text-primary text-sm font-bold">Klook 專屬門票優惠</span>
-                    </div>
-                    <span class="text-primary text-xs font-bold group-hover:translate-x-1 transition-transform">前往加購 ></span>
-                </div>
-            ` : '';
-
         // 🌟 修改：目的地加入停留時間的 <input type="number">
         const destinationHTML = `
               <div draggable="true" ondragstart="handleDragStart(event, ${day}, ${i})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, ${i})" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm animate-fade-in-up cursor-move transition-all duration-200 hover:shadow-md">
@@ -718,7 +708,6 @@ function renderItineraryPanel(day) {
                     </button>
                   </div>
                 </div>
-                ${ticketHTML}
               </div>
             `;
 
