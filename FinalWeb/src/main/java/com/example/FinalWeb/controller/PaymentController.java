@@ -99,6 +99,15 @@ public class PaymentController {
 
             // 呼叫 Service 算錢
             model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
+            // 取出已購買的票券名稱清單，傳給前端用來隱藏已選的下拉選項
+            Set<String> purchasedNames = new java.util.HashSet<>();
+            if (order.getOrderDetails() != null) {
+                order.getOrderDetails().forEach(d -> {
+                    if (d.getTicketType() != null) purchasedNames.add(d.getTicketType());
+                });
+            }
+            model.addAttribute("purchasedNames", purchasedNames);
+
             List<TicketDto> availableTickets = new ArrayList<>();
             if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
                 List<MyMapEntity> planSpots = order.getMyPlan().getMyMaps();
@@ -106,26 +115,15 @@ public class PaymentController {
                 for (MyMapEntity myMap : planSpots) {
                     TicketDto ticket = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
                     if (ticket != null) {
-                        // 檢查訂單中是否已經包含該票券
-                        boolean alreadyInOrder = false;
-                        if (order.getOrderDetails() != null) {
-                            alreadyInOrder = order.getOrderDetails().stream()
-                                    .anyMatch(detail -> ticket.getTicketName().equals(detail.getTicketType()));
-                        }
-                        if (!alreadyInOrder) {
-                            availableTickets.add(ticket);
-                        }
+                        availableTickets.add(ticket);
                     }
                 }
                 // 呼叫 TicketService 取得智慧推薦的交通票，並傳給前端 Model
                 List<TicketDto> recommendedTransports = ticketService.recommendTransportTickets(planSpots);
-                if (order.getOrderDetails() != null && recommendedTransports != null) {
-                    recommendedTransports.removeIf(transport -> order.getOrderDetails().stream()
-                            .anyMatch(detail -> transport.getTicketName().equals(detail.getTicketType())));
-                }
                 model.addAttribute("recommendedTransports", recommendedTransports);
             }
             model.addAttribute("availableTickets", availableTickets);
+
         }
     }
 
