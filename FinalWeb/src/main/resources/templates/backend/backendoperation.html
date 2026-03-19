@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-TW">
+
+<head th:replace="~{ fragments/backendhead :: backHead}"></head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+    <!-- Sidebar Navigation -->
+    <aside th:replace="~{ fragments/backendaside :: backaside('opera')}"> </aside>
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-x-hidden">
+        <!-- Header -->
+        <header th:replace="~{ fragments/backendheader :: backendheader('帳號與營收管理', '監控平台運行狀況與用戶活動數據')}"></header>
+        <div class="p-8 flex flex-col gap-8">
+            <!-- Key Metrics -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-neutral-400 text-sm font-medium">總營收 (NTD)</span>
+                        <span class="material-symbols-outlined text-primary">payments</span>
+                    </div>
+                    <div class="flex items-end gap-3">
+                        <span id="display-total-revenue" class="text-3xl font-bold text-slate-100">$1,284,500</span>
+                        <span class="text-green-500 text-sm font-bold flex items-center mb-1">
+                            <span class="material-symbols-outlined text-sm">trending_up</span> 12.5%
+                        </span>
+                    </div>
+                </div>
+                <div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-neutral-400 text-sm font-medium">活躍用戶</span>
+                        <span class="material-symbols-outlined text-primary">group</span>
+                    </div>
+                    <div class="flex items-end gap-3">
+                        <span id="display-active-users" class="text-3xl font-bold text-slate-100">42,891</span>
+                        <span class="text-green-500 text-sm font-bold flex items-center mb-1">
+                            <span class="material-symbols-outlined text-sm">trending_up</span> 8.2%
+                        </span>
+                    </div>
+                </div>
+                <div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-neutral-400 text-sm font-medium">本月增長率</span>
+                        <span class="material-symbols-outlined text-primary">show_chart</span>
+                    </div>
+                    <div class="flex items-end gap-3">
+                        <span class="text-3xl font-bold text-slate-100">+24.8%</span>
+                        <span class="text-primary text-sm font-bold flex items-center mb-1">
+                            目標達成率 92%
+                        </span>
+                    </div>
+                </div>
+            </section>
+            <!-- Revenue Chart Section -->
+            <section class="bg-neutral-800/30 rounded-xl border border-neutral-700 p-6">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined">bar_chart</span> 營收統計趨勢 (2024)
+                    </h3>
+                    <div class="flex bg-neutral-800 rounded-lg p-1">
+                        <button class="px-4 py-1.5 text-xs font-bold bg-neutral-700 text-white rounded-md">月報</button>
+                        <button class="px-4 py-1.5 text-xs font-bold text-neutral-400 hover:text-white">季報</button>
+                    </div>
+                </div>
+                <div class="h-64 flex items-end justify-between gap-4 px-4">
+                    <!-- Simple Bar Chart -->
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
+                            style="height: 40%"></div>
+                        <span class="text-xs text-neutral-400">1月</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
+                            style="height: 55%"></div>
+                        <span class="text-xs text-neutral-400">2月</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
+                            style="height: 75%"></div>
+                        <span class="text-xs text-neutral-400">3月</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
+                            style="height: 60%"></div>
+                        <span class="text-xs text-neutral-400">4月</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="w-full bg-primary/20 hover:bg-primary transition-all rounded-t-lg"
+                            style="height: 90%"></div>
+                        <span class="text-xs text-neutral-400">5月</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center gap-2">
+                        <div class="w-full bg-primary transition-all rounded-t-lg shadow-[0_0_15px_rgba(255,140,0,0.3)]"
+                            style="height: 100%"></div>
+                        <span class="text-xs text-slate-100 font-bold">6月</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Account Maintenance Table -->
+            <section class="flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined">person_search</span> 帳號維護管理
+                    </h3>
+                    <button class="text-sm font-bold text-primary flex items-center gap-1 hover:underline">
+                        <span class="material-symbols-outlined text-base">add_circle</span> 新增管理員
+                    </button>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800/30">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-neutral-800">
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶 ID
+                                </th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶名稱
+                                </th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">電子郵件
+                                </th>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-center">
+                                    狀態</th>
+                                <th
+                                    class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-right">
+                                    操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="member-table-body" class="divide-y divide-neutral-700">
+                           
+                        </tbody>
+                    </table>
+             <div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
+                    <p id="pagination-info" class="text-xs text-neutral-400">載入中...</p>
+                    
+                 <div class="flex gap-2">
+                    <button id="prev-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                    </button>
+                    <button id="next-page" class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+             </div>
+        </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="/backend/operation.js"></script>
+</body>
+
+</html>

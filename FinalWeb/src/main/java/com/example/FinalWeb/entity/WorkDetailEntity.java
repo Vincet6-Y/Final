@@ -2,6 +2,7 @@
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +22,11 @@ public class WorkDetailEntity {
     private LocalDate onDate;
     private String workClass;
     private String workImg;
-    private String description, director, writer, location;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    private String director, writer, location;
     private Integer movielength, episodes;
-    
+
 }
