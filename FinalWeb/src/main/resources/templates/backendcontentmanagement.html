@@ -7,34 +7,34 @@
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Navigation -->
-        <aside th:replace="~{ fragments/backendaside :: backaside('content')}"> </aside> 
+        <aside th:replace="~{ fragments/backendaside :: backaside('content')}"> </aside>
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-hidden bg-background-light dark:bg-background-dark">
             <!-- Header -->
             <header
-            class="flex items-center justify-between px-8 py-4 border-b border-neutral-700 bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
-            <div class="flex flex-col">
-                <h2 class="text-xl font-bold tracking-tight text-slate-100">作品與行程管理</h2>
-                <p class="text-neutral-400 text-sm">即時監控、編輯與優化您的聖地巡禮內容資源。</p>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="relative">
-                    <span
-                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xl">search</span>
-                    <input
-                        class="bg-neutral-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary text-slate-100"
-                        placeholder="搜尋作品、行程或關鍵字..." type="text" />
+                class="flex items-center justify-between px-8 py-4 border-b border-neutral-700 bg-background-dark/50 backdrop-blur-md sticky top-0 z-10">
+                <div class="flex flex-col">
+                    <h2 class="text-xl font-bold tracking-tight text-slate-100">作品與行程管理</h2>
+                    <p class="text-neutral-400 text-sm">即時監控、編輯與優化您的聖地巡禮內容資源。</p>
                 </div>
-                <button class="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white relative">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
-                </button>
-                <div class="size-10 rounded-full border-2 border-neutral-600 bg-cover bg-center"
-                    data-alt="Administrator profile avatar"
-                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUUTy1gTT3eSRCjNIclzcbEbKRvqQsrTLoRLVgxz83nD8zImAihi0VitbwTNQ-MAF2noeaQ4sXUQDiNlLyakkyYL_pge8xx6TpYpD-cKi5JCm_LfyI-aWFBKKwGF86HfTfEjxOoHvKGd_z3J4P5hR6Wdaw-Wz0mPw7alP_8996rrO0BFfc1Gob17sZvHf-l-cpFieDmMaBsHmuOlC6dhpPGjb7xpk7URi-Lbfd3fpzT_husXUTzMyYKhDa2tL14H_LLU0icqDIHdQ')">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xl">search</span>
+                        <input
+                            class="bg-neutral-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary text-slate-100"
+                            placeholder="搜尋作品、行程或關鍵字..." type="text" />
+                    </div>
+                    <button class="p-2 rounded-lg bg-neutral-800 text-neutral-400 hover:text-white relative">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+                    </button>
+                    <div class="size-10 rounded-full border-2 border-neutral-600 bg-cover bg-center"
+                        data-alt="Administrator profile avatar"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCUUTy1gTT3eSRCjNIclzcbEbKRvqQsrTLoRLVgxz83nD8zImAihi0VitbwTNQ-MAF2noeaQ4sXUQDiNlLyakkyYL_pge8xx6TpYpD-cKi5JCm_LfyI-aWFBKKwGF86HfTfEjxOoHvKGd_z3J4P5hR6Wdaw-Wz0mPw7alP_8996rrO0BFfc1Gob17sZvHf-l-cpFieDmMaBsHmuOlC6dhpPGjb7xpk7URi-Lbfd3fpzT_husXUTzMyYKhDa2tL14H_LLU0icqDIHdQ')">
+                    </div>
                 </div>
-            </div>
-        </header>
+            </header>
             <!-- Dashboard Content -->
             <div class="flex-1 overflow-y-auto p-8 space-y-8">
                 <!-- Stats Overview -->
@@ -192,43 +192,7 @@
                                         <th class="px-6 py-4 text-right">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-primary/5">
-                                    <tr class="hover:bg-primary/5 transition-colors">
-                                        <td class="px-6 py-4">
-                                            <p class="text-sm font-medium">2024 夏季新番聖地預測指南</p>
-                                            <p class="text-[10px] text-slate-500 mt-0.5">發布於 2 小時前</p>
-                                        </td>
-                                        <td class="px-6 py-4"><span
-                                                class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">多項關聯</span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm">編輯室 A</td>
-                                        <td class="px-6 py-4"><span
-                                                class="flex items-center gap-1.5 text-xs text-green-500"><span
-                                                    class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> 已發布</span>
-                                        </td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button
-                                                class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">more_horiz</button>
-                                        </td>
-                                    </tr>
-                                    <tr class="hover:bg-primary/5 transition-colors">
-                                        <td class="px-6 py-4">
-                                            <p class="text-sm font-medium">【專訪】跟著導演細田守走進富山縣的現實世界</p>
-                                            <p class="text-[10px] text-slate-500 mt-0.5">最後編輯: 昨天</p>
-                                        </td>
-                                        <td class="px-6 py-4"><span
-                                                class="text-xs text-primary bg-primary/10 px-2 py-1 rounded">狼的孩子雨和雪</span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm">特約記者 B</td>
-                                        <td class="px-6 py-4"><span
-                                                class="flex items-center gap-1.5 text-xs text-amber-500"><span
-                                                    class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> 草稿</span></td>
-                                        <td class="px-6 py-4 text-right">
-                                            <button
-                                                class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">more_horiz</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="articleTableBody" class="divide-y divide-primary/5"> </tbody>
                             </table>
                         </div>
                     </div>
@@ -237,5 +201,7 @@
         </main>
     </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script th:src="@{/backend/backendcontentmanagement.js}"></script>
 
 </html>

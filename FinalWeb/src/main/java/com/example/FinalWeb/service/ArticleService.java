@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
@@ -137,12 +136,14 @@ public class ArticleService {
 
     /**
      * 依分類分組
-     * 優化：同樣交給資料庫排序，再進行 Map 分類
+     * 優化：同樣交給資料庫排序，再進行 Map 分類，並加上 null 防護
      */
     public Map<String, List<ArticleDTO>> getAllArticlesGrouped() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
                 .stream()
                 .map(ArticleDTO::new) // 將 Entity 轉成乾淨的 DTO
-                .collect(Collectors.groupingBy(ArticleDTO::getArticleClass));
+                .collect(Collectors.groupingBy(dto ->
+                // 【防呆機制】如果分類是 null，就給它一個預設值 "未分類"，避免 groupingBy 當機
+                dto.getArticleClass() != null ? dto.getArticleClass() : "未分類"));
     }
 }

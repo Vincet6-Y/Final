@@ -69,6 +69,9 @@ public class AdminArticleController {
         return ResponseEntity.noContent().build(); // HTTP 204
     }
 
+    // ------------------------------------------------
+    // 5. 上傳圖片 (Upload)
+    // ------------------------------------------------
     @PostMapping("/upload")
     public Map<String, String> uploadImage(
             @RequestParam("file") MultipartFile file,
@@ -86,5 +89,10 @@ public class AdminArticleController {
         Map<String, String> result = new HashMap<>();
         result.put("url", url);
         return result;
+    }
+
+    @GetMapping("/preview")
+    public String previewPage() {
+        return "article";
     }
 }
