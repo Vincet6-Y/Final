@@ -12,6 +12,8 @@ public interface MyMapRepo extends JpaRepository<MyMapEntity, Integer> {
 
     List<MyMapEntity> findByMyPlan_MyPlanIdOrderByDayNumberAscVisitOrderAsc(Integer myPlanId);
 
-// 🌟 AI 排序運作
+    // 🌟 AI 排序運作
     List<MyMapEntity> findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(Integer myPlanId, Integer dayNumber);
+
+    List<MyMapEntity> findByMyPlan_MyPlanId(Integer planId);
 }

@@ -28,7 +28,7 @@ public interface OrdersRepo extends JpaRepository<OrdersEntity, Integer> {
 
     // 5. 🌟 後台統計：待處理訂單數
     long countByPayStatus(String payStatus);
-    
+
     // 6. 🌟 後台統計：今日發放憑證 (Query 中的欄位已改為 payStatus)
     @Query("SELECT o FROM OrdersEntity o LEFT JOIN FETCH o.myPlan WHERE o.member.memberId = :memberId ORDER BY o.orderTime DESC")
     List<OrdersEntity> findMemberOrdersWithPlan(@Param("memberId") Integer memberId);
@@ -36,12 +36,16 @@ public interface OrdersRepo extends JpaRepository<OrdersEntity, Integer> {
     // 在 OrdersRepo.java 中修改或新增
     // 在 OrdersRepo.java 新增
     @Query("SELECT o FROM OrdersEntity o WHERE " +
-       "CAST(o.orderId AS string) LIKE %:keyword% OR " +
-       "o.tradeNo LIKE %:keyword% ORDER BY o.orderTime DESC")
+            "CAST(o.orderId AS string) LIKE %:keyword% OR " +
+            "o.tradeNo LIKE %:keyword% ORDER BY o.orderTime DESC")
     List<OrdersEntity> searchOrders(@Param("keyword") String keyword);
 
     // 🌟 新增：計算所有已付款訂單的總營收
-// 在 OrdersRepo.java 中
+    // 在 OrdersRepo.java 中
     @Query("SELECT SUM(od.ticketPrice) FROM OrdersEntity o JOIN o.orderDetails od WHERE o.payStatus = '已付款'")
     Long getSumOfPaidOrders();
+
+    // 🌟 找出特定行程中，已經付款成功的景點 ID (spotId) 列表
+    @Query("SELECT m.spotId FROM OrdersEntity o JOIN o.orderDetails od JOIN od.myMap m WHERE o.myPlan.myPlanId = :planId AND o.payStatus = '已付款'")
+    List<Integer> findPurchasedSpotIdsByPlanId(@Param("planId") Integer planId);
 }
