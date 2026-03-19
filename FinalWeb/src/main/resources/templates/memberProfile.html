@@ -19,9 +19,6 @@
               <h1 class="text-primary tracking-tight text-3xl font-bold">
                 編輯個人資料
               </h1>
-              <p class="text-slate-400 text-sm">
-                管理您的帳號資訊與個人隱私設定，讓大家更認識您
-              </p>
             </div>
             <form id="profileForm" th:action="@{/member/profile}" method="post" class="space-y-8">
               <input type="hidden" id="memberImgUrl" name="memberImgUrl" th:value="${member.memberImgUrl}">
@@ -36,11 +33,12 @@
                       class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 border-4 border-primary/30"
                       th:style="|background-image: url('${member.memberImgUrl != null ? member.memberImgUrl : defaultMemberImgUrl}')|">
                     </div>
-                    <button
-                      class="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
-                      type="button">
-                      <span class="material-symbols-outlined text-sm">photo_camera</span>
-                    </button>
+                    <div
+                      class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                      <span class="material-symbols-outlined text-white text-sm">
+                        photo_camera
+                      </span>
+                    </div>
                   </div>
                   <div class="flex flex-col items-center md:items-start gap-3">
                     <div class="text-center md:text-left">
