@@ -29,45 +29,26 @@
                         </div>
                         <div class="p-6">
                             <div class="space-y-4">
-                                <div
+                                <div  th:each=" newWrok : ${newWroks}" 
                                     class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
                                     <div class="w-16 h-10 rounded overflow-hidden">
                                         <img class="w-full h-full object-cover" data-alt="Anime scenery illustration"
-                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9BWxbaibJZTYG7xX5w9Oc7L4K1vRJtLCut1Qqhq46iI216MK4xZ2_cDimSgD76HUShjKi_GBcpBwUVVh2LSz7jMc8ZAVil6Z4kgSZJMnkHTnvFOhKR0Qagl5Y83mFowBnKSltQZy4-jE0CZ_ojaTEalywSYPqL_bsAoWEKNR0RqemNpyqjAjL96JPy3xXHZpKzNfPjNs376JlA9-cIEFX1qoe5FYm2IOasLkR46OIFK2wNC1UsztoRRTOwpPFeesmb9rwAvZyTcE" />
+                                        th:src="${newWrok.workImg}" />
                                     </div>
                                     <div class="flex-1">
-                                        <h4 class="text-sm font-bold">鈴芽之旅 (Suzume)</h4>
-                                        <p class="text-xs text-slate-500">更新於: 2023-11-20</p>
+                                        <h4 class="text-sm font-bold" th:text="${newWrok.workName}">作品名稱</h4>
                                     </div>
-                                    <span
-                                        class="px-2 py-0.5 rounded bg-green-500/20 text-green-500 text-[10px] font-bold">已上架</span>
-                                    <button class="p-1 hover:bg-primary/20 rounded transition-colors">
-                                        <span class="material-symbols-outlined text-sm">edit</span>
-                                    </button>
-                                </div>
-                                <div
-                                    class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
-                                    <div class="w-16 h-10 rounded overflow-hidden">
-                                        <img class="w-full h-full object-cover" data-alt="Urban Tokyo nighttime street"
-                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5W6dgRG3vPtX_pgjM6UBnLaQT5q6Wv5wK0DWTbgNsNDE9GjH_awXmj2kRPgMA2Rph6AXAtvc3voepnVnpzgEaXv8s3qtLVs2-p9tU1lVhEy4i7GGqv11Q7o6u_OyLwmBQYOHCXYT9lGu3MonkuVpUE-9Z1iShkm7GnMkTfXoFf4vfWWuuZSWCGEHjN1CDra1zO2FWDG4DxFZeKfSo0j587jver-DNS4YAfMFG7oBEVPUzQ0Yueg70hO3hVC-NqcNmKso1lCvgsfk" />
-                                    </div>
-                                    <div class="flex-1">
-                                        <h4 class="text-sm font-bold">孤獨搖滾！</h4>
-                                        <p class="text-xs text-slate-500">更新於: 2023-11-18</p>
-                                    </div>
-                                    <span
-                                        class="px-2 py-0.5 rounded bg-green-500/20 text-green-500 text-[10px] font-bold">已上架</span>
                                     <button class="p-1 hover:bg-primary/20 rounded transition-colors">
                                         <span class="material-symbols-outlined text-sm">edit</span>
                                     </button>
                                 </div>
                             </div>
-                            <button
-                                class="w-full mt-6 py-2 border border-dashed border-primary/30 rounded-lg text-primary text-sm font-bold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined text-base">add_circle</span>
-                                新增作品資料
-                            </button>
                         </div>
+                        <a th:href="@{/backend/contentmanagement/work}"
+                            class="w-full mt-6 py-2 border border-dashed border-primary/30 rounded-lg text-primary text-sm font-bold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">add_circle</span>
+                            新增作品資料
+                        </a>
                     </div>
                     <!-- 套裝行程管理 (Itinerary Packages) -->
                     <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
