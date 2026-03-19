@@ -1,6 +1,3 @@
-// 1. 全域變數定義 (確保在最上方)
-window.currentSearchMarkers = [];
-
 async function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 34.6937, lng: 135.5023 },
@@ -29,123 +26,130 @@ async function initMap() {
 }
 
 // ==========================================
-// 🌟 終極版：專為獨旅設計的大眾運輸計算 (含動態景點數字標記)
+// 🌟 終極版：支援 大眾運輸 + 飛機 + 走路 自動判斷 (精準起終點防飄移版)
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
 
-    // 1. 先清除地圖上舊的路線與標記
     dayRouteRenderers.forEach(renderer => renderer.setMap(null));
     dayRouteRenderers = [];
+    if (routeMarkers) { routeMarkers.forEach(m => m.setMap(null)); routeMarkers = []; }
 
-    // 🌟 清除前一次畫出的景點數字標記
-    if (routeMarkers) {
-        routeMarkers.forEach(m => m.setMap(null));
-        routeMarkers = [];
-    }
-
-    // 🌟 新增：如果當天有景點，就畫上帶有順序數字的自訂標記
     if (places && places.length > 0) {
         places.forEach((place, index) => {
             const isFirst = index === 0;
             const isLast = index === places.length - 1;
-
             let bgColor = "#ea4335";
             if (isFirst) bgColor = "#ff8c00";
             else if (isLast) bgColor = "#008ccf";
 
+            const markerLat = parseFloat(place.latitude || place.lat);
+            const markerLng = parseFloat(place.longitude || place.lng);
+
             const stopMarker = new google.maps.Marker({
-                position: { lat: place.lat, lng: place.lng },
+                position: { lat: markerLat, lng: markerLng },
                 map: map,
-                label: {
-                    text: String(index + 1),
-                    color: "white",
-                    fontWeight: "bold",
-                    fontSize: "14px"
-                },
-                icon: {
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillColor: bgColor,
-                    fillOpacity: 1,
-                    strokeColor: "white",
-                    strokeWeight: 2,
-                    scale: 14
-                },
-                title: place.name,
-                zIndex: 999
+                label: { text: String(index + 1), color: "white", fontWeight: "bold", fontSize: "14px" },
+                icon: { path: google.maps.SymbolPath.CIRCLE, fillColor: bgColor, fillOpacity: 1, strokeColor: "white", strokeWeight: 2, scale: 14 },
+                title: place.name, zIndex: 999
             });
 
             stopMarker.addListener("click", () => {
-                if (typeof fetchAndShowDetails === 'function') {
-                    fetchAndShowDetails(place.place_id);
-                }
+                if (typeof fetchAndShowDetails === 'function') fetchAndShowDetails(place.GooglePlaceID || place.googlePlaceId || place.place_id);
             });
-
             routeMarkers.push(stopMarker);
         });
     }
 
     if (!places || places.length < 2) {
         routeLegs[dayToCalculate] = [];
-        recalculateTimes(dayToCalculate);
-        renderItineraryPanel(dayToCalculate);
+        if (typeof recalculateTimes === 'function') recalculateTimes(dayToCalculate);
+        if (typeof renderItineraryPanel === 'function') renderItineraryPanel(dayToCalculate);
         return;
     }
 
     const results = [];
+    let currentDepartureTime = new Date();
+    currentDepartureTime.setDate(currentDepartureTime.getDate() + 7);
+    currentDepartureTime.setHours(8, 0, 0, 0);
+
     for (let i = 0; i < places.length - 1; i++) {
-        const origin = { lat: places[i].lat, lng: places[i].lng };
-        const destination = { lat: places[i + 1].lat, lng: places[i + 1].lng };
+        const markerLatOrigin = parseFloat(places[i].latitude || places[i].lat);
+        const markerLngOrigin = parseFloat(places[i].longitude || places[i].lng);
+        const markerLatDest = parseFloat(places[i + 1].latitude || places[i + 1].lat);
+        const markerLngDest = parseFloat(places[i + 1].longitude || places[i + 1].lng);
 
-        // 🌟 修正 1：保證大眾運輸時間絕對是「未來時間」 (一律用 7 天後來推算車程)
-        const transitTime = new Date();
-        transitTime.setDate(transitTime.getDate() + 7);
-        transitTime.setHours(8, 0, 0, 0);
+        const getPlaceId = (place) => place.GooglePlaceID || place.googlePlaceId || place.googlePlaceID || place.place_id;
+        
+        const originId = getPlaceId(places[i]);
+        const originTransit = originId ? { placeId: originId } : { lat: markerLatOrigin, lng: markerLngOrigin };
+        const destId = getPlaceId(places[i + 1]);
+        const destinationTransit = destId ? { placeId: destId } : { lat: markerLatDest, lng: markerLngDest };
 
-        // 🌟 修正 2：改為「排隊等待(await)」，取代 Promise.all 轟炸
+        const originPrecise = { lat: markerLatOrigin, lng: markerLngOrigin };
+        const destPrecise = { lat: markerLatDest, lng: markerLngDest };
+
+        const transitTime = new Date(currentDepartureTime.getTime());
+
         const res = await new Promise((resolve) => {
-            setTimeout(() => { // 🌟 加上 300 毫秒延遲，讓 Google 覺得我們是真人
+            setTimeout(() => {
                 directionsService.route({
-                    origin: origin,
-                    destination: destination,
-                    travelMode: google.maps.TravelMode.TRANSIT,
-                    transitOptions: { departureTime: transitTime }
-                }, (res, status) => {
-                    if (status === "OK") {
-                        res._mode = 'TRANSIT'; resolve(res);
+                    origin: originTransit, destination: destinationTransit, travelMode: google.maps.TravelMode.TRANSIT, transitOptions: { departureTime: transitTime }
+                }, (resT, statusT) => {
+                    if (statusT === "OK") {
+                        resT._mode = 'TRANSIT';
+                        resolve(resT);
                     } else {
                         directionsService.route({
-                            origin: origin, destination: destination, travelMode: google.maps.TravelMode.DRIVING
-                        }, (resD, statusD) => {
-                            if (statusD === "OK") {
-                                resD._mode = 'DRIVING'; resolve(resD);
+                            origin: originPrecise, destination: destPrecise, travelMode: google.maps.TravelMode.WALKING
+                        }, (resW, statusW) => {
+                            // 🌟 變更點：門檻降回 1000m (1公里)
+                            if (statusW === "OK" && resW.routes[0].legs[0].distance.value <= 1000) {
+                                resW._mode = 'WALKING'; resolve(resW);
                             } else {
-                                directionsService.route({
-                                    origin: origin, destination: destination, travelMode: google.maps.TravelMode.WALKING
-                                }, (resW, statusW) => {
-                                    if (statusW === "OK") {
-                                        resW._mode = 'WALKING'; resolve(resW);
-                                    } else {
-                                        // 🌟 終極保底：連走路都算不出來（地點太近或海跨島），強制給予 0 秒與 0 公尺
-                                        resolve({
-                                            routes: [{ legs: [{ duration: { value: 0, text: '0 分鐘' }, distance: { value: 0, text: '0 公尺' } }] }],
-                                            _mode: 'WALKING'
-                                        });
-                                    }
+                                const distKm = getDistanceFromLatLonInKm(markerLatOrigin, markerLngOrigin, markerLatDest, markerLngDest);
+                                let estimatedMinutes = 0, finalMode = 'TRANSIT', lineColor = '#ff8c00';
+
+                                if (distKm > 500) {
+                                    finalMode = 'FLIGHT'; lineColor = '#9c27b0';
+                                    estimatedMinutes = Math.ceil((distKm / 800) * 60) + 120;
+                                } else if (distKm > 80) {
+                                    estimatedMinutes = Math.ceil((distKm / 150) * 60) + 30;
+                                } else {
+                                    estimatedMinutes = Math.ceil(distKm * 2.4) + 12;
+                                }
+
+                                let timeText = "";
+                                if (estimatedMinutes < 60) {
+                                    timeText = `${estimatedMinutes} 分鐘`;
+                                } else {
+                                    const h = Math.floor(estimatedMinutes / 60);
+                                    const m = estimatedMinutes % 60;
+                                    timeText = m > 0 ? `${h} 小時 ${m} 分鐘` : `${h} 小時`;
+                                }
+
+                                resolve({
+                                    _mode: finalMode, _isFake: true, _color: lineColor,
+                                    _path: [{ lat: markerLatOrigin, lng: markerLngOrigin }, { lat: markerLatDest, lng: markerLngDest }],
+                                    routes: [{ legs: [{ distance: { value: Math.round(distKm * 1000), text: distKm.toFixed(1) + ' 公里' }, duration: { value: estimatedMinutes * 60, text: timeText } }] }]
                                 });
                             }
                         });
                     }
                 });
-            }, 300); // 延遲 0.3 秒
+            }, 300);
         });
 
+        if (res && res.routes[0] && res.routes[0].legs[0]) {
+            const travelDurationSeconds = res.routes[0].legs[0].duration.value;
+            const stayDurationMinutes = places[i + 1].stayTime || 60;
+            currentDepartureTime = new Date(transitTime.getTime() + (travelDurationSeconds * 1000) + (stayDurationMinutes * 60 * 1000));
+        }
         results.push(res);
     }
 
-    // 🌟 把成功的交通方式 (_mode) 傳遞進去 routeLegs
     routeLegs[dayToCalculate] = results.map(res => {
-        if (res) {
+        if (res && res.routes[0] && res.routes[0].legs[0]) {
             const leg = res.routes[0].legs[0];
             leg._mode = res._mode;
             return leg;
@@ -155,28 +159,44 @@ async function calculateAndDisplayRoute(dayToCalculate) {
 
     results.forEach((res, index) => {
         if (res) {
-            const renderer = new google.maps.DirectionsRenderer({
-                map: map,
-                suppressMarkers: true,
-                polylineOptions: {
-                    strokeColor: index % 2 === 0 ? "#008ccf" : "#ff8c00",
-                    strokeWeight: 5,
-                    strokeOpacity: 0.8
+            if (res._isFake) {
+                const polyline = new google.maps.Polyline({
+                    path: res._path, strokeOpacity: 0,
+                    icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, offset: '0', repeat: '15px' }],
+                    strokeColor: res._color, strokeWeight: 4, map: map
+                });
+                dayRouteRenderers.push(polyline);
+            } else {
+                let routeColor = res._mode === 'WALKING' ? "#008ccf" : (res._mode === 'DRIVING' ? "#ea4335" : "#ff8c00");
+                const renderer = new google.maps.DirectionsRenderer({
+                    map: map, suppressMarkers: true, polylineOptions: { strokeColor: routeColor, strokeWeight: 5, strokeOpacity: 0.8 }
+                });
+                renderer.setDirections(res);
+                dayRouteRenderers.push(renderer);
+
+                const path = res.routes[0].overview_path;
+                if (path && path.length > 0) {
+                    const markerStart = { lat: parseFloat(places[index].latitude || places[index].lat), lng: parseFloat(places[index].longitude || places[index].lng) };
+                    const markerEnd = { lat: parseFloat(places[index + 1].latitude || places[index + 1].lat), lng: parseFloat(places[index + 1].longitude || places[index + 1].lng) };
+
+                    const dashedLineOptions = {
+                        strokeColor: routeColor, 
+                        strokeOpacity: 0,
+                        strokeWeight: 4,
+                        icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, offset: '0', repeat: '10px' }],
+                        map: map, zIndex: 1
+                    };
+
+                    dayRouteRenderers.push(new google.maps.Polyline({ path: [markerStart, path[0]], ...dashedLineOptions }));
+                    dayRouteRenderers.push(new google.maps.Polyline({ path: [path[path.length - 1], markerEnd], ...dashedLineOptions }));
                 }
-            });
-            renderer.setDirections(res);
-            dayRouteRenderers.push(renderer);
+            }
         }
     });
 
-    // 6. 重新推算抵達時間並更新畫面
-    recalculateTimes(dayToCalculate);
-    renderItineraryPanel(dayToCalculate);
-
-    // 🌟 7. 新增：等地圖路線計算、時間推算都完成後，才將所有包含車程的數據一次同步進資料庫
-    if (typeof syncOrderToDatabase === 'function') {
-        syncOrderToDatabase(dayToCalculate);
-    }
+    if (typeof recalculateTimes === 'function') recalculateTimes(dayToCalculate);
+    if (typeof renderItineraryPanel === 'function') renderItineraryPanel(dayToCalculate);
+    if (typeof syncOrderToDatabase === 'function') syncOrderToDatabase(dayToCalculate);
 }
 
 // ==========================================
@@ -191,50 +211,31 @@ function setupAutocomplete(inputId) {
     autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (!place.place_id) return;
-
         if (place.geometry && place.geometry.viewport) map.fitBounds(place.geometry.viewport);
         else if (place.geometry) { map.setCenter(place.geometry.location); map.setZoom(17); }
-
-        clearMarkers(); // 搜尋新地點時清空舊標記
+        clearMarkers();
         fetchAndShowDetails(place.place_id);
-
-        if (window.innerWidth <= 768 && isMapView === false) {
-            toggleMobileView();
-        }
+        if (window.innerWidth <= 768 && isMapView === false) toggleMobileView();
         input.value = '';
     });
 }
 
 function createMarker(place) {
     const marker = new google.maps.Marker({
-        map,
-        position: place.location,
-        title: place.displayName,
-        animation: google.maps.Animation.DROP
+        map, position: place.location, title: place.displayName, animation: google.maps.Animation.DROP
     });
-
-    // 🌟 將標記存入「總叉叉」的紀錄盒
     window.currentSearchMarkers.push(marker);
     markers.push(marker);
-
-    marker.addListener("click", () => {
-        fetchAndShowDetails(place.id);
-    });
+    marker.addListener("click", () => fetchAndShowDetails(place.id));
 }
 
 async function searchNearby(type) {
     const { Place } = await google.maps.importLibrary("places");
-
     const request = {
         fields: ['id', 'displayName', 'location'],
-        locationRestriction: {
-            center: map.getCenter(),
-            radius: 1000,
-        },
-        includedTypes: [type],
-        maxResultCount: 20,
+        locationRestriction: { center: map.getCenter(), radius: 1000 },
+        includedTypes: [type], maxResultCount: 20,
     };
-
     try {
         const { places } = await Place.searchNearby(request);
         if (places && places.length > 0) {
@@ -249,29 +250,27 @@ async function searchNearby(type) {
 }
 
 // ==========================================
-// 🌟 清除邏輯 (修正後：兩個 function 獨立不嵌套)
+// 🌟 清除邏輯
 // ==========================================
-
-// 1. 內部清理函式：搜尋新分類時自動執行
 function clearMarkers() {
-    if (markers) {
-        markers.forEach(m => m.setMap(null));
-    }
+    if (markers) markers.forEach(m => m.setMap(null));
     markers = [];
-    // 同步清空全域紀錄盒，避免新舊標記混亂
     window.currentSearchMarkers = [];
 }
 
-// 2. 外部清除函式：點擊「總叉叉」按鈕時執行
 function clearAllSearchMarkers() {
-    console.log("執行總清除，目前數量：", window.currentSearchMarkers.length);
     if (window.currentSearchMarkers && window.currentSearchMarkers.length > 0) {
-        window.currentSearchMarkers.forEach(marker => {
-            marker.setMap(null);
-        });
-        window.currentSearchMarkers = []; // 清空盒子
-        console.log("地圖搜尋標記已清除");
-    } else {
-        console.log("目前地圖上沒有搜尋地標");
+        window.currentSearchMarkers.forEach(marker => marker.setMap(null));
+        window.currentSearchMarkers = [];
     }
+}
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
 }
