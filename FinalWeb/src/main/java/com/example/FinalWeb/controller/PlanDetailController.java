@@ -19,7 +19,7 @@ import com.example.FinalWeb.service.MyMapService;
 import com.example.FinalWeb.service.TicketService;
 
 @Controller
-public class MyMapPlanController {
+public class PlanDetailController {
         @Autowired
         private MyMapRepo myMapRepo;
 

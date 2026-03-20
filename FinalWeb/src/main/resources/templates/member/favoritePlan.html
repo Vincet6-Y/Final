@@ -39,7 +39,7 @@
                             待完善計畫
                         </span>
                         <!-- TODO: 導向完善行程頁面 -->
-                        <a th:href="@{/packageTourDetail(planId=${fav.journeyPlan != null ? fav.journeyPlan.planId : ''})}"
+                        <a th:href="@{/officialMap(planId=${fav.journeyPlan != null ? fav.journeyPlan.planId : ''})}"
                             class="px-4 py-2 bg-primary/10 dark:bg-primary/20 text-primary hover:bg-primary hover:text-white dark:hover:text-background-dark rounded-lg text-xs font-bold transition-all text-center cursor-pointer">
                             完善行程
                         </a>

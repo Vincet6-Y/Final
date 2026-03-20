@@ -23,7 +23,7 @@ import com.example.FinalWeb.repo.MyMapRepo;
 import com.example.FinalWeb.repo.MyPlanRepo;
 
 @Controller
-public class PackageTourMapController {
+public class MyMapController {
 
     @Autowired
     private MyPlanRepo myPlanRepo;
@@ -35,8 +35,8 @@ public class PackageTourMapController {
     @Value("${google.maps.api.key}")
     private String googleMapsApiKey;
 
-    @RequestMapping("/packageTourMap")
-    public String packageTourMap(@RequestParam(required = false) Integer myPlanId, Model model) {
+    @RequestMapping("/myMap")
+    public String myMap(@RequestParam(required = false) Integer myPlanId, Model model) {
 
         // 1. 根據傳入的 ID 抓取會員行程資料
         if (myPlanId != null) {
@@ -56,8 +56,8 @@ public class PackageTourMapController {
         // 2. 將金鑰存入 model，供 HTML 中的 Google Maps Script 使用
         model.addAttribute("apiKey", googleMapsApiKey);
 
-        // 3. 回傳 packageTourMap.html 頁面
-        return "packageTourMap";
+        // 3. 回傳 myMap.html 頁面
+        return "myMap";
     }
 
     // ==========================================

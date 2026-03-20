@@ -63,7 +63,6 @@
 
 <body
     class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
-
     <div id="rich-place-modal"
         class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
         <div
@@ -165,7 +164,7 @@
                 </div>
             </div>
             <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/packageTour}">行程規劃</a>
+                th:href="@{/officialTour}">行程規劃</a>
         </nav>
         <div class="flex items-center gap-4">
             <button aria-label="Toggle theme"
@@ -218,7 +217,7 @@
                 <div class="flex items-center gap-2">
                     <h1 class="text-lg font-bold text-primary tracking-tight">官方行程總覽</h1>
                 </div>
-                <button th:onclick="'copyToMyPlan(' + ${plan?.planId} + ')'"
+                <button th:onclick="|copyToMyPlan(event, ${plan?.planId ?: 'null'})|"
                     class="flex items-center gap-1 md:gap-2 bg-[#008ccf] hover:bg-[#007ab8] text-white px-4 py-1.5 rounded-full font-bold transition shadow-md text-sm shrink-0">
                     <span class="material-symbols-outlined text-base">edit_document</span>完善規劃
                 </button>
@@ -238,7 +237,7 @@
 
                     <div class="absolute bottom-4 left-4">
                         <span class="px-3 py-1 bg-primary text-white text-xs font-bold rounded shadow-lg backdrop-blur-sm"
-                            th:text="${plan.planCity}">
+                            th:text="${plan?.planCity ?: '未知城市'}">
                             日本, 關西
                         </span>
                     </div>
@@ -251,7 +250,7 @@
                         </h1>
                     </div>
                 </div>
-                <div id="total-days" th:attr="data-total-days=${plan.daysCount}" style="display:none;"></div>
+                <div id="total-days" th:attr="data-total-days=${plan?.daysCount ?: 5}" style="display:none;"></div>
 
                 <div class="flex items-center gap-2 p-3 bg-white dark:bg-background-dark border-b border-slate-100 dark:border-white/5 shrink-0 overflow-x-auto no-scrollbar" id="day-buttons-container">
                 </div>
@@ -274,11 +273,11 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script th:src="@{/assets/toast.js}"></script>
 
-    <script th:src="@{/tour/Detail/tourGlobals.js}" defer></script>
-    <script th:src="@{/tour/Detail/tourApi.js}" defer></script>
-    <script th:src="@{/tour/Detail/tourMap.js}" defer></script>
-    <script th:src="@{/tour/Detail/tourUi.js}" defer></script>
-    
+    <script th:src="@{/tour/officialMap/officialGlobals.js}" defer></script>
+    <script th:src="@{/tour/officialMap/officialApi.js}" defer></script>
+    <script th:src="@{/tour/officialMap/officialMap.js}" defer></script>
+    <script th:src="@{/tour/officialMap/officialUi.js}" defer></script>
+
     <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
 </body>
 
