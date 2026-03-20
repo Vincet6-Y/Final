@@ -4,7 +4,7 @@
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
   <div class="flex min-h-screen">
-    <!-- Sidebar -->
+    <!-- Sidebar --> 
     <aside th:replace="~{ fragments/backendaside :: backaside('order')}"> </aside>
     <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-x-hidden">
@@ -33,21 +33,18 @@
     <p class="text-neutral-muted text-sm font-medium mb-1">待處理訂單</p>
     <div class="flex items-end justify-between">
       <h3 id="stat-pending" class="text-3xl font-bold text-slate-100">0</h3>
-      <span class="text-green-500 text-sm font-bold flex items-center">+5% <span class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
     </div>
   </div>
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">退款請求</p>
     <div class="flex items-end justify-between">
       <h3 id="stat-refund" class="text-3xl font-bold text-slate-100">0</h3>
-      <span class="text-red-500 text-sm font-bold flex items-center">-2% <span class="material-symbols-outlined text-sm ml-1">trending_down</span></span>
     </div>
   </div>
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">今日發放憑證</p>
     <div class="flex items-end justify-between">
       <h3 id="stat-today" class="text-3xl font-bold text-slate-100">0</h3>
-      <span class="text-green-500 text-sm font-bold flex items-center">+15% <span class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
     </div>
   </div>
 </div>
@@ -70,81 +67,8 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-dark">
-                <!-- Row 1 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-001</td>
-                  <td class="px-6 py-4 text-sm">鎌倉・江之島電鐵巡禮券</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-20 14:30</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥2,500</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">已付款
-                      (Paid)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
-                </tr>
-                <!-- Row 2 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-002</td>
-                  <td class="px-6 py-4 text-sm">京都・出町柳商店街紀念章</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-20 12:15</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥1,200</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">待處理
-                      (Pending)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
-                </tr>
-                <!-- Row 3 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-003</td>
-                  <td class="px-6 py-4 text-sm">岐阜・飛驒高山君之名巡禮套票</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-19 18:45</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥4,800</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20">已退款
-                      (Refunded)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
-                </tr>
-                <!-- Row 4 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-004</td>
-                  <td class="px-6 py-4 text-sm">秩父・未聞花名十週年限定憑證</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-19 15:20</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥3,500</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">已付款
-                      (Paid)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
-                </tr>
-                <!-- Row 5 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-005</td>
-                  <td class="px-6 py-4 text-sm">沼津・LoveLive! Sunshine!! 巴士一日券</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-19 10:10</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥1,800</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">已付款
-                      (Paid)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
-                </tr>
+                
+                
               </tbody>
             </table>
           </div>
@@ -172,6 +96,36 @@
     </main>
   </div>
 <script th:src="@{/backend/order.js}"></script>
+<div id="orderModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    
+    <div class="relative flex items-center justify-center min-h-screen p-4">
+        <div class="bg-[#FDFDF6] w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden transform transition-all border border-neutral-300">
+            
+            <div class="px-8 py-5 border-b border-neutral-200 flex justify-between items-center bg-[#F9F9F3]">
+                <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-3xl">local_activity</span>
+                    訂單詳細資訊
+                </h3>
+                <button onclick="closeModal()" class="text-neutral-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            
+            <div id="modalContent" class="p-10 max-h-[75vh] overflow-y-auto space-y-8 text-slate-700">
+                <div class="flex justify-center py-10">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </div>
+
+            <div class="px-8 py-5 border-t border-neutral-200 text-right bg-[#F9F9F3]">
+                <button onclick="closeModal()" class="px-8 py-3 rounded-xl bg-white border border-neutral-300 text-slate-600 hover:bg-neutral-100 transition-colors text-sm font-bold shadow-sm">
+                    關閉視窗
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 
 
