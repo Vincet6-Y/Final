@@ -237,6 +237,8 @@
     </div>
 
     <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+    <!-- ✅ 傳遞登入會員名稱給 JS -->
+    <span id="loginMemberName" class="hidden" th:text="${loginMemberName}"></span>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script th:src="@{/assets/toast.js}"></script>
     <script th:src="@{/backend/backendcontentmanagement.js}"></script>

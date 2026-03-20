@@ -20,12 +20,14 @@
                 <div class="relative w-full h-[50vh] md:h-[65vh] overflow-hidden">
 
                     <!-- ✅ 有封面圖時 -->
-                    <div th:if="${article?.articleImageUrl != null and !#strings.isEmpty(article?.articleImageUrl)}"
+                    <div id="hero-bg"
+                        th:if="${article?.articleImageUrl != null and !#strings.isEmpty(article?.articleImageUrl)}"
                         class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
                         th:style="'background-image: url(' + ${article.articleImageUrl} + ');'">
                     </div>
                     <!-- ✅ 無封面圖時 fallback -->
-                    <div th:unless="${article?.articleImageUrl != null and !#strings.isEmpty(article?.articleImageUrl)}"
+                    <div id="hero-bg-fallback"
+                        th:unless="${article?.articleImageUrl != null and !#strings.isEmpty(article?.articleImageUrl)}"
                         class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
                         style="background-image: url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop');">
                     </div>
@@ -68,11 +70,13 @@
                     </div>
 
                     <div class="mt-20 pt-10 border-t border-white/10">
-                        <a th:href="${article?.articleClass == '特色活動'} ? @{/info} : @{/news}"
+                        <a id="back-link"
+                            th:href="${article?.articleClass == '特色活動'} ? @{/info} : @{/news}"
                             class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
                             <span
                                 class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
-                            <span th:text="${article?.articleClass == '特色活動'} ? '返回旅遊情報' : '返回最新消息'">返回</span>
+                            <span id="back-text"
+                                th:text="${article?.articleClass == '特色活動'} ? '返回旅遊情報' : '返回最新消息'">返回</span>
                         </a>
                     </div>
                 </div>

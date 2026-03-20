@@ -3,18 +3,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const classEl = document.getElementById('article-class');
     const contentEl = document.getElementById('markdown-content');
 
-    // 判斷網址是不是包含 "preview" (代表現在是預覽模式)
+    // 判斷是否為後台預覽模式
     const isPreviewMode = window.location.pathname.includes("/admin/articles/preview");
 
     if (isPreviewMode) {
         const previewDataStr = sessionStorage.getItem('articlePreview');
         if (previewDataStr) {
             const data = JSON.parse(previewDataStr);
+
+            // ✅ 設定標題、分類、內容
             if (titleEl) titleEl.innerText = data.title || "未命名文章";
             if (classEl) classEl.innerText = data.articleClass || "未分類";
             if (contentEl) contentEl.innerHTML = renderContent(data.content || "");
+
+            // ✅ 設定 Hero Banner 背景圖
+            if (data.articleImageUrl) {
+                const fallbackBg = document.getElementById('hero-bg-fallback');
+                if (fallbackBg) {
+                    fallbackBg.style.backgroundImage = `url(${data.articleImageUrl})`;
+                }
+            }
+
+            // ✅ 預覽模式：返回按鈕改為返回編輯頁面
+            const backLink = document.getElementById('back-link');
+            if (backLink) {
+                if (data.editId) {
+                    backLink.href = `/backend/backendarticle?editId=${data.editId}`;
+                } else {
+                    backLink.href = `/backend/backendarticle`;
+                }
+                const backText = backLink.querySelector('#back-text');
+                if (backText) backText.innerText = '返回編輯畫面';
+            }
         }
     } else {
+        // ✅ 正常前端瀏覽模式 — 從 data-markdown 取出內容渲染
         const rawContent = contentEl?.getAttribute('data-markdown') || "";
         if (contentEl) contentEl.innerHTML = renderContent(rawContent);
     }
@@ -22,56 +45,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * renderContent()
- * 有 Markdown 標記 → marked 解析
- * 純文字 → autoLayout 自動排版
+ * 判斷內容類型：
+ * - 有 HTML 標籤 → 直接當 HTML 顯示
+ * - 有 Markdown 語法 → 用 marked 解析（相容舊資料）
+ * - 純文字 → 換行轉 <p> 段落
  */
 function renderContent(raw) {
     if (!raw) return "";
-    const hasMarkdown = /^#{1,4}\s|^\*\*|^>\s|^[-*]\s|^\d+\.\s/m.test(raw);
-    return hasMarkdown ? marked.parse(raw) : autoLayout(raw);
-}
 
-/**
- * autoLayout()
- * 把純文字段落智慧升格為有層次的 HTML
- */
-function autoLayout(text) {
-    const blocks = text.split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
-    let html = "";
-    blocks.forEach(block => {
-        const lines = block.split(/\n/).map(l => l.trim()).filter(Boolean);
-        lines.forEach(line => { html += classifyLine(line); });
-    });
-    return html;
-}
-
-/**
- * classifyLine()：對每行決定 HTML 標籤
- */
-function classifyLine(line) {
-    // 1. 小貼士 / 注意 / 提醒 → blockquote
-    if (/^[「【]?(小貼士|注意|提醒|溫馨提醒|重要|警告)/.test(line)) {
-        return `<blockquote><strong>${line}</strong></blockquote>\n`;
+    // 1. 如果已經是 HTML（WYSIWYG 產出），直接返回
+    if (/<[a-z][\s\S]*>/i.test(raw)) {
+        return raw;
     }
 
-    // 2. 引號包住的完整句子 → blockquote 引用
-    if (/^[「『""]/.test(line) && /[」』""]$/.test(line)) {
-        return `<blockquote>${line}</blockquote>\n`;
+    // 2. 如果有 Markdown 語法（舊資料相容），用 marked 解析
+    if (typeof marked !== 'undefined' && /^#{1,4}\s|^\*\*|^>\s|^[-*]\s|^\d+\.\s/m.test(raw)) {
+        return marked.parse(raw);
     }
 
-    // 3. 短句標題（≤18字、無標點）或冒號結尾 → h3
-    const isShortTitle = line.length <= 18 && !/[。，,.?？!！]/.test(line);
-    const isColonEnd = /[:：]$/.test(line);
-    if (isShortTitle || isColonEnd) {
-        return `<h3>${line.replace(/[:：]$/, "")}</h3>\n`;
-    }
-
-    // 4. 「關鍵詞：內容」格式 → 粗體標籤
-    const colonMatch = line.match(/^(.{1,15}[：:])(.+)$/);
-    if (colonMatch) {
-        return `<p><strong>${colonMatch[1]}</strong>${colonMatch[2]}</p>\n`;
-    }
-
-    // 5. 一般段落
-    return `<p>${line}</p>\n`;
+    // 3. 純文字 → 每段落包 <p>
+    return raw
+        .split(/\n{2,}/)
+        .map(p => p.trim())
+        .filter(Boolean)
+        .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+        .join('\n');
 }

@@ -18,9 +18,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.FinalWeb.dto.PlanCreateRequestDTO;
 import com.example.FinalWeb.dto.WorkDTO;
 import com.example.FinalWeb.entity.JourneyPlanEntity;
+import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.JourneyPlanService;
 import com.example.FinalWeb.service.WorkService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/backend")
@@ -51,7 +54,7 @@ public class BackEndController {
     }
 
     @RequestMapping("/contentmanagement")
-    public String backendcontentmanagement(Model model) {
+    public String backendcontentmanagement(Model model, HttpSession session) {
         List<WorkDetailEntity> getNew5 = service.showNew5();
         model.addAttribute("newWroks", getNew5);
 
@@ -62,6 +65,15 @@ public class BackEndController {
         // 2. 利用 Stream 只取前 5 筆給主畫面預覽 (避免主畫面太長)
         List<JourneyPlanEntity> top5Plans = allPlans.stream().limit(5).collect(Collectors.toList());
         model.addAttribute("journeyPlans", top5Plans);
+
+        // 3. 取得登入會員名稱，顯示在文章管理表格的「作者」欄
+        Object memberObj = session.getAttribute("loginMember");
+        if (memberObj instanceof MemberEntity) {
+            model.addAttribute("loginMemberName",
+                    ((MemberEntity) memberObj).getName());
+        } else {
+            model.addAttribute("loginMemberName", "管理員");
+        }
 
         return "/backend/backendcontentmanagement";
     }

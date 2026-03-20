@@ -5,6 +5,7 @@ $(document).ready(function () {
     // ==========================================
     let currentPage = 0;
     const pageSize = 10;
+    const loginMemberName = $("#loginMemberName").text() || "管理員";
 
     // 1. 載入文章列表（支援分頁）
     function loadArticles(page = 0) {
@@ -52,7 +53,7 @@ $(document).ready(function () {
                         </div>
                     </td>
                     <td class="px-6 py-4 text-sm text-slate-400">${article.articleClass || '未分類'}</td>
-                    <td class="px-6 py-4 text-sm text-slate-400">管理員</td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${loginMemberName}</td>
                     <td class="px-6 py-4">${statusBadge}</td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
