@@ -6,8 +6,10 @@ import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.entity.MyPlanEntity;
 import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.service.ECPayService;
+import com.example.FinalWeb.service.MyMapService;
 import com.example.FinalWeb.service.OrderService;
 import com.example.FinalWeb.service.TicketService;
+import com.example.FinalWeb.dto.MyMapDTO;
 import com.example.FinalWeb.dto.TicketDto;
 import com.example.FinalWeb.repo.OrdersRepo;
 import com.example.FinalWeb.repo.MyPlanRepo;
@@ -24,10 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @ControllerAdvice(assignableTypes = GlobalController.class)
@@ -44,6 +44,9 @@ public class PaymentController {
     private OrdersRepo ordersRepo;
     @Autowired
     private MyPlanRepo myPlanRepo;
+
+    @Autowired
+    private MyMapService myMapService;
 
     @Value("${google.maps.api-key:NONE}")
     private String googleMapsApiKey;
@@ -96,6 +99,15 @@ public class PaymentController {
 
             // 呼叫 Service 算錢
             model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
+            // 取出已購買的票券名稱清單，傳給前端用來隱藏已選的下拉選項
+            Set<String> purchasedNames = new java.util.HashSet<>();
+            if (order.getOrderDetails() != null) {
+                order.getOrderDetails().forEach(d -> {
+                    if (d.getTicketType() != null) purchasedNames.add(d.getTicketType());
+                });
+            }
+            model.addAttribute("purchasedNames", purchasedNames);
+
             List<TicketDto> availableTickets = new ArrayList<>();
             if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
                 List<MyMapEntity> planSpots = order.getMyPlan().getMyMaps();
@@ -111,6 +123,7 @@ public class PaymentController {
                 model.addAttribute("recommendedTransports", recommendedTransports);
             }
             model.addAttribute("availableTickets", availableTickets);
+
         }
     }
 
@@ -220,38 +233,52 @@ public class PaymentController {
                 // 呼叫 Service 算總金額
                 model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
+                // 順序對調】我們先把票券分類拿出來，因為等一下 DTO 轉換需要用到它來判斷有沒有買票！
+                Map<String, Object> classifiedTickets = orderService.classifyTickets(order);
+                @SuppressWarnings("unchecked")
+                Set<Integer> ticketSpotIdsSet = (Set<Integer>) classifiedTickets.get("ticketSpotIds");
+                @SuppressWarnings("unchecked")
+                List<OrdersDetailEntity> transportTickets = (List<OrdersDetailEntity>) classifiedTickets
+                        .get("transportTickets");
+
+                List<Integer> ticketSpotIds = new ArrayList<>(ticketSpotIdsSet);
+
                 if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
                     List<MyMapEntity> allMaps = order.getMyPlan().getMyMaps();
                     model.addAttribute("myPlan", order.getMyPlan());
-                    model.addAttribute("myMaps", allMaps);
 
-                    // 呼叫 Service 取得分組好的行程表
-                    model.addAttribute("groupedByDay", orderService.groupMapsByDay(allMaps));
+                    // 🌟 【重構核心】1. 把 Entity 轉換為前端專用的 DTO
+                    List<MyMapDTO> dtoList = allMaps.stream()
+                            .map(entity -> myMapService.convertToDto(entity, ticketSpotIds))
+                            .collect(Collectors.toList());
+
+                    // 🌟 【重構核心】2. 改用 DTO 來做分組！這樣前端拿到的就是處理好的資料了
+                    Map<Integer, List<MyMapDTO>> groupedByDay = dtoList.stream()
+                            .sorted(Comparator
+                                    .comparingInt((MyMapDTO m) -> m.getDayNumber() != null ? m.getDayNumber() : 1)
+                                    .thenComparingInt(m -> m.getVisitOrder() != null ? m.getVisitOrder() : 0))
+                            .collect(Collectors.groupingBy(
+                                    m -> m.getDayNumber() != null ? m.getDayNumber() : 1,
+                                    TreeMap::new,
+                                    java.util.stream.Collectors.toList()));
+
+                    // 把分組好的 DTO 傳給前端
+                    model.addAttribute("groupedByDay", groupedByDay);
 
                     // 計算最大天數
-                    int maxDay = allMaps.stream().mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1).max()
+                    int maxDay = dtoList.stream().mapToInt(m -> m.getDayNumber() != null ? m.getDayNumber() : 1).max()
                             .orElse(1);
                     model.addAttribute("maxDay", maxDay);
 
                     // 根據 startDate 跟 maxDay 算出結束日期
                     if (order.getMyPlan().getStartDate() != null) {
-                        // 結束日期 = 出發日期 + (總天數 - 1) 天
                         LocalDate endDate = order.getMyPlan().getStartDate().plusDays(maxDay - 1);
                         model.addAttribute("endDate", endDate);
                     }
                 }
 
-                // 呼叫 Service 一次取得分類好的實體票與交通票
-                Map<String, Object> classifiedTickets = orderService.classifyTickets(order);
-
-                // 因為 Service 回傳的是 Object，我們需要做個安全的強制轉型再塞給 Model
-                @SuppressWarnings("unchecked")
-                Set<Integer> ticketSpotIds = (Set<Integer>) classifiedTickets.get("ticketSpotIds");
-                @SuppressWarnings("unchecked")
-                List<OrdersDetailEntity> transportTickets = (List<OrdersDetailEntity>) classifiedTickets
-                        .get("transportTickets");
-
-                model.addAttribute("ticketSpotIds", ticketSpotIds);
+                // 傳遞其他票券資料給前端
+                model.addAttribute("ticketSpotIds", ticketSpotIdsSet);
                 model.addAttribute("transportTickets", transportTickets);
             });
         }

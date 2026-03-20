@@ -175,6 +175,7 @@ function initAddonSystem() {
         const $row = $(this).closest('.db-ticket-row');
         const detailId = $(this).data('id');
         const price = Number($(this).data('price')) || 0;
+        const name = $(this).data('name'); // 我們在 HTML 中新增了 data-name="" 屬性
 
         // 把要刪除的 ID 記錄下來，並塞入隱藏欄位供後端讀取
         removedDbTicketIds.push(detailId);
@@ -184,6 +185,25 @@ function initAddonSystem() {
         // 隱藏並徹底移除畫面元素
         $row.fadeOut(200, function () { $(this).remove(); });
         $('#summary-db-' + detailId).fadeOut(200, function () { $(this).remove(); });
+
+        // 🌟 將取消的舊票券放回下拉選單！
+        if (name) {
+            // 先找景點門票
+            let $opt = $("#ticketSelect").find(`option`).filter(function () {
+                return $(this).data("name") === name;
+            });
+            if ($opt.length > 0) {
+                $opt.prop("disabled", false).show(); // 如果是舊版的寫法，也可以直接 .css("display", "") 
+            } else {
+                // 如果找不到，改找交通票
+                let $transOpt = $("#transportSelect").find(`option`).filter(function () {
+                    return $(this).data("name") === name;
+                });
+                if ($transOpt.length > 0) {
+                    $transOpt.prop("disabled", false).show();
+                }
+            }
+        }
 
         renderAddons();
     });

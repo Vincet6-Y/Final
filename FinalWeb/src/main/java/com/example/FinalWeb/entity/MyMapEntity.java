@@ -48,14 +48,4 @@ public class MyMapEntity {
     @JsonIgnore
     private MyPlanEntity myPlan;
 
-    @Transient
-public String getOrderItemsName() {
-    if (this.myPlan != null) {
-        // 確保 MyPlanEntity 有 planName 字段和 getPlanName() 方法
-        // 如果 MyPlanEntity 的字段名稱不同，請替換為正確的名稱，例如 getName()
-        return this.myPlan.getMyPlanName();
-    }
-    return "自訂行程";
-}
-
 }

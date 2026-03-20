@@ -69,9 +69,13 @@
                 <button id="memberDropdownBtn"
                     class="flex items-center gap-2 bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 h-9 rounded-lg text-sm font-bold transition-all">
 
-                    <span class="material-symbols-outlined text-[18px] leading-none">
-                        account_circle
-                    </span>
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/30">
+                        <img class="w-full h-full object-cover"
+                            th:src="${session.loginMember.memberImgUrl != null and !#strings.isEmpty(session.loginMember.memberImgUrl)
+                                    ? session.loginMember.memberImgUrl
+                                    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc'}"
+                            alt="會員頭像">
+                    </div>
 
                     <span th:text="${session.loginMember.name}"></span>
 

@@ -136,4 +136,8 @@ public class WorkService {
 
         repo.save(wEntity);
     }
+
+    public List<WorkDetailEntity> showNew5(){
+        return repo.findTop5ByOrderByWorkIdDesc();        
+    }
 }

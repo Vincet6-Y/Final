@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
@@ -91,6 +90,9 @@ public class ArticleService {
 
     /** 新增文章 */
     public ArticleEntity createArticle(ArticleEntity article) {
+        if (article.getViewCount() == null) article.setViewCount(0);
+        article.setCreatedTime(java.time.LocalDateTime.now());
+        article.setUpdatedTime(java.time.LocalDateTime.now());
         return articleRepo.save(article);
     }
 
@@ -104,6 +106,9 @@ public class ArticleService {
         old.setTitle(article.getTitle());
         old.setContent(article.getContent());
         old.setArticleClass(article.getArticleClass());
+        old.setArticleImageUrl(article.getArticleImageUrl());
+        old.setStatus(article.getStatus());
+        old.setUpdatedTime(java.time.LocalDateTime.now());
 
         return articleRepo.save(old);
     }
@@ -131,18 +136,22 @@ public class ArticleService {
     public List<ArticleDTO> getAllArticles() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
                 .stream()
+                .filter(a -> !"draft".equals(a.getStatus()))
                 .map(ArticleDTO::new)
                 .collect(Collectors.toList());
     }
 
     /**
      * 依分類分組
-     * 優化：同樣交給資料庫排序，再進行 Map 分類
+     * 優化：同樣交給資料庫排序，再進行 Map 分類，並加上 null 防護
      */
     public Map<String, List<ArticleDTO>> getAllArticlesGrouped() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
                 .stream()
+                .filter(a -> !"draft".equals(a.getStatus()))
                 .map(ArticleDTO::new) // 將 Entity 轉成乾淨的 DTO
-                .collect(Collectors.groupingBy(ArticleDTO::getArticleClass));
+                .collect(Collectors.groupingBy(dto ->
+                // 【防呆機制】如果分類是 null，就給它一個預設值 "未分類"，避免 groupingBy 當機
+                dto.getArticleClass() != null ? dto.getArticleClass() : "未分類"));
     }
 }

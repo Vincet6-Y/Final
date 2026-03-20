@@ -1,13 +1,17 @@
 package com.example.FinalWeb.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.FinalWeb.entity.MyMapEntity;
 import com.example.FinalWeb.dto.TicketDto;
+import com.example.FinalWeb.repo.OrdersRepo;
 
 import java.util.*;
 
 @Service
 public class TicketService {
+    @Autowired
+    private OrdersRepo ordersRepo;
 
     /**
      * 地區 Enum (避免字串打錯)
@@ -21,10 +25,20 @@ public class TicketService {
         MT_FUJI
     }
 
-    // 🌟 全面替換為 TicketDto
+    /**
+     * 取得該行程中，已經購買且結帳成功(綠界)的景點 ID (spotId) 列表
+     */
+    public List<Integer> getPurchasedSpotIds(Integer planId) {
+        if (planId == null) {
+            return new ArrayList<>();
+        }
+        // 直接請資料庫幫忙撈資料
+        return ordersRepo.findPurchasedSpotIdsByPlanId(planId);
+    }
+
+    // 替換為 TicketDto
     private static final Map<String, TicketDto> TICKET_CACHE = new HashMap<>();
     private static final Map<String, Region> PLACE_REGION_MAP = new HashMap<>();
-
     static {
         // =========================
         // 🎫 景點門票
