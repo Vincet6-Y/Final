@@ -1,135 +1,290 @@
 <!DOCTYPE html>
-
 <html class="dark" lang="zh-Hant">
 
 <head th:replace="~{ fragments/backendhead :: backHead}"></head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar Navigation -->
         <aside th:replace="~{ fragments/backendaside :: backaside('content')}"> </aside>
-        <!-- Main Content Area -->
+
         <main class="flex-1 flex flex-col overflow-hidden bg-background-light dark:bg-background-dark">
-            <!-- Header -->
             <header th:replace="~{ fragments/backendheader :: backendheader('作品與行程管理', '即時監控、編輯與優化您的聖地巡禮內容資源。')}">
             </header>
-            <!-- Dashboard Content -->
+
             <div class="flex-1 overflow-y-auto p-8 space-y-8">
                 <!-- Management Modules -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- 作品管理 -->
-                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
-                        <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">movie_edit</span>
-                                <h3 class="font-bold text-lg">作品管理</h3>
-                            </div>
-                            <button class="text-primary text-sm font-bold hover:underline">查看全部</button>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
-                                <div th:each="newWrok : ${newWroks}"
-                                    class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
-                                    <div class="w-16 h-10 rounded overflow-hidden">
-                                        <img class="w-full h-full object-cover" th:src="${newWrok.workImg}" />
-                                    </div>
-                                    <div class="flex-1">
-                                        <h4 class="text-sm font-bold" th:text="${newWrok.workName}">作品名稱</h4>
-                                    </div>
-                                    <button class="p-1 hover:bg-primary/20 rounded transition-colors">
-                                        <span class="material-symbols-outlined text-sm">edit</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <a th:href="@{/backend/contentmanagement/work}"
-                            class="w-full mt-6 py-2 border border-dashed border-primary/30 rounded-lg text-primary text-sm font-bold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
-                            <span class="material-symbols-outlined text-base">add_circle</span>
-                            新增作品資料
-                        </a>
-                    </div>
-                    <!-- 套裝行程管理 -->
-                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
-                        <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">package_2</span>
-                                <h3 class="font-bold text-lg">行程套裝上下架</h3>
-                            </div>
-                            <button class="text-primary text-sm font-bold hover:underline">查看行程庫</button>
-                        </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
-                                <div
-                                    class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
-                                    <div class="flex-1">
-                                        <h4 class="text-sm font-bold">鎌倉江之島・灌籃高手朝聖 5日遊</h4>
-                                        <p class="text-xs text-slate-500 mt-1">價格: $32,800起 | 目前庫存: 12</p>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-xs text-slate-400">狀態</span>
-                                        <div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer">
-                                            <div class="absolute right-0.5 top-0.5 w-4 h-4 bg-primary rounded-full">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div
-                                    class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
-                                    <div class="flex-1">
-                                        <h4 class="text-sm font-bold">飛驒高山・你的名字景點巡覽 4日遊</h4>
-                                        <p class="text-xs text-slate-500 mt-1">價格: $28,500起 | 目前庫存: 0</p>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-xs text-slate-400">狀態</span>
-                                        <div class="w-10 h-5 bg-slate-700 rounded-full relative cursor-pointer">
-                                            <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-slate-400 rounded-full">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- ✅ 文章發布與管理（跨兩欄） -->
-                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden lg:col-span-2">
-                        <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">edit_note</span>
-                                <h3 class="font-bold text-lg">文章發布與管理</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
+                            <div class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary">movie_edit</span>
+                                    <h3 class="font-bold text-lg">作品管理</h3>
+                                </div>
+                                <button class="text-primary text-sm font-bold hover:underline">查看全部</button>
                             </div>
-                            <a th:href="@{/backend/backendarticle}"
-                                class="px-4 py-1.5 bg-primary text-background-dark text-xs font-bold rounded-full">
-                                撰寫新文章
-                            </a>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead
-                                    class="bg-background-dark/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-                                    <tr>
-                                        <th class="px-6 py-4">文章標題</th>
-                                        <th class="px-6 py-4">分類</th>
-                                        <th class="px-6 py-4">作者</th>
-                                        <th class="px-6 py-4">狀態</th>
-                                        <th class="px-6 py-4 text-right">操作</th>
-                                    </tr>
-                                </thead>
-                                <!-- ✅ JS 動態渲染列表 -->
-                                <tbody id="articleTableBody" class="divide-y divide-primary/5"></tbody>
-                            </table>
-                        </div>
-                        <!-- ✅ 分頁控制 -->
-                        <div id="paginationContainer"
-                            class="flex items-center justify-center gap-2 p-4 border-t border-white/5">
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <div th:each="newWrok : ${newWroks}"
+                                        class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
+                                        <div class="w-16 h-10 rounded overflow-hidden">
+                                            <img class="w-full h-full object-cover" th:src="${newWrok.workImg}" />
+                                            <div th:each=" newWrok : ${newWroks}"
+                                                class="flex items-center gap-4 bg-background-dark/40 p-3 rounded-lg border border-primary/5">
+                                                <div class="w-16 h-10 rounded overflow-hidden">
+                                                    <img class="w-full h-full object-cover"
+                                                        data-alt="Anime scenery illustration"
+                                                        th:src="${newWrok.workImg}" />
+                                                </div>
+                                                <div class="flex-1">
+                                                    <h4 class="text-sm font-bold" th:text="${newWrok.workName}">作品名稱
+                                                    </h4>
+                                                </div>
+                                                <button class="p-1 hover:bg-primary/20 rounded transition-colors">
+                                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-6 pt-0">
+                                        <a th:href="@{/backend/contentmanagement/work}"
+                                            class="w-full py-2 border border-dashed border-primary/30 rounded-lg text-primary text-sm font-bold hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
+                                            <span class="material-symbols-outlined text-base">add_circle</span>
+                                            新增作品資料
+                                        </a>
+                                    </div>
+                                </div>
+                                <<<<<<< HEAD <!-- 套裝行程管理 -->
+                                    <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden">
+                                        =======
+
+                                        <div
+                                            class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden flex flex-col">
+                                            >>>>>>> dev
+                                            <div
+                                                class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
+                                                <div class="flex items-center gap-3">
+                                                    <span
+                                                        class="material-symbols-outlined text-primary">inventory_2</span>
+                                                    <h3 class="font-bold text-lg">行程套裝上下架</h3>
+                                                </div>
+                                                <button id="openPlanModalBtn"
+                                                    class="text-primary text-sm font-bold hover:underline">查看行程庫</button>
+                                            </div>
+                                            <div class="p-6 flex-1 flex flex-col">
+                                                <div class="space-y-4 flex-1">
+                                                    <div th:each="plan : ${journeyPlans}"
+                                                        class="flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5">
+
+                                                        <div class="batch-checkbox-container hidden shrink-0">
+                                                            <input type="checkbox"
+                                                                class="plan-checkbox w-4 h-4 rounded border-slate-500 text-primary focus:ring-primary bg-transparent"
+                                                                th:value="${plan.planId}">
+                                                        </div>
+
+                                                        <div class="flex-1">
+                                                            <h4 class="text-sm font-bold" th:text="${plan.planName}">
+                                                                行程名稱</h4>
+                                                            <p class="text-xs text-slate-500 mt-1"
+                                                                th:text="${plan.planCity} + ' | ' + ${plan.daysCount} + '日遊'">
+                                                            </p>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <span class="text-xs text-slate-400">狀態</span>
+                                                            <div th:data-plan-id="${plan.planId}"
+                                                                th:data-status="${plan.status != null ? plan.status : false}"
+                                                                class="toggle-plan-btn w-10 h-5 rounded-full relative cursor-pointer transition-colors"
+                                                                th:classappend="${plan.status == true} ? 'bg-primary/20' : 'bg-slate-700'">
+                                                                <div class="absolute top-0.5 w-4 h-4 rounded-full transition-all"
+                                                                    th:classappend="${plan.status == true} ? 'right-0.5 bg-primary' : 'left-0.5 bg-slate-400'">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div th:if="${#lists.isEmpty(journeyPlans)}"
+                                                        class="text-center py-4 text-slate-500 text-sm">
+                                                        目前尚無行程資料
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ✅ 文章發布與管理（跨兩欄） -->
+
+                                        <div id="normal-action-btns" class="mt-6 flex gap-3">
+                                            <a th:href="@{/backend/contentmanagement/plan/create}"
+                                                class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 transition-all text-center flex items-center justify-center gap-2">
+                                                <span class="material-symbols-outlined text-base">add_circle</span>
+                                                快速上架新行程
+                                            </a>
+                                            <button id="enterBatchModeBtn"
+                                                class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 text-sm font-bold rounded-lg hover:bg-primary/20 transition-all">批次管理</button>
+                                        </div>
+
+                                        <div id="batch-action-btns" class="mt-6 hidden flex gap-3">
+                                            <button id="batchPublishBtn"
+                                                class="flex-1 py-2 bg-green-600/20 text-green-500 border border-green-500/30 text-sm font-bold rounded-lg hover:bg-green-600/30 transition-all">勾選上架</button>
+                                            <button id="batchUnpublishBtn"
+                                                class="flex-1 py-2 bg-slate-700 text-slate-300 border border-slate-600 text-sm font-bold rounded-lg hover:bg-slate-600 transition-all">勾選下架</button>
+                                            <button id="exitBatchModeBtn"
+                                                class="px-4 py-2 text-slate-400 hover:text-white text-sm font-bold transition-colors">取消</button>
+                                        </div>
+                                    </div>
+                            </div>
+
+                            <div class="bg-primary/5 border border-primary/10 rounded-xl overflow-hidden lg:col-span-2">
+                                <div
+                                    class="p-6 border-b border-primary/10 flex items-center justify-between bg-primary/5">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-primary">edit_note</span>
+                                        <h3 class="font-bold text-lg">文章發布與管理</h3>
+                                    </div>
+                                    <a th:href="@{/backend/backendarticle}"
+                                        class="px-4 py-1.5 bg-primary text-background-dark text-xs font-bold rounded-full">
+                                        撰寫新文章
+                                    </a>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left">
+                                        <thead
+                                            class="bg-background-dark/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                                            <tr>
+                                                <th class="px-6 py-4">文章標題</th>
+                                                <th class="px-6 py-4">分類</th>
+                                                <th class="px-6 py-4">作者</th>
+                                                <th class="px-6 py-4">狀態</th>
+                                                <th class="px-6 py-4 text-right">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <!-- ✅ JS 動態渲染列表 -->
+                                        <tbody id="articleTableBody" class="divide-y divide-primary/5"></tbody>
+                                    </table>
+                                </div>
+                                <!-- ✅ 分頁控制 -->
+                                <div id="paginationContainer"
+                                    class="flex items-center justify-center gap-2 p-4 border-t border-white/5">
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-            </div>
         </main>
     </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- ✅ 確保有引入 toast.js（showToast 共用函式） -->
+
+    <div id="planModal" class="fixed inset-0 z-50 hidden bg-black/60 flex items-center justify-center backdrop-blur-sm">
+        <div
+            class="bg-background-light dark:bg-background-dark w-11/12 max-w-4xl max-h-[85vh] rounded-xl flex flex-col border border-primary/20 shadow-2xl">
+
+            <div class="p-6 border-b border-primary/10 flex justify-between items-center bg-primary/5 rounded-t-xl">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">inventory_2</span>
+                    所有行程庫管理
+                </h2>
+                <button id="closePlanModal" class="text-slate-400 hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div class="flex justify-between items-end px-6 pt-4 border-b border-primary/10">
+                <div class="flex gap-6">
+                    <button
+                        class="plan-tab active-tab pb-2 text-primary border-b-2 border-primary font-bold transition-all"
+                        data-target="all">全部行程</button>
+                    <button
+                        class="plan-tab pb-2 text-slate-400 border-b-2 border-transparent hover:text-primary font-bold transition-all"
+                        data-target="5">5日遊</button>
+                    <button
+                        class="plan-tab pb-2 text-slate-400 border-b-2 border-transparent hover:text-primary font-bold transition-all"
+                        data-target="10">10日遊</button>
+                </div>
+                <button id="modalEnterBatchBtn"
+                    class="pb-2 text-sm text-primary font-bold hover:brightness-110 transition-colors">
+                    <span class="flex items-center gap-1"><span
+                            class="material-symbols-outlined text-sm">checklist</span>批次管理</span>
+                </button>
+            </div>
+
+            <div id="modalBatchActionBar"
+                class="hidden bg-primary/10 px-6 py-3 border-b border-primary/10 flex items-center justify-between transition-all">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input type="checkbox" id="modalSelectAll"
+                        class="w-4 h-4 rounded border-slate-500 text-primary focus:ring-primary bg-transparent">
+                    <span
+                        class="text-sm font-bold text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors">全部選取
+                        (當前頁籤)</span>
+                </label>
+                <div class="flex gap-2">
+                    <button id="modalBatchPublishBtn"
+                        class="px-4 py-1.5 bg-green-600/20 text-green-500 border border-green-500/30 text-xs font-bold rounded-lg hover:bg-green-600/30 transition-all">勾選項目上架</button>
+                    <button id="modalBatchUnpublishBtn"
+                        class="px-4 py-1.5 bg-slate-700 text-slate-300 border border-slate-600 text-xs font-bold rounded-lg hover:bg-slate-600 transition-all">勾選項目下架</button>
+                    <button id="modalExitBatchBtn"
+                        class="px-4 py-1.5 text-slate-400 hover:text-white text-xs font-bold transition-colors">取消</button>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-1 bg-background-light/50 dark:bg-background-dark/50">
+                <div class="space-y-3">
+                    <div th:each="plan : ${allPlans}" th:data-days="${plan.daysCount}"
+                        class="modal-plan-row flex items-center gap-4 bg-background-dark/40 p-4 rounded-lg border border-primary/5 hover:border-primary/30 transition-colors">
+
+                        <div class="modal-batch-checkbox-container hidden shrink-0">
+                            <input type="checkbox"
+                                class="modal-plan-checkbox w-4 h-4 rounded border-slate-500 text-primary focus:ring-primary bg-transparent"
+                                th:value="${plan.planId}">
+                        </div>
+
+                        <div class="flex-1">
+                            <h4 class="text-sm font-bold" th:text="${plan.planName}">行程名稱</h4>
+                            <p class="text-xs text-slate-500 mt-1"
+                                th:text="${plan.planCity} + ' | ' + ${plan.daysCount} + '日遊'"></p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs text-slate-400">狀態</span>
+                            <div th:data-plan-id="${plan.planId}"
+                                th:data-status="${plan.status != null ? plan.status : false}"
+                                class="toggle-plan-btn w-10 h-5 rounded-full relative cursor-pointer transition-colors"
+                                th:classappend="${plan.status == true} ? 'bg-primary/20' : 'bg-slate-700'">
+                                <div class="absolute top-0.5 w-4 h-4 rounded-full transition-all"
+                                    th:classappend="${plan.status == true} ? 'right-0.5 bg-primary' : 'left-0.5 bg-slate-400'">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="customConfirmModal"
+        class="fixed inset-0 z-[70] hidden bg-black/60 flex items-center justify-center backdrop-blur-sm">
+        <div
+            class="bg-background-light dark:bg-background-dark w-11/12 max-w-sm rounded-xl flex flex-col border border-primary/20 shadow-2xl p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 mb-4">
+                <span class="material-symbols-outlined text-primary text-2xl">help</span>
+            </div>
+            <h3 id="confirmTitle" class="text-lg font-bold text-slate-900 dark:text-white mb-2">確認操作</h3>
+            <p id="confirmMessage" class="text-sm text-slate-500 dark:text-slate-400 mb-6">您確定要執行此操作嗎？</p>
+            <div class="flex gap-3 w-full">
+                <button id="cancelConfirmBtn"
+                    class="flex-1 py-2 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
+                    取消
+                </button>
+                <button id="executeConfirmBtn"
+                    class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 transition-all">
+                    確定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script th:src="@{/assets/toast.js}"></script>
     <script th:src="@{/backend/backendcontentmanagement.js}"></script>
 </body>
