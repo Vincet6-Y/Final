@@ -169,63 +169,66 @@ public class OrderService {
     }
 
     // 🌟 3. 給管理後台：獲取儀表板統計數據
-public Map<String, Object> getAdminDashboardStats() {
-    Map<String, Object> stats = new HashMap<>();
-    
-    // 1. 待處理訂單：通常指「已付款」但「尚未完成服務/核銷」或「待處理」狀態的訂單
-    long pendingCount = ordersRepo.countByPayStatus("待處理");
-    
-    // 2. 退款請求：計算狀態為「退款中」的數量
-    long refundCount = ordersRepo.countByPayStatus("退款中");
-    
-    // 3. 今日發放憑證：統計今日「已付款」的訂單總數
-    // 這裡建議在 Repo 新增一個查詢今日成功的計算，或者先用 findAll 篩選
-    long todayIssued = ordersRepo.findAll().stream()
-            .filter(o -> "已付款".equals(o.getPayStatus()) && 
-                    o.getOrderTime().toLocalDate().equals(java.time.LocalDate.now()))
-            .count();
+    public Map<String, Object> getAdminDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
 
-    stats.put("pendingOrders", pendingCount);
-    stats.put("refundRequests", refundCount);
-    stats.put("todayIssued", todayIssued);
-    
-    // 漲跌幅暫時回傳固定值或不回傳，等資料庫資料變多再寫計算邏輯
-    return stats;
-}
+        // 1. 待處理訂單：通常指「已付款」但「尚未完成服務/核銷」或「待處理」狀態的訂單
+        long pendingCount = ordersRepo.countByPayStatus("待處理");
 
-// 🌟 4. 給管理後台：獲取所有訂單列表 (包含篩選功能)
-   // 修改 OrderService.java 中的 getAllOrdersForAdmin 方法
-public List<OrdersEntity> getAllOrdersForAdmin(String status, String keyword) {
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        // 🌟 改用剛才寫的多欄位搜尋方法
-        return ordersRepo.searchOrders(keyword.trim());
+        // 2. 退款請求：計算狀態為「退款中」的數量
+        long refundCount = ordersRepo.countByPayStatus("退款中");
+
+        // 3. 今日發放憑證：統計今日「已付款」的訂單總數
+        // 這裡建議在 Repo 新增一個查詢今日成功的計算，或者先用 findAll 篩選
+        long todayIssued = ordersRepo.findAll().stream()
+                .filter(o -> "已付款".equals(o.getPayStatus()) &&
+                        o.getOrderTime().toLocalDate().equals(java.time.LocalDate.now()))
+                .count();
+
+        stats.put("pendingOrders", pendingCount);
+        stats.put("refundRequests", refundCount);
+        stats.put("todayIssued", todayIssued);
+
+        // 漲跌幅暫時回傳固定值或不回傳，等資料庫資料變多再寫計算邏輯
+        return stats;
     }
-    
-    if (status != null && !status.equals("全部")) {
-        return ordersRepo.findByPayStatusOrderByOrderTimeDesc(status);
-    }
-    
-    return ordersRepo.findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "orderTime"));
-}
 
-// 🌟 5. 給管理後台：更新訂單狀態 (退款、出貨等操作)
-@Transactional
-public void updateOrderStatus(Integer orderId, String newStatus) {
-    OrdersEntity order = getOrderById(orderId);
-    order.setPayStatus(newStatus);
-    ordersRepo.save(order);
-}
+    // 🌟 4. 給管理後台：獲取所有訂單列表 (包含篩選功能)
+    // 修改 OrderService.java 中的 getAllOrdersForAdmin 方法
+    public List<OrdersEntity> getAllOrdersForAdmin(String status, String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // 🌟 改用剛才寫的多欄位搜尋方法
+            return ordersRepo.searchOrders(keyword.trim());
+        }
+
+        if (status != null && !status.equals("全部")) {
+            return ordersRepo.findByPayStatusOrderByOrderTimeDesc(status);
+        }
+
+        return ordersRepo.findAll(org.springframework.data.domain.Sort
+                .by(org.springframework.data.domain.Sort.Direction.DESC, "orderTime"));
+    }
+
+    // 🌟 5. 給管理後台：更新訂單狀態 (退款、出貨等操作)
+    @Transactional
+    public void updateOrderStatus(Integer orderId, String newStatus) {
+        OrdersEntity order = getOrderById(orderId);
+        order.setPayStatus(newStatus);
+        ordersRepo.save(order);
+    }
+
     // 🌟 新增：計算所有訂單的總營收
     public long getTotalRevenue() {
-    // 1. 取得所有訂單
-    List<OrdersEntity> allOrders = ordersRepo.findAll(); 
-    
-    // 2. 篩選已付款訂單並加總金額
-    return allOrders.stream()
-            .filter(o -> "已付款".equals(o.getPayStatus()))
-            .mapToLong(o -> (long) calculateTotalAmount(o)) 
-            .sum();
-}
+        // 1. 取得所有訂單
+        List<OrdersEntity> allOrders = ordersRepo.findAll();
+
+        // 2. 篩選已付款訂單並加總金額
+        return allOrders.stream()
+                .filter(o -> "已付款".equals(o.getPayStatus()))
+                .mapToLong(o -> (long) calculateTotalAmount(o))
+                .sum();
+    }
+
     @Autowired
     private MemberRepo memberRepo; // 記得注入 MemberRepo
 
@@ -233,31 +236,72 @@ public void updateOrderStatus(Integer orderId, String newStatus) {
         return memberRepo.count(); // 回傳資料庫會員總數
     }
 
-    //後台訂單詳細資訊
-   public Map<String, Object> getOrderDetailWithItems(Integer id) {
-    OrdersEntity order = ordersRepo.findById(id).orElse(null);
-    if (order == null) return null;
+    // 🌟 新增：取得今年 1~12 月的營收陣列 (給圖表用)
+    public List<Integer> getMonthlyRevenueForCurrentYear() {
+        // 建立一個長度為 12 的陣列，預設全部為 0
+        List<Integer> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0));
 
-    List<OrdersDetailEntity> details = ordersDetailRepo.findByOrders(order); 
-    
-    Map<String, Object> response = new HashMap<>();
-    response.put("orderId", order.getOrderId());
-    response.put("tradeNo", order.getTradeNo());
-    response.put("payStatus", order.getPayStatus());
-    response.put("orderTime", order.getOrderTime());
-    response.put("totalPrice", calculateTotalAmount(order)); 
-    response.put("orderItemsName", order.getOrderItemsName());
-    response.put("orderDetails", details); 
+        // 找出所有已付款的訂單
+        List<OrdersEntity> paidOrders = ordersRepo.findByPayStatusOrderByOrderTimeDesc("已付款");
 
-    // 🌟 新增：購買人資訊 (從關聯的 MemberEntity 抓取)
-    if (order.getMember() != null) {
-        response.put("customerName", order.getMember().getName()); // 假設欄位是 name
-        response.put("customerEmail", order.getMember().getEmail()); // 假設欄位是 email
-    } else {
-        response.put("customerName", "訪客標記");
-        response.put("customerEmail", "無內容");
+        int currentYear = java.time.LocalDate.now().getYear();
+
+        for (OrdersEntity order : paidOrders) {
+            // 綠界付款成功後應該會有 payTime，如果沒有，退而求其次用 orderTime
+            LocalDateTime timeToCheck = order.getPayTime() != null ? order.getPayTime() : order.getOrderTime();
+
+            if (timeToCheck != null && timeToCheck.getYear() == currentYear) {
+                // 取得該訂單是第幾個月 (1~12)
+                int monthIndex = timeToCheck.getMonthValue() - 1; // 陣列索引是 0~11
+
+                // 呼叫你原本寫好的 calculateTotalAmount 來算這筆訂單的錢
+                int orderTotal = calculateTotalAmount(order);
+                monthlyRevenue.set(monthIndex, monthlyRevenue.get(monthIndex) + orderTotal);
+            }
+        }
+        return monthlyRevenue;
     }
 
-    return response;
+    public List<Integer> getQuarterlyRevenueForCurrentYear() {
+        List<Integer> monthly = getMonthlyRevenueForCurrentYear(); // 取得 12 個月的資料
+        List<Integer> quarterly = new ArrayList<>();
+
+        for (int i = 0; i < 12; i += 3) {
+            // 每三個月加總一次
+            int quarterSum = monthly.get(i) + monthly.get(i + 1) + monthly.get(i + 2);
+            quarterly.add(quarterSum);
+        }
+        return quarterly; // 回傳 [Q1, Q2, Q3, Q4]
+    }
+
+    public Map<String, Object> getOrderDetailWithItems(Integer orderId) {
+    OrdersEntity order = ordersRepo.findById(orderId).orElse(null);
+    if (order == null) return null;
+
+    Map<String, Object> detail = new HashMap<>();
+    detail.put("orderId", order.getOrderId());
+    detail.put("payStatus", order.getPayStatus());
+    detail.put("orderTime", order.getOrderTime());
+    
+    // 這裡要對應前端 order.js 期待的欄位名
+    detail.put("customerName", order.getMember() != null ? order.getMember().getName() : "未知顧客");
+    detail.put("customerEmail", order.getMember() != null ? order.getMember().getEmail() : "");
+    
+    // 計算總額
+    detail.put("totalPrice", calculateTotalAmount(order));
+
+    // 處理明細
+    List<Map<String, Object>> items = new ArrayList<>();
+    if (order.getOrderDetails() != null) {
+        for (OrdersDetailEntity d : order.getOrderDetails()) {
+            Map<String, Object> itemMap = new HashMap<>();
+            itemMap.put("ticketType", d.getTicketType());
+            itemMap.put("ticketPrice", d.getTicketPrice());
+            items.add(itemMap);
+        }
+    }
+    detail.put("orderDetails", items); // 這裡要叫 orderDetails，前端才抓得到
+
+    return detail;
 }
 }
