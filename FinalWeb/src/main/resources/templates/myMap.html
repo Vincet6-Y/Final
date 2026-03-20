@@ -165,9 +165,9 @@
                 <div
                     class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
-                        href="#">電影作品</a>
+                        th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='電影')}">電影作品</a>
                     <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
-                        href="#">動畫作品</a>
+                        th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='動畫')}">動畫作品</a>
                 </div>
             </div>
             <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
@@ -176,27 +176,71 @@
         <div class="flex items-center gap-4">
             <button aria-label="Toggle theme"
                 class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                onclick="document.documentElement.classList.toggle('dark')">
+                onclick="toggleTheme()">
                 <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
                 <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
             </button>
-            <a th:if="${session.loginMember == null}" th:href="@{/auth}"><button
-                    class="bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
+            <div th:if="${session.loginMember == null}">
+                <a th:href="@{/auth}"
+                    class="inline-block bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
                     會員登入
-                </button>
-            </a>
-
-            <div th:if="${session.loginMember != null}" class="flex items-center gap-3">
-                <span class="text-sm font-medium text-neutral-800 dark:text-white">
-                    <span th:text="${session.loginMember.name}"></span>
-                </span>
-
-                <a th:href="@{/member}"
-                    class="bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 py-1.5 rounded-lg text-sm font-bold transition-all">
-                    會員中心
                 </a>
             </div>
+
+            <div th:if="${session.loginMember != null}" class="relative">
+                <button id="memberDropdownBtn"
+                    class="flex items-center gap-2 bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 h-9 rounded-lg text-sm font-bold transition-all">
+
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/30">
+                        <img class="w-full h-full object-cover"
+                            th:src="${session.loginMember.memberImgUrl != null and !#strings.isEmpty(session.loginMember.memberImgUrl)
+                                    ? session.loginMember.memberImgUrl
+                                    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc'}"
+                            alt="會員頭像">
+                    </div>
+
+                    <span th:text="${session.loginMember.name}"></span>
+
+                    <span id="memberDropdownArrow"
+                        class="material-symbols-outlined text-[18px] leading-none transition-transform duration-200">
+                        keyboard_arrow_down
+                    </span>
+                </button>
+
+                <div id="memberDropdownMenu"
+                    class="absolute right-0 top-full mt-2 w-40 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-800 shadow-xl z-50 opacity-0 -translate-y-2 pointer-events-none transition-all duration-200">
+
+                    <a th:href="@{/member}"
+                        class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-t-xl">
+                        會員中心
+                    </a>
+
+                    <a th:href="@{/backend/home}" sec:authorize="hasRole('ADMIN')"
+                        class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-t-xl">
+                        管理後台
+                    </a>
+
+                    <a th:href="@{/member/logout}"
+                        class="block w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-b-xl">
+                        登出
+                    </a>
+                </div>
+            </div>
         </div>
+        <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+        <script>
+            function toggleTheme() {
+                // 1. 執行切換
+                const isDark = document.documentElement.classList.toggle('dark');
+
+                // 2. 存入瀏覽器記憶體 (LocalStorage)
+                // 如果現在是 dark 模式，就存 'dark'，否則存 'light'
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+        </script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script th:src="@{/member/js/headerMemberDropdown.js}"></script>
+        <script th:src="@{/assets/toast.js}"></script>
     </header>
 
     <main class="flex-1 relative flex w-full h-full overflow-hidden">
@@ -214,26 +258,26 @@
                         class="peer h-full w-full outline-none text-sm bg-transparent pr-4 text-slate-900 dark:text-slate-100 placeholder-slate-400"
                         type="text" id="pac-input-desktop" placeholder="輸入關鍵字或點擊下方分類..." />
                 </div>
-              <div class="flex items-center justify-end gap-2 px-1 mt-1 w-full">
-    <button onclick="searchNearby('tourist_attraction')"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition shadow-md">
-        <span class="material-symbols-outlined text-sm text-primary">attractions</span> 景點
-    </button>
-    <button onclick="searchNearby('lodging')"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-500 hover:text-white transition shadow-md">
-        <span class="material-symbols-outlined text-sm text-blue-500">hotel</span> 住宿
-    </button>
-    <button onclick="searchNearby('restaurant')"
-        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white transition shadow-md">
-        <span class="material-symbols-outlined text-sm text-red-400">restaurant</span> 美食
-    </button>
+                <div class="flex items-center justify-end gap-2 px-1 mt-1 w-full">
+                    <button onclick="searchNearby('tourist_attraction')"
+                        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-primary hover:text-white transition shadow-md">
+                        <span class="material-symbols-outlined text-sm text-primary">attractions</span> 景點
+                    </button>
+                    <button onclick="searchNearby('lodging')"
+                        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-blue-500 hover:text-white transition shadow-md">
+                        <span class="material-symbols-outlined text-sm text-blue-500">hotel</span> 住宿
+                    </button>
+                    <button onclick="searchNearby('restaurant')"
+                        class="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/90 dark:bg-surface-dark/90 backdrop-blur border border-slate-200 dark:border-white/10 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-red-500 hover:text-white transition shadow-md">
+                        <span class="material-symbols-outlined text-sm text-red-400">restaurant</span> 美食
+                    </button>
 
-    <button onclick="clearAllSearchMarkers()"
-        title="清除地圖搜尋結果"
-        class="flex items-center justify-center w-8 h-8 bg-slate-500/20 hover:bg-red-500 text-slate-500 hover:text-white backdrop-blur rounded-full transition shadow-md border border-slate-200 dark:border-white/10">
-        <span class="material-symbols-outlined text-lg">close</span>
-    </button>
-</div>
+                    <button onclick="clearAllSearchMarkers()"
+                        title="清除地圖搜尋結果"
+                        class="flex items-center justify-center w-8 h-8 bg-slate-500/20 hover:bg-red-500 text-slate-500 hover:text-white backdrop-blur rounded-full transition shadow-md border border-slate-200 dark:border-white/10">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -311,7 +355,8 @@
                     </p>
                 </div>
 
-            </div> </div>
+            </div>
+        </div>
 
         <button id="mobile-toggle-btn" onclick="toggleMobileView()"
             class="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 z-30 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
@@ -337,7 +382,7 @@
         window.currentMyPlanId = /*[[${myPlan?.myPlanId}]]*/ null;
         console.log("從伺服器取得的行程 ID:", window.currentMyPlanId);
     </script>
-    
+
 </body>
 
 </html>
