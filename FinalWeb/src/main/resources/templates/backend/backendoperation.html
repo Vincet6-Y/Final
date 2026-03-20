@@ -2,7 +2,11 @@
 
 <html class="dark" lang="zh-TW">
 
-<head th:replace="~{ fragments/backendhead :: backHead}"></head>
+<head > 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link th:replace="~{ fragments/backendhead :: backHead}" />
+
+</head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
     <!-- Sidebar Navigation -->
@@ -22,7 +26,6 @@
                     <div class="flex items-end gap-3">
                         <span id="display-total-revenue" class="text-3xl font-bold text-slate-100">$1,284,500</span>
                         <span class="text-green-500 text-sm font-bold flex items-center mb-1">
-                            <span class="material-symbols-outlined text-sm">trending_up</span> 12.5%
                         </span>
                     </div>
                 </div>
@@ -34,25 +37,14 @@
                     <div class="flex items-end gap-3">
                         <span id="display-active-users" class="text-3xl font-bold text-slate-100">42,891</span>
                         <span class="text-green-500 text-sm font-bold flex items-center mb-1">
-                            <span class="material-symbols-outlined text-sm">trending_up</span> 8.2%
                         </span>
                     </div>
                 </div>
-                <div class="bg-neutral-800/50 p-6 rounded-xl border border-neutral-700">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-neutral-400 text-sm font-medium">本月增長率</span>
-                        <span class="material-symbols-outlined text-primary">show_chart</span>
-                    </div>
-                    <div class="flex items-end gap-3">
-                        <span class="text-3xl font-bold text-slate-100">+24.8%</span>
-                        <span class="text-primary text-sm font-bold flex items-center mb-1">
-                            目標達成率 92%
-                        </span>
-                    </div>
-                </div>
+                
+                   
             </section>
             <!-- Revenue Chart Section -->
-            <section class="bg-neutral-800/30 rounded-xl border border-neutral-700 p-6">
+           <section class="bg-neutral-800/30 rounded-xl border border-neutral-700 p-6">
                 <div class="flex items-center justify-between mb-8">
                     <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
                         <span class="material-symbols-outlined">bar_chart</span> 營收統計趨勢 (2026)
@@ -72,9 +64,7 @@
                     <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
                         <span class="material-symbols-outlined">person_search</span> 帳號維護管理
                     </h3>
-                    <button class="text-sm font-bold text-primary flex items-center gap-1 hover:underline">
-                        <span class="material-symbols-outlined text-base">add_circle</span> 新增管理員
-                    </button>
+                    
                 </div>
                 <div class="overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800/30">
                     <table class="w-full text-left">
@@ -113,6 +103,33 @@
                 </div>
             </section>
         </div>
+
+        <div id="orderModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-background-dark/80 backdrop-blur-sm"></div>
+  
+  <div class="relative flex items-center justify-center min-h-screen p-4">
+    <div class="bg-neutral-dark border border-neutral-muted/30 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform transition-all">
+      <div class="px-6 py-4 border-b border-neutral-muted/20 flex justify-between items-center bg-neutral-dark/50">
+        <h3 class="text-xl font-bold text-slate-100">訂單詳細資訊</h3>
+        <button onclick="closeModal()" class="text-neutral-muted hover:text-slate-100 transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <div id="modalContent" class="p-8 max-h-[70vh] overflow-y-auto space-y-6 text-slate-200">
+        <div class="flex justify-center py-10">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 border-t border-neutral-muted/20 text-right bg-neutral-dark/50">
+        <button onclick="closeModal()" class="px-6 py-2 rounded-lg bg-neutral-dark border border-neutral-muted text-slate-300 hover:bg-neutral-muted/10 transition-colors text-sm font-bold">
+          關閉視窗
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

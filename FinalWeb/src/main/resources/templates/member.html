@@ -14,12 +14,20 @@
             <aside class="lg:col-span-4 flex flex-col gap-6">
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
                     <div class="relative mb-4">
-                        <div class="size-32 rounded-full border-4 border-primary p-1">
-                            <img alt="Profile Picture"
-                                class="w-full h-full object-cover rounded-full"
+                        <div class="size-32 rounded-full border-4 border-primary p-1 relative">
+                            <div id="avatarSkeleton"
+                                class="w-full h-full rounded-full bg-slate-700 animate-pulse absolute inset-0">
+                            </div>
+                            <img id="memberAvatar"
+                                alt="Profile Picture"
+                                fetchpriority="high"
+                                decoding="async"
+                                class="w-full h-full object-cover rounded-full opacity-0 transition-opacity duration-300"
                                 th:src="${session.loginMember.memberImgUrl != null and !#strings.isEmpty(session.loginMember.memberImgUrl)
                                         ? session.loginMember.memberImgUrl
-                                        : defaultMemberImgUrl}" />
+                                        : defaultMemberImgUrl}"
+                                th:data-default-img="${defaultMemberImgUrl}"
+                                onload="this.style.opacity='1'; document.getElementById('avatarSkeleton').style.display='none';" />
                         </div>
                     </div>
                     <h1 class="text-2xl font-bold text-slate-100" th:text="'聖地旅者 · ' + ${session.loginMember.name}">
@@ -111,6 +119,19 @@
     <script th:src="@{/member/js/purchaseModal.js}"></script>
     <script th:src="@{/assets/toast.js}"></script>
     <script type="module" th:src="@{/member/js/firebase/googleLink.js}"></script>
+    <script>
+        document.getElementById('memberAvatar').onerror = function() {
+            this.src = this.dataset.defaultImg;
+            this.style.opacity = '1';
+            document.getElementById('avatarSkeleton').style.display = 'none';
+        };
+
+        const avatar = document.getElementById('memberAvatar');
+        if (avatar && avatar.complete) {
+            avatar.style.opacity = '1';
+            document.getElementById('avatarSkeleton').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>

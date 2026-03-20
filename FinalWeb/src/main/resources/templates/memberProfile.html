@@ -3,6 +3,7 @@
 <html class="dark" lang="zh-Hant">
   <head>
   <th:block th:replace="~{ fragments/head :: myHead}"></th:block>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
   </head>
   
   <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen"
@@ -28,17 +29,24 @@
               <div class="bg-primary/5 p-6 rounded-xl border border-primary/10">
                 <div class="flex flex-col md:flex-row items-center gap-8">
                   <div class="relative group">
-                    <div
-                      id="memberAvatarPreview"
-                      class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 border-4 border-primary/30"
-                      th:style="|background-image: url('${member.memberImgUrl != null ? member.memberImgUrl : defaultMemberImgUrl}')|">
-                    </div>
-                    <div
-                      class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-                      <span class="material-symbols-outlined text-white text-sm">
-                        photo_camera
-                      </span>
-                    </div>
+                      <div class="relative size-32">
+                          <div id="avatarSkeleton"
+                              class="w-full h-full rounded-full bg-slate-700 animate-pulse absolute inset-0">
+                          </div>
+                          <img id="memberAvatarPreview"
+                              alt="會員頭像"
+                              fetchpriority="high"
+                              decoding="async"
+                              class="size-32 rounded-full border-4 border-primary/30 object-cover opacity-0 transition-opacity duration-300"
+                              th:src="${member.memberImgUrl != null and !#strings.isEmpty(member.memberImgUrl)
+                                      ? member.memberImgUrl
+                                      : defaultMemberImgUrl}"
+                              onload="this.style.opacity='1'; document.getElementById('avatarSkeleton').style.display='none';"
+                              onerror="this.src=document.getElementById('defaultMemberImgUrl').value; this.style.opacity='1'; document.getElementById('avatarSkeleton').style.display='none';" />
+                      </div>
+                      <div id="cropTriggerBtn" class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center cursor-pointer">
+                          <span class="material-symbols-outlined text-white text-sm">photo_camera</span>
+                      </div>
                   </div>
                   <div class="flex flex-col items-center md:items-start gap-3">
                     <div class="text-center md:text-left">
@@ -125,6 +133,30 @@
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
       </div>
     </div>
+
+    <!-- 裁切 Modal -->
+    <div id="cropModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        style="display:none !important;">
+        <div class="bg-zinc-900 rounded-2xl p-6 w-full max-w-lg flex flex-col gap-4">
+            <h3 class="text-white font-bold text-lg">調整大頭照</h3>
+            <div class="w-full overflow-hidden" style="max-height: 400px;">
+                <img id="cropperImage" src="" alt="裁切預覽" class="max-w-full">
+            </div>
+            <div class="flex gap-3 justify-end mt-2">
+                <button id="cropCancelBtn" type="button"
+                    class="px-5 py-2 bg-slate-700 text-slate-300 font-bold rounded-lg hover:bg-slate-600 transition-colors">
+                    取消
+                </button>
+                <button id="cropConfirmBtn" type="button"
+                    class="px-5 py-2 bg-primary text-white font-bold rounded-lg hover:bg-orange-600 transition-colors">
+                    確認裁切
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="module" th:src="@{/member/js/firebase/memberAvatarUpload.js}"></script>
   </body>

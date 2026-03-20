@@ -110,15 +110,26 @@
             </button>
           </div>
 
-          <div id="content-japan" class="flex overflow-x-auto no-scrollbar py-2 gap-5">
-            <div
-              class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm">
-              <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                <span class="material-symbols-outlined text-primary text-3xl">event</span>
-              </div>
+          <div class="relative flex-1 min-w-0 group/japan">
+    
+    <button onclick="scrollJapan('left')" 
+            class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-primary/80 text-white shadow-lg opacity-0 group-hover/japan:opacity-100 transition-opacity flex items-center justify-center hover:bg-primary">
+        <span class="material-symbols-outlined">chevron_left</span>
+    </button>
 
+    <div id="content-japan" class="flex overflow-x-auto no-scrollbar py-2 gap-5 scroll-smooth">
+        <div class="w-56 h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col items-center justify-center p-8 text-center hover:border-primary/50 transition-all cursor-pointer group shadow-sm">
+            <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-primary text-3xl">event</span>
             </div>
-          </div>
+        </div>
+    </div>
+
+    <button onclick="scrollJapan('right')" 
+            class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-primary/80 text-white shadow-lg opacity-0 group-hover/japan:opacity-100 transition-opacity flex items-center justify-center hover:bg-primary">
+        <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+</div>
 
           <div id="content-mofa"
             class="hidden w-full h-full min-h-[400px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 overflow-y-auto text-slate-700 dark:text-slate-300">
@@ -161,109 +172,23 @@
   <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
 
 
-  <script>
-    // 定義非同步載入新聞的函式
-    async function loadJapanNews() {
-      const container = document.getElementById('content-japan');
-      try {
-        // 1. 抓取後端 API 資料
-        const response = await fetch('/api/news/japan');
-        if (!response.ok) throw new Error("API 連線失敗");
-        const data = await response.json();
-
-        // 2. 清空容器（移除原本的 loading 或預設佔位內容）
-        container.innerHTML = '';
-
-        if (data.length === 0) {
-          container.innerHTML = '<div class="text-slate-500 p-8">目前暫無最新新聞</div>';
-          return;
-        }
-
-        // 3. 渲染新聞卡片
-        data.forEach(news => {
-          const cleanTitle = news.title.split(' - ')[0];
-          const newsCard = `
-                <div class="min-w-[280px] max-w-[320px] bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 shadow-sm hover:border-primary/50 transition-all flex flex-col justify-between group">
-                    <div>
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold rounded uppercase tracking-wider">最新資訊</span>
-                            <span class="text-slate-500 text-[10px]">${news.source}</span>
-                        </div>
-                        <a href="${news.link}" target="_blank" class="block mb-4">
-                            <h5 class="text-slate-200 group-hover:text-primary text-base font-bold leading-snug line-clamp-3 transition-colors">
-                                ${cleanTitle}
-                            </h5>
-                        </a>
-                    </div>
-                    <div class="pt-4 border-t border-white/5 flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-slate-500">
-                            <span class="material-symbols-outlined text-sm">calendar_today</span>
-                            <span class="text-[11px]">${new Date(news.date).toLocaleDateString()}</span>
-                        </div>
-                        <a href="${news.link}" target="_blank" class="flex items-center gap-1 text-primary text-xs font-bold hover:gap-2 transition-all">
-                            閱讀更多 <span class="material-symbols-outlined text-xs">arrow_forward</span>
-                        </a>
-                    </div>
-                </div>
-            `;
-          container.innerHTML += newsCard;
-        });
-      } catch (error) {
-        console.error('新聞載入錯誤:', error);
-        container.innerHTML = '<div class="text-red-400 p-8 text-sm">無法獲取日本資訊，請稍後再試</div>';
-      }
-    }
-
-    // 監聽頁面載入完成後執行
-    document.addEventListener('DOMContentLoaded', function () {
-      // 執行新聞載入
-      loadJapanNews();
-
-      // 搜尋按鈕功能
-      document.getElementById('searchBtn').addEventListener('click', function () {
-        const keyword = document.getElementById('searchInput').value.trim();
-        if (!keyword) return;
-
-        fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`)
-          .then(response => {
-            if (!response.ok) throw new Error("找不到作品");
-            return response.json();
-          })
-          .then(work => {
-            window.location.href = `/workListDetail?workId=${work.workId}`;
-          })
-          .catch(error => {
-            console.warn(error);
-            window.location.href = `/workList?keyword=${encodeURIComponent(keyword)}`;
-          });
-      });
-    });
-
-    // 切換 Tab 功能
-    function showContent(tab) {
-      const japanContent = document.getElementById('content-japan');
-      const mofaContent = document.getElementById('content-mofa');
-      const btnJapan = document.getElementById('btn-japan');
-      const btnMofa = document.getElementById('btn-mofa');
-
-      if (tab === 'japan') {
-        japanContent.classList.remove('hidden');
-        japanContent.classList.add('flex');
-        mofaContent.classList.add('hidden');
-        btnJapan.className = "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group";
-        btnMofa.className = "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm";
-      } else {
-        japanContent.classList.add('hidden');
-        japanContent.classList.remove('flex');
-        mofaContent.classList.remove('hidden');
-        btnMofa.className = "flex flex-col items-center justify-center h-48 bg-slate-200 dark:bg-white/10 border-2 border-primary rounded-2xl text-slate-900 dark:text-white transition-all shadow-lg group";
-        btnJapan.className = "flex flex-col items-center justify-center h-48 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:border-primary/50 hover:text-primary transition-all group shadow-sm";
-      }
-    }
-  </script>
+  
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script th:src="@{/assets/toast.js}"></script>
+  <script th:src="@{/home/home.js}"></script>
+
+  <div id="wikiModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="bg-white dark:bg-background-dark w-full max-w-4xl h-[70vh] rounded-2xl overflow-hidden flex flex-col shadow-2xl">
+        <div class="p-5 border-b border-slate-200 dark:border-white/10 flex justify-between items-center bg-slate-50 dark:bg-white/5">
+            <h3 id="wikiTitle" class="font-bold text-xl text-primary">景點介紹</h3>
+            <button onclick="closeWikiModal()" class="material-symbols-outlined hover:text-primary transition-colors">close</button>
+        </div>
+        <div id="wikiContent" class="flex-1 p-8 overflow-y-auto prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
+            </div>
+    </div>
+</div>
+
 </body>
 
 </html>

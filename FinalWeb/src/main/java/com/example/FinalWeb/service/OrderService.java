@@ -232,7 +232,7 @@ public class OrderService {
     @Autowired
     private MemberRepo memberRepo; // 記得注入 MemberRepo
 
-    public long getTotalMemberCount() {
+    public long getTotalCount() {
         return memberRepo.count(); // 回傳資料庫會員總數
     }
 
@@ -273,4 +273,43 @@ public class OrderService {
         }
         return quarterly; // 回傳 [Q1, Q2, Q3, Q4]
     }
+    // 請確認這段程式碼位於 OrderService 類別內
+public Map<String, Object> getOrderDetailWithItems(Integer orderId) {
+    OrdersEntity order = ordersRepo.findById(orderId).orElse(null);
+    if (order == null) return null;
+
+    Map<String, Object> detail = new HashMap<>();
+    detail.put("orderId", order.getOrderId());
+    detail.put("payStatus", order.getPayStatus());
+    detail.put("orderTime", order.getOrderTime());
+    detail.put("tradeNo", order.getTradeNo());
+
+    if (order.getMember() != null) {
+        detail.put("customerName", order.getMember().getName()); 
+        // 修正：確保 Key 名稱為 customerEmail
+        detail.put("customerEmail", order.getMember().getEmail()); 
+    } else {
+        detail.put("customerName", "未知顧客");
+        detail.put("customerEmail", "未提供 Email");
+    }
+
+    // 修正：確保 Key 名稱為 totalPrice，對應前端 order.totalPrice
+    detail.put("totalPrice", calculateTotalAmount(order)); 
+
+    List<Map<String, Object>> items = new ArrayList<>();
+    if (order.getOrderDetails() != null) {
+        for (OrdersDetailEntity item : order.getOrderDetails()) {
+            Map<String, Object> itemMap = new HashMap<>();
+            itemMap.put("ticketType", item.getTicketType());
+            itemMap.put("ticketPrice", item.getTicketPrice() != null ? item.getTicketPrice() : 0);
+            items.add(itemMap);
+        }
+    }
+    detail.put("orderDetails", items);
+    return detail;
+}
+    
+   
+
+           
 }

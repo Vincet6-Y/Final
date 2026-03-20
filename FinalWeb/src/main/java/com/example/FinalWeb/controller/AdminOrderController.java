@@ -35,14 +35,15 @@ public class AdminOrderController {
         return ResponseEntity.ok("更新成功");
     }
     // 在 AdminOrderController.java 中新增
-@GetMapping("/{id}")
+@GetMapping("/detail/{id}")
 public ResponseEntity<?> getOrderDetail(@PathVariable Integer id) {
     try {
-        // 使用 service 獲取訂單詳情
-        return ResponseEntity.ok(orderService.getOrderById(id));
+        // 🌟 這裡建議改用你新寫的 getOrderDetailWithItems，資訊比較豐富
+        var detail = orderService.getOrderDetailWithItems(id);
+        if (detail == null) return ResponseEntity.status(404).body("找不到該訂單");
+        return ResponseEntity.ok(detail);
     } catch (Exception e) {
-        return ResponseEntity.status(404).body("找不到該訂單");
+        return ResponseEntity.status(500).body("伺服器錯誤");
     }
 }
-
 }

@@ -33,7 +33,7 @@ public class AdminRevenueController { // 修正拼字
 
         // 💡 呼叫新的方法來取得真實會員數（假設你稍後在 Service 寫好這個方法）
         // 如果暫時沒有 Service，可以先改成一個明顯的數字測試，例如 888
-        long realActiveUsers = orderService.getTotalMemberCount();
+        long realActiveUsers = orderService.getTotalCount();
 
         response.put("totalRevenue", totalRevenue);
         response.put("activeUsers", realActiveUsers); // 這裡改為動態變數

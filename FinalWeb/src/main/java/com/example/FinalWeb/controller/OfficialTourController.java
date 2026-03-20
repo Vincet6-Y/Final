@@ -15,7 +15,7 @@ import com.example.FinalWeb.repo.JourneyPlanRepo;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-public class PackageTourController {
+public class OfficialTourController {
 
     @Autowired
     private JourneyPlanRepo journeyPlanRepo;
@@ -23,8 +23,8 @@ public class PackageTourController {
     @Autowired
     private FavoritesRepo favoritesRepo;
 
-    @GetMapping("/packageTour")
-    public String packageTourPage(Model model, HttpSession session) {
+    @GetMapping("/officialTour")
+    public String officialTourPage(Model model, HttpSession session) {
         
         // 1. 撈取資料庫中所有的官方行程
         List<JourneyPlanEntity> plans = journeyPlanRepo.findAll();
@@ -46,7 +46,7 @@ public class PackageTourController {
             model.addAttribute("myFavoritePlanIds", null);
         }
         
-        // 6. 導向至 packageTour.html
-        return "packageTour";
+        // 6. 導向至 officialTour.html
+        return "officialTour";
     }
 }

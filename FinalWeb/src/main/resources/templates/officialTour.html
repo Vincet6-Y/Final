@@ -47,7 +47,7 @@
                             class="tour-card bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col"
                             th:data-days="${plan.daysCount}">
 
-                            <a th:href="@{/packageTourDetail(planId=${plan.planId})}" class="flex flex-col h-full">
+                            <a th:href="@{/officialMap(planId=${plan.planId})}" class="flex flex-col h-full">
                                 <div class="p-5 flex-1 flex flex-col">
 
                                     <div class="flex items-center justify-between mb-3">
@@ -98,38 +98,7 @@
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
     </div>
 
-    <script th:src="@{/tour/packageTour.js}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-    const filters = document.querySelectorAll('.day-filter');
-    const cards = document.querySelectorAll('.tour-card');
-
-    filters.forEach(filter => {
-        filter.addEventListener('change', function() {
-            const selectedValue = this.value; // "all", "5", "10"
-
-            cards.forEach(card => {
-                const cardDays = card.getAttribute('data-days');
-                
-                // 判斷是否符合條件
-                const isMatch = (selectedValue === 'all' || cardDays === selectedValue);
-
-                if (isMatch) {
-                    card.style.display = 'flex';
-                    // 增加一個微小的動畫效果
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transition = 'opacity 0.3s ease';
-                    }, 10);
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    });
-});
-    </script>
+    <script th:src="@{/tour/officialTour.js}"></script>
 </body>
 
 </html>
