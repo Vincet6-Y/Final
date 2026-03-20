@@ -11,4 +11,7 @@ import com.example.FinalWeb.entity.JourneyPlanEntity;
 public interface JourneyPlanRepo extends JpaRepository<JourneyPlanEntity, Integer> {
     // @EntityGraph(attributePaths = {"maps"})
     List<JourneyPlanEntity> findByWorkDetail_WorkId(Integer workId);
+
+    // 撈取狀態為 true 的行程
+    List<JourneyPlanEntity> findByStatusTrue();
 }

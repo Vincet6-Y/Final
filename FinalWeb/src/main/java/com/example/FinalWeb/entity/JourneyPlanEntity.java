@@ -34,6 +34,8 @@ public class JourneyPlanEntity {
     @Transient
     private Map<Integer, String> groupedDays; // Key 是第幾天 (1, 2, 3...)，Value 是串好的字串 ("地點A、地點B")
 
+    private Boolean status = false;
+
     // 拉關連線到 workDetail
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workId")

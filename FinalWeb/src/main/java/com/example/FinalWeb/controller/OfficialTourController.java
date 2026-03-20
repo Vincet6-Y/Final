@@ -27,7 +27,7 @@ public class OfficialTourController {
     public String officialTourPage(Model model, HttpSession session) {
         
         // 1. 撈取資料庫中所有的官方行程
-        List<JourneyPlanEntity> plans = journeyPlanRepo.findAll();
+        List<JourneyPlanEntity> plans = journeyPlanRepo.findByStatusTrue();
         
         // 2. 將行程清單放入 Model，就能用 ${journeyPlans} 取出
         model.addAttribute("journeyPlans", plans);
