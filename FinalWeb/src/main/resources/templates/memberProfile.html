@@ -28,17 +28,24 @@
               <div class="bg-primary/5 p-6 rounded-xl border border-primary/10">
                 <div class="flex flex-col md:flex-row items-center gap-8">
                   <div class="relative group">
-                    <div
-                      id="memberAvatarPreview"
-                      class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-32 border-4 border-primary/30"
-                      th:style="|background-image: url('${member.memberImgUrl != null ? member.memberImgUrl : defaultMemberImgUrl}')|">
-                    </div>
-                    <div
-                      class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-                      <span class="material-symbols-outlined text-white text-sm">
-                        photo_camera
-                      </span>
-                    </div>
+                      <div class="relative size-32">
+                          <div id="avatarSkeleton"
+                              class="w-full h-full rounded-full bg-slate-700 animate-pulse absolute inset-0">
+                          </div>
+                          <img id="memberAvatarPreview"
+                              alt="會員頭像"
+                              fetchpriority="high"
+                              decoding="async"
+                              class="size-32 rounded-full border-4 border-primary/30 object-cover opacity-0 transition-opacity duration-300"
+                              th:src="${member.memberImgUrl != null and !#strings.isEmpty(member.memberImgUrl)
+                                      ? member.memberImgUrl
+                                      : defaultMemberImgUrl}"
+                              onload="this.style.opacity='1'; document.getElementById('avatarSkeleton').style.display='none';"
+                              onerror="this.src=document.getElementById('defaultMemberImgUrl').value; this.style.opacity='1'; document.getElementById('avatarSkeleton').style.display='none';" />
+                      </div>
+                      <div class="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                          <span class="material-symbols-outlined text-white text-sm">photo_camera</span>
+                      </div>
                   </div>
                   <div class="flex flex-col items-center md:items-start gap-3">
                     <div class="text-center md:text-left">

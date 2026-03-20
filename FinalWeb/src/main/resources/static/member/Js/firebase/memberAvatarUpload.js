@@ -6,6 +6,44 @@ import {
   deleteObject
 } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
+function compressImage(file, maxSize, quality) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+
+        img.onload = function () {
+            URL.revokeObjectURL(url);
+
+            // 計算縮放比例，超過 maxSize 才縮
+            let width = img.width;
+            let height = img.height;
+            if (width > maxSize || height > maxSize) {
+                if (width > height) {
+                    height = Math.round(height * maxSize / width);
+                    width = maxSize;
+                } else {
+                    width = Math.round(width * maxSize / height);
+                    height = maxSize;
+                }
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+                (blob) => blob ? resolve(blob) : reject(new Error("壓縮失敗")),
+                "image/jpeg",
+                quality  // 0~1，0.85 = 品質85%
+            );
+        };
+
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
 $(function () {
   const $fileInput = $("#avatarFileInput");
   const $uploadBtn = $("#uploadAvatarBtn");
@@ -21,7 +59,7 @@ $(function () {
   let isAvatarRemoved = false;
 
   function setPreviewImage(url) {
-    $preview.css("background-image", `url("${url}")`);
+      $preview.attr("src", url);
   }
 
   function getSafeImageUrl(url) {
@@ -49,9 +87,15 @@ $(function () {
     }
 
     try {
+
+      // 壓縮圖片再上傳
+      const compressedBlob = await compressImage(file, 400, 0.85);
+
       const avatarRef = ref(storage, `avatars/${memberId}/profile.jpg`);
-      await uploadBytes(avatarRef, file);
-      const downloadURL = await getDownloadURL(avatarRef);
+      await uploadBytes(avatarRef, compressedBlob);
+      const bucket = "anime-travel-website.firebasestorage.app";
+      const path = encodeURIComponent(`avatars/${memberId}/profile.jpg`);
+      const downloadURL = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${path}?alt=media`;
 
       isAvatarRemoved = false;
       $memberImgUrl.val(downloadURL);
