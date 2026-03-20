@@ -66,7 +66,7 @@ $(document).ready(function () {
                             </button>
                             <button class="toggle-status-btn p-1.5 rounded-lg hover:bg-yellow-500/20 text-slate-400 hover:text-yellow-400 transition-colors" 
                                     data-id="${article.articleId}" data-status="${article.status}" title="切換狀態">
-                                <span class="material-symbols-outlined text-sm">${article.status === 'published' ? 'visibility_off' : 'visibility'}</span>
+                                <span class="material-symbols-outlined text-sm">${article.status === 'published' ? 'visibility' : 'visibility_off'}</span>
                             </button>
                             <button class="delete-btn p-1.5 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors" 
                                     data-id="${article.articleId}" title="刪除">
