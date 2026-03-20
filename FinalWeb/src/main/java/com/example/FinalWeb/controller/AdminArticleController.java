@@ -96,4 +96,16 @@ public class AdminArticleController {
     public ModelAndView previewPage() {
         return new ModelAndView("article");
     }
+
+    // ------------------------------------------------
+    // 6. 查詢單篇文章 (Read - 切換狀態用)
+    // ------------------------------------------------
+    @GetMapping("/{id}")
+    public ResponseEntity<ArticleEntity> getById(@PathVariable Integer id) {
+        ArticleEntity article = articleService.findEntityById(id);
+        if (article == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(article);
+    }
 }

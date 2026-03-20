@@ -60,7 +60,7 @@
                                 <div class="relative">
                                     <input type="text" id="articleClass" list="classOptions"
                                         class="w-full bg-[#1a1614] border border-white/10 rounded-lg p-3 text-white outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                                        placeholder="手動輸入或下拉選擇..." value="特色活動" />
+                                        placeholder="手動輸入或下拉選擇..." />
                                     <datalist id="classOptions">
                                         <option value="特色活動"></option>
                                         <option value="活動"></option>
@@ -93,11 +93,11 @@
             </div>
         </main>
     </div>
+    <!-- UI Editor-->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script th:src="@{/assets/toast.js}"></script>
+    <script th:src="@{/backend/backendarticle.js}"></script>
 </body>
-<!-- UI Editor-->
-<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script th:src="@{/assets/toast.js}"></script>
-<script th:src="@{/backend/backendarticle.js}"></script>
 
 </html>

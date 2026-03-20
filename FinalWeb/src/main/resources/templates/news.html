@@ -5,26 +5,32 @@
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
-    <!-- Main Container -->
     <div class="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-        <!-- Top Navigation Bar -->
+        <!-- Header Section -->
         <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
         <main class="flex-1 w-full max-w-7xl mx-auto px-6 lg:px-20 py-12">
-            <!-- Hero Section Header -->
             <div class="mb-12">
-                <h2 class="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight ">最新消息</h2>
+                <h2 class="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">最新消息</h2>
                 <p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4 whitespace-nowrap">
                     掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。
                 </p>
             </div>
-            <!-- Section 1: Website Info (Cards Layout) -->
+
+            <!-- Section 1: 最新文章卡片 -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
                 <div th:each="info, iterStat : ${newSection}"
                     class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none flex flex-col">
 
                     <div class="aspect-video relative overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                        <!-- ✅ 有封面圖時用資料庫的圖 -->
+                        <div th:if="${info.articleImageUrl != null and !#strings.isEmpty(info.articleImageUrl)}"
+                            class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            th:style="'background-image: url(' + ${info.articleImageUrl} + ');'">
+                        </div>
+                        <!-- ✅ 沒有封面圖時 fallback 靜態圖 -->
+                        <div th:unless="${info.articleImageUrl != null and !#strings.isEmpty(info.articleImageUrl)}"
+                            class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                             th:style="'background-image: url(' + 
                                     (${iterStat.index == 0} ? @{/news/news_discount.png} : 
                                     (${iterStat.index == 1} ? @{/news/news_member.png} : @{/news/news_photo.png})) 
@@ -45,16 +51,17 @@
                         <a th:href="@{/article/{id}(id=${info.articleId})}"
                             class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2 mt-auto">
 
-                            <span th:text="${info.articleClass == '活動'} ? '了解更多' : 
-                            (${info.articleClass == '會員限定'} ? '註冊優惠' : '參賽細則')">了解更多</span>
+                            <span th:text="${info.articleClass == '活動'} ? '了解更多' :
+                                (${info.articleClass == '會員限定'} ? '註冊優惠' : '參賽細則')">了解更多</span>
 
-                            <span class="material-symbols-outlined text-base" th:text="${info.articleClass == '活動'} ? 'open_in_new' : 
-                             (${info.articleClass == '會員限定'} ? 'person_add' : 'photo_camera')"></span>
+                            <span class="material-symbols-outlined text-base" th:text="${info.articleClass == '活動'} ? 'open_in_new' :
+                                (${info.articleClass == '會員限定'} ? 'person_add' : 'photo_camera')"></span>
                         </a>
                     </div>
                 </div>
             </div>
-            <!-- Section 2: MOFA Travel Alerts (Safety Focus) -->
+
+            <!-- Section 2: 外交部旅遊即時資訊 -->
             <section class="mb-16 bg-primary/5 border border-primary/20 rounded-2xl p-8">
                 <div class="flex items-center gap-3 mb-8">
                     <span class="material-symbols-outlined text-primary text-3xl">security</span>
@@ -67,7 +74,6 @@
                             <span class="material-symbols-outlined text-primary text-lg">campaign</span>
                             <h4 class="text-lg font-bold text-slate-900 dark:text-white">即時警戒動態</h4>
                         </div>
-
                         <div id="alert-container" class="w-full space-y-4">
                             <div
                                 class="animate-pulse p-5 bg-white dark:bg-background-dark/50 rounded-xl border border-slate-200 dark:border-white/5">
@@ -90,7 +96,6 @@
                                     (外交部)</span>
                                 <p class="text-slate-500 dark:text-slate-400 text-xs">包含簽證、入境政策與安全公告。</p>
                             </a>
-
                             <a href="https://vjw-lp.digital.go.jp/zh-hant/" target="_blank"
                                 class="group p-4 bg-white dark:bg-background-dark/50 border border-slate-200 dark:border-white/10 rounded-xl hover:border-primary/50 transition-all shadow-sm dark:shadow-none">
                                 <span
@@ -108,7 +113,8 @@
                     </div>
                 </div>
             </section>
-            <!-- Section 3: Travel Guides & Tips (Featured Grid) -->
+
+            <!-- Section 3: 旅遊攻略 -->
             <section class="mb-20">
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center gap-3">
@@ -118,30 +124,33 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:h-[600px]">
-
-                    <a th:each="art, iterStat :${travelGuides}" th:if="${iterStat.index < 4}"
+                    <a th:each="art, iterStat : ${travelGuides}" th:if="${iterStat.index < 4}"
                         class="relative group rounded-2xl overflow-hidden shadow-md transition-all duration-300"
-                        th:classappend="${iterStat.index == 0} ? 'h-[400px] md:h-full md:col-span-2 md:row-span-2 shadow-lg' : 
+                        th:classappend="${iterStat.index == 0} ? 'h-[400px] md:h-full md:col-span-2 md:row-span-2 shadow-lg' :
                                         (${iterStat.index == 1} ? 'h-[250px] md:h-full md:col-span-2' : 'h-[250px] md:h-full md:col-span-1')"
                         th:href="@{/article/{id}(id=${art.articleId})}" aria-label="閱讀文章詳細內容">
 
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                            th:style="'background-image: url(' + 
-                                        (${iterStat.index == 0} ? @{/news/news_travel.png} : 
-                                        (${iterStat.index == 1} ? @{/news/news_ticket.png} : 
-                                        (${iterStat.index == 2} ? @{/news/news_shoes.png} : @{/news/news_food.png}))) 
-                                        + ');'">
+                        <!-- ✅ 有封面圖時用資料庫的圖 -->
+                        <div th:if="${art.articleImageUrl != null and !#strings.isEmpty(art.articleImageUrl)}"
+                            class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            th:style="'background-image: url(' + ${art.articleImageUrl} + ');'">
+                        </div>
+                        <!-- ✅ 沒有封面圖時 fallback 靜態圖 -->
+                        <div th:unless="${art.articleImageUrl != null and !#strings.isEmpty(art.articleImageUrl)}"
+                            class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            th:style="${iterStat.index == 0} ? 'background-image: url(/news/news_travel.png);' :
+                                       (${iterStat.index == 1} ? 'background-image: url(/news/news_ticket.png);' :
+                                       (${iterStat.index == 2} ? 'background-image: url(/news/news_shoes.png);' :
+                                        'background-image: url(/news/news_food.png);'))">
                         </div>
 
                         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
 
                         <div class="absolute bottom-0 left-0 w-full p-6"
                             th:classappend="${iterStat.index == 0} ? 'p-8' : ''">
-
                             <span class="text-primary font-bold uppercase tracking-widest mb-2 block"
                                 th:classappend="${iterStat.index == 0} ? 'text-sm' : 'text-[10px]'"
                                 th:text="${art.articleClass}">分類</span>
-
                             <h4 th:if="${iterStat.index == 0}" class="text-3xl font-bold text-white mb-4"
                                 th:text="${art.title}">標題</h4>
                             <h5 th:unless="${iterStat.index == 0}"
@@ -151,16 +160,13 @@
                 </div>
             </section>
         </main>
+
         <!-- Footer -->
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-
     </div>
 
-    <!-- 日本旅遊即時資訊  -->
+    <!-- 日本旅遊即時資訊 -->
     <script th:src="@{/news/js/news.js}"></script>
-
-
-
 </body>
 
 </html>

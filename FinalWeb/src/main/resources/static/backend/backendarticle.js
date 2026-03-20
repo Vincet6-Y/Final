@@ -1,14 +1,13 @@
 $(document).ready(function () {
-
     // 【宣告全域變數】放在最頂端，讓底下的「上傳圖」、「發布」、「草稿」都能共用這個變數
     let coverImageUrl = "";
-    let currentArticleId = null; // 紀錄目前文章的 ID，避免重複新增
+    let currentArticleId = null;
 
     // ==========================================
     // 1. 初始化 UI Editor
     // ==========================================
     const editor = new toastui.Editor({
-        el: document.querySelector('#editor'), // 抓取 HTML 中的 editor div
+        el: document.querySelector('#editor'),
         height: '500px',
         initialEditType: 'markdown',
         previewStyle: 'vertical',
@@ -17,11 +16,40 @@ $(document).ready(function () {
     });
 
     // ==========================================
-    // 2. 封面圖上傳邏輯
+    // 2. ✅ 編輯模式：若 URL 帶有 ?editId=xxx 就載入舊資料
+    // ==========================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get("editId");
+
+    if (editId) {
+        currentArticleId = parseInt(editId);
+        $.ajax({
+            url: `/admin/articles/${editId}`,
+            method: "GET",
+            success: function (article) {
+                $("#titleInput").val(article.title);
+                $("#articleClass").val(article.articleClass);
+                editor.setMarkdown(article.content || "");
+
+                if (article.articleImageUrl) {
+                    coverImageUrl = article.articleImageUrl;
+                    $("#coverPreview").attr("src", article.articleImageUrl).removeClass("hidden");
+                }
+
+                // 更新頁面標題提示
+                $("h2").text("編輯文章：" + article.title);
+                showToast("success", "文章資料已載入");
+            },
+            error: function () {
+                showToast("error", "無法載入文章，請確認 ID 是否正確");
+            }
+        });
+    }
+
+    // ==========================================
+    // 3. 封面圖上傳邏輯
     // ==========================================
     $("#coverUpload").click(function (e) {
-        // 【關鍵修正】檢查點擊目標！
-        // 如果點擊的不是 input 本身，才去觸發 input 點擊，避免無限迴圈
         if (e.target.id !== 'coverInput') {
             $("#coverInput").click();
         }
@@ -33,7 +61,6 @@ $(document).ready(function () {
 
         const formData = new FormData();
         formData.append("file", file);
-        // 上傳圖片需要告知後端分類資料，不然 controller 會報錯 (Missing required parameter 'articleClass')
         const currentClass = $("#articleClass").val() || "未分類";
         formData.append("articleClass", currentClass);
 
@@ -41,18 +68,21 @@ $(document).ready(function () {
             url: "/admin/articles/upload",
             method: "POST",
             data: formData,
-            processData: false,  // 告訴 jQuery 不要處理資料
-            contentType: false,  // 告訴 jQuery 不要設定 Content-Type (讓 FormData 自動設定邊界)
+            processData: false,
+            contentType: false,
             success: function (res) {
-                coverImageUrl = res.url; // 將後端回傳的網址存入全域變數
-                $("#coverPreview").attr("src", res.url).removeClass("hidden"); // 顯示預覽圖
+                coverImageUrl = res.url;
+                $("#coverPreview").attr("src", res.url).removeClass("hidden");
                 showToast("success", "封面上傳成功");
+            },
+            error: function () {
+                showToast("error", "封面上傳失敗");
             }
         });
     });
 
     // ==========================================
-    // 3. 共用函式：更新最後儲存時間
+    // 4. 更新最後儲存時間
     // ==========================================
     function updateSaveTime() {
         const now = new Date();
@@ -62,13 +92,12 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 4. 定時器：每 30 秒自動儲存草稿
+    // 5. 每 30 秒自動儲存草稿
     // ==========================================
     setInterval(function () {
         const title = $("#titleInput").val();
         const content = editor.getMarkdown();
-
-        if (!title && !content) return; // 如果都沒填，就不自動存
+        if (!title && !content) return;
 
         const data = {
             title: title || "未命名草稿",
@@ -96,30 +125,21 @@ $(document).ready(function () {
     }, 30000);
 
     // ==========================================
-    // 5. 按鈕邏輯：預覽、存草稿、發布
+    // 6. 預覽按鈕
     // ==========================================
-    // 預覽
     $("#previewBtn").click(function () {
-        // 1. 【新增這三行】先從畫面上把資料抓下來！
-        const title = $("#titleInput").val() || "未命名文章";
-        const articleClass = $("#articleClass").val() || "未分類";
-        const content = editor.getMarkdown() || "沒有內容...";
-
-        // 2. 將資料組裝成物件
         const previewData = {
-            title: title,
-            articleClass: articleClass,
-            content: content
+            title: $("#titleInput").val() || "未命名文章",
+            articleClass: $("#articleClass").val() || "未分類",
+            content: editor.getMarkdown() || "沒有內容..."
         };
-
-        // 3. 存入瀏覽器的 sessionStorage
         sessionStorage.setItem('articlePreview', JSON.stringify(previewData));
-
-        // 4. 開啟新分頁，導向 Controller 提供的預覽網址
         window.open("/admin/articles/preview", "_blank");
     });
 
-    // 儲存草稿
+    // ==========================================
+    // 7. 儲存草稿
+    // ==========================================
     $("#draftBtn").click(function () {
         const data = {
             title: $("#titleInput").val() || "未命名草稿",
@@ -143,17 +163,21 @@ $(document).ready(function () {
                 }
                 showToast("success", "草稿已儲存");
                 updateSaveTime();
+            },
+            error: function () {
+                showToast("error", "草稿儲存失敗");
             }
         });
     });
 
-    // 發布文章
+    // ==========================================
+    // 8. 發布文章
+    // ==========================================
     $("#publishBtn").click(function () {
         const title = $("#titleInput").val();
         const content = editor.getMarkdown();
         const articleClass = $("#articleClass").val();
 
-        // 基本的防呆檢查
         if (!title.trim()) return showToast("warning", "請輸入文章標題");
         if (!content.trim()) return showToast("warning", "請輸入文章內容");
         if (!articleClass) return showToast("warning", "請選擇文章分類");
@@ -163,7 +187,7 @@ $(document).ready(function () {
             content: content,
             articleClass: articleClass,
             articleImageUrl: coverImageUrl,
-            status: "published" // 發布狀態
+            status: "published"
         };
 
         const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
