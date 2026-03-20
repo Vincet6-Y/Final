@@ -22,6 +22,9 @@ import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.JourneyPlanService;
 import com.example.FinalWeb.service.WorkService;
+import com.example.FinalWeb.service.ArticleService;
+import com.example.FinalWeb.entity.ArticleEntity;
+import org.springframework.data.domain.Page;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -34,6 +37,9 @@ public class BackEndController {
 
     @Autowired
     private JourneyPlanService journeyPlanService;
+
+    @Autowired
+    private ArticleService articleService;
 
     @Value("${google.maps.api.key}")
     private String googleMapsApiKey;
@@ -54,7 +60,10 @@ public class BackEndController {
     }
 
     @RequestMapping("/contentmanagement")
-    public String backendcontentmanagement(Model model, HttpSession session) {
+    public String backendcontentmanagement(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model, HttpSession session) {
         List<WorkDetailEntity> getNew5 = service.showNew5();
         model.addAttribute("newWroks", getNew5);
 
@@ -66,7 +75,11 @@ public class BackEndController {
         List<JourneyPlanEntity> top5Plans = allPlans.stream().limit(5).collect(Collectors.toList());
         model.addAttribute("journeyPlans", top5Plans);
 
-        // 3. 取得登入會員名稱，顯示在文章管理表格的「作者」欄
+        // 3. 取得文章分頁資料
+        Page<ArticleEntity> articlesPage = articleService.findAllPaged(page, size);
+        model.addAttribute("articlesPage", articlesPage);
+
+        // 4. 取得登入會員名稱，顯示在文章管理表格的「作者」欄
         Object memberObj = session.getAttribute("loginMember");
         if (memberObj instanceof MemberEntity) {
             model.addAttribute("loginMemberName",

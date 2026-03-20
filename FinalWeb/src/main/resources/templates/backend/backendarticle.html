@@ -69,19 +69,18 @@
                             <section class="bg-[#2d2620] rounded-xl p-4 md:p-6 border-2 border-primary/40 shadow-lg">
                                 <h3 class="text-sm font-bold text-slate-300 mb-4">文章分類</h3>
                                 <div class="relative">
-                                    <input type="text" id="articleClass" list="classOptions"
-                                        class="w-full bg-[#1a1614] border border-white/10 rounded-lg p-3 text-white outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                                        placeholder="手動輸入或下拉選擇..." />
-                                    <datalist id="classOptions">
-                                        <option value="特色活動"></option>
-                                        <option value="活動"></option>
-                                        <option value="會員限定"></option>
-                                        <option value="比賽"></option>
-                                        <option value="日本聖地獨旅"></option>
-                                        <option value="朝聖地指南"></option>
-                                        <option value="裝備推薦"></option>
-                                        <option value="聖地美食"></option>
-                                    </datalist>
+                                    <select id="articleClass"
+                                        class="w-full bg-[#1a1614] border border-white/10 rounded-lg p-3 text-white outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer">
+                                        <option value="" disabled selected>請選擇分類...</option>
+                                        <option value="特色活動">特色活動</option>
+                                        <option value="活動">活動</option>
+                                        <option value="會員限定">會員限定</option>
+                                        <option value="比賽">比賽</option>
+                                        <option value="日本聖地獨旅">日本聖地獨旅</option>
+                                        <option value="朝聖地指南">朝聖地指南</option>
+                                        <option value="裝備推薦">裝備推薦</option>
+                                        <option value="聖地美食">聖地美食</option>
+                                    </select>
                                     <span
                                         class="material-symbols-outlined absolute right-3 top-3 text-slate-500 pointer-events-none">expand_more</span>
                                 </div>
