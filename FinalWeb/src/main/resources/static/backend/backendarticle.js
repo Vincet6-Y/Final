@@ -1,8 +1,19 @@
+//firebase 圖片上傳
+import { storage } from "/member/Js/firebase/firebase.js";
+import { ref, uploadBytes, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+
+window.firebaseUploadCover = async function (file, articleClass) {
+    const storagePath = `articles/${articleClass}/${Date.now()}_cover`;
+    const storageRef = ref(storage, storagePath);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+};
+
 $(document).ready(function () {
     // 【宣告全域變數】放在最頂端，讓底下的「上傳圖」、「發布」、「草稿」都能共用這個變數
     let coverImageUrl = "";
     let currentArticleId = null;
-
     // ==========================================
     // 1. 初始化 UI Editor
     // ==========================================
