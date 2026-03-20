@@ -87,6 +87,24 @@
                                     目前尚無行程資料
                                 </div>
                             </div>
+
+                            <div id="normal-action-btns" class="mt-6 flex gap-3">
+                                <a th:href="@{/backend/contentmanagement/plan/create}"
+                                    class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 transition-all text-center flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-base">add_circle</span>快速上架新行程
+                                </a>
+                                <button id="enterBatchModeBtn"
+                                    class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 text-sm font-bold rounded-lg hover:bg-primary/20 transition-all">批次管理</button>
+                            </div>
+                            <div id="batch-action-btns" class="mt-6 hidden flex gap-3">
+                                <button id="batchPublishBtn"
+                                    class="flex-1 py-2 bg-green-600/20 text-green-500 border border-green-500/30 text-sm font-bold rounded-lg hover:bg-green-600/30 transition-all">勾選上架</button>
+                                <button id="batchUnpublishBtn"
+                                    class="flex-1 py-2 bg-slate-700 text-slate-300 border border-slate-600 text-sm font-bold rounded-lg hover:bg-slate-600 transition-all">勾選下架</button>
+                                <button id="exitBatchModeBtn"
+                                    class="px-4 py-2 text-slate-400 hover:text-white text-sm font-bold transition-colors">取消</button>
+                            </div>
+
                         </div>
                     </div>
 
@@ -122,7 +140,7 @@
             </div>
         </main>
     </div>
-
+    <!-- 行程庫管理彈窗 -->
     <div id="planModal" class="fixed inset-0 z-50 hidden bg-black/60 flex items-center justify-center backdrop-blur-sm">
         <div
             class="bg-background-light dark:bg-background-dark w-11/12 max-w-4xl max-h-[85vh] rounded-xl flex flex-col border border-primary/20 shadow-2xl">
@@ -195,22 +213,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div id="normal-action-btns" class="mt-6 flex gap-3">
-                    <a th:href="@{/backend/contentmanagement/plan/create}"
-                        class="flex-1 py-2 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 transition-all text-center flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-base">add_circle</span>快速上架新行程
-                    </a>
-                    <button id="enterBatchModeBtn"
-                        class="px-4 py-2 bg-primary/10 text-primary border border-primary/30 text-sm font-bold rounded-lg hover:bg-primary/20 transition-all">批次管理</button>
-                </div>
-                <div id="batch-action-btns" class="mt-6 hidden flex gap-3">
-                    <button id="batchPublishBtn"
-                        class="flex-1 py-2 bg-green-600/20 text-green-500 border border-green-500/30 text-sm font-bold rounded-lg hover:bg-green-600/30 transition-all">勾選上架</button>
-                    <button id="batchUnpublishBtn"
-                        class="flex-1 py-2 bg-slate-700 text-slate-300 border border-slate-600 text-sm font-bold rounded-lg hover:bg-slate-600 transition-all">勾選下架</button>
-                    <button id="exitBatchModeBtn"
-                        class="px-4 py-2 text-slate-400 hover:text-white text-sm font-bold transition-colors">取消</button>
                 </div>
             </div>
         </div>
