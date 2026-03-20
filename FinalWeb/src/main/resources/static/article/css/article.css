@@ -1,110 +1,330 @@
-/* ===============================
-   Markdown Style System
-   =============================== */
+/* ==============================================
+   article.css — Markdown 文章內容排版樣式
+   對應 class: .markdown-body
+   ============================================== */
 
-#markdown-content {
-    /* 基礎變數 */
-    --md-primary: #fb923c;
-    --md-text-p: #334155;
-    --md-text-li: #475569;
-    --md-bg-quote: rgba(251, 146, 60, 0.05);
+/* ── 基底文字 ── */
+.markdown-body {
+    color: #cbd5e1;
+    /* slate-300 */
+    font-size: 1.0625rem;
+    /* ~17px，閱讀舒適 */
+    line-height: 1.85;
+    word-break: break-word;
 }
 
-/* Dark Mode */
-.dark #markdown-content {
-    --md-text-p: #cbd5e1;
-    --md-text-li: #cbd5e1;
-    --md-bg-quote: rgba(251, 146, 60, 0.1);
+/* ── 段落 ── */
+.markdown-body p {
+    margin-bottom: 1.5rem;
+    color: #cbd5e1;
 }
 
-
-/* ===============================
-   Headings
-   =============================== */
-
-#markdown-content h3 {
-    color: var(--md-primary);
-    font-size: 1.875rem;
+/* ── 標題 H1–H4 ── */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+    color: #f97316;
+    /* primary 橘色 */
     font-weight: 900;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    border-left: 6px solid var(--md-primary);
+    line-height: 1.25;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    border-left: 6px solid #f97316;
     padding-left: 1rem;
-    line-height: 1.2;
 }
 
-
-/* ===============================
-   Paragraph
-   =============================== */
-
-#markdown-content p {
-    color: var(--md-text-p);
-    font-size: 1.125rem;
-    line-height: 2;
-    margin-bottom: 1.5rem;
-    text-align: justify;
+.markdown-body h1 {
+    font-size: 2rem;
 }
 
-
-/* ===============================
-   Lists
-   =============================== */
-
-#markdown-content ol {
-    padding-left: 2.5rem;
-    margin-bottom: 2rem;
-    list-style-position: outside;
+.markdown-body h2 {
+    font-size: 1.6rem;
 }
 
-#markdown-content li {
-    margin-bottom: 0.75rem;
-    color: var(--md-text-li);
-    line-height: 1.8;
-    padding-left: 0.5rem;
-    list-style-type: decimal;
+.markdown-body h3 {
+    font-size: 1.3rem;
 }
 
-/* 數字樣式 */
-#markdown-content ol li::marker {
-    color: var(--md-primary);
-    font-weight: 800;
-    font-family: "JetBrains Mono", monospace;
+.markdown-body h4 {
+    font-size: 1.1rem;
 }
 
-
-/* ===============================
-   Strong Text
-   =============================== */
-
-#markdown-content strong {
-    color: #1e293b;
+/* ── 粗體 / 斜體 ── */
+.markdown-body strong {
+    color: #f1f5f9;
+    /* 近白 */
     font-weight: 700;
-    background: rgba(251, 146, 60, 0.15);
-    padding: 2px 4px;
-    border-radius: 4px;
 }
 
-.dark #markdown-content strong {
-    color: #ffffff;
-}
-
-/* 清單內強調文字 */
-#markdown-content li strong {
-    color: var(--md-primary);
-    background: none;
-}
-
-
-/* ===============================
-   Blockquote
-   =============================== */
-
-#markdown-content blockquote {
-    border-left: 4px solid var(--md-primary);
-    background: var(--md-bg-quote);
-    padding: 1.5rem 2rem;
-    margin: 2rem 0;
+.markdown-body em {
+    color: #94a3b8;
     font-style: italic;
-    border-radius: 0 0.75rem 0.75rem 0;
+}
+
+/* ── 引用區塊 (blockquote) ── */
+.markdown-body blockquote {
+    border-left: 4px solid #f97316;
+    background: rgba(249, 115, 22, 0.08);
+    padding: 1rem 1.5rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+    margin: 1.5rem 0;
+    color: #e2e8f0;
+    font-style: italic;
+}
+
+.markdown-body blockquote p {
+    margin-bottom: 0;
+}
+
+/* ── 無序清單 ── */
+.markdown-body ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+}
+
+.markdown-body ul li {
+    padding-left: 1.5rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+    color: #cbd5e1;
+}
+
+.markdown-body ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 6px;
+    height: 6px;
+    background: #f97316;
+    border-radius: 50%;
+}
+
+/* ── 有序清單 ── */
+.markdown-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+    counter-reset: ol-counter;
+    list-style: none;
+}
+
+.markdown-body ol li {
+    counter-increment: ol-counter;
+    padding-left: 0.75rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+    color: #cbd5e1;
+}
+
+.markdown-body ol li::before {
+    content: counter(ol-counter) ".";
+    position: absolute;
+    left: -1.5rem;
+    color: #f97316;
+    font-weight: 700;
+    width: 1.5rem;
+    text-align: right;
+}
+
+/* ── 巢狀清單 ── */
+.markdown-body ul ul,
+.markdown-body ol ul,
+.markdown-body ul ol,
+.markdown-body ol ol {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding-left: 1.5rem;
+}
+
+/* ── 行內程式碼 ── */
+.markdown-body code {
+    background: rgba(249, 115, 22, 0.12);
+    color: #fb923c;
+    padding: 0.15em 0.45em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* ── 程式碼區塊 ── */
+.markdown-body pre {
+    background: #1e1b18;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.markdown-body pre code {
+    background: transparent;
+    color: #e2e8f0;
+    padding: 0;
+    font-size: 0.875rem;
+    line-height: 1.7;
+}
+
+/* ── 水平線 ── */
+.markdown-body hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2.5rem 0;
+}
+
+/* ── 連結 ── */
+.markdown-body a {
+    color: #f97316;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+
+.markdown-body a:hover {
+    color: #fb923c;
+}
+
+/* ── 圖片 ── */
+.markdown-body img {
+    max-width: 100%;
+    border-radius: 0.75rem;
+    margin: 1.5rem auto;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── 表格 ── */
+.markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.markdown-body th {
+    background: rgba(249, 115, 22, 0.15);
+    color: #f97316;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+}
+
+.markdown-body td {
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+}
+
+.markdown-body tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+
+/* ── 小貼士 blockquote 特別樣式（粗體開頭）── */
+.markdown-body blockquote strong:first-child {
+    display: block;
+    color: #f97316;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+/* ==============================================
+   WYSIWYG (Toast UI) 產生的 HTML 標籤樣式
+   Toast UI 的 WYSIWYG 模式會輸出原生 HTML 標籤
+   ============================================== */
+
+/* 標題：Toast UI 輸出 <h1>~<h4> */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    color: #f97316;
+    font-weight: 900;
+    line-height: 1.25;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    border-left: 6px solid #f97316;
+    padding-left: 1rem;
+}
+
+/* 粗體：Toast UI 輸出 <strong> */
+.markdown-body strong {
+    color: #f1f5f9;
+    font-weight: 700;
+}
+
+/* 斜體 */
+.markdown-body em {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* 引用：Toast UI 輸出 <blockquote> */
+.markdown-body blockquote {
+    border-left: 4px solid #f97316 !important;
+    background: rgba(249, 115, 22, 0.08) !important;
+    padding: 1rem 1.5rem !important;
+    border-radius: 0 0.5rem 0.5rem 0;
+    margin: 1.5rem 0;
+    color: #e2e8f0;
+    font-style: italic;
+}
+
+/* Toast UI WYSIWYG 的清單：直接輸出 <ul><li> */
+.markdown-body ul li,
+.markdown-body ol li {
+    color: #cbd5e1;
+    margin-bottom: 0.4rem;
+    padding-left: 0.25rem;
+}
+
+/* Toast UI 輸出的 <br> 換行間距 */
+.markdown-body br {
+    display: block;
+    content: "";
+    margin-bottom: 0.5rem;
+}
+
+/* Toast UI 段落 <p> */
+.markdown-body>p,
+.markdown-body p {
+    margin-bottom: 1.25rem;
+    color: #cbd5e1;
+    line-height: 1.85;
+}
+
+/* 連結 */
+.markdown-body a {
+    color: #f97316 !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* 行內程式碼 <code> */
+.markdown-body code {
+    background: rgba(249, 115, 22, 0.12) !important;
+    color: #fb923c !important;
+    padding: 0.15em 0.45em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+/* 圖片 */
+.markdown-body img {
+    max-width: 100%;
+    border-radius: 0.75rem;
+    margin: 1.5rem auto;
+    display: block;
+}
+
+/* 水平線 <hr> */
+.markdown-body hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2.5rem 0;
 }
