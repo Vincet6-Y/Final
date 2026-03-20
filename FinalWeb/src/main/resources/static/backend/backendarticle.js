@@ -16,20 +16,34 @@ $(document).ready(function () {
     let currentArticleId = null;
 
     // ==========================================
-    // 1. 初始化 Toast UI Editor（純 WYSIWYG，隱藏 Markdown 切換）
+    // 1. 編輯器
     // ==========================================
     const editor = new toastui.Editor({
         el: document.querySelector('#editor'),
         height: '500px',
         initialEditType: 'wysiwyg',
-        hideModeSwitch: true,           // ✅ 隱藏 Markdown/WYSIWYG 切換按鈕
-        previewStyle: 'vertical',
+        hideModeSwitch: false,
         theme: 'dark',
-        placeholder: "開始撰寫你的巡禮故事..."
+        placeholder: "開始撰寫你的文章..."
     });
 
+    /**
+     * 讀檔邏輯：把 DB 裡的內容放進編輯器
+     */
+    function loadContentToEditor(content) {
+        if (!content) return;
+        editor.setMarkdown(content);
+    }
+
+    /**
+     * 存檔邏輯：
+     */
+    function getContent() {
+        return editor.getMarkdown();
+    }
+
     // ==========================================
-    // 2. 共用：顯示封面預覽
+    // 2. 封面預覽
     // ==========================================
     function showCoverPreview(url) {
         if (url) {
@@ -40,7 +54,7 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 3. 封面圖片 URL 輸入框 — 手動貼網址即時預覽
+    // 3. 封面圖片 URL 輸入框
     // ==========================================
     $("#coverUrlInput").on("input", function () {
         const url = $(this).val().trim();
@@ -76,7 +90,6 @@ $(document).ready(function () {
         try {
             const downloadURL = await window.firebaseUploadCover(file, articleClass);
             coverImageUrl = downloadURL;
-
             $("#coverUrlInput").val(downloadURL);
             showCoverPreview(downloadURL);
 
@@ -113,9 +126,8 @@ $(document).ready(function () {
                 $("#titleInput").val(article.title);
                 $("#articleClass").val(article.articleClass);
 
-                // ✅ 統一用 setHTML，不再區分 markdown
-                const content = article.content || "";
-                editor.setHTML(content);
+                // 將 DB 裡的東西加到編輯器
+                loadContentToEditor(article.content || "");
 
                 if (article.articleImageUrl) {
                     coverImageUrl = article.articleImageUrl;
@@ -133,14 +145,7 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 6. 取得編輯器 HTML 內容（永遠回傳 HTML）
-    // ==========================================
-    function getContent() {
-        return editor.getHTML();
-    }
-
-    // ==========================================
-    // 7. 更新最後儲存時間
+    // 6. 更新最後儲存時間
     // ==========================================
     function updateSaveTime() {
         const now = new Date();
@@ -150,7 +155,7 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 8. 共用存文章函式
+    // 7. 共用存文章函式 (存進 DB 的會是 Markdown 格式)
     // ==========================================
     function saveArticle(status, onSuccess) {
         const data = {
@@ -182,7 +187,7 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 9. 每 30 秒自動儲存草稿
+    // 8. 每 30 秒自動儲存草稿
     // ==========================================
     setInterval(function () {
         if (!$("#titleInput").val() && !getContent()) return;
@@ -190,7 +195,7 @@ $(document).ready(function () {
     }, 30000);
 
     // ==========================================
-    // 10. 手動存草稿
+    // 9. 手動存草稿
     // ==========================================
     $("#draftBtn").on("click", function () {
         saveArticle("draft", function () {
@@ -199,13 +204,13 @@ $(document).ready(function () {
     });
 
     // ==========================================
-    // 11. 預覽
+    // 10. 預覽
     // ==========================================
     $("#previewBtn").on("click", function () {
         const previewData = {
             title: $("#titleInput").val() || "未命名文章",
             articleClass: $("#articleClass").val() || "未分類",
-            content: getContent() || "沒有內容...",
+            content: getContent() || "沒有內容...", // Markdown 語法
             articleImageUrl: coverImageUrl || "",
             editId: currentArticleId || null,
             isAdminPreview: true
@@ -215,15 +220,16 @@ $(document).ready(function () {
     });
 
     // ==========================================
-    // 12. 發布文章
+    // 11. 發布文章
     // ==========================================
     $("#publishBtn").on("click", function () {
         const title = $("#titleInput").val();
-        const content = getContent();
+        // 驗證要看值是否為空，Editor 預設會有換行空白，可以用 length 檢查或清乾淨
+        const checkContent = editor.getMarkdown().replace(/\n/g, '').trim();
         const articleClass = $("#articleClass").val();
 
         if (!title.trim()) return showToast("warning", "請輸入文章標題");
-        if (!content.trim()) return showToast("warning", "請輸入文章內容");
+        if (!checkContent) return showToast("warning", "請輸入文章內容");
         if (!articleClass) return showToast("warning", "請選擇文章分類");
 
         saveArticle("published", function () {

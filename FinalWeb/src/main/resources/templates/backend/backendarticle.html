@@ -6,6 +6,7 @@
     <!-- UI Editor-->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css">
+    <link rel="stylesheet" th:href="@{/backend/backendarticle.css}">
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
@@ -52,7 +53,8 @@
                                 <input id="coverUrlInput"
                                     class="w-full bg-[#1a1614] border border-white/10 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-white p-3 outline-none placeholder:text-slate-600"
                                     placeholder="輸入圖片網址 或 上傳圖片..." type="text" />
-                                <img id="coverPreview" class="mt-3 rounded-lg hidden max-h-40 w-full object-cover border border-white/10" />
+                                <img id="coverPreview"
+                                    class="mt-3 rounded-lg hidden max-h-48 w-full object-contain border border-white/10" />
                             </section>
 
                             <!-- ✅ 或選擇上傳到 Firebase -->

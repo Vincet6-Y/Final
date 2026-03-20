@@ -22,14 +22,15 @@ public class ArticleDTO {
         this.purePreview = generatePreview(entity.getContent());
     }
 
-    // 核心邏輯：清洗 Markdown 符號，讓卡片顯示純文字
+    // 核心邏輯：清洗 Markdown 與 HTML 標籤，讓卡片顯示純文字
     private String generatePreview(String content) {
         if (content == null) {
             return "";
         }
         String clean = content
-                .replaceAll("[#*>`\\-]", "")
-                .replaceAll("\\n+", " ")
+                .replaceAll("<[^>]*>", "") // 清除 HTML 標籤
+                .replaceAll("[#*>`\\-]", "") // 為了相容避免之前的 markdown 標記漏網之魚
+                .replaceAll("\\n+", " ") // 換行變空格
                 .replaceAll("\\s{2,}", " ")
                 .trim();
         return clean.length() > 65 ? clean.substring(0, 65) + "..." : clean;
