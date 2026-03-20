@@ -184,21 +184,6 @@ public class OrderService {
                 .filter(o -> "已付款".equals(o.getPayStatus()) &&
                         o.getOrderTime().toLocalDate().equals(java.time.LocalDate.now()))
                 .count();
-    public Map<String, Object> getAdminDashboardStats() {
-        Map<String, Object> stats = new HashMap<>();
-
-        // 1. 待處理訂單：通常指「已付款」但「尚未完成服務/核銷」或「待處理」狀態的訂單
-        long pendingCount = ordersRepo.countByPayStatus("待處理");
-
-        // 2. 退款請求：計算狀態為「退款中」的數量
-        long refundCount = ordersRepo.countByPayStatus("退款中");
-
-        // 3. 今日發放憑證：統計今日「已付款」的訂單總數
-        // 這裡建議在 Repo 新增一個查詢今日成功的計算，或者先用 findAll 篩選
-        long todayIssued = ordersRepo.findAll().stream()
-                .filter(o -> "已付款".equals(o.getPayStatus()) &&
-                        o.getOrderTime().toLocalDate().equals(java.time.LocalDate.now()))
-                .count();
 
         stats.put("pendingOrders", pendingCount);
         stats.put("refundRequests", refundCount);
@@ -247,7 +232,84 @@ public class OrderService {
     @Autowired
     private MemberRepo memberRepo; // 記得注入 MemberRepo
 
-    public long getTotalMemberCount() {
+    public long getTotalCount() {
         return memberRepo.count(); // 回傳資料庫會員總數
     }
+
+    // 🌟 新增：取得今年 1~12 月的營收陣列 (給圖表用)
+    public List<Integer> getMonthlyRevenueForCurrentYear() {
+        // 建立一個長度為 12 的陣列，預設全部為 0
+        List<Integer> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0));
+
+        // 找出所有已付款的訂單
+        List<OrdersEntity> paidOrders = ordersRepo.findByPayStatusOrderByOrderTimeDesc("已付款");
+
+        int currentYear = java.time.LocalDate.now().getYear();
+
+        for (OrdersEntity order : paidOrders) {
+            // 綠界付款成功後應該會有 payTime，如果沒有，退而求其次用 orderTime
+            LocalDateTime timeToCheck = order.getPayTime() != null ? order.getPayTime() : order.getOrderTime();
+
+            if (timeToCheck != null && timeToCheck.getYear() == currentYear) {
+                // 取得該訂單是第幾個月 (1~12)
+                int monthIndex = timeToCheck.getMonthValue() - 1; // 陣列索引是 0~11
+
+                // 呼叫你原本寫好的 calculateTotalAmount 來算這筆訂單的錢
+                int orderTotal = calculateTotalAmount(order);
+                monthlyRevenue.set(monthIndex, monthlyRevenue.get(monthIndex) + orderTotal);
+            }
+        }
+        return monthlyRevenue;
+    }
+
+    public List<Integer> getQuarterlyRevenueForCurrentYear() {
+        List<Integer> monthly = getMonthlyRevenueForCurrentYear(); // 取得 12 個月的資料
+        List<Integer> quarterly = new ArrayList<>();
+
+        for (int i = 0; i < 12; i += 3) {
+            // 每三個月加總一次
+            int quarterSum = monthly.get(i) + monthly.get(i + 1) + monthly.get(i + 2);
+            quarterly.add(quarterSum);
+        }
+        return quarterly; // 回傳 [Q1, Q2, Q3, Q4]
+    }
+    // 請確認這段程式碼位於 OrderService 類別內
+public Map<String, Object> getOrderDetailWithItems(Integer orderId) {
+    OrdersEntity order = ordersRepo.findById(orderId).orElse(null);
+    if (order == null) return null;
+
+    Map<String, Object> detail = new HashMap<>();
+    detail.put("orderId", order.getOrderId());
+    detail.put("payStatus", order.getPayStatus());
+    detail.put("orderTime", order.getOrderTime());
+    detail.put("tradeNo", order.getTradeNo());
+
+    if (order.getMember() != null) {
+        detail.put("customerName", order.getMember().getName()); 
+        // 修正：確保 Key 名稱為 customerEmail
+        detail.put("customerEmail", order.getMember().getEmail()); 
+    } else {
+        detail.put("customerName", "未知顧客");
+        detail.put("customerEmail", "未提供 Email");
+    }
+
+    // 修正：確保 Key 名稱為 totalPrice，對應前端 order.totalPrice
+    detail.put("totalPrice", calculateTotalAmount(order)); 
+
+    List<Map<String, Object>> items = new ArrayList<>();
+    if (order.getOrderDetails() != null) {
+        for (OrdersDetailEntity item : order.getOrderDetails()) {
+            Map<String, Object> itemMap = new HashMap<>();
+            itemMap.put("ticketType", item.getTicketType());
+            itemMap.put("ticketPrice", item.getTicketPrice() != null ? item.getTicketPrice() : 0);
+            items.add(itemMap);
+        }
+    }
+    detail.put("orderDetails", items);
+    return detail;
+}
+    
+   
+
+           
 }
