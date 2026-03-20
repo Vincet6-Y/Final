@@ -171,7 +171,7 @@
                 </div>
             </div>
             <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/packageTour}">行程規劃</a>
+                th:href="@{/officialTour}">行程規劃</a>
         </nav>
         <div class="flex items-center gap-4">
             <button aria-label="Toggle theme"
@@ -327,10 +327,10 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script th:src="@{/assets/toast.js}"></script>
 
-    <script th:src="@{/tour/map/myTourGlobals.js}"></script>
-    <script th:src="@{/tour/map/myTourApi.js}"></script>
-    <script th:src="@{/tour/map/myTourMap.js}"></script>
-    <script th:src="@{/tour/map/myTourUi.js}"></script>
+    <script th:src="@{/tour/myMap/myMapGlobals.js}"></script>
+    <script th:src="@{/tour/myMap/myMapApi.js}"></script>
+    <script th:src="@{/tour/myMap/myMapCore.js}"></script>
+    <script th:src="@{/tour/myMap/myMapUi.js}"></script>
 
     <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
     <script th:inline="javascript">

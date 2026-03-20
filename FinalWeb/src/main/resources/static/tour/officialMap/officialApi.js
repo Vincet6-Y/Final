@@ -72,13 +72,19 @@
 // ==========================================
 // 🌟 2. 完善規劃 (複製到我的行程)
 // ==========================================
-function copyToMyPlan(officialPlanId) {
+function copyToMyPlan(event, officialPlanId) {
     if (!officialPlanId) return;
 
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<span class="material-symbols-outlined text-base animate-spin">refresh</span> 處理中...`;
-    btn.disabled = true;
+    let btn = null;
+    let originalText = '';
+
+    // 如果是手動點擊（有 event），才顯示轉圈圈動畫
+    if (event && event.currentTarget) {
+        btn = event.currentTarget;
+        originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined text-base animate-spin">refresh</span> 處理中...`;
+        btn.disabled = true;
+    }
 
     fetch(`/api/plan/copy/${officialPlanId}`, {
         method: 'POST',
@@ -86,12 +92,15 @@ function copyToMyPlan(officialPlanId) {
     })
         .then(response => {
             if (response.status === 401) {
-                // 🚩 關鍵修復 404：確保導向的路徑是組員正確的登入頁面 (通常是 /auth)
                 const currentPath = window.location.pathname + window.location.search;
                 const redirectTarget = encodeURIComponent(`${currentPath}&autoCopy=true`);
 
                 showToast('error', '請先登入會員，即可規劃您的專屬行程！');
-                window.location.href = `/auth?redirect=${redirectTarget}`;
+
+                setTimeout(() => {
+                    window.location.href = `/auth?redirect=${redirectTarget}`;
+                }, 1500);
+
                 throw new Error('Unauthorized');
             }
             if (!response.ok) throw new Error('伺服器錯誤');
@@ -99,18 +108,26 @@ function copyToMyPlan(officialPlanId) {
         })
         .then(data => {
             if (data.success) {
-                window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
+                showToast('success', '複製成功！正在前往編輯頁面...');
+                setTimeout(() => {
+                    window.location.href = `/myMap?myPlanId=${data.newMyPlanId}`;
+                }, 1000);
             } else {
                 showToast('error', data.message || '複製失敗');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             }
         })
         .catch(error => {
             if (error.message !== 'Unauthorized') {
                 console.error('Error:', error);
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                showToast('error', '系統發生錯誤');
+                if (btn) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             }
         });
 }
