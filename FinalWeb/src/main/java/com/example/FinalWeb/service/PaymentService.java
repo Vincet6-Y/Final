@@ -29,25 +29,24 @@ public class PaymentService {
         model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
         model.addAttribute("purchasedNames", extractPurchasedNames(order));
 
-        List<TicketDto> availableTickets = new ArrayList<>();
+        // 預設空值，避免 Thymeleaf 取到 null 爆炸
+        List<TicketDto> recommendedSpots = new ArrayList<>();
         List<TicketDto> recommendedTransports = new ArrayList<>();
+        List<TicketDto> globalTransports = ticketService.getGlobalTransportTickets();
 
         if (order.getMyPlan() != null && order.getMyPlan().getMyMaps() != null) {
             List<MyMapEntity> spots = order.getMyPlan().getMyMaps();
-            for (MyMapEntity myMap : spots) {
-                TicketDto t = ticketService.getTicketByPlaceId(myMap.getGooglePlaceId());
-                if (t != null)
-                    availableTickets.add(t);
-            }
-            // 先算智慧推薦
+
+            // 1. 景點門票：依行程景點推薦
+            recommendedSpots = ticketService.recommendSpotTickets(spots);
+
+            // 2. 地區交通票：依行程地區推薦（全日本通用票不在這裡）
             recommendedTransports = ticketService.recommendTransportTickets(spots);
         }
-        // 2. 再算「其他票」= 全部排除推薦的
-        List<TicketDto> otherTransports = ticketService.getOtherTransportTickets(recommendedTransports);
 
-        model.addAttribute("availableTickets", availableTickets);
-        model.addAttribute("recommendedTransports", recommendedTransports);
-        model.addAttribute("otherTransports", otherTransports);
+        model.addAttribute("availableTickets", recommendedSpots); // 景點票（依行程）
+        model.addAttribute("recommendedTransports", recommendedTransports); // 地區交通票（依行程）
+        model.addAttribute("globalTransports", globalTransports); // 全日本通用票（固定3張）
     }
 
     /** 準備付款成功頁所需的全部 Model 資料 */

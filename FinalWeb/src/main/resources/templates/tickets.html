@@ -1,4 +1,4 @@
-<!-- ===== Fragment 1：已包含票券===== -->
+<!-- ===== Fragment 1：已包含票券 ===== -->
 <div th:fragment="includedTickets(orderDetails)" class="section-card rounded-xl p-8"
     th:if="${orderDetails != null && !orderDetails.isEmpty()}">
     <div class="flex items-center gap-3 mb-8">
@@ -30,8 +30,15 @@
 </div>
 
 
-<!-- ===== Fragment 2：加購付費項目===== -->
-<section th:fragment="addonTickets(availableTickets, recommendedTransports, purchasedNames, otherTransports)"
+<!-- ===== Fragment 2：加購付費項目 ===== -->
+<!--
+    參數說明：
+    availableTickets      → 景點門票（依行程景點推薦，只有行程內有的才出現）
+    recommendedTransports → 地區交通票（依行程地區推薦，沒有對應地區則 optgroup 不顯示）
+    purchasedNames        → 已購買的票券名稱 Set（後端保證非 null）
+    globalTransports      → 全日本通用票（固定 3 張，永遠顯示）
+-->
+<section th:fragment="addonTickets(availableTickets, recommendedTransports, purchasedNames, globalTransports)"
     class="section-card rounded-xl p-8">
 
     <div class="flex items-center gap-3 mb-8">
@@ -42,37 +49,54 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <!-- 景點門票 -->
+        <!-- ==================== 景點門票 ==================== -->
         <div>
             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                景點門票升級
+                景點門票
+                <!-- 有推薦票才顯示「依您的行程」標籤 -->
+                <span th:if="${availableTickets != null and !availableTickets.isEmpty()}"
+                    class="text-orange-500 text-xs font-bold ml-1">✨ 依您的行程</span>
             </label>
             <select id="ticketSelect"
                 class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                 <option value="0" data-name="">不需加購</option>
-                <option th:each="ticket : ${availableTickets}" th:value="${ticket.price}"
-                    th:data-name="${ticket.ticketName}"
-                    th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
-                    th:classappend="${purchasedNames.contains(ticket.ticketName)} ? 'hidden' : ''"
-                    th:disabled="${purchasedNames.contains(ticket.ticketName)}">
-                </option>
+
+                <!-- 行程內有對應景點才顯示；若行程沒有可購票的景點，整個 optgroup 不出現 -->
+                <optgroup th:if="${availableTickets != null and !availableTickets.isEmpty()}" label="🗾 您的行程景點門票">
+                    <option th:each="ticket : ${availableTickets}" th:value="${ticket.price}"
+                        th:data-name="${ticket.ticketName}"
+                        th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
+                        th:classappend="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)} ? 'hidden' : ''"
+                        th:disabled="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)}">
+                    </option>
+                </optgroup>
             </select>
         </div>
 
-        <!-- 交通票券 -->
+        <!-- ==================== 交通票券 ==================== -->
         <div>
             <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                 交通票券加購
-                <span th:if="${!recommendedTransports.isEmpty()}" class="text-orange-500 text-xs font-bold ml-1">🔥
-                    推薦！</span>
+                <span th:if="${recommendedTransports != null and !recommendedTransports.isEmpty()}"
+                    class="text-orange-500 text-xs font-bold ml-1">🔥 依行程推薦！</span>
             </label>
             <select id="transportSelect"
                 class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
                 <option value="" data-price="0" data-name="">不需加購</option>
 
-                <!-- 💡 智慧推薦（根據行程動態產生）-->
+                <!-- 🌏 全日本通用（固定 3 張，永遠顯示） -->
+                <optgroup label="🌏 全日本通用">
+                    <option th:each="ticket : ${globalTransports}" th:value="${ticket.ticketId}"
+                        th:data-price="${ticket.price}" th:data-name="${ticket.ticketName}"
+                        th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
+                        th:classappend="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)} ? 'hidden' : ''"
+                        th:disabled="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)}">
+                    </option>
+                </optgroup>
+
+                <!-- 💡 依行程地區推薦（沒有符合地區 → 整個 optgroup 不顯示） -->
                 <optgroup th:if="${recommendedTransports != null and !recommendedTransports.isEmpty()}"
-                    label="💡 根據您的行程推薦">
+                    label="💡 依您的行程推薦">
                     <option th:each="transport : ${recommendedTransports}" th:value="${transport.ticketId}"
                         th:data-price="${transport.price}" th:data-name="${transport.ticketName}"
                         th:text="${transport.ticketName} + ' (+NT$' + ${#numbers.formatInteger(transport.price, 0, 'COMMA')} + ')'"
@@ -81,15 +105,6 @@
                     </option>
                 </optgroup>
 
-                <!-- 🗾 其他可選票券（自動排除已推薦的，不會重複）-->
-                <optgroup th:if="${otherTransports != null and !otherTransports.isEmpty()}" label="其他票券">
-                    <option th:each="ticket : ${otherTransports}" th:value="${ticket.ticketId}"
-                        th:data-price="${ticket.price}" th:data-name="${ticket.ticketName}"
-                        th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
-                        th:classappend="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)} ? 'hidden' : ''"
-                        th:disabled="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)}">
-                    </option>
-                </optgroup>
             </select>
         </div>
     </div>

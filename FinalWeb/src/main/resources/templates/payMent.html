@@ -71,7 +71,7 @@
                 <th:block th:replace="~{tickets:: includedTickets(${order.orderDetails})}" />
                 <!-- ==================== 加購付費項目 ==================== -->
                 <th:block
-                    th:replace="~{tickets :: addonTickets(${availableTickets}, ${recommendedTransports}, ${purchasedNames}, ${otherTransports})}" />
+                    th:replace="~{tickets :: addonTickets(${availableTickets}, ${recommendedTransports}, ${purchasedNames}, ${globalTransports})}" />
             </div>
             <!-- ==================== 右側：訂單金額明細 ==================== -->
             <div class="lg:col-span-4">
