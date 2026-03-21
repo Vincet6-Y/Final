@@ -14,17 +14,20 @@
       <div class="p-8">
         <!-- Tabs -->
         <div class="flex border-b border-neutral-dark mb-8 gap-8 overflow-x-auto scrollbar-hide">
-          <a class="flex flex-col items-center justify-center border-b-2 border-primary text-primary pb-4 px-2 whitespace-nowrap"
-            href="#">
-            <span class="text-sm font-bold">狀態管理</span>
+          <a class="flex flex-col items-center justify-center border-b-2 pb-4 px-2 whitespace-nowrap"
+             th:classappend="${currentStatus == '全部' || currentStatus == null} ? 'border-primary text-primary' : 'border-transparent text-neutral-muted hover:text-slate-100 transition-colors'"
+             th:href="@{/backend/order(status='全部')}">
+            <span class="text-sm font-bold">所有訂單</span>
           </a>
-          <a class="flex flex-col items-center justify-center border-b-2 border-transparent text-neutral-muted hover:text-slate-100 pb-4 px-2 whitespace-nowrap transition-colors"
-            href="#">
+          <a class="flex flex-col items-center justify-center border-b-2 pb-4 px-2 whitespace-nowrap"
+             th:classappend="${currentStatus == '已付款'} ? 'border-primary text-primary' : 'border-transparent text-neutral-muted hover:text-slate-100 transition-colors'"
+             th:href="@{/backend/order(status='已付款')}">
+            <span class="text-sm font-bold">已付款 (出貨處理)</span>
+          </a>
+          <a class="flex flex-col items-center justify-center border-b-2 pb-4 px-2 whitespace-nowrap"
+             th:classappend="${currentStatus == '退款中'} ? 'border-primary text-primary' : 'border-transparent text-neutral-muted hover:text-slate-100 transition-colors'"
+             th:href="@{/backend/order(status='退款中')}">
             <span class="text-sm font-bold">退款管理</span>
-          </a>
-          <a class="flex flex-col items-center justify-center border-b-2 border-transparent text-neutral-muted hover:text-slate-100 pb-4 px-2 whitespace-nowrap transition-colors"
-            href="#">
-            <span class="text-sm font-bold">出貨/發放憑證</span>
           </a>
         </div>
         <!-- Quick Stats -->
@@ -32,19 +35,19 @@
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">待處理訂單</p>
     <div class="flex items-end justify-between">
-      <h3 id="stat-pending" class="text-3xl font-bold text-slate-100">0</h3>
+      <h3 id="stat-pending" class="text-3xl font-bold text-slate-100" th:text="${stats.pendingOrders ?: 0}">0</h3>
     </div>
   </div>
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">退款請求</p>
     <div class="flex items-end justify-between">
-      <h3 id="stat-refund" class="text-3xl font-bold text-slate-100">0</h3>
+      <h3 id="stat-refund" class="text-3xl font-bold text-slate-100" th:text="${stats.refundRequests ?: 0}">0</h3>
     </div>
   </div>
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">今日發放憑證</p>
     <div class="flex items-end justify-between">
-      <h3 id="stat-today" class="text-3xl font-bold text-slate-100">0</h3>
+      <h3 id="stat-today" class="text-3xl font-bold text-slate-100" th:text="${stats.todayIssued ?: 0}">0</h3>
     </div>
   </div>
 </div>
@@ -52,7 +55,6 @@
         <div class="bg-neutral-dark/20 border border-neutral-dark rounded-xl overflow-hidden">
           <div class="p-6 border-b border-neutral-dark flex items-center justify-between">
             <h3 class="text-lg font-bold text-slate-100">最近訂單列表</h3>
-            
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -67,28 +69,57 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-dark">
-                
-                
+                <tr th:each="order : ${ordersPage.content}" th:onclick="'viewDetail(' + ${order.orderId} + ')'" 
+                    class="group hover:bg-white/10 transition-all duration-300 border-b border-neutral-800 flex flex-col md:table-row cursor-pointer">
+                  <td class="px-6 py-4 text-sm font-mono text-slate-100 group-hover:text-primary transition-colors">
+                    <span class="md:hidden font-bold text-neutral-500"># </span><span th:text="${order.tradeNo != null ? order.tradeNo : order.orderId}"></span>
+                  </td>
+                  <td class="px-6 py-1 md:py-4 text-sm">
+                    <div class="font-bold text-white group-hover:translate-x-1 transition-transform inline-block"
+                         th:text="${order.myPlan != null && order.myPlan.myPlanName != null ? order.myPlan.myPlanName : '自訂行程'}">自訂行程</div>
+                  </td>
+                  <td class="hidden md:table-cell px-6 py-4 text-sm text-slate-100" th:text="${#temporals.format(order.orderTime, 'yyyy/MM/dd HH:mm')}"></td>
+                  <td class="px-6 py-2 md:py-4 flex justify-between items-center md:table-cell">
+                    <span class="md:hidden text-xs text-neutral-500 font-bold uppercase">總額</span>
+                    <span class="text-sm font-bold text-white" th:text="'NT$ ' + ${#numbers.formatInteger(@orderService.calculateTotalAmount(order), 0, 'COMMA')}">0</span>
+                  </td>
+                  <td class="px-6 py-2 md:py-4 flex justify-between items-center md:table-cell">
+                    <span class="md:hidden text-xs text-neutral-500 font-bold uppercase">狀態</span>
+                    <span class="px-2 py-1 rounded-full text-[10px] font-bold"
+                          th:classappend="${order.payStatus == '已付款'} ? 'bg-green-100 text-green-700 border border-green-200' : 
+                                         (${order.payStatus == '退款中'} ? 'bg-red-100 text-red-700 border border-red-200' : 
+                                         (${order.payStatus == '待處理'} ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
+                                         'bg-neutral-100 text-neutral-500 border border-neutral-200'))"
+                          th:text="${order.payStatus}"></span>
+                  </td>
+                  <td class="px-6 py-4 text-right md:table-cell">
+                    <button class="text-primary hover:text-primary-light text-sm font-bold flex items-center justify-end gap-1 ml-auto">
+                      查看詳情 <span class="material-symbols-outlined text-xs">arrow_forward_ios</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(ordersPage.content)}">
+                  <td colspan="6" class="px-6 py-10 text-center text-neutral-400">目前尚無相關訂單資料</td>
+                </tr>
               </tbody>
             </table>
           </div>
-          <div class="p-4 border-t border-neutral-dark flex items-center justify-between">
-            <p  id="pagination-info" class="text-sm text-neutral-muted">顯示 1 到 5 項，共 128 項訂單</p>
-            <div  id="pagination-container" class="flex gap-2">
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors disabled:opacity-50"
-                disabled="">
+          <div class="p-4 border-t border-neutral-dark flex items-center justify-between" th:if="${ordersPage.totalPages > 0}">
+            <p id="pagination-info" class="text-sm text-neutral-muted" 
+               th:text="'顯示 ' + (${ordersPage.number * ordersPage.size + 1}) + ' 到 ' + (${ordersPage.number * ordersPage.size + ordersPage.numberOfElements}) + ' 項，共 ' + ${ordersPage.totalElements} + ' 項訂單'"></p>
+            <div id="pagination-container" class="flex gap-2">
+              <a th:href="@{/backend/order(page=${ordersPage.number - 1}, size=${ordersPage.size}, status=${currentStatus})}"
+                 th:class="${ordersPage.first} ? 'pointer-events-none opacity-50 size-8 rounded border border-neutral-dark flex items-center justify-center text-slate-400' : 'size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-slate-100'">
                 <span class="material-symbols-outlined text-sm">chevron_left</span>
-              </button>
-              <button class="size-8 rounded bg-primary text-background-dark font-bold text-sm">1</button>
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-sm">2</button>
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-sm">3</button>
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors">
+              </a>
+              <a th:each="i : ${#numbers.sequence(0, ordersPage.totalPages - 1)}" 
+                 th:href="@{/backend/order(page=${i}, size=${ordersPage.size}, status=${currentStatus})}"
+                 th:class="${ordersPage.number == i} ? 'size-8 rounded bg-primary text-background-dark font-bold text-sm flex items-center justify-center' : 'size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-sm text-slate-100'"
+                 th:text="${i + 1}">1</a>
+              <a th:href="@{/backend/order(page=${ordersPage.number + 1}, size=${ordersPage.size}, status=${currentStatus})}"
+                 th:class="${ordersPage.last} ? 'pointer-events-none opacity-50 size-8 rounded border border-neutral-dark flex items-center justify-center text-slate-400' : 'size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-slate-100'">
                 <span class="material-symbols-outlined text-sm">chevron_right</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>

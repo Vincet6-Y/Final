@@ -1,6 +1,7 @@
 package com.example.FinalWeb.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,11 @@ import com.example.FinalWeb.dto.PlanCreateRequestDTO;
 import com.example.FinalWeb.dto.WorkDTO;
 import com.example.FinalWeb.entity.JourneyPlanEntity;
 import com.example.FinalWeb.entity.MemberEntity;
+import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.entity.WorkDetailEntity;
 import com.example.FinalWeb.service.JourneyPlanService;
 import com.example.FinalWeb.service.WorkService;
+import com.example.FinalWeb.service.AdminOrderService;
 import com.example.FinalWeb.service.ArticleService;
 import com.example.FinalWeb.entity.ArticleEntity;
 import org.springframework.data.domain.Page;
@@ -41,6 +44,9 @@ public class BackEndController {
     @Autowired
     private ArticleService articleService;
 
+    @Autowired
+    private AdminOrderService adminOrderService;
+
     @Value("${google.maps.api.key}")
     private String googleMapsApiKey;
 
@@ -50,7 +56,19 @@ public class BackEndController {
     }
 
     @RequestMapping("/order")
-    public String backendorder() {
+    public String backendorder(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "全部") String status,
+            Model model) {
+
+        Page<OrdersEntity> ordersPage = adminOrderService.getOrdersPaged(status, page, size);
+        model.addAttribute("ordersPage", ordersPage);
+        model.addAttribute("currentStatus", status);
+
+        Map<String, Object> stats = adminOrderService.getAdminDashboardStats();
+        model.addAttribute("stats", stats);
+
         return "/backend/backendorder";
     }
 

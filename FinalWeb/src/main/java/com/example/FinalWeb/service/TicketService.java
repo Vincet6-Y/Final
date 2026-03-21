@@ -32,8 +32,12 @@ public class TicketService {
         if (planId == null) {
             return new ArrayList<>();
         }
-        // 直接請資料庫幫忙撈資料
-        return ordersRepo.findPurchasedSpotIdsByPlanId(planId);
+        return ordersRepo.findByMyPlan_MyPlanIdAndPayStatus(planId, "已付款").stream()
+                .flatMap(order -> order.getOrderDetails().stream())
+                .filter(detail -> detail.getMyMap() != null && detail.getMyMap().getSpotId() != null)
+                .map(detail -> detail.getMyMap().getSpotId())
+                .distinct() // 過濾重複的景點 ID
+                .toList();
     }
 
     // 替換為 TicketDto
