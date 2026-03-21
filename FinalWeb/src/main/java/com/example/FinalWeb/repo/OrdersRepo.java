@@ -1,5 +1,7 @@
 package com.example.FinalWeb.repo;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -32,4 +34,9 @@ public interface OrdersRepo extends JpaRepository<OrdersEntity, Integer> {
     // 找出特定行程中，已經付款成功的景點 ID (spotId) 列表
     List<OrdersEntity> findByMyPlan_MyPlanIdAndPayStatus(Integer myPlanId, String payStatus);
 
+    // 當天後台付款訂單
+    long countByPayStatusAndOrderTimeBetween(
+            String payStatus,
+            LocalDateTime start,
+            LocalDateTime end);
 }

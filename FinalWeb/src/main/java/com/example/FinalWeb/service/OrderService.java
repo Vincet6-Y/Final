@@ -1,5 +1,6 @@
 package com.example.FinalWeb.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import com.example.FinalWeb.entity.MyPlanEntity;
 import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.repo.OrdersRepo;
+import com.example.FinalWeb.repo.MyPlanRepo;
 import com.example.FinalWeb.repo.OrdersDetailRepo;
 import com.example.FinalWeb.dto.TicketDto;
 
@@ -28,6 +30,9 @@ public class OrderService {
 
     @Autowired
     private TicketService ticketService;
+
+    @Autowired
+    private MyPlanRepo myPlanRepo;
 
     // 建立新訂單
     @Transactional
@@ -67,9 +72,7 @@ public class OrderService {
                 .sum();
     }
 
-    /**
-     * 處理前端傳來的加購門票與交通票 (支援購物車多選！)
-     */
+    // 處理前端傳來的加購門票與交通票 (支援購物車多選！)
     @Transactional
     public void processAddonTickets(OrdersEntity order, List<String> ticketNames, List<Integer> ticketPrices,
             List<String> transportIds) {
@@ -98,9 +101,7 @@ public class OrderService {
         }
     }
 
-    /**
-     * 刪除使用者在結帳頁面取消的「舊票券」
-     */
+    // 刪除使用者在結帳頁面取消的「舊票券」
     @Transactional
     public void removeOrderDetails(List<Integer> detailIds) {
         if (detailIds != null && !detailIds.isEmpty()) {
@@ -119,6 +120,7 @@ public class OrderService {
         return detail;
     }
 
+    // 分組行程
     public Map<Integer, List<MyMapEntity>> groupMapsByDay(List<MyMapEntity> allMaps) {
         if (allMaps == null || allMaps.isEmpty()) {
             return new TreeMap<>();
@@ -132,6 +134,7 @@ public class OrderService {
                         Collectors.toList()));
     }
 
+    // 分類票券
     public Map<String, Object> classifyTickets(OrdersEntity order) {
         Set<Integer> ticketSpotIds = new HashSet<>();
         List<OrdersDetailEntity> transportTickets = new ArrayList<>();
@@ -166,6 +169,25 @@ public class OrderService {
         result.put("ticketSpotIds", ticketSpotIds);
         result.put("transportTickets", transportTickets);
         return result;
+    }
+
+    // 處理修改行程名稱與日期
+    @Transactional
+    public void applyPlanChanges(OrdersEntity order, String newName, String newStartDate) {
+        if (order.getMyPlan() == null)
+            return;
+        boolean dirty = false;
+
+        if (newName != null && !newName.isBlank()) {
+            order.getMyPlan().setMyPlanName(newName.trim());
+            dirty = true;
+        }
+        if (newStartDate != null && !newStartDate.isBlank()) {
+            order.getMyPlan().setStartDate(LocalDate.parse(newStartDate));
+            dirty = true;
+        }
+        if (dirty)
+            myPlanRepo.save(order.getMyPlan());
     }
 
 }
