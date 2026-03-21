@@ -68,73 +68,76 @@
                                 <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200">當日行程總覽</h3>
                             </div>
 
-                            <div class="relative border-l-2 border-primary/40 ml-4 lg:ml-6 space-y-8 pb-8">
+                            <div class="relative border-l-2 border-primary/40 ml-4 lg:ml-6 pb-8">
+                                <th:block th:each="spot : ${entry.value}">
 
-                                <div th:each="spot : ${entry.value}" class="relative pl-10">
-                                    <div
-                                        class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-primary flex items-center justify-center shadow-md">
-                                        <span class="material-symbols-outlined text-primary text-sm">place</span>
+                                    <div th:if="${spot.displayTransitTime != null}"
+                                        class="relative h-12 flex items-center -mt-4 mb-4">
+                                        <div
+                                            class="absolute top-1/2 -translate-y-1/2 left-[-16px] z-10 flex items-center gap-1.5 bg-white dark:bg-[#1e1e1e] text-primary border border-primary/30 px-3 py-1.5 rounded-full text-xs shadow-sm hover:border-primary/60 transition-colors">
+                                            <span class="material-symbols-outlined text-[14px]"
+                                                th:text="${spot.travelIcon}">directions_car</span>
+                                            <span th:text="${spot.travelModeText}">車程</span>
+                                            <span class="font-bold" th:text="${spot.displayTransitTime}">約 15 分鐘</span>
+                                            <span th:if="${spot.displayDistance != null}"
+                                                class="ml-1 text-[10px] text-primary/70 font-medium tracking-wider"
+                                                th:text="${spot.displayDistance}">(1.5 km)</span>
+                                        </div>
                                     </div>
 
-                                    <div class="spot-card cursor-pointer group bg-white dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-4 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all"
-                                        th:data-spot-id="${spot.spotId}" th:data-spot-name="${spot.locationName}"
-                                        th:data-place-id="${spot.googlePlaceId}" th:data-day="${spot.dayNumber}"
-                                        th:data-order="${spot.visitOrder}" th:data-has-ticket="${spot.hasTicket}">
+                                    <div class="relative pl-10 mb-8 last:mb-0">
 
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-3">
-                                                <span class="text-primary font-bold text-sm min-w-[50px]"
-                                                    th:text="${spot.displayTime}">08:00</span>
+                                        <div
+                                            class="absolute -left-5 top-0 w-10 h-10 rounded-full bg-white dark:bg-background-dark border-2 border-primary flex items-center justify-center shadow-md z-10">
+                                            <span class="material-symbols-outlined text-primary text-sm">place</span>
+                                        </div>
 
-                                                <h4 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors"
-                                                    th:text="${spot.locationName}">景點名稱</h4>
+                                        <div class="spot-card cursor-pointer group bg-white dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-4 shadow-sm hover:shadow-lg hover:border-primary/40 transition-all"
+                                            th:data-spot-id="${spot.spotId}" th:data-spot-name="${spot.locationName}"
+                                            th:data-place-id="${spot.googlePlaceId}" th:data-day="${spot.dayNumber}"
+                                            th:data-order="${spot.visitOrder}" th:data-has-ticket="${spot.hasTicket}">
 
-                                                <div
-                                                    class="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-primary font-bold text-sm min-w-[50px]"
+                                                        th:text="${spot.displayTime}">08:00</span>
 
-                                                    <span
-                                                        class="flex items-center gap-1 bg-slate-100 dark:bg-black/30 px-2 py-1 rounded"
-                                                        th:if="${spot.stayTime != null}">
+                                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors"
+                                                        th:text="${spot.locationName}">景點名稱</h4>
+
+                                                    <div
+                                                        class="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
                                                         <span
-                                                            class="material-symbols-outlined text-[13px]">hourglass_empty</span>
-                                                        停留 <span th:text="${spot.stayTime}">60</span> 分鐘
-                                                    </span>
-
-                                                    <span
-                                                        class="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded"
-                                                        th:if="${spot.displayTransitTime != null}">
-                                                        <span class="material-symbols-outlined text-[13px]"
-                                                            th:text="${spot.travelIcon}">directions_car</span>
-                                                        <span th:text="${spot.travelModeText}">車程</span>
-                                                        <span th:text="${spot.displayTransitTime}">約 15 分鐘</span>
-
-                                                        <span th:if="${spot.displayDistance != null}"
-                                                            class="ml-1 text-[10px] text-primary/70 font-bold tracking-wider"
-                                                            th:text="${spot.displayDistance}">(1.5 km)</span>
-                                                    </span>
+                                                            class="flex items-center gap-1 bg-slate-100 dark:bg-black/30 px-2 py-1 rounded"
+                                                            th:if="${spot.stayTime != null}">
+                                                            <span
+                                                                class="material-symbols-outlined text-[13px]">hourglass_empty</span>
+                                                            停留 <span th:text="${spot.stayTime}">60</span> 分鐘
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="flex items-center gap-2">
-                                                <span th:if="${spot.hasTicket}"
-                                                    class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span th:if="${spot.hasTicket}"
+                                                        class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                        <span
+                                                            class="material-symbols-outlined text-xs">local_activity</span>
+                                                        付費
+                                                    </span>
                                                     <span
-                                                        class="material-symbols-outlined text-xs">local_activity</span>
-                                                    付費
-                                                </span>
-                                                <span
-                                                    class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors text-sm">chevron_right</span>
+                                                        class="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary transition-colors text-sm">chevron_right</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </th:block>
                             </div>
                         </div>
                     </div>
 
                     <!-- 沒有行程資料時 -->
                     <div th:if="${groupedByDay == null || groupedByDay.isEmpty()}"
-                        class="bg-slate-50 dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-12 text-center">
+                        clath:blockss="bg-slate-50 dark:bg-[#1e1e1e] rounded-xl border border-slate-200 dark:border-white/10 p-12 text-center">
                         <span class="material-symbols-outlined text-5xl text-slate-300 mb-4 block">map</span>
                         <p class="text-slate-500 text-lg">行程景點資料將在此顯示</p>
                     </div>
