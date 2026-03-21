@@ -7,6 +7,7 @@ import com.example.FinalWeb.dto.TicketDto;
 import com.example.FinalWeb.repo.OrdersRepo;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -198,5 +199,23 @@ public class TicketService {
         if (ticket != null) {
             list.add(ticket);
         }
+    }
+
+    /**
+     * 取得「其他可選交通票」= 全部交通票 排除掉已被智慧推薦的
+     */
+    public List<TicketDto> getOtherTransportTickets(List<TicketDto> recommended) {
+        // 把已推薦的 ticketId 收集成 Set，方便快速比對
+        Set<String> recommendedIds = recommended.stream()
+                .map(TicketDto::ticketId)
+                .collect(Collectors.toSet());
+
+        // 全部 TRANS_ 開頭的票，過濾掉已推薦的
+        return TICKET_CACHE.entrySet().stream()
+                .filter(e -> e.getKey().startsWith("TRANS_"))
+                .filter(e -> !recommendedIds.contains(e.getKey()))
+                .map(Map.Entry::getValue)
+                .sorted(Comparator.comparing(TicketDto::ticketName)) // 字母排序，顯示整齊
+                .collect(Collectors.toList());
     }
 }
