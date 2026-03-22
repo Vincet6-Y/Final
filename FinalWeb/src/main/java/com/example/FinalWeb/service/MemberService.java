@@ -1,8 +1,15 @@
 package com.example.FinalWeb.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +19,9 @@ import com.example.FinalWeb.dto.PasswdChangeDto;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.util.BCrypt;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class MemberService {
@@ -30,6 +40,25 @@ public class MemberService {
             return null;
         }
         return member;
+    }
+
+    // 建立登入後的 Session 與 Spring Security 驗證資訊
+    public void saveLoginSession(MemberEntity member, HttpServletRequest request) {
+        // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
+        // 2. 建立一個官方認可的身份憑證 (Authentication)
+        Authentication auth = new UsernamePasswordAuthenticationToken(member.getEmail(), null, authorities);
+        // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        // 4. 將狀態綁定到 Session 中 (最關鍵的一步！)
+        HttpSession session = request.getSession(true);
+        // 這是你原本存放使用者資料的地方，保留著完全沒問題，方便你前端畫面使用
+        session.setAttribute("loginMember", member);
+        // 🌟 新增這行：把安管中心的安全狀態，用 Spring Security 指定的專屬名稱存進 Session 裡！
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
     }
 
     public String register(MemberRegisterDTO register) {
@@ -88,11 +117,14 @@ public class MemberService {
         return memberRepo.findById(memberId).orElse(null);
     }
 
+    public MemberEntity findByEmail(String email) {
+        return memberRepo.findByEmail(email).orElse(null);
+    }
+
     @Transactional
     public void updateMemberProfile(Integer memberId, MemberProfileDTO dto) {
 
-        MemberEntity member = memberRepo.findById(memberId)
-            .orElseThrow();
+        MemberEntity member = memberRepo.findById(memberId).orElseThrow();
 
         member.setName(dto.name());
         member.setPhone(dto.phone());
@@ -106,9 +138,7 @@ public class MemberService {
 
     @Transactional
     public void updateMemberAvatar(Integer memberId, String avatarUrl) {
-
         MemberEntity member = memberRepo.findById(memberId).orElseThrow();
-
         member.setMemberImgUrl(avatarUrl);
     }
     

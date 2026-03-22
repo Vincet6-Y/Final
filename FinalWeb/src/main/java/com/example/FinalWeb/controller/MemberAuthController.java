@@ -1,28 +1,17 @@
 package com.example.FinalWeb.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import com.example.FinalWeb.dto.*;
+import com.example.FinalWeb.service.*;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.enums.AuthProvider;
-import com.example.FinalWeb.repo.MemberRepo;
-import com.example.FinalWeb.service.GoogleLoginService;
-import com.example.FinalWeb.service.LineLoginService;
-import com.example.FinalWeb.service.MemberService;
-import com.example.FinalWeb.service.SocialAuthService;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,9 +33,6 @@ public class MemberAuthController {
     @Autowired
     private SocialAuthService socialAuthService;
 
-    @Autowired
-    private MemberRepo memberRepo;
-
     // ==================== 一般登入 / 註冊 ====================
     // 處理登入
     @PostMapping("/login")
@@ -64,8 +50,7 @@ public class MemberAuthController {
             model.addAttribute("redirect", redirect);
             return "auth";
         }
-
-        saveLoginSession(member, request);
+        memberService.saveLoginSession(member, request);
         redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("登入成功，歡迎回來"));
 
         return redirectOrHome(redirect);
@@ -86,7 +71,6 @@ public class MemberAuthController {
             model.addAttribute("socialEmail", session.getAttribute("socialEmail"));
             return "auth";
         }
- 
         // 若是從第三方登入流程過來，補綁 OAuth
         linkPendingSocialOauth(register.email(), session, request);
  
@@ -106,10 +90,9 @@ public class MemberAuthController {
                                   findMemberByOauth(AuthProvider.GOOGLE, profile.providerId());
  
             if (member != null) {
-                saveLoginSession(member, request);
+                memberService.saveLoginSession(member, request);
                 return Map.of("success", true, "redirectUrl", consumeSocialRedirect(session, "/home"));
             }
-
             // 未綁定 → 暫存資料，導到註冊頁補資料
             storePendingSocial(session, AuthProvider.GOOGLE, profile);
             return Map.of("success", true, "redirectUrl", "/auth");
@@ -149,9 +132,7 @@ public class MemberAuthController {
 
         MemberEntity loginMember = getLoginMember(session);
 
-        if (loginMember == null) {
-            return Map.of("success", false, "message", "請先登入");
-        }
+        if (loginMember == null) return Map.of("success", false, "message", "請先登入");
  
         if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
             return Map.of("success", false, "message", "請先設定密碼後再解除 Google 綁定");
@@ -160,7 +141,7 @@ public class MemberAuthController {
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.GOOGLE);
             return Map.of("success", true, "message", "已解除 Google 綁定");
- 
+
         } catch (IllegalStateException e) {
             return Map.of("success", false, "message", e.getMessage());
         }
@@ -181,7 +162,6 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
         }
- 
         return "redirect:" + lineLoginService.getLineLinkUrl(session);
     }
 
@@ -203,7 +183,6 @@ public class MemberAuthController {
             if ("link".equals(lineAction)) {
                 return handleLineLink(profile.providerId(), session, redirectAttr);
             }
-
             return socialQuickLogin(AuthProvider.LINE, profile, session, redirectAttr, model, request);
 
         } catch (Exception e) {
@@ -223,51 +202,21 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
         }
-
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.LINE);
-            lineLoginService.unlinkLine(loginMember.getMemberId());
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
         } catch (IllegalStateException e) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(e.getMessage()));
         }
- 
         return "redirect:/member";
     }
 
 
     // ==================== 以下是 helper 方法 ====================
 
-    // 建立登入後的 Session 與 Spring Security 驗證資訊
-    private void saveLoginSession(MemberEntity member, HttpServletRequest request) {
-
-        // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
-
-        // 2. 建立一個官方認可的身份憑證 (Authentication)
-        Authentication auth = new UsernamePasswordAuthenticationToken(member.getEmail(), null, authorities);
-
-        // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        // 4. 將狀態綁定到 Session 中 (最關鍵的一步！)
-        HttpSession session = request.getSession(true);
-
-        // 這是你原本存放使用者資料的地方，保留著完全沒問題，方便你前端畫面使用
-        session.setAttribute("loginMember", member);
-
-        // 🌟 新增這行：把安管中心的安全狀態，用 Spring Security 指定的專屬名稱存進 Session 裡！
-        session.setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext()
-        );
-    }
-
     // 若有 redirect 參數則跳轉，否則回首頁
     private String redirectOrHome(String redirect) {
-        if (redirect != null && !redirect.isBlank()) {
-            return "redirect:" + redirect;
-        }
+        if (redirect != null && !redirect.isBlank()) return "redirect:" + redirect;
         return "redirect:/home";
     }
 
@@ -298,15 +247,15 @@ public class MemberAuthController {
  
         if (socialId == null || socialProvider == null) return;
  
-        memberRepo.findByEmail(email).ifPresent(member -> {
+        MemberEntity member = memberService.findByEmail(email);
+        if (member != null) {
             try {
                 socialAuthService.link(member, socialProvider, socialId);
             } catch (IllegalStateException ignored) {
                 // 已綁定則略過
             }
-            saveLoginSession(member, request);
-        });
- 
+            memberService.saveLoginSession(member, request);
+        }
         session.removeAttribute("socialProvider");
         session.removeAttribute("socialId");
         session.removeAttribute("socialName");
@@ -336,15 +285,13 @@ public class MemberAuthController {
         String providerId = profile.get("userId").asText();
         String name = profile.get("displayName").asText();
         String email = profile.has("email") && !profile.get("email").isNull()
-                ? profile.get("email").asText()
-                : "";
+                ? profile.get("email").asText() : "";
  
         return new SocialProfileDTO(providerId, name, email);
     }
 
     /** LINE link callback 的處理邏輯 */
-    private String handleLineLink(
-            String providerId, HttpSession session, RedirectAttributes redirectAttr) {
+    private String handleLineLink(String providerId, HttpSession session, RedirectAttributes redirectAttr) {
  
         session.removeAttribute("lineAction");
         MemberEntity loginMember = getLoginMember(session);
@@ -353,14 +300,12 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
         }
- 
         try {
             socialAuthService.link(loginMember, AuthProvider.LINE, providerId);
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 綁定成功"));
         } catch (IllegalStateException e) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(e.getMessage()));
         }
- 
         return "redirect:/member";
     }
 
@@ -372,7 +317,7 @@ public class MemberAuthController {
         MemberEntity member = socialAuthService.findMemberByOauth(provider, profile.providerId());
  
         if (member != null) {
-            saveLoginSession(member, request);
+            memberService.saveLoginSession(member, request);
             session.removeAttribute("lineAction");
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success(provider.name() + " 登入成功"));
             return redirectOrHome(consumeSocialRedirect(session, null));
