@@ -18,6 +18,7 @@ public record WorkDTO(
         String writer,
         String location,
         Integer movielength,
-        Integer episodes) {
+        Integer episodes,
+        Integer workId) {
 
 }

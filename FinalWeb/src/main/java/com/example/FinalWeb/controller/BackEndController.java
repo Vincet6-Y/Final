@@ -1,6 +1,7 @@
 package com.example.FinalWeb.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,6 +62,36 @@ public class BackEndController {
     @PostMapping("/contentmanagement/work/add")
     public String workupload(WorkDTO wDto) {
         service.addwork(wDto);
+
+        return "redirect:/backend/contentmanagement/work";
+    }
+
+    @RequestMapping("/contentmanagement/work/list")
+    public String worklist(Model model,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<WorkDetailEntity> workPage = service.getBackendWorklist(page, size);
+
+        model.addAttribute("works", workPage);
+        model.addAttribute("page", page);
+
+        return "/backend/backendworklist";
+    }
+
+    @GetMapping("/contentmanagement/work/edit")
+    public String workedit(Model model,
+            WorkDTO wDto) {
+        Optional<WorkDetailEntity> getWorkBox = service.findWork(wDto);
+        WorkDetailEntity getWork = getWorkBox.orElse(null);
+        model.addAttribute("getWork", getWork);
+
+        return "/backend/backendworkedit";
+    }
+
+    @PostMapping("/contentmanagement/work/update")
+    public String workupdate(WorkDTO wDto) {
+        service.updateWork(wDto);
 
         return "redirect:/backend/contentmanagement/work";
     }

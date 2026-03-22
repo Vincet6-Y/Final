@@ -25,7 +25,7 @@
                                 <span class="material-symbols-outlined text-primary">movie_edit</span>
                                 <h3 class="font-bold text-lg">作品管理</h3>
                             </div>
-                            <button class="text-primary text-sm font-bold hover:underline">查看全部</button>
+                            <a th:href="@{/backend/contentmanagement/work/list}" class="text-primary text-sm font-bold hover:underline">查看全部</a>
                         </div>
                         <div class="p-6">
                             <div class="space-y-4">
@@ -38,9 +38,10 @@
                                     <div class="flex-1">
                                         <h4 class="text-sm font-bold" th:text="${newWrok.workName}">作品名稱</h4>
                                     </div>
-                                    <button class="p-1 hover:bg-primary/20 rounded transition-colors">
+                                    <a th:href="@{/backend/contentmanagement/work/edit(workId=${newWrok.workId})}"
+                                    class="p-1 hover:bg-primary/20 rounded transition-colors">
                                         <span class="material-symbols-outlined text-sm">edit</span>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         </div>

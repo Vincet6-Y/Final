@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-Hant">
+
+<head th:replace="~{ fragments/backendhead :: backHead}"></head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <aside th:replace="~{ fragments/backendaside :: backaside('content')}"> </aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden bg-background-light dark:bg-background-dark">
+
+            <header
+                class="flex items-center justify-between px-4 md:px-8 py-4 border-b border-white/10 bg-background-dark/80 backdrop-blur-md sticky top-0 z-10">
+                <div class="flex flex-col">
+                    <div class="hidden sm:flex items-center gap-2 text-slate-500 text-sm mb-1">
+                        <span>內容管理</span>
+                        <span class="material-symbols-outlined text-xs">chevron_right</span>
+                        <span class="text-primary font-medium">全部作品</span>
+                    </div>
+                    <h2 class="text-lg md:text-xl font-bold tracking-tight text-white">列出全部作品</h2>
+                </div>
+            </header>
+
+            <div class="flex flex-col gap-8">
+                <div class="p-6">
+                    <div class="space-y-4">
+
+                        <div th:each="work : ${works.content}"
+                            class="flex items-center gap-4 bg-white dark:bg-white/5 p-3 rounded-lg border border-slate-200 dark:border-white/10 hover:border-primary/40 transition-all group">
+
+                            <div class="w-16 h-10 rounded overflow-hidden shrink-0">
+                                <img th:src="${work.workImg}" alt="IMAGE"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate"
+                                    th:text="${work.workName}">
+                                    你的名字 (君の名は。)
+                                </h4>
+
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <a th:href="@{/backend/contentmanagement/work/edit(workId=${work.workId})}"
+                                    class="p-1 hover:bg-primary/20 rounded transition-colors text-slate-500 hover:text-primary">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-16 flex justify-center">
+                    <nav class="flex items-center gap-2">
+                        <a th:if="${page > 0}"
+                            th:href="@{/backend/contentmanagement/work/list(page=${page - 1}, size=10)}"
+                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
+                            >
+                            <span class="material-symbols-outlined" >chevron_left</span>
+                        </a>
+
+                        <th:block th:each="i : ${#numbers.sequence(0, works.totalPages - 1)}">
+
+                            <div th:if="${i == works.number}" th:text="${i + 1}"
+                                class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white dark:text-background-dark font-bold">
+                            </div>
+
+                            <a th:unless="${i == works.number}"
+                                th:href="@{/backend/contentmanagement/work/list(page=${i}, size=10)}"
+                                th:text="${i + 1}"
+                                class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                            </a>
+
+                        </th:block>
+                        <!-- <span th:text="${page + 1}"></span> / <span th:text="${works.totalPages}"></span> -->
+
+                        <a th:if="${page + 1 < works.totalPages}"
+                            th:href="@{/backend/contentmanagement/work/list(page=${page + 1}, size=10)}"
+                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
+                            >
+                            <span class="material-symbols-outlined" >chevron_right</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</body>
+
+</html>

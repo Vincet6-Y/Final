@@ -3,6 +3,7 @@ package com.example.FinalWeb.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +138,41 @@ public class WorkService {
         repo.save(wEntity);
     }
 
-    public List<WorkDetailEntity> showNew5(){
-        return repo.findTop5ByOrderByWorkIdDesc();        
+    public List<WorkDetailEntity> showNew5() {
+        return repo.findTop5ByOrderByWorkIdDesc();
+    }
+
+    public Page<WorkDetailEntity> getBackendWorklist(int page, int size) {
+
+        // 分頁功能
+        Pageable pageable = PageRequest.of(page, size);
+
+        return repo.findAll(pageable);
+    }
+
+    public Optional<WorkDetailEntity> findWork(WorkDTO wDto) {
+
+        return repo.findById(wDto.workId());
+    }
+
+    public void updateWork(WorkDTO wDto) {
+        WorkDetailEntity wEntity = new WorkDetailEntity();
+        wEntity.setWorkId(wDto.workId());
+        wEntity.setWorkName(wDto.workName());
+        wEntity.setOnDate(wDto.onDate());
+        wEntity.setWorkClass(wDto.workClass());
+        wEntity.setWorkImg(wDto.workImg());
+        wEntity.setDescription(wDto.description());
+        wEntity.setDirector(wDto.director());
+        wEntity.setWriter(wDto.writer());
+        wEntity.setLocation(wDto.location());
+        if (wDto.workClass().equals("動畫")) {
+            wEntity.setEpisodes(wDto.episodes());
+        }
+        if (wDto.workClass().equals("電影")) {
+            wEntity.setMovielength(wDto.movielength());
+        }
+
+        repo.save(wEntity);
     }
 }
