@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-
 <html class="dark" lang="zh-Hant">
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-        <!-- Header Section -->
-        <header th:replace="~{ fragments/header :: myHeader}"> </header>
+
+        <header th:replace="~{ fragments/header :: myHeader}"></header>
 
         <main class="flex-1 w-full max-w-7xl mx-auto p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Sidebar / Profile Stats -->
+
+            <!-- 側邊欄 -->
             <aside class="lg:col-span-4 flex flex-col gap-6">
+
+                <!-- 會員資料卡 -->
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
+
+                    <!-- 大頭照 -->
                     <div class="relative mb-4">
                         <div class="size-32 rounded-full border-4 border-primary p-1 relative">
                             <div id="avatarSkeleton"
@@ -30,19 +34,23 @@
                                 onload="this.style.opacity='1'; document.getElementById('avatarSkeleton').style.display='none';" />
                         </div>
                     </div>
-                    <h1 class="text-2xl font-bold text-slate-100" th:text="'聖地旅者 · ' + ${session.loginMember.name}">
+
+                    <!-- 會員名稱 -->
+                    <h1 class="text-2xl font-bold text-slate-100"
+                        th:text="'聖地旅者 · ' + ${session.loginMember.name}">
                     </h1>
+
+                    <!-- 收藏數量 -->
                     <div class="w-full mt-8 flex justify-center">
                         <div id="btn-stats-favs"
                             class="cursor-pointer w-full max-w-[130px] flex flex-col items-center py-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
-
                             <span class="text-3xl font-bold text-primary leading-none"
                                 th:text="${favorites != null ? favorites.size() : 0}">0</span>
-
-                            <span
-                                class="text-[14px] tracking-wider text-slate-500 dark:text-slate-400 mt-1">已收藏行程</span>
+                            <span class="text-[14px] tracking-wider text-slate-500 dark:text-slate-400 mt-1">已收藏行程</span>
                         </div>
                     </div>
+
+                    <!-- 操作按鈕 -->
                     <div class="w-full mt-6 flex items-center gap-3">
                         <a th:href="@{/member/profile}"
                             class="w-1/2 py-3 bg-primary text-background-dark font-bold rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-center">
@@ -57,15 +65,14 @@
                                 <span class="material-symbols-outlined text-[20px]">settings</span>
                             </button>
 
+                            <!-- 下拉選單 -->
                             <div id="memberMenu" style="display: none;"
                                 class="absolute right-0 top-14 w-64 rounded-2xl bg-white dark:bg-zinc-900 shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden z-50">
-
                                 <button type="button" id="openAccountModal"
                                     class="w-full flex items-center gap-3 px-4 py-4 text-sm text-left text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition border-b border-slate-200 dark:border-white/10">
                                     <span class="material-symbols-outlined text-[20px]">settings</span>
                                     帳戶設定
                                 </button>
-
                                 <a th:href="@{/member/logout}"
                                     class="flex items-center gap-3 px-4 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
                                     <span class="material-symbols-outlined text-[20px]">logout</span>
@@ -75,7 +82,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- Navigation List -->
+
+                <!-- 側邊導覽列 -->
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-2 hidden lg:flex flex-col">
                     <a id="nav-home"
                         class="cursor-pointer flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 rounded-lg">
@@ -93,45 +101,35 @@
                         <span class="font-medium">收藏行程</span>
                     </a>
                 </div>
+
             </aside>
-            <!-- Main Content -->
+
+            <!-- 主要內容 -->
             <div class="lg:col-span-8 flex flex-col gap-8">
-                <!-- Purchase Records Section -->
                 <div id="section-orders">
                     <th:block th:replace="~{member/purchaseRecord :: purchaseRecord}"></th:block>
                 </div>
-                <!-- Saved List Section -->
-
                 <div id="section-favs">
                     <th:block th:replace="~{member/favoritePlan :: favoritePlan}"></th:block>
                 </div>
             </div>
+
         </main>
-        <!-- Footer Footer -->
+
         <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
     </div>
+
     <th:block th:replace="~{member/purchaseModal :: purchaseModal}"></th:block>
     <th:block th:replace="~{member/accountModal :: accountModal}"></th:block>
     <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script th:src="@{/member/js/member.js}"></script>
     <script th:src="@{/member/js/accountModal.js}"></script>
     <script th:src="@{/member/js/purchaseModal.js}"></script>
     <script th:src="@{/assets/toast.js}"></script>
+    <script th:src="@{/member/js/memberAvatar.js}"></script>
     <script type="module" th:src="@{/member/js/firebase/googleLink.js}"></script>
-    <script>
-        document.getElementById('memberAvatar').onerror = function() {
-            this.src = this.dataset.defaultImg;
-            this.style.opacity = '1';
-            document.getElementById('avatarSkeleton').style.display = 'none';
-        };
 
-        const avatar = document.getElementById('memberAvatar');
-        if (avatar && avatar.complete) {
-            avatar.style.opacity = '1';
-            document.getElementById('avatarSkeleton').style.display = 'none';
-        }
-    </script>
 </body>
-
 </html>
