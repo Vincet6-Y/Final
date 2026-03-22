@@ -120,6 +120,29 @@ public class MemberAuthController {
         }
     }
 
+    
+    @PostMapping("/google/link")
+    @ResponseBody
+    public Map<String, Object> googleLink(@RequestBody GoogleLoginRequestDTO req,
+                                          HttpSession session) {
+        
+        MemberEntity loginMember = getLoginMember(session);
+        if (loginMember == null) {
+            return Map.of("success", false, "message", "請先登入會員");
+        }
+        try {
+            SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
+            socialAuthService.link(loginMember, AuthProvider.GOOGLE, profile.providerId());
+            return Map.of("success", true, "message", "Google 綁定成功");
+ 
+        } catch (IllegalStateException e) {
+            return Map.of("success", false, "message", e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of("success", false, "message", "Google 綁定失敗");
+        }
+    }
+
     @PostMapping("/google/unlink")
     @ResponseBody
     public Map<String, Object> unlinkGoogle(HttpSession session) {
@@ -143,28 +166,6 @@ public class MemberAuthController {
         }
     }
 
-    @PostMapping("/google/link")
-    @ResponseBody
-    public Map<String, Object> googleLink(@RequestBody GoogleLoginRequestDTO req,
-                                          HttpSession session) {
-        
-        MemberEntity loginMember = getLoginMember(session);
-        if (loginMember == null) {
-            return Map.of("success", false, "message", "請先登入會員");
-        }
-        try {
-            SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
-            socialAuthService.link(loginMember, AuthProvider.GOOGLE, profile.providerId());
-            return Map.of("success", true, "message", "Google 綁定成功");
- 
-        } catch (IllegalStateException e) {
-            return Map.of("success", false, "message", e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Map.of("success", false, "message", "Google 綁定失敗");
-        }
-    }
-
     // ==================== LINE ====================
 
     @GetMapping("/line/login")
@@ -172,7 +173,17 @@ public class MemberAuthController {
         return "redirect:" + lineLoginService.getLineLoginUrl(session, redirect);
     }
 
+    // 點擊「立即綁定 LINE」時，導向 LINE OAuth 授權頁
+    @GetMapping("/line/link")
+    public String lineLink(HttpSession session, RedirectAttributes redirectAttr) {
 
+        if (getLoginMember(session) == null) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
+            return "redirect:/auth";
+        }
+ 
+        return "redirect:" + lineLoginService.getLineLinkUrl(session);
+    }
 
     @GetMapping("/line/callback")
     public String lineCallback(@RequestParam String code, @RequestParam String state, 
@@ -203,19 +214,6 @@ public class MemberAuthController {
         }
     }
 
-
-    // 點擊「立即綁定 LINE」時，導向 LINE OAuth 授權頁
-    @GetMapping("/line/link")
-    public String lineLink(HttpSession session, RedirectAttributes redirectAttr) {
-
-        if (getLoginMember(session) == null) {
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
-            return "redirect:/auth";
-        }
- 
-        return "redirect:" + lineLoginService.getLineLinkUrl(session);
-    }
-
     // 解除目前會員的 LINE 綁定
     @PostMapping("/line/unlink")
     public String lineUnlink(HttpSession session, RedirectAttributes redirectAttr) {
@@ -236,7 +234,6 @@ public class MemberAuthController {
  
         return "redirect:/member";
     }
-
 
 
     // ==================== 以下是 helper 方法 ====================
