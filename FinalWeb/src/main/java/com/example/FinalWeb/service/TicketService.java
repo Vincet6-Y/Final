@@ -232,20 +232,6 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 取得該行程中已付款成功的景點 ID (spotId) 列表
-     */
-    public List<Integer> getPurchasedSpotIds(Integer planId) {
-        if (planId == null)
-            return new ArrayList<>();
-        return ordersRepo.findByMyPlan_MyPlanIdAndPayStatus(planId, "已付款").stream()
-                .flatMap(order -> order.getOrderDetails().stream())
-                .filter(detail -> detail.getMyMap() != null && detail.getMyMap().getSpotId() != null)
-                .map(detail -> detail.getMyMap().getSpotId())
-                .distinct()
-                .toList();
-    }
-
     // =====================================================
     // 私有工具
     // =====================================================

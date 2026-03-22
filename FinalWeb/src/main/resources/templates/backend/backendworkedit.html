@@ -23,7 +23,8 @@
 
             <div class="flex-1 overflow-y-auto flex flex-col bg-[#161210]">
                 <div class="max-w-7xl w-full mx-auto p-4 md:p-8 flex-1">
-                    <form th:action="@{/backend/contentmanagement/work/update}" method="post" class="lg:col-span-2 space-y-6">
+                    <form th:action="@{/backend/contentmanagement/work/update}" method="post"
+                        class="lg:col-span-2 space-y-6">
                         <input type="hidden" name="workId" th:value="${getWork.workId}">
                         <input name="workName" th:value="${getWork.workName}"
                             class="w-full bg-[#1a1614] border border-primary/40 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-white p-3 md:p-4 outline-none placeholder:text-slate-400"
@@ -32,11 +33,11 @@
                             class="w-full bg-[#1a1614] border border-primary/40 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-white p-3 md:p-4 outline-none placeholder:text-slate-400"
                             type="text" placeholder="點擊選擇首映日期" onfocus="this.type='date'; this.showPicker()"
                             onblur="if(!this.value) this.type='text'" />
-                        <select name="workClass" id="type" th:value="${getWork.workClass}"
+                        <select name="workClass" id="type"
                             class="w-full bg-[#1a1614] border border-primary/40 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-white p-3 md:p-4 outline-none placeholder:text-slate-400">
                             <option disabled selected>選擇作品類型</option>
-                            <option value="動畫">動畫</option>
-                            <option value="電影">電影</option>
+                            <option value="動畫" th:selected="${getWork.workClass == '動畫'}">動畫</option>
+                            <option value="電影" th:selected="${getWork.workClass == '電影'}">電影</option>
                         </select>
                         <input name="workImg" th:value="${getWork.workImg}"
                             class="w-full bg-[#1a1614] border border-primary/40 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary text-white p-3 md:p-4 outline-none placeholder:text-slate-400"
@@ -70,9 +71,20 @@
         </main>
     </div>
 
+    <div th:if="${message != null}" id="toast"
+        class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <p th:text="${message}"></p>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         $(document).ready(function () {
+            let initialType = $('#type').val();
+            if (initialType === "動畫") {
+                $('#choseAnime').removeClass('hidden');
+            } else if (initialType === "電影") {
+                $('#choseMovie').removeClass('hidden');
+            }
 
             $('#type').on('change', function () {
 
@@ -90,8 +102,13 @@
                     console.log(selectedType);
                     $('#choseMovie').removeClass('hidden');
                 }
-            });
+            })
 
+            if ($("#toast").length > 0) {
+                setTimeout(function () {
+                    $("#toast").fadeOut('slow');
+                }, 3000);
+            }
         });
     </script>
 </body>

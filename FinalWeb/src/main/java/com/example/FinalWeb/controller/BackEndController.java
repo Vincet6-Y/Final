@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.FinalWeb.dto.PlanCreateRequestDTO;
 import com.example.FinalWeb.dto.WorkDTO;
@@ -212,9 +213,10 @@ public class BackEndController {
     }
 
     @PostMapping("/contentmanagement/work/update")
-    public String workupdate(WorkDTO wDto) {
+    public String workupdate(WorkDTO wDto, RedirectAttributes redirectAttributes) {
         service.updateWork(wDto);
+        redirectAttributes.addFlashAttribute("message", "更新成功！");
 
-        return "redirect:/backend/contentmanagement/work";
+        return "redirect:/backend/contentmanagement/work/edit" + "?workId=" + wDto.workId();
     }
 }
