@@ -4,7 +4,7 @@
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
   <div class="flex min-h-screen">
-    <!-- Sidebar -->
+    <!-- Sidebar --> 
     <aside th:replace="~{ fragments/backendaside :: backaside('order')}"> </aside>
     <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-x-hidden">
@@ -14,17 +14,20 @@
       <div class="p-8">
         <!-- Tabs -->
         <div class="flex border-b border-neutral-dark mb-8 gap-8 overflow-x-auto scrollbar-hide">
-          <a class="flex flex-col items-center justify-center border-b-2 border-primary text-primary pb-4 px-2 whitespace-nowrap"
-            href="#">
-            <span class="text-sm font-bold">狀態管理</span>
+          <a class="flex flex-col items-center justify-center border-b-2 pb-4 px-2 whitespace-nowrap"
+             th:classappend="${currentStatus == '全部' || currentStatus == null} ? 'border-primary text-primary' : 'border-transparent text-neutral-muted hover:text-slate-100 transition-colors'"
+             th:href="@{/backend/order(status='全部')}">
+            <span class="text-sm font-bold">所有訂單</span>
           </a>
-          <a class="flex flex-col items-center justify-center border-b-2 border-transparent text-neutral-muted hover:text-slate-100 pb-4 px-2 whitespace-nowrap transition-colors"
-            href="#">
+          <a class="flex flex-col items-center justify-center border-b-2 pb-4 px-2 whitespace-nowrap"
+             th:classappend="${currentStatus == '已付款'} ? 'border-primary text-primary' : 'border-transparent text-neutral-muted hover:text-slate-100 transition-colors'"
+             th:href="@{/backend/order(status='已付款')}">
+            <span class="text-sm font-bold">已付款 (出貨處理)</span>
+          </a>
+          <a class="flex flex-col items-center justify-center border-b-2 pb-4 px-2 whitespace-nowrap"
+             th:classappend="${currentStatus == '退款中'} ? 'border-primary text-primary' : 'border-transparent text-neutral-muted hover:text-slate-100 transition-colors'"
+             th:href="@{/backend/order(status='退款中')}">
             <span class="text-sm font-bold">退款管理</span>
-          </a>
-          <a class="flex flex-col items-center justify-center border-b-2 border-transparent text-neutral-muted hover:text-slate-100 pb-4 px-2 whitespace-nowrap transition-colors"
-            href="#">
-            <span class="text-sm font-bold">出貨/發放憑證</span>
           </a>
         </div>
         <!-- Quick Stats -->
@@ -32,22 +35,19 @@
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">待處理訂單</p>
     <div class="flex items-end justify-between">
-      <h3 id="stat-pending" class="text-3xl font-bold text-slate-100">0</h3>
-      <span class="text-green-500 text-sm font-bold flex items-center">+5% <span class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
+      <h3 id="stat-pending" class="text-3xl font-bold text-slate-100" th:text="${stats.pendingOrders ?: 0}">0</h3>
     </div>
   </div>
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">退款請求</p>
     <div class="flex items-end justify-between">
-      <h3 id="stat-refund" class="text-3xl font-bold text-slate-100">0</h3>
-      <span class="text-red-500 text-sm font-bold flex items-center">-2% <span class="material-symbols-outlined text-sm ml-1">trending_down</span></span>
+      <h3 id="stat-refund" class="text-3xl font-bold text-slate-100" th:text="${stats.refundRequests ?: 0}">0</h3>
     </div>
   </div>
   <div class="bg-neutral-dark/40 border border-neutral-dark p-6 rounded-xl hover:border-primary/50 transition-colors">
     <p class="text-neutral-muted text-sm font-medium mb-1">今日發放憑證</p>
     <div class="flex items-end justify-between">
-      <h3 id="stat-today" class="text-3xl font-bold text-slate-100">0</h3>
-      <span class="text-green-500 text-sm font-bold flex items-center">+15% <span class="material-symbols-outlined text-sm ml-1">trending_up</span></span>
+      <h3 id="stat-today" class="text-3xl font-bold text-slate-100" th:text="${stats.todayIssued ?: 0}">0</h3>
     </div>
   </div>
 </div>
@@ -55,7 +55,6 @@
         <div class="bg-neutral-dark/20 border border-neutral-dark rounded-xl overflow-hidden">
           <div class="p-6 border-b border-neutral-dark flex items-center justify-between">
             <h3 class="text-lg font-bold text-slate-100">最近訂單列表</h3>
-            
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -70,101 +69,57 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-dark">
-                <!-- Row 1 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-001</td>
-                  <td class="px-6 py-4 text-sm">鎌倉・江之島電鐵巡禮券</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-20 14:30</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥2,500</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">已付款
-                      (Paid)</span>
+                <tr th:each="order : ${ordersPage.content}" th:onclick="'viewDetail(' + ${order.orderId} + ')'" 
+                    class="group hover:bg-white/10 transition-all duration-300 border-b border-neutral-800 flex flex-col md:table-row cursor-pointer">
+                  <td class="px-6 py-4 text-sm font-mono text-slate-100 group-hover:text-primary transition-colors">
+                    <span class="md:hidden font-bold text-neutral-500"># </span><span th:text="${order.tradeNo != null ? order.tradeNo : order.orderId}"></span>
                   </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
+                  <td class="px-6 py-1 md:py-4 text-sm">
+                    <div class="font-bold text-white group-hover:translate-x-1 transition-transform inline-block"
+                         th:text="${order.myPlan != null && order.myPlan.myPlanName != null ? order.myPlan.myPlanName : '自訂行程'}">自訂行程</div>
                   </td>
-                </tr>
-                <!-- Row 2 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-002</td>
-                  <td class="px-6 py-4 text-sm">京都・出町柳商店街紀念章</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-20 12:15</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥1,200</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">待處理
-                      (Pending)</span>
+                  <td class="hidden md:table-cell px-6 py-4 text-sm text-slate-100" th:text="${#temporals.format(order.orderTime, 'yyyy/MM/dd HH:mm')}"></td>
+                  <td class="px-6 py-2 md:py-4 flex justify-between items-center md:table-cell">
+                    <span class="md:hidden text-xs text-neutral-500 font-bold uppercase">總額</span>
+                    <span class="text-sm font-bold text-white" th:text="'NT$ ' + ${#numbers.formatInteger(@orderService.calculateTotalAmount(order), 0, 'COMMA')}">0</span>
                   </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
+                  <td class="px-6 py-2 md:py-4 flex justify-between items-center md:table-cell">
+                    <span class="md:hidden text-xs text-neutral-500 font-bold uppercase">狀態</span>
+                    <span class="px-2 py-1 rounded-full text-[10px] font-bold"
+                          th:classappend="${order.payStatus == '已付款'} ? 'bg-green-100 text-green-700 border border-green-200' : 
+                                         (${order.payStatus == '退款中'} ? 'bg-red-100 text-red-700 border border-red-200' : 
+                                         (${order.payStatus == '待處理'} ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
+                                         'bg-neutral-100 text-neutral-500 border border-neutral-200'))"
+                          th:text="${order.payStatus}"></span>
                   </td>
-                </tr>
-                <!-- Row 3 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-003</td>
-                  <td class="px-6 py-4 text-sm">岐阜・飛驒高山君之名巡禮套票</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-19 18:45</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥4,800</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20">已退款
-                      (Refunded)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
+                  <td class="px-6 py-4 text-right md:table-cell">
+                    <button class="text-primary hover:text-primary-light text-sm font-bold flex items-center justify-end gap-1 ml-auto">
+                      查看詳情 <span class="material-symbols-outlined text-xs">arrow_forward_ios</span>
+                    </button>
                   </td>
                 </tr>
-                <!-- Row 4 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-004</td>
-                  <td class="px-6 py-4 text-sm">秩父・未聞花名十週年限定憑證</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-19 15:20</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥3,500</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">已付款
-                      (Paid)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
-                </tr>
-                <!-- Row 5 -->
-                <tr class="hover:bg-neutral-dark/10 transition-colors">
-                  <td class="px-6 py-4 text-sm font-medium">#SJ-2023-005</td>
-                  <td class="px-6 py-4 text-sm">沼津・LoveLive! Sunshine!! 巴士一日券</td>
-                  <td class="px-6 py-4 text-sm text-neutral-muted">2023-11-19 10:10</td>
-                  <td class="px-6 py-4 text-sm font-bold">¥1,800</td>
-                  <td class="px-6 py-4">
-                    <span
-                      class="px-2 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">已付款
-                      (Paid)</span>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <button class="text-primary hover:underline text-sm font-medium">查看詳情</button>
-                  </td>
+                <tr th:if="${#lists.isEmpty(ordersPage.content)}">
+                  <td colspan="6" class="px-6 py-10 text-center text-neutral-400">目前尚無相關訂單資料</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div class="p-4 border-t border-neutral-dark flex items-center justify-between">
-            <p  id="pagination-info" class="text-sm text-neutral-muted">顯示 1 到 5 項，共 128 項訂單</p>
-            <div  id="pagination-container" class="flex gap-2">
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors disabled:opacity-50"
-                disabled="">
+          <div class="p-4 border-t border-neutral-dark flex items-center justify-between" th:if="${ordersPage.totalPages > 0}">
+            <p id="pagination-info" class="text-sm text-neutral-muted" 
+               th:text="'顯示 ' + (${ordersPage.number * ordersPage.size + 1}) + ' 到 ' + (${ordersPage.number * ordersPage.size + ordersPage.numberOfElements}) + ' 項，共 ' + ${ordersPage.totalElements} + ' 項訂單'"></p>
+            <div id="pagination-container" class="flex gap-2">
+              <a th:href="@{/backend/order(page=${ordersPage.number - 1}, size=${ordersPage.size}, status=${currentStatus})}"
+                 th:class="${ordersPage.first} ? 'pointer-events-none opacity-50 size-8 rounded border border-neutral-dark flex items-center justify-center text-slate-400' : 'size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-slate-100'">
                 <span class="material-symbols-outlined text-sm">chevron_left</span>
-              </button>
-              <button class="size-8 rounded bg-primary text-background-dark font-bold text-sm">1</button>
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-sm">2</button>
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-sm">3</button>
-              <button
-                class="size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors">
+              </a>
+              <a th:each="i : ${#numbers.sequence(0, ordersPage.totalPages - 1)}" 
+                 th:href="@{/backend/order(page=${i}, size=${ordersPage.size}, status=${currentStatus})}"
+                 th:class="${ordersPage.number == i} ? 'size-8 rounded bg-primary text-background-dark font-bold text-sm flex items-center justify-center' : 'size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-sm text-slate-100'"
+                 th:text="${i + 1}">1</a>
+              <a th:href="@{/backend/order(page=${ordersPage.number + 1}, size=${ordersPage.size}, status=${currentStatus})}"
+                 th:class="${ordersPage.last} ? 'pointer-events-none opacity-50 size-8 rounded border border-neutral-dark flex items-center justify-center text-slate-400' : 'size-8 rounded border border-neutral-dark flex items-center justify-center hover:bg-neutral-dark transition-colors text-slate-100'">
                 <span class="material-symbols-outlined text-sm">chevron_right</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -172,6 +127,36 @@
     </main>
   </div>
 <script th:src="@{/backend/order.js}"></script>
+<div id="orderModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    
+    <div class="relative flex items-center justify-center min-h-screen p-4">
+        <div class="bg-[#FDFDF6] w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden transform transition-all border border-neutral-300">
+            
+            <div class="px-8 py-5 border-b border-neutral-200 flex justify-between items-center bg-[#F9F9F3]">
+                <h3 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-3xl">local_activity</span>
+                    訂單詳細資訊
+                </h3>
+                <button onclick="closeModal()" class="text-neutral-400 hover:text-slate-600 transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            
+            <div id="modalContent" class="p-10 max-h-[75vh] overflow-y-auto space-y-8 text-slate-700">
+                <div class="flex justify-center py-10">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </div>
+
+            <div class="px-8 py-5 border-t border-neutral-200 text-right bg-[#F9F9F3]">
+                <button onclick="closeModal()" class="px-8 py-3 rounded-xl bg-white border border-neutral-300 text-slate-600 hover:bg-neutral-100 transition-colors text-sm font-bold shadow-sm">
+                    關閉視窗
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 
 

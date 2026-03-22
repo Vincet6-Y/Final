@@ -1,0 +1,118 @@
+<!-- ===== Fragment 1：已包含票券 ===== -->
+<div th:fragment="includedTickets(orderDetails)" class="section-card rounded-xl p-8"
+    th:if="${orderDetails != null && !orderDetails.isEmpty()}">
+    <div class="flex items-center gap-3 mb-8">
+        <div class="w-1 h-6 bg-green-500 rounded-full"></div>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">已包含票券</h2>
+        <span class="text-xs bg-green-500/10 text-green-500 px-3 py-1 rounded-full font-bold">
+            來自行程規劃
+        </span>
+    </div>
+    <div class="space-y-3">
+        <div th:each="detail : ${orderDetails}"
+            class="db-ticket-row flex justify-between items-center bg-green-500/5 border border-green-500/10 rounded-lg px-5 py-3">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-500 text-lg">local_activity</span>
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-200"
+                    th:text="${detail.ticketType}">票券名稱</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-bold text-green-600 dark:text-green-400"
+                    th:text="'NT$ ' + ${detail.ticketPrice}">NT$ 0</span>
+                <button type="button" class="remove-db-ticket-btn text-gray-400 hover:text-red-500 transition-colors"
+                    th:data-id="${detail.orderDetailId}" th:data-price="${detail.ticketPrice}"
+                    th:data-name="${detail.ticketType}">
+                    <span class="material-symbols-outlined text-lg">cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ===== Fragment 2：加購付費項目 ===== -->
+<!--
+    參數說明：
+    availableTickets      → 景點門票（依行程景點推薦，只有行程內有的才出現）
+    recommendedTransports → 地區交通票（依行程地區推薦，沒有對應地區則 optgroup 不顯示）
+    purchasedNames        → 已購買的票券名稱 Set（後端保證非 null）
+    globalTransports      → 全日本通用票（固定 3 張，永遠顯示）
+-->
+<section th:fragment="addonTickets(availableTickets, recommendedTransports, purchasedNames, globalTransports)"
+    class="section-card rounded-xl p-8">
+
+    <div class="flex items-center gap-3 mb-8">
+        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">加購付費項目</h2>
+        <span class="text-xs bg-orange-500/10 text-orange-500 px-3 py-1 rounded-full font-bold">選購</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- ==================== 景點門票 ==================== -->
+        <div>
+            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                景點門票
+                <!-- 有推薦票才顯示「依您的行程」標籤 -->
+                <span th:if="${availableTickets != null and !availableTickets.isEmpty()}"
+                    class="text-orange-500 text-xs font-bold ml-1">✨ 依您的行程</span>
+            </label>
+            <select id="ticketSelect"
+                class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                <option value="0" data-name="">不需加購</option>
+
+                <!-- 行程內有對應景點才顯示；若行程沒有可購票的景點，整個 optgroup 不出現 -->
+                <optgroup th:if="${availableTickets != null and !availableTickets.isEmpty()}" label="🗾 您的行程景點門票">
+                    <option th:each="ticket : ${availableTickets}" th:value="${ticket.price}"
+                        th:data-name="${ticket.ticketName}"
+                        th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
+                        th:classappend="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)} ? 'hidden' : ''"
+                        th:disabled="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)}">
+                    </option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- ==================== 交通票券 ==================== -->
+        <div>
+            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                交通票券加購
+                <span th:if="${recommendedTransports != null and !recommendedTransports.isEmpty()}"
+                    class="text-orange-500 text-xs font-bold ml-1">🔥 依行程推薦！</span>
+            </label>
+            <select id="transportSelect"
+                class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
+                <option value="" data-price="0" data-name="">不需加購</option>
+
+                <!-- 🌏 全日本通用（固定 3 張，永遠顯示） -->
+                <optgroup label="🌏 全日本通用">
+                    <option th:each="ticket : ${globalTransports}" th:value="${ticket.ticketId}"
+                        th:data-price="${ticket.price}" th:data-name="${ticket.ticketName}"
+                        th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
+                        th:classappend="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)} ? 'hidden' : ''"
+                        th:disabled="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)}">
+                    </option>
+                </optgroup>
+
+                <!-- 💡 依行程地區推薦（沒有符合地區 → 整個 optgroup 不顯示） -->
+                <optgroup th:if="${recommendedTransports != null and !recommendedTransports.isEmpty()}"
+                    label="💡 依您的行程推薦">
+                    <option th:each="transport : ${recommendedTransports}" th:value="${transport.ticketId}"
+                        th:data-price="${transport.price}" th:data-name="${transport.ticketName}"
+                        th:text="${transport.ticketName} + ' (+NT$' + ${#numbers.formatInteger(transport.price, 0, 'COMMA')} + ')'"
+                        th:classappend="${purchasedNames != null and purchasedNames.contains(transport.ticketName)} ? 'hidden' : ''"
+                        th:disabled="${purchasedNames != null and purchasedNames.contains(transport.ticketName)}">
+                    </option>
+                </optgroup>
+
+            </select>
+        </div>
+    </div>
+
+    <div id="addon-summary" class="mt-6 hidden">
+        <div class="border-t border-gray-200 dark:border-white/10 pt-4">
+            <div id="ticket-list-container" class="space-y-2"></div>
+            <div id="transport-list-container" class="space-y-2 mt-4"></div>
+        </div>
+    </div>
+</section>

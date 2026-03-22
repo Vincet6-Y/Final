@@ -1,0 +1,38 @@
+        .toastui-editor-contents h1,
+        .toastui-editor-contents h2,
+        .toastui-editor-contents h3,
+        .toastui-editor-contents h4 {
+            color: #f97316 !important;
+            font-weight: 900 !important;
+            border-left: 6px solid #f97316 !important;
+            padding-left: 1rem !important;
+            margin-top: 2.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .toastui-editor-contents h3 {
+            font-size: 1.3rem !important;
+        }
+
+        .toastui-editor-contents h2 {
+            font-size: 1.6rem !important;
+        }
+
+        .toastui-editor-contents blockquote {
+            border-left: 4px solid #f97316 !important;
+            background: rgba(249, 115, 22, 0.08) !important;
+            padding: 1rem 1.5rem !important;
+            border-radius: 0 0.5rem 0.5rem 0 !important;
+            margin: 1.5rem 0 !important;
+            color: #e2e8f0 !important;
+            font-style: italic !important;
+        }
+
+        .toastui-editor-contents blockquote p {
+            color: #e2e8f0 !important;
+        }
+
+        .toastui-editor-contents ol li::before {
+            color: #f97316 !important;
+            font-weight: 900 !important;
+        }

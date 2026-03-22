@@ -40,7 +40,7 @@
                 </div>
             </div>
             <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/packageTour}">行程規劃</a>
+                th:href="@{/officialTour}">行程規劃</a>
         </nav>
         <div class="flex items-center gap-4">
             <button aria-label="Toggle theme"
@@ -49,15 +49,6 @@
                 <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
                 <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
             </button>
-            <!-- head CSS 不是直接放入而是引用時用這條
-            <button aria-label="Toggle theme"
-                class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
-                onclick="document.documentElement.classList.toggle('dark')">
-
-                <span class="material-symbols-outlined block dark:hidden">light_mode</span>
-
-                <span class="material-symbols-outlined hidden dark:block">dark_mode</span>
-            </button> -->
             <div th:if="${session.loginMember == null}">
                 <a th:href="@{/auth}"
                 class="inline-block bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">

@@ -1,89 +1,176 @@
+// firebase 圖片上傳
+import { storage } from "/member/Js/firebase/firebase.js";
+import { ref, uploadBytes, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+
+window.firebaseUploadCover = async function (file, articleClass) {
+    const storagePath = `articles/${articleClass}/${Date.now()}_cover`;
+    const storageRef = ref(storage, storagePath);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+};
+
 $(document).ready(function () {
 
-    // 【宣告全域變數】放在最頂端，讓底下的「上傳圖」、「發布」、「草稿」都能共用這個變數
     let coverImageUrl = "";
-    let currentArticleId = null; // 紀錄目前文章的 ID，避免重複新增
+    let currentArticleId = null;
 
     // ==========================================
-    // 1. 初始化 UI Editor
+    // 1. 編輯器
     // ==========================================
     const editor = new toastui.Editor({
-        el: document.querySelector('#editor'), // 抓取 HTML 中的 editor div
+        el: document.querySelector('#editor'),
         height: '500px',
-        initialEditType: 'markdown',
-        previewStyle: 'vertical',
+        initialEditType: 'wysiwyg',
+        hideModeSwitch: false,
         theme: 'dark',
-        placeholder: "開始撰寫你的巡禮故事..."
+        placeholder: "開始撰寫你的文章..."
     });
 
+    /**
+     * 讀檔邏輯：把 DB 裡的內容放進編輯器
+     */
+    function loadContentToEditor(content) {
+        if (!content) return;
+        editor.setMarkdown(content);
+    }
+
+    /**
+     * 存檔邏輯：
+     */
+    function getContent() {
+        return editor.getMarkdown();
+    }
+
     // ==========================================
-    // 2. 封面圖上傳邏輯
+    // 2. 封面預覽
     // ==========================================
-    $("#coverUpload").click(function (e) {
-        // 【關鍵修正】檢查點擊目標！
-        // 如果點擊的不是 input 本身，才去觸發 input 點擊，避免無限迴圈
-        if (e.target.id !== 'coverInput') {
-            $("#coverInput").click();
+    function showCoverPreview(url) {
+        if (url) {
+            $("#coverPreview").attr("src", url).removeClass("hidden");
+        } else {
+            $("#coverPreview").addClass("hidden").attr("src", "");
         }
+    }
+
+    // ==========================================
+    // 3. 封面圖片 URL 輸入框
+    // ==========================================
+    $("#coverUrlInput").on("input", function () {
+        const url = $(this).val().trim();
+        coverImageUrl = url;
+        showCoverPreview(url);
     });
 
-    $("#coverInput").change(function () {
+    // ==========================================
+    // 4. 封面上傳 → Firebase Storage
+    // ==========================================
+    $("#coverUpload").on("click", function (e) {
+        if ($(e.target).is("#coverInput")) return;
+        $("#coverInput").trigger("click");
+    });
+
+    $(document).on("change", "#coverInput", async function () {
         const file = this.files[0];
         if (!file) return;
 
-        const formData = new FormData();
-        formData.append("file", file);
-        // 上傳圖片需要告知後端分類資料，不然 controller 會報錯 (Missing required parameter 'articleClass')
-        const currentClass = $("#articleClass").val() || "未分類";
-        formData.append("articleClass", currentClass);
+        if (typeof window.firebaseUploadCover !== "function") {
+            showToast("error", "Firebase 尚未就緒，請稍後再試");
+            return;
+        }
 
-        $.ajax({
-            url: "/admin/articles/upload",
-            method: "POST",
-            data: formData,
-            processData: false,  // 告訴 jQuery 不要處理資料
-            contentType: false,  // 告訴 jQuery 不要設定 Content-Type (讓 FormData 自動設定邊界)
-            success: function (res) {
-                coverImageUrl = res.url; // 將後端回傳的網址存入全域變數
-                $("#coverPreview").attr("src", res.url).removeClass("hidden"); // 顯示預覽圖
-                showToast("success", "封面上傳成功");
-            }
-        });
+        const articleClass = $("#articleClass").val() || "未分類";
+
+        $("#coverUpload").html(`
+            <span class="material-symbols-outlined text-4xl text-slate-400">sync</span>
+            <p class="text-sm text-slate-400">上傳中...</p>
+            <input type="file" id="coverInput" accept="image/*" hidden>
+        `);
+
+        try {
+            const downloadURL = await window.firebaseUploadCover(file, articleClass);
+            coverImageUrl = downloadURL;
+            $("#coverUrlInput").val(downloadURL);
+            showCoverPreview(downloadURL);
+
+            $("#coverUpload").html(`
+                <span class="material-symbols-outlined text-4xl text-green-400">check_circle</span>
+                <p class="text-sm text-green-400">封面已上傳</p>
+                <p class="text-xs text-slate-500">點擊重新選擇</p>
+                <input type="file" id="coverInput" accept="image/*" hidden>
+            `);
+            showToast("success", "封面上傳成功");
+
+        } catch (err) {
+            console.error("Firebase 上傳失敗：", err);
+            $("#coverUpload").html(`
+                <span class="material-symbols-outlined text-4xl text-red-400">error</span>
+                <p class="text-sm text-red-400">上傳失敗，點擊重試</p>
+                <input type="file" id="coverInput" accept="image/*" hidden>
+            `);
+            showToast("error", "封面上傳失敗：" + err.message);
+        }
     });
 
     // ==========================================
-    // 3. 共用函式：更新最後儲存時間
+    // 5. 編輯模式：URL 帶 ?editId=xxx 就載入舊資料
+    // ==========================================
+    const editId = new URLSearchParams(window.location.search).get("editId");
+
+    if (editId) {
+        currentArticleId = parseInt(editId);
+        $.ajax({
+            url: `/admin/articles/${editId}`,
+            method: "GET",
+            success: function (article) {
+                $("#titleInput").val(article.title);
+                $("#articleClass").val(article.articleClass);
+
+                // 將 DB 裡的東西加到編輯器
+                loadContentToEditor(article.content || "");
+
+                if (article.articleImageUrl) {
+                    coverImageUrl = article.articleImageUrl;
+                    $("#coverUrlInput").val(article.articleImageUrl);
+                    showCoverPreview(article.articleImageUrl);
+                }
+
+                $("h2").text("編輯文章：" + article.title);
+                showToast("success", "文章資料已載入");
+            },
+            error: function () {
+                showToast("error", "無法載入文章");
+            }
+        });
+    }
+
+    // ==========================================
+    // 6. 更新最後儲存時間
     // ==========================================
     function updateSaveTime() {
         const now = new Date();
-        const time = now.getHours().toString().padStart(2, "0") + ":" +
-            now.getMinutes().toString().padStart(2, "0");
+        const time = String(now.getHours()).padStart(2, "0") + ":" +
+            String(now.getMinutes()).padStart(2, "0");
         $("#saveTime").text("最後儲存：" + time);
     }
 
     // ==========================================
-    // 4. 定時器：每 30 秒自動儲存草稿
+    // 7. 共用存文章函式 (存進 DB 的會是 Markdown 格式)
     // ==========================================
-    setInterval(function () {
-        const title = $("#titleInput").val();
-        const content = editor.getMarkdown();
-
-        if (!title && !content) return; // 如果都沒填，就不自動存
-
+    function saveArticle(status, onSuccess) {
         const data = {
-            title: title || "未命名草稿",
-            content: content,
+            title: $("#titleInput").val() || "未命名草稿",
+            content: getContent(),
             articleClass: $("#articleClass").val(),
             articleImageUrl: coverImageUrl,
-            status: "draft"
+            status: status
         };
 
-        const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
-        const ajaxMethod = currentArticleId ? "PUT" : "POST";
+        const url = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
+        const method = currentArticleId ? "PUT" : "POST";
 
         $.ajax({
-            url: ajaxUrl,
-            method: ajaxMethod,
+            url: url, method: method,
             contentType: "application/json",
             data: JSON.stringify(data),
             success: function (res) {
@@ -91,99 +178,66 @@ $(document).ready(function () {
                     currentArticleId = res.articleId;
                 }
                 updateSaveTime();
+                if (onSuccess) onSuccess(res);
+            },
+            error: function () {
+                showToast("error", "儲存失敗");
             }
         });
+    }
+
+    // ==========================================
+    // 8. 每 30 秒自動儲存草稿
+    // ==========================================
+    setInterval(function () {
+        if (!$("#titleInput").val() && !getContent()) return;
+        saveArticle("draft");
     }, 30000);
 
     // ==========================================
-    // 5. 按鈕邏輯：預覽、存草稿、發布
+    // 9. 手動存草稿
     // ==========================================
-    // 預覽
-    $("#previewBtn").click(function () {
-        // 1. 【新增這三行】先從畫面上把資料抓下來！
-        const title = $("#titleInput").val() || "未命名文章";
-        const articleClass = $("#articleClass").val() || "未分類";
-        const content = editor.getMarkdown() || "沒有內容...";
+    $("#draftBtn").on("click", function () {
+        saveArticle("draft", function () {
+            showToast("success", "草稿已儲存");
+        });
+    });
 
-        // 2. 將資料組裝成物件
+    // ==========================================
+    // 10. 預覽
+    // ==========================================
+    $("#previewBtn").on("click", function () {
         const previewData = {
-            title: title,
-            articleClass: articleClass,
-            content: content
+            title: $("#titleInput").val() || "未命名文章",
+            articleClass: $("#articleClass").val() || "未分類",
+            content: getContent() || "沒有內容...", // Markdown 語法
+            articleImageUrl: coverImageUrl || "",
+            editId: currentArticleId || null,
+            isAdminPreview: true
         };
-
-        // 3. 存入瀏覽器的 sessionStorage
-        sessionStorage.setItem('articlePreview', JSON.stringify(previewData));
-
-        // 4. 開啟新分頁，導向 Controller 提供的預覽網址
+        sessionStorage.setItem("articlePreview", JSON.stringify(previewData));
         window.open("/admin/articles/preview", "_blank");
     });
 
-    // 儲存草稿
-    $("#draftBtn").click(function () {
-        const data = {
-            title: $("#titleInput").val() || "未命名草稿",
-            content: editor.getMarkdown(),
-            articleClass: $("#articleClass").val(),
-            articleImageUrl: coverImageUrl,
-            status: "draft"
-        };
-
-        const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
-        const ajaxMethod = currentArticleId ? "PUT" : "POST";
-
-        $.ajax({
-            url: ajaxUrl,
-            method: ajaxMethod,
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function (res) {
-                if (!currentArticleId && res && res.articleId) {
-                    currentArticleId = res.articleId;
-                }
-                showToast("success", "草稿已儲存");
-                updateSaveTime();
-            }
-        });
-    });
-
-    // 發布文章
-    $("#publishBtn").click(function () {
+    // ==========================================
+    // 11. 發布文章
+    // ==========================================
+    $("#publishBtn").on("click", function () {
         const title = $("#titleInput").val();
-        const content = editor.getMarkdown();
+        // 驗證要看值是否為空，Editor 預設會有換行空白，可以用 length 檢查或清乾淨
+        const checkContent = editor.getMarkdown().replace(/\n/g, '').trim();
         const articleClass = $("#articleClass").val();
 
-        // 基本的防呆檢查
         if (!title.trim()) return showToast("warning", "請輸入文章標題");
-        if (!content.trim()) return showToast("warning", "請輸入文章內容");
+        if (!checkContent) return showToast("warning", "請輸入文章內容");
         if (!articleClass) return showToast("warning", "請選擇文章分類");
 
-        const data = {
-            title: title,
-            content: content,
-            articleClass: articleClass,
-            articleImageUrl: coverImageUrl,
-            status: "published" // 發布狀態
-        };
-
-        const ajaxUrl = currentArticleId ? `/admin/articles/${currentArticleId}` : "/admin/articles";
-        const ajaxMethod = currentArticleId ? "PUT" : "POST";
-
-        $.ajax({
-            url: ajaxUrl,
-            method: ajaxMethod,
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function (res) {
-                if (!currentArticleId && res && res.articleId) {
-                    currentArticleId = res.articleId;
-                }
-                showToast("success", "文章發布成功");
-                setTimeout(() => { window.location.href = "/backend/contentmanagement"; }, 1200);
-            },
-            error: function () {
-                showToast("error", "文章發布失敗");
-            }
+        saveArticle("published", function () {
+            showToast("success", "文章發布成功");
+            setTimeout(function () {
+                window.location.href = "/backend/contentmanagement";
+            }, 1200);
         });
     });
+
 });

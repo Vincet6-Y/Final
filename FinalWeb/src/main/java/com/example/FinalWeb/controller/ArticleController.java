@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.FinalWeb.dto.ArticleDTO;
+import com.example.FinalWeb.entity.ArticleEntity;
 import com.example.FinalWeb.service.ArticleService;
 
 @Controller
 @RequestMapping("/")
-public class NewsController {
+public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
@@ -49,11 +50,19 @@ public class NewsController {
 
     // 文章詳細頁 (公版頁)
     @GetMapping("/article/{id}")
-    public String showArticleDetail(@PathVariable Integer id, Model model) {
-        ArticleDTO article = articleService.findById(id);
-        if (article == null)
-            return "redirect:/news"; // 防錯機制
+    public String articleDetail(@PathVariable Integer id, Model model) {
+        // 1. 查詢文章
+        ArticleEntity article = articleService.findEntityById(id);
+        if (article == null) {
+            // 找不到就轉回首頁或 404 頁
+            return "redirect:/news";
+        }
+        // 2. 瀏覽數 + 1 並存回資料庫
+        int currentCount = article.getViewCount() != null ? article.getViewCount() : 0;
+        article.setViewCount(currentCount + 1);
+        articleService.updateViewCount(article); // 只更新 viewCount，不動其他欄位
+        // 3. 傳入 Model
         model.addAttribute("article", article);
-        return "article"; // 你的公版 HTML 檔名
+        return "article";
     }
 }

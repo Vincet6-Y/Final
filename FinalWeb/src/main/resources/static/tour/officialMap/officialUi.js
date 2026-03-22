@@ -703,7 +703,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cleanUrl = window.location.pathname + `?planId=${planId}`;
         window.history.replaceState({}, document.title, cleanUrl);
 
-        setTimeout(() => copyToMyPlan(planId), 1000);
+        setTimeout(() => copyToMyPlan(null, planId), 1000);
     }
 
     const checkReady = setInterval(() => {
@@ -719,35 +719,3 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 100);
 });
-
-async function copyToMyPlan(officialPlanId) {
-    if (!officialPlanId) return;
-
-    try {
-        const response = await fetch(`/api/plan/copy/${officialPlanId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (response.status === 401) {
-            const currentPath = window.location.pathname + window.location.search;
-            const separator = currentPath.includes('?') ? '&' : '?';
-            const targetUrl = encodeURIComponent(currentPath + separator + "autoCopy=true");
-
-            showToast('error', '請先登入會員，登入後即可安排您的專屬行程！');
-            setTimeout(() => { 
-                window.location.href = `/auth?redirect=${targetUrl}`; 
-            }, 1000);
-            return;
-        }
-
-        const data = await response.json();
-        if (data.success) {
-            window.location.href = `/packageTourMap?myPlanId=${data.newMyPlanId}`;
-        } else {
-            showToast('error', '複製失敗：' + data.message);
-        }
-    } catch (error) {
-        console.error("複製行程時出錯:", error);
-    }
-}

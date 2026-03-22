@@ -1,5 +1,7 @@
 package com.example.FinalWeb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,6 +34,7 @@ public class OrdersDetailEntity {
     // 拉關連線到 orders
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId")
+    @JsonIgnore  // 🌟 重要：防止明細往回抓訂單，導致無窮迴圈
     private OrdersEntity orders;
 
     // 拉關連線到 myMap (加購項目可能沒有對應景點，所以 nullable)

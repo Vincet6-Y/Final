@@ -1,12 +1,10 @@
-﻿package com.example.FinalWeb.entity;
+package com.example.FinalWeb.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import jakarta.persistence.Transient;
 // ... 其他匯入
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -59,27 +57,6 @@ public class OrdersEntity {
     @EqualsAndHashCode.Exclude
     private List<OrdersDetailEntity> orderDetails;
 
-    
-
-   // 🌟 修正：加上 JsonProperty 讓前端 order.orderItemsName 抓得到值
-    @Transient
-    @JsonProperty("orderItemsName")
-    public String getOrderItemsName() {
-        if (this.myPlan != null) {
-            return this.myPlan.getMyPlanName(); 
-        }
-        return "自訂行程";
-    }
-
-    // 🌟 修正：加上 JsonProperty 讓前端 order.totalPrice 抓得到值
-    @Transient
-    @JsonProperty("totalPrice")
-    public int getTotalPrice() {
-        if (this.orderDetails == null || this.orderDetails.isEmpty()) return 0;
-        return this.orderDetails.stream()
-                .mapToInt(d -> d.getTicketPrice() != null ? d.getTicketPrice() : 0)
-                .sum();
-    }
 }
 
 

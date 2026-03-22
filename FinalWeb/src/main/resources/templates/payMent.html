@@ -68,101 +68,10 @@
                         </div>
                 </section>
                 <!-- ==================== 已包含票券 ==================== -->
-                <section class="section-card rounded-xl p-8"
-                    th:if="${order.orderDetails != null && !order.orderDetails.isEmpty()}">
-                    <div class="flex items-center gap-3 mb-8">
-                        <div class="w-1 h-6 bg-green-500 rounded-full"></div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">已包含票券</h2>
-                        <span
-                            class="text-xs bg-green-500/10 text-green-500 px-3 py-1 rounded-full font-bold">來自行程規劃</span>
-                    </div>
-                    <div class="space-y-3">
-                        <div th:each="detail : ${order.orderDetails}"
-                            class="db-ticket-row flex justify-between items-center bg-green-500/5 border border-green-500/10 rounded-lg px-5 py-3">
-                            <div class="flex items-center gap-3">
-                                <span class="material-symbols-outlined text-green-500 text-lg">local_activity</span>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-200"
-                                    th:text="${detail.ticketType}">票券名稱</span>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <span class="text-sm font-bold text-green-600 dark:text-green-400"
-                                    th:text="'NT$ ' + ${detail.ticketPrice}">NT$ 0</span>
-                                <button type="button"
-                                    class="remove-db-ticket-btn text-gray-400 hover:text-red-500 transition-colors"
-                                    th:data-id="${detail.orderDetailId}" th:data-price="${detail.ticketPrice}" th:data-name="${detail.ticketType}"
-                                    title="取消購買此票券">
-                                    <span class="material-symbols-outlined text-lg">cancel</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <th:block th:replace="~{tickets:: includedTickets(${order.orderDetails})}" />
                 <!-- ==================== 加購付費項目 ==================== -->
-                <section class="section-card rounded-xl p-8">
-                    <div class="flex items-center gap-3 mb-8">
-                        <div class="w-1 h-6 bg-orange-500 rounded-full"></div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">加購付費項目</h2>
-                        <span
-                            class="text-xs bg-orange-500/10 text-orange-500 px-3 py-1 rounded-full font-bold">選購</span>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">景點門票升級</label>
-                            <select id="ticketSelect"
-                                class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
-                                <option value="0" data-name="">不需加購</option>
-                                <option th:each="ticket : ${availableTickets}" th:value="${ticket.price}"
-                                    th:data-name="${ticket.ticketName}"
-                                    th:text="${ticket.ticketName} + ' (+NT$' + ${#numbers.formatInteger(ticket.price, 0, 'COMMA')} + ')'"
-                                    th:disabled="${purchasedNames != null and purchasedNames.contains(ticket.ticketName)}"
-                                    th:style="${purchasedNames != null and purchasedNames.contains(ticket.ticketName) ? 'display:none' : ''}">
-                                </option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">交通票券加購
-                                <span th:if="${recommendedTransports != null && !recommendedTransports.isEmpty()}"
-                                    class="text-orange-500 text-xs font-bold ml-1">🔥 推薦！</span>
-                            </label>
-                            <select id="transportSelect"
-                                class="addon-select input-field w-full px-4 py-3 text-sm font-medium text-gray-600 dark:text-black mb-2">
-                                <option value="" data-price="0" data-name="">不需加購</option>
-                                <optgroup th:if="${recommendedTransports != null && !recommendedTransports.isEmpty()}"
-                                    label="💡 智慧推薦">
-                                    <option th:each="transport : ${recommendedTransports}"
-                                        th:value="${transport.ticketId}" th:data-price="${transport.price}"
-                                        th:data-name="${transport.ticketName}"
-                                        th:text="${transport.ticketName} + ' (+NT$' + ${#numbers.formatInteger(transport.price, 0, 'COMMA')} + ')'"
-                                        th:disabled="${purchasedNames != null and purchasedNames.contains(transport.ticketName)}"
-                                        th:style="${purchasedNames != null and purchasedNames.contains(transport.ticketName) ? 'display:none' : ''}">
-                                    </option>
-                                </optgroup>
-                                <optgroup label="全日本通用神券">
-                                    <option value="TRANS_TOKYO_SUBWAY_24H" data-price="800" data-name="東京地鐵 24 小時券"
-                                        th:disabled="${purchasedNames != null and purchasedNames.contains('東京地鐵 24 小時券')}"
-                                        th:style="${purchasedNames != null and purchasedNames.contains('東京地鐵 24 小時券') ? 'display:none' : ''}">東京地鐵 24 小時券 (+NT$800)</option>
-                                    <option value="TRANS_KYOTO_BUS_1D" data-price="1100" data-name="京都地下鐵巴士 1 日"
-                                        th:disabled="${purchasedNames != null and purchasedNames.contains('京都地下鐵巴士 1 日')}"
-                                        th:style="${purchasedNames != null and purchasedNames.contains('京都地下鐵巴士 1 日') ? 'display:none' : ''}">京都地下鐵・巴士 1 日券 (+NT$1,100)</option>
-                                    <option value="TRANS_OSAKA_AMAZING_1D" data-price="2800" data-name="大阪周遊卡 1 日"
-                                        th:disabled="${purchasedNames != null and purchasedNames.contains('大阪周遊卡 1 日')}"
-                                        th:style="${purchasedNames != null and purchasedNames.contains('大阪周遊卡 1 日') ? 'display:none' : ''}">大阪周遊卡 1 日券 (+NT$2,800)</option>
-                                    <option value="TRANS_JR_PASS_7D" data-price="50000" data-name="JR Pass 全日本 7日"
-                                        th:disabled="${purchasedNames != null and purchasedNames.contains('JR Pass 全日本 7日')}"
-                                        th:style="${purchasedNames != null and purchasedNames.contains('JR Pass 全日本 7日') ? 'display:none' : ''}">JR Pass 全日本鐵路周遊券 7日 (+NT$50,000)</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="addon-summary" class="mt-6 hidden">
-                        <div class="border-t border-gray-200 dark:border-white/10 pt-4">
-                            <div id="ticket-list-container" class="space-y-2"></div>
-                            <div id="transport-list-container" class="space-y-2 mt-4"></div>
-                        </div>
-                    </div>
-                </section>
+                <th:block
+                    th:replace="~{tickets :: addonTickets(${availableTickets}, ${recommendedTransports}, ${purchasedNames}, ${globalTransports})}" />
             </div>
             <!-- ==================== 右側：訂單金額明細 ==================== -->
             <div class="lg:col-span-4">
@@ -252,7 +161,6 @@
             totalAmount: /*[[${totalAmount}]]*/ 0
         };
     </script>
-
     <script th:src="@{/payment/payment.js}"></script>
 
 </body>

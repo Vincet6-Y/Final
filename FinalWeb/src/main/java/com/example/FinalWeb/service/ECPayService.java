@@ -73,7 +73,7 @@ public class ECPayService {
         }
         params.put("ItemName", itemName);
         params.put("ReturnURL", "http://localhost:8080/payment/callback"); // 綠界 Server-to-Server 背景回傳
-        params.put("ClientBackURL", "http://localhost:8080/"); // TODO:綠界付款畫面上的「返回商店」會導回首頁
+        params.put("ClientBackURL", "http://localhost:8080/"); // 綠界付款畫面上的「返回商店」會導回首頁
         params.put("OrderResultURL", "http://localhost:8080/payment/success"); // 綠界付款完成後轉跳頁面
         params.put("ChoosePayment", "Credit");
         params.put("EncryptType", "1");

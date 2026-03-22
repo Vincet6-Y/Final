@@ -1,36 +1,60 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const titleEl = document.getElementById('article-title');
     const classEl = document.getElementById('article-class');
     const contentEl = document.getElementById('markdown-content');
 
-    // 判斷網址是不是包含 "preview" (代表現在是預覽模式)
-    // 使用 pathname 檢查，避免一般文章標題剛好有 preview 時也誤判
     const isPreviewMode = window.location.pathname.includes("/admin/articles/preview");
 
     if (isPreviewMode) {
         // ==========================================
-        // 【預覽模式】：從 sessionStorage 拿暫存資料來貼上
+        // 後台預覽模式 — 從 sessionStorage 讀取資料
         // ==========================================
         const previewDataStr = sessionStorage.getItem('articlePreview');
         if (previewDataStr) {
             const data = JSON.parse(previewDataStr);
-
-            // 替換標題與分類
             if (titleEl) titleEl.innerText = data.title || "未命名文章";
             if (classEl) classEl.innerText = data.articleClass || "未分類";
+            if (contentEl) contentEl.innerHTML = renderMarkdown(data.content || "");
 
-            // 替換並解析 Markdown 內容
-            if (contentEl) contentEl.innerHTML = marked.parse(data.content || "沒有內容...");
+            // 設定 Hero Banner 背景圖
+            if (data.articleImageUrl) {
+                const fallbackBg = document.getElementById('hero-bg-fallback');
+                if (fallbackBg) {
+                    fallbackBg.style.backgroundImage = `url(${data.articleImageUrl})`;
+                    fallbackBg.style.backgroundSize = 'cover';
+                    fallbackBg.style.backgroundPosition = 'center';
+                }
+            }
+
+            // 返回按鈕 → 返回編輯畫面
+            const backLink = document.getElementById('back-link');
+            if (backLink) {
+                backLink.href = data.editId
+                    ? `/backend/backendarticle?editId=${data.editId}`
+                    : `/backend/backendarticle`;
+                const backText = backLink.querySelector('#back-text');
+                if (backText) backText.innerText = '返回編輯畫面';
+            }
         }
-
     } else {
         // ==========================================
-        // 【正常觀看模式】：從 Thymeleaf 塞入的 data-markdown 拿資料
+        // 正常前端瀏覽模式
         // ==========================================
-        const rawMarkdown = contentEl.getAttribute('data-markdown');
-        if (rawMarkdown) {
-            contentEl.innerHTML = marked.parse(rawMarkdown);
-        }
+        const rawContent = contentEl?.getAttribute('data-markdown') || "";
+        if (contentEl) contentEl.innerHTML = renderMarkdown(rawContent);
     }
 });
+
+/**
+ * renderMarkdown:
+ */
+function renderMarkdown(raw) {
+    if (!raw) return "";
+
+    if (typeof marked !== 'undefined') {
+        return marked.parse(raw);
+    }
+
+    // fallback
+    return raw.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('\n');
+}

@@ -15,8 +15,20 @@
 
             <!-- Main Content Container -->
             <main class="flex-1 w-full bg-white dark:bg-background-dark transition-colors duration-300">
+
+                <!-- Hero Banner：優先用 articleImageUrl，沒有才用預設圖 -->
                 <div class="relative w-full h-[50vh] md:h-[65vh] overflow-hidden">
-                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+
+                    <!-- ✅ 有封面圖時 -->
+                    <div id="hero-bg"
+                        th:if="${article?.articleImageUrl != null and !#strings.isEmpty(article?.articleImageUrl)}"
+                        class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+                        th:style="'background-image: url(' + ${article.articleImageUrl} + ');'">
+                    </div>
+                    <!-- ✅ 無封面圖時 fallback -->
+                    <div id="hero-bg-fallback"
+                        th:unless="${article?.articleImageUrl != null and !#strings.isEmpty(article?.articleImageUrl)}"
+                        class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
                         style="background-image: url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2070&auto=format&fit=crop');">
                     </div>
 
@@ -38,34 +50,38 @@
                 </div>
 
                 <div class="max-w-4xl mx-auto px-6 lg:px-20 py-16">
+                    <!-- ✅ 動態日期與 Views -->
                     <div class="flex items-center gap-6 mb-12 text-slate-500 text-sm border-b border-white/10 pb-8">
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">calendar_today</span>
-                            <span>2026-03-10</span>
+                            <span th:if="${article?.createdTime != null}"
+                                th:text="${#temporals.format(article.createdTime, 'yyyy-MM-dd')}">日期</span>
+                            <span th:unless="${article?.createdTime != null}">—</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="material-symbols-outlined text-sm">visibility</span>
-                            <span>1,250 Views</span>
+                            <span th:text="${(article?.viewCount != null ? article.viewCount : 0) + ' Views'}">0
+                                Views</span>
                         </div>
                     </div>
 
-                    <div id="markdown-content" th:attr="data-markdown=${article?.content}" class="prose prose-lg prose-slate dark:prose-invert max-w-none 
-                        prose-headings:text-primary prose-headings:font-black prose-headings:mt-12 prose-headings:mb-6
-                        prose-p:text-slate-300 prose-p:leading-loose prose-p:mb-6
-                        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-4 prose-blockquote:px-8
-                        text-slate-300">
+                    <!-- ✅ Markdown 內容區塊，樣式改由 article.css 控制 -->
+                    <div id="markdown-content" th:attr="data-markdown=${article?.content}" class="markdown-body">
                     </div>
 
                     <div class="mt-20 pt-10 border-t border-white/10">
-                        <a th:href="${article?.articleClass == '特色活動'} ? @{/info} : @{/news}"
+                        <a id="back-link"
+                            th:href="${article?.articleClass == '特色活動'} ? @{/info} : @{/news}"
                             class="inline-flex items-center gap-2 text-primary hover:gap-6 transition-all font-bold group">
                             <span
                                 class="material-symbols-outlined transition-transform group-hover:-translate-x-2">west</span>
-                            <span th:text="${article?.articleClass == '特色活動'} ? '返回旅遊情報' : '返回最新消息'">返回</span>
+                            <span id="back-text"
+                                th:text="${article?.articleClass == '特色活動'} ? '返回旅遊情報' : '返回最新消息'">返回</span>
                         </a>
                     </div>
                 </div>
             </main>
+
             <!-- Footer -->
             <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 

@@ -23,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j // 引入 Lombok 的日誌神器，取代 System.out.println
+@Slf4j
 @Service
 public class ArticleService {
 
@@ -59,7 +59,7 @@ public class ArticleService {
             log.info(">>> 成功匯入 {} 篇文章", articles.size());
 
         } catch (Exception e) {
-            log.error(">>> 匯入 JSON 失敗", e); // 將錯誤詳細資訊寫入 Log
+            log.error(">>> 匯入 JSON 失敗", e);
         }
     }
 
@@ -90,7 +90,8 @@ public class ArticleService {
 
     /** 新增文章 */
     public ArticleEntity createArticle(ArticleEntity article) {
-        if (article.getViewCount() == null) article.setViewCount(0);
+        if (article.getViewCount() == null)
+            article.setViewCount(0);
         article.setCreatedTime(java.time.LocalDateTime.now());
         article.setUpdatedTime(java.time.LocalDateTime.now());
         return articleRepo.save(article);
@@ -131,7 +132,6 @@ public class ArticleService {
 
     /**
      * 取得全部文章（DTO）
-     * 優化：使用 Sort.by 交給底層資料庫排序，節省 Java 記憶體
      */
     public List<ArticleDTO> getAllArticles() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
@@ -143,7 +143,6 @@ public class ArticleService {
 
     /**
      * 依分類分組
-     * 優化：同樣交給資料庫排序，再進行 Map 分類，並加上 null 防護
      */
     public Map<String, List<ArticleDTO>> getAllArticlesGrouped() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
@@ -153,5 +152,12 @@ public class ArticleService {
                 .collect(Collectors.groupingBy(dto ->
                 // 【防呆機制】如果分類是 null，就給它一個預設值 "未分類"，避免 groupingBy 當機
                 dto.getArticleClass() != null ? dto.getArticleClass() : "未分類"));
+    }
+
+    /**
+     * 只更新瀏覽數，不改動其他欄位
+     */
+    public void updateViewCount(ArticleEntity article) {
+        articleRepo.save(article);
     }
 }

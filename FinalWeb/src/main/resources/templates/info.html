@@ -8,147 +8,160 @@
     <!-- Header Section -->
     <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
-   <main class="container mx-auto px-4 lg:px-12 space-y-20 py-10">
+    <main class="container mx-auto px-4 lg:px-12 space-y-20 py-10">
 
-    
-  <section class="mb-20">
-    <div class="flex items-center justify-between mb-8">
-        <h3 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">explore</span>
-            日本當地情報彙整
-        </h3>
-    </div>
+        <!-- 特色活動文章卡片 -->
+        <section class="mb-20">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">explore</span>
+                    日本當地情報彙整
+                </h3>
+            </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div th:each="info, iterStat : ${travelSection}" 
-             class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none flex flex-col">
-            
-          <div class="aspect-video relative overflow-hidden">
-                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div th:each="info, iterStat : ${travelSection}"
+                    class="group bg-white dark:bg-primary/5 border border-slate-200 dark:border-primary/10 rounded-xl overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm dark:shadow-none flex flex-col">
+
+                    <div class="aspect-video relative overflow-hidden">
+                        <!-- ✅ 有封面圖時用資料庫的圖 -->
+                        <div th:if="${info.articleImageUrl != null and !#strings.isEmpty(info.articleImageUrl)}"
+                            class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            th:style="'background-image: url(' + ${info.articleImageUrl} + ');'">
+                        </div>
+                        <!-- ✅ 沒有封面圖時 fallback 靜態圖 -->
+                        <div th:unless="${info.articleImageUrl != null and !#strings.isEmpty(info.articleImageUrl)}"
+                            class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                             th:style="'background-image: url(' + 
                                     (${iterStat.index == 0} ? @{/news/01.png} : 
                                     (${iterStat.index == 1} ? @{/news/02.png} : @{/news/03.png})) 
                                     + ');'">
                         </div>
 
-                <div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded"
-                    th:text="${info.articleClass}">分類</div>
-            </div>
+                        <div class="absolute top-4 left-4 bg-primary text-background-dark text-[10px] font-bold px-2 py-1 rounded"
+                            th:text="${info.articleClass}">分類</div>
+                    </div>
 
-            <div class="p-6 flex flex-col flex-1">
-                <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors"
-                    th:text="${info.title}">標題</h4>
+                    <div class="p-6 flex flex-col flex-1">
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors"
+                            th:text="${info.title}">標題</h4>
 
-               <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2"
-                      th:text="${info.content}">內文簡介</p>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2"
+                            th:text="${info.purePreview}">內文簡介</p>
 
-                <a th:href="@{/article/{id}(id=${info.articleId})}"
-                    class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2 mt-auto">
-                    <span>了解詳情</span>
-                    <span class="material-symbols-outlined text-base">open_in_new</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-    
-
-
- 
-
-    <section>
-        <div class="flex items-center gap-2 mb-8">
-            <span class="material-symbols-outlined text-primary">cloudy_snowing</span>
-            <h3  class="text-2xl font-bold text-slate-900 dark:text-white">日本即時天氣預報</h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div th:each="cityData : ${allWeather}"
-                class="bg-primary/5 rounded-xl p-6 border border-primary/10 hover:border-primary/40 transition-all">
-                
-                <div class="flex justify-between items-center mb-6">
-                    <h4 class="text-2xl font-bold text-primary" th:text="${cityData.cityName}">城市</h4>
-                    <span class="text-slate-400 text-sm" th:text="${cityData.daily.time[0]}">日期</span>
-                </div>
-
-                <div class="flex items-center gap-4 mb-8">
-                    <span class="text-5xl">🌡️</span>
-                    <div>
-                        <div class="text-lg font-bold text-slate-900 dark:text-white">
-                            <span th:text="${cityData.daily.temperature_2m_max[0]}">20</span>°C
-                        </div>
-                        <p class="text-slate-400 text-xs">今日最高溫</p>
+                        <a th:href="@{/article/{id}(id=${info.articleId})}"
+                            class="w-full py-3 bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-background-dark text-slate-900 dark:text-white font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2 mt-auto">
+                            <span>了解詳情</span>
+                            <span class="material-symbols-outlined text-base">open_in_new</span>
+                        </a>
                     </div>
                 </div>
-
-                <div class="bg-orange-50/80 rounded-lg overflow-hidden border border-white/5">
-                    <table class="w-full text-sm text-left">
-                        <thead class="text-xs text-slate-500 uppercase bg-primary/10">
-                            <tr>
-                                <th class="px-3 py-2">日期</th>
-                                <th class="px-3 py-2">最高</th>
-                                <th class="px-3 py-2">最低</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr th:each="i : ${#numbers.sequence(0, 4)}" class="hover:bg-primary/5">
-                                <td class="px-3 py-2 text-slate-400" th:text="${cityData.daily.time[i].substring(5)}">MM-DD</td>
-                                <td class="px-3 py-2 font-bold text-red-400"><span th:text="${cityData.daily.temperature_2m_max[i]}"></span>°</td>
-                                <td class="px-3 py-2 font-bold text-blue-400"><span th:text="${cityData.daily.temperature_2m_min[i]}"></span>°</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section>
-        <div class="flex items-center gap-2 mb-8">
-            <span class="material-symbols-outlined text-primary">auto_awesome</span>
-            <h3 class="text-2xl font-bold text-slate-900 dark:text-white">節氣時辰</h3>
-        </div>
-        <div class="space-y-6">
-            <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden group">
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoqu--afWbkxw90QshgnuxBa1nIVh2KpDeuSqOyEnLwXVqMxQzt4OyZMCqLY1VRL71AtnQ0PKC1iJwMlap7o6Uy4iafPC09UeRniG20LH3PuDhb5MuSavSHe2BBcRDpaHeB2zaRRtVg8f5E0auciUdEBJ7z8lifg7lbabIYqYkVSBfD4LSD8d1V6KFYG9Rpd7y5Ql7tHQbGFIgTzowFudkCESpZPBywyWPQSJIlTDz4TbsvACW2UFxTdymnes9ZYUEjKMzAroQgHij')">
-                </div>
-                <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center px-12">
-                    <span class="text-primary font-bold tracking-widest mb-2">預計盛開時間</span>
-                    <h4 class="text-4xl font-black mb-4 text-white">櫻花季時程</h4>
-                    <p class="max-w-md text-slate-200 mb-2 leading-relaxed">每年春天，日本隨處可見櫻花盛開的美景，感受其嬌貴之美的機會無所不在。不妨在早春時造訪地理位置較南的九州、四國等氣候較為暖和的地區，欣賞首輪櫻花勝景；或於晚春時前往北方的東北、北海道賞櫻。</p>
-                    <p class="max-w-md text-slate-200 mb-2 leading-relaxed">東京 3/19 - 3/28</p>
-                    <p class="max-w-md text-slate-200 mb-2 leading-relaxed">仙台 4/4 - 4/9</p>
-                    <p class="max-w-md text-slate-200 mb-2 leading-relaxed">北海道 4/27 - 5/10</p>
-                </div>
+        <!-- 天氣預報 -->
+        <section>
+            <div class="flex items-center gap-2 mb-8">
+                <span class="material-symbols-outlined text-primary">cloudy_snowing</span>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">日本即時天氣預報</h3>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="relative aspect-video rounded-xl overflow-hidden group">
-                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAN0VU2dCa2Wc_H25UBRxcCVhuiU-8XynaY60lFsdZpXCov1OQlzRgD0iBExeQsTG-2nojVF9yDG9USfBYVkzH3ij7NGtZso6komRgGe7rJ5n9jyI0n2zHKJzxdfn1QZxuDpLWjdNiHwcnbAY5XYVDr0uca8fYPmlW0N3dDEnPhWH2Uq-aEzH7-EM6DttfwYWf79ZQLBDjVQP3LX_fLKt_GRjBMwd4Yo1Bn9kXbvFIrRvK0be2q_NaMs6BOdkjW3ZW4Btp11TwpQq0H')"></div>
-                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div th:each="cityData : ${allWeather}"
+                    class="bg-primary/5 rounded-xl p-6 border border-primary/10 hover:border-primary/40 transition-all">
+
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-2xl font-bold text-primary" th:text="${cityData.cityName}">城市</h4>
+                        <span class="text-slate-400 text-sm" th:text="${cityData.daily.time[0]}">日期</span>
+                    </div>
+
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="text-5xl">🌡️</span>
                         <div>
-                            <h5 class="text-xl font-bold text-white">秋季：賞楓情報預覽</h5>
-                            <p class="text-sm text-slate-200">深紅的樹葉和美好的天氣，使秋天成為旅遊的最佳時節</p>
+                            <div class="text-lg font-bold text-slate-900 dark:text-white">
+                                <span th:text="${cityData.daily.temperature_2m_max[0]}">20</span>°C
+                            </div>
+                            <p class="text-slate-400 text-xs">今日最高溫</p>
                         </div>
                     </div>
+
+                    <div class="bg-orange-50/80 rounded-lg overflow-hidden border border-white/5">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-primary/10">
+                                <tr>
+                                    <th class="px-3 py-2">日期</th>
+                                    <th class="px-3 py-2">最高</th>
+                                    <th class="px-3 py-2">最低</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr th:each="i : ${#numbers.sequence(0, 4)}" class="hover:bg-primary/5">
+                                    <td class="px-3 py-2 text-slate-400"
+                                        th:text="${cityData.daily.time[i].substring(5)}">MM-DD</td>
+                                    <td class="px-3 py-2 font-bold text-red-400"><span
+                                            th:text="${cityData.daily.temperature_2m_max[i]}"></span>°</td>
+                                    <td class="px-3 py-2 font-bold text-blue-400"><span
+                                            th:text="${cityData.daily.temperature_2m_min[i]}"></span>°</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="relative aspect-video rounded-xl overflow-hidden group">
-                    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACNETwBd_GI2_KieAUEdsYte081MBVHwQAIwn0vMZXnNHlY0zg7iRl8LGQRv22uaEykS2MR1Tn-lzaI9qVmzCfA6TnJX2etKGwo_jknoFwDleckoeWuLkROtU3DRlozvb2zS1cHXEQnRtoyXwtMrlgqFwErEJmO8xbojNzvaaTeqsVCyoE_XsdyaCKVUZG3xBnC1lxAzt1GFP9ODcBuojbcAbd4_Auz4sxacT9zspfZZ2qdC-uYrHg-ACAhDXbwQc_0oJd7_NadH9U')"></div>
-                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6">
-                        <div>
-                            <h5 class="text-xl font-bold text-white">冬季：雪國聖地之旅</h5>
-                            <p class="text-sm text-slate-200">白川鄉合掌村與北海道滑雪聖地</p>
+            </div>
+        </section>
+
+        <!-- 節氣時辰 -->
+        <section>
+            <div class="flex items-center gap-2 mb-8">
+                <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                <h3 class="text-2xl font-bold text-slate-900 dark:text-white">節氣時辰</h3>
+            </div>
+            <div class="space-y-6">
+                <div class="relative w-full aspect-[21/9] rounded-2xl overflow-hidden group">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBoqu--afWbkxw90QshgnuxBa1nIVh2KpDeuSqOyEnLwXVqMxQzt4OyZMCqLY1VRL71AtnQ0PKC1iJwMlap7o6Uy4iafPC09UeRniG20LH3PuDhb5MuSavSHe2BBcRDpaHeB2zaRRtVg8f5E0auciUdEBJ7z8lifg7lbabIYqYkVSBfD4LSD8d1V6KFYG9Rpd7y5Ql7tHQbGFIgTzowFudkCESpZPBywyWPQSJIlTDz4TbsvACW2UFxTdymnes9ZYUEjKMzAroQgHij')">
+                    </div>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center px-12">
+                        <span class="text-primary font-bold tracking-widest mb-2">預計盛開時間</span>
+                        <h4 class="text-4xl font-black mb-4 text-white">櫻花季時程</h4>
+                        <p class="max-w-md text-slate-200 mb-2 leading-relaxed">每年春天，日本隨處可見櫻花盛開的美景，感受其嬌貴之美的機會無所不在。</p>
+                        <p class="max-w-md text-slate-200 mb-2 leading-relaxed">東京 3/19 - 3/28</p>
+                        <p class="max-w-md text-slate-200 mb-2 leading-relaxed">仙台 4/4 - 4/9</p>
+                        <p class="max-w-md text-slate-200 mb-2 leading-relaxed">北海道 4/27 - 5/10</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="relative aspect-video rounded-xl overflow-hidden group">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAN0VU2dCa2Wc_H25UBRxcCVhuiU-8XynaY60lFsdZpXCov1OQlzRgD0iBExeQsTG-2nojVF9yDG9USfBYVkzH3ij7NGtZso6komRgGe7rJ5n9jyI0n2zHKJzxdfn1QZxuDpLWjdNiHwcnbAY5XYVDr0uca8fYPmlW0N3dDEnPhWH2Uq-aEzH7-EM6DttfwYWf79ZQLBDjVQP3LX_fLKt_GRjBMwd4Yo1Bn9kXbvFIrRvK0be2q_NaMs6BOdkjW3ZW4Btp11TwpQq0H')">
+                        </div>
+                        <div
+                            class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6">
+                            <div>
+                                <h5 class="text-xl font-bold text-white">秋季：賞楓情報預覽</h5>
+                                <p class="text-sm text-slate-200">深紅的樹葉和美好的天氣，使秋天成為旅遊的最佳時節</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="relative aspect-video rounded-xl overflow-hidden group">
+                        <div class="absolute inset-0 bg-cover bg-center"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACNETwBd_GI2_KieAUEdsYte081MBVHwQAIwn0vMZXnNHlY0zg7iRl8LGQRv22uaEykS2MR1Tn-lzaI9qVmzCfA6TnJX2etKGwo_jknoFwDleckoeWuLkROtU3DRlozvb2zS1cHXEQnRtoyXwtMrlgqFwErEJmO8xbojNzvaaTeqsVCyoE_XsdyaCKVUZG3xBnC1lxAzt1GFP9ODcBuojbcAbd4_Auz4sxacT9zspfZZ2qdC-uYrHg-ACAhDXbwQc_0oJd7_NadH9U')">
+                        </div>
+                        <div
+                            class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all flex items-end p-6">
+                            <div>
+                                <h5 class="text-xl font-bold text-white">冬季：雪國聖地之旅</h5>
+                                <p class="text-sm text-slate-200">白川鄉合掌村與北海道滑雪聖地</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-</main>
+        </section>
+    </main>
     <!-- Footer -->
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-
     <script th:src="@{/news/js/news.js}"></script>
 </body>
 
