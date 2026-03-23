@@ -99,6 +99,7 @@ public class OfficialMapController {
                 myMap.setVisitTime(startDateTime.plusDays(n.getDayNumber() - 1));
                 myMap.setStayTime(60); 
                 newMyMapNodes.add(myMap);
+                // System.out.println("正在複製第 " + n.getDayNumber() + " 天的景點");
             }
             
             myMapRepo.saveAll(newMyMapNodes);

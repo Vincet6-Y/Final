@@ -52,30 +52,32 @@ async function fetchAndShowDetails(placeId) {
 // ==========================================
 async function loadMyPlanData(myPlanId, targetDay = null) {
     try {
-        console.log("正在發起請求，讀取個人行程 ID:", myPlanId);
         const res = await fetch(`/api/plan/myPlanNodes/${myPlanId}`);
         if (!res.ok) throw new Error(`API 請求失敗：${res.status}`);
-
         const data = await res.json();
+
         let nodes = Array.isArray(data) ? data : (data.data || []);
+        if (nodes.length === 0) {
+            console.log("此行程尚無景點資料");
+            return;
+        }
 
-        if (nodes.length === 0) return;
+        // 🌟 1. 自動計算這筆資料中「實際的最大天數」(解決只有 5 天的問題)
+        const maxDay = nodes.reduce((max, node) => Math.max(max, node.dayNumber || 1), 1);
 
-        itineraryData = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+        // 初始化 itineraryData，確保 1 到 maxDay 都有空陣列可以裝資料
+        itineraryData = {};
+        for (let d = 1; d <= maxDay; d++) {
+            itineraryData[d] = [];
+        }
 
+        // 將資料塞入對應的天數陣列中
         for (const node of nodes) {
             let safePlaceId = (node.GooglePlaceId || node.googlePlaceId || node.googlePlaceID || node.GooglePlaceID || "").toString().trim();
-            if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5) safePlaceId = "undefined";
+            if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5) safePlaceId = "undefined"
 
             const day = node.dayNumber || 1;
-
-            let arrivalStr = "08:00";
-            if (node.visitTime) {
-                const timePart = node.visitTime.split('T')[1];
-                if (timePart) arrivalStr = timePart.substring(0, 5);
-            }
-
-            const durationHours = node.stayTime ? (node.stayTime / 60) : 1;
+            if (!itineraryData[day]) itineraryData[day] = [];
 
             itineraryData[day].push({
                 spotId: node.spotId,
@@ -83,29 +85,33 @@ async function loadMyPlanData(myPlanId, targetDay = null) {
                 lat: parseFloat(node.latitude),
                 lng: parseFloat(node.longitude),
                 name: node.locationName,
-                arrivals: arrivalStr,
-                duration: durationHours,
+                arrivals: node.visitTime ? node.visitTime.substring(11, 16) : "08:00",
+                duration: "1",
                 // 🌟 新增：讀取資料庫的交通數據狀態，用來判斷是否需要自動補全
                 transitTime: node.transitTime || null
             });
         }
 
-        const dayToSelect = targetDay || currentDay || 1;
-
-        if (itineraryData[dayToSelect].length > 0) {
-            map.setCenter({ lat: itineraryData[dayToSelect][0].lat, lng: itineraryData[dayToSelect][0].lng });
+        // 🌟 2. 核心修復：通知 UI 根據「實際天數」重新產生日數按鈕與列表容器
+        if (typeof updateDayButtonsAndLists === 'function') {
+            updateDayButtonsAndLists(maxDay);
         }
 
-        calculateAndDisplayRoute(dayToSelect);
+        // 🌟 3. 核心修復：自動選取 Day 1 並畫出路線 (解決需要手動點擊的問題)
+        const dayToSelect = targetDay ? targetDay : 1;
         selectDay(dayToSelect);
 
-        // 🌟 方案 A 啟動：延遲 3 秒執行背景自動補全，不卡住使用者當下的畫面操作
-        setTimeout(() => {
-            backgroundSyncMissingTransit(dayToSelect);
-        }, 3000);
+        // 如果 Day 1 有景點，自動將地圖中心移動到第一個景點
+        if (itineraryData[dayToSelect] && itineraryData[dayToSelect].length > 0) {
+            const firstNode = itineraryData[dayToSelect][0];
+            if (firstNode.lat && firstNode.lng) {
+                map.setCenter({ lat: firstNode.lat, lng: firstNode.lng });
+            }
+        }
 
     } catch (error) {
         console.error("🔥 載入個人行程錯誤：", error);
+        showToast('error', '載入行程失敗');
     }
 }
 
