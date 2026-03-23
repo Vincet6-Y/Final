@@ -187,13 +187,20 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 8. 每 30 秒自動儲存草稿
+    // 8. 每 30 秒有修改就自動儲存草稿
     // ==========================================
+    let lastSnapshot = "";
     setInterval(function () {
-        if (!$("#titleInput").val() && !getContent()) return;
+        const title = $("#titleInput").val();
+        const content = getContent();
+        // 完全空白就不儲存
+        if (!title && !content) return;
+        // title + content 組合成快照，任一改變都觸發
+        const snapshot = title + "||" + content;
+        if (snapshot === lastSnapshot) return;
+        lastSnapshot = snapshot;
         saveArticle("draft");
     }, 30000);
-
     // ==========================================
     // 9. 手動存草稿
     // ==========================================

@@ -9,5 +9,6 @@ import com.example.FinalWeb.entity.ArticleEntity;
 
 @Repository
 public interface ArticleRepo extends JpaRepository<ArticleEntity, Integer> {
+    // 依分類查詢，並按 ID 倒序（最新的在前）
     List<ArticleEntity> findByArticleClassOrderByArticleIdDesc(String articleClass);
 }
