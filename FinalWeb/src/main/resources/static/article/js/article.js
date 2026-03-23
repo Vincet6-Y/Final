@@ -19,11 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 設定封面圖片
             if (data.articleImageUrl) {
-                const fallbackBg = document.getElementById('hero-bg-fallback');
-                if (fallbackBg) {
-                    fallbackBg.style.backgroundImage = `url(${data.articleImageUrl})`;
-                    fallbackBg.style.backgroundSize = 'cover';
-                    fallbackBg.style.backgroundPosition = 'center';
+                const heroBg = document.getElementById('hero-bg')
+                    || document.getElementById('hero-bg-fallback');
+                if (heroBg) {
+                    heroBg.style.backgroundImage = `url(${data.articleImageUrl})`;
                 }
             }
 

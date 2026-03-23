@@ -4,6 +4,13 @@
    相容 Markdown 輸出 與 Toast UI WYSIWYG HTML
    ============================================== */
 
+/* ── Hero Banner 背景圖 ── */
+#hero-bg-fallback {
+    background-size: cover;
+    background-position: center 40%;
+    background-repeat: no-repeat;
+}
+
 /* ── CSS 變數 ── */
 .markdown-body {
     --primary: #f97316;
