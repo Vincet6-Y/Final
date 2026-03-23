@@ -80,12 +80,6 @@ public class GlobalController {
             model.addAttribute("socialName", socialName);
             model.addAttribute("socialEmail", socialEmail);
         }
-
-        System.out.println("=== authPage session ===");
-        System.out.println("session id = " + session.getId());
-        System.out.println("socialProvider = " + session.getAttribute("socialProvider"));
-        System.out.println("socialName = " + session.getAttribute("socialName"));
-        System.out.println("socialEmail = " + session.getAttribute("socialEmail"));
         return "auth";
     }
 

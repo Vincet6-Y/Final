@@ -4,15 +4,15 @@
 
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
-    <div class="relative flex flex-col min-h-screen w-full overflow-x-hidden">
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+    <div class="relative flex flex-col min-h-screen w-full">
         <!-- Header Section -->
         <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
         <main class="flex-1 w-full max-w-7xl mx-auto px-6 lg:px-20 py-12">
             <div class="mb-12">
-                <h2 class="text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">最新消息</h2>
-                <p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4 whitespace-nowrap">
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">最新消息</h2>
+                <p class="text-slate-400 text-lg max-w-2xl border-l-4 border-primary pl-4">
                     掌握最新的聖地資訊、限時優惠與全球旅遊安全動態，為您的下一段靈魂之旅做好準備。
                 </p>
             </div>

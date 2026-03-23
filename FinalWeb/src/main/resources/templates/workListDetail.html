@@ -10,62 +10,52 @@
 
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
             <section class="mb-20">
-                <div class="relative rounded-3xl overflow-hidden aspect-[21/9] group mb-10 shadow-2xl">
-                    <img alt="Background Image" class="w-full h-full object-cover opacity-80"
+                <!-- 桌機版：原本的 aspect-[21/9] 疊圖設計 -->
+                <div class="relative rounded-3xl overflow-hidden mb-10 shadow-2xl lg:aspect-[21/9] group">
+                    
+                    <img alt="Background Image" 
+                        class="w-full h-[250px] lg:h-full lg:absolute lg:inset-0 object-cover opacity-80"
                         th:src="${idNow.workImg}" />
 
-                    <div
-                        class="absolute top-8 right-8 lg:top-1 lg:right-12 bg-black/50 backdrop-blur-lg border border-white/10 p-6 rounded-2xl shadow-2xl min-w-[220px]">
-                        <div class="flex flex-col gap-4">
-                            <div class="flex items-center justify-between gap-6 border-b border-white/10 pb-2">
-                                <span class="text-primary font-bold text-sm tracking-widest">導演</span>
-                                <span class="text-white font-medium text-right" th:text="${idNow.director}">新海誠</span>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-6 border-b border-white/10 pb-2">
-                                <span class="text-primary font-bold text-sm tracking-widest">編劇</span>
-                                <span class="text-white font-medium text-right" th:text="${idNow.writer}">新海誠</span>
-                            </div>
-
-                            <div th:if="${idNow.workClass == '電影'}" class="flex items-center justify-between gap-6">
-                                <span class="text-primary font-bold text-sm tracking-widest">片長</span>
-                                <span class="text-white font-medium text-right"
-                                    th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
-                            </div>
-
-                            <div th:if="${idNow.workClass == '動畫'}" class="flex items-center justify-between gap-6">
-                                <span class="text-primary font-bold text-sm tracking-widest">總集數</span>
-                                <span class="text-white font-medium text-right" th:text="${idNow.episodes} + ' 集'">12
-                                    集</span>
-                            </div>
+                    <!-- 導演資訊卡：手機版正常流，桌機版 absolute 右上角 -->
+                    <div class="relative lg:absolute lg:top-8 lg:right-12 bg-black/50 backdrop-blur-lg border border-white/10 p-5 lg:p-6 rounded-2xl shadow-2xl mx-4 lg:mx-0 -mt-4 lg:mt-0 z-10
+                                flex flex-row flex-wrap lg:flex-col gap-3 lg:gap-4 lg:min-w-[220px]">
+                        <div class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6 lg:border-b border-white/10 lg:pb-2">
+                            <span class="text-primary font-bold text-sm tracking-widest">導演</span>
+                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.director}">新海誠</span>
+                        </div>
+                        <div class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6 lg:border-b border-white/10 lg:pb-2">
+                            <span class="text-primary font-bold text-sm tracking-widest">編劇</span>
+                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.writer}">新海誠</span>
+                        </div>
+                        <div th:if="${idNow.workClass == '電影'}" class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6">
+                            <span class="text-primary font-bold text-sm tracking-widest">片長</span>
+                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
+                        </div>
+                        <div th:if="${idNow.workClass == '動畫'}" class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6">
+                            <span class="text-primary font-bold text-sm tracking-widest">總集數</span>
+                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.episodes} + ' 集'">12 集</span>
                         </div>
                     </div>
 
-
-                    <div
-                        class="absolute bottom-0 left-0 p-8 lg:p-12 w-full bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent">
+                    <!-- 標題描述：手機版正常流，桌機版 absolute 底部漸層 -->
+                    <div class="px-4 py-6 lg:absolute lg:bottom-0 lg:left-0 lg:p-12 lg:w-full lg:bg-gradient-to-t lg:from-background-dark lg:via-background-dark/80 lg:to-transparent">
                         <div class="flex items-center gap-4 mb-4">
                             <span th:text="${idNow.workClass}"
-                                class="bg-primary text-white dark:text-background-dark text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">電影
-                                / 動畫</span>
-                            <span class="text-slate-200 text-sm font-medium"
-                                th:text="${idNow.onDate}">上映日期：2016-08-26</span>
+                                class="bg-primary text-white dark:text-background-dark text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">電影</span>
+                            <span class="text-slate-600 dark:text-slate-200 text-sm font-medium" th:text="${idNow.onDate}">2016-08-26</span>
                         </div>
-
-                        <h2 class="text-4xl lg:text-6xl font-black text-white mb-6 drop-shadow-lg"
-                            th:text="${idNow.workName}">你的名字 (君の名は。)</h2>
-
-                        <div class="grid lg:grid-cols-3 gap-8 items-end">
+                        <h2 class="text-3xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 lg:mb-6 drop-shadow-lg"
+                            th:text="${idNow.workName}">你的名字</h2>
+                        <div class="grid lg:grid-cols-3 gap-4 lg:gap-8 items-end">
                             <div class="lg:col-span-2">
-                                <p class="text-slate-200 text-lg leading-relaxed max-w-3xl drop-shadow"
-                                    th:text="${idNow.description}">
-                                    故事背景主要取景於東京與岐阜縣飛驒市。講述了高中生立花瀧和宮水三葉在夢中交換身體的奇幻故事。其中最著名的巡禮地莫過於東京新宿的「須賀神社前階梯」，是片尾男女主角重逢的經典場景。此外，信濃町站前的天橋、國立新美術館以及飛驒市圖書館也是粉絲必訪的聖地。
-                                </p>
+                                <p class="text-slate-600 dark:text-slate-200 text-base lg:text-lg leading-relaxed max-w-3xl"
+                                    th:text="${idNow.description}">作品介紹</p>
                             </div>
-                            <div class="flex flex-col gap-2 border-l-4 border-primary pl-6">
+                            <div class="flex flex-col gap-2 border-l-4 border-primary pl-4 lg:pl-6">
                                 <h4 class="text-primary font-bold text-sm uppercase tracking-widest">巡禮區域</h4>
-                                <ul class="text-slate-300 text-sm flex flex-wrap gap-x-4 gap-y-1">
-                                    <li th:text="${idNow.location}">• 須賀神社前階梯</li>
+                                <ul class="text-slate-600 dark:text-slate-300 text-sm flex flex-wrap gap-x-4 gap-y-1">
+                                    <li th:text="${idNow.location}">須賀神社前階梯</li>
                                 </ul>
                             </div>
                         </div>
@@ -80,16 +70,12 @@
                         <div class="flex-1 h-px bg-slate-200 dark:bg-white/10"></div>
                     </div>
                 </div>
-
                 <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-
                     <div th:each="plan : ${plans}"
                         class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-8 hover:border-primary/50 transition-all flex flex-col h-full relative overflow-hidden group">
-
                         <div
                             class="absolute -top-4 -right-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all">
                         </div>
-
                         <div class="flex items-center gap-4 mb-8">
                             <div
                                 class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
@@ -101,7 +87,6 @@
                                 <p th:text="${plan.planCity}" class="text-primary text-sm font-bold">精華版聖地巡禮</p>
                             </div>
                         </div>
-
                         <div class="space-y-6 mb-10 flex-1">
                             <div th:each="dayEntry : ${plan.groupedDays}" class="flex gap-4">
                                 <div th:text="'Day ' + ${dayEntry.key}"
@@ -110,21 +95,15 @@
                                 </div>
                             </div>
                         </div>
-
                         <a th:href="@{/officialMap(planId=${plan.planId})}"
                             class="block text-center w-full py-4 bg-primary hover:bg-primary/90 text-white dark:text-background-dark rounded-xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-95">
                             查看詳情
                         </a>
-
                     </div>
                 </div>
-    </div>
-    </section>
-    </main>
+            </section>
+        </main>
     <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
-
-    </div>
-
 </body>
 
 </html>
