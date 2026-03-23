@@ -58,23 +58,20 @@ public class MemberAuthController {
 
     // 處理註冊
     @PostMapping("/register")
-    public String register(MemberRegisterDTO register, HttpSession session, Model model,
-                           HttpServletRequest request) {
+    @ResponseBody
+    public Map<String, Object> register(@RequestBody MemberRegisterDTO register,
+                                        HttpSession session,
+                                        HttpServletRequest request) {
 
         String result = memberService.register(register);
 
         if (!"註冊成功".equals(result)) {
-            model.addAttribute("toast", resolveRegisterError(result));
-            model.addAttribute("openPanel", "register");
-            model.addAttribute("registerData", register);
-            model.addAttribute("socialName", session.getAttribute("socialName"));
-            model.addAttribute("socialEmail", session.getAttribute("socialEmail"));
-            return "auth";
+            ToastInfoDTO toast = resolveRegisterError(result);
+            return Map.of("success", false, "message", toast.message());
         }
-        // 若是從第三方登入流程過來，補綁 OAuth
+
         linkPendingSocialOauth(register.email(), session, request);
- 
-        return "redirect:/home";
+        return Map.of("success", true, "redirectUrl", "/home");
     }
 
     // ==================== Google ====================
@@ -266,9 +263,14 @@ public class MemberAuthController {
     /** 解析註冊失敗原因，轉成對應的 ToastInfoDTO */
     private ToastInfoDTO resolveRegisterError(String result) {
         return switch (result) {
-            case "Email已註冊" -> ToastInfoDTO.error("此 Email 已註冊");
-            case "密碼不一致" -> ToastInfoDTO.error("兩次輸入的密碼不一致");
-            default -> ToastInfoDTO.error("註冊失敗，請稍後再試");
+        case "Email已註冊" -> ToastInfoDTO.error("此 Email 已註冊");
+        case "密碼不一致" -> ToastInfoDTO.error("兩次輸入的密碼不一致");
+        case "手機號碼格式不正確" -> ToastInfoDTO.error("手機號碼格式不正確");    
+        case "生日不能是未來日期" -> ToastInfoDTO.error("生日不能是未來日期");    
+        case "請輸入正確的生日" -> ToastInfoDTO.error("請輸入正確的生日");        
+        case "密碼長度至少需要 8 個字元" -> ToastInfoDTO.error("密碼長度至少需要 8 個字元");
+        case "密碼需包含大小寫英文及數字" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字");
+        default -> ToastInfoDTO.error("註冊失敗，請稍後再試");
         };
     }
 

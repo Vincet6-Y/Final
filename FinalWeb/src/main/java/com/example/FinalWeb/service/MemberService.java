@@ -1,5 +1,6 @@
 package com.example.FinalWeb.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,11 +67,31 @@ public class MemberService {
         if (memberRepo.existsByEmail(register.email())) {
             return "Email已註冊";
         }
-        // 2 檢查密碼是否一致
+        // 2. 電話格式
+        if (!register.phone().matches("^09\\d{8}$")) {
+            return "手機號碼格式不正確";
+        }
+        // 3. 生日範圍
+        if (register.birthday().isAfter(LocalDate.now())) {
+            return "生日不能是未來日期";
+        }
+        if (register.birthday().isBefore(LocalDate.of(1900, 1, 1))) {
+            return "請輸入正確的生日";
+        }
+        // 4. 密碼一致性
         if (!register.passwd().equals(register.confirmPasswd())) {
             return "密碼不一致";
         }
-        // 3 建立 entity
+        // 5. 密碼長度
+        if (register.passwd().length() < 8) {
+            return "密碼長度至少需要 8 個字元";
+        }
+        // 6. 密碼複雜度
+        if (!register.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            return "密碼需包含大小寫英文及數字";
+        }
+
+        // 建立 entity
         MemberEntity member = new MemberEntity();
         member.setName(register.name());
         member.setEmail(register.email());
@@ -81,7 +102,7 @@ public class MemberService {
         member.setPasswd(hashedPasswd);
         // 預設為一般會員
         member.setRole("USER");
-        // 5 存入資料庫
+        // 存入資料庫
         memberRepo.save(member);
         return "註冊成功";
     }
@@ -92,6 +113,13 @@ public class MemberService {
         if (!dto.getNewPasswd().equals(dto.getConfirmPasswd())) {
             return "新密碼與確認密碼不一致";
         }
+        if (dto.getNewPasswd().length() < 8) {
+            return "密碼長度至少需要 8 個字元";
+        }
+        if (!dto.getNewPasswd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            return "密碼需包含大小寫英文及數字";
+        }
+
         // 2. 資料庫查詢
         MemberEntity member = memberRepo.findByEmail(email).orElse(null);
         if (member == null) {

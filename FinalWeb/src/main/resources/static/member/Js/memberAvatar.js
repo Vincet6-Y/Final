@@ -4,6 +4,11 @@
     const skeleton = document.getElementById("avatarSkeleton");
     if (!avatar) return;
 
+    avatar.onload = function () {
+        this.style.opacity = "1";
+        skeleton.style.display = "none";
+    };
+
     avatar.onerror = function () {
         this.src = this.dataset.defaultImg;
         this.style.opacity = "1";

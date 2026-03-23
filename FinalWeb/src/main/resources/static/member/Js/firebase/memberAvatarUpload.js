@@ -218,6 +218,7 @@ $(function () {
 
         try {
             $confirmBtn.prop("disabled", true).text("上傳中...");
+            showToast("info", "圖片上傳中，請稍候...");
             const croppedBlob = await canvasToRoundBlob(canvas);
             const downloadURL = await uploadCroppedBlob(croppedBlob);
 
@@ -227,10 +228,15 @@ $(function () {
             isAvatarRemoved = false;
             $memberImgUrl.val(downloadURL);
             $preview.attr("src", downloadURL);
+            // 等圖片真正載入完再顯示 Toast
+            $preview.off("load.avatar").on("load.avatar", function () {
+                showToast("success", "大頭照上傳成功！");
+                $preview.off("load.avatar");
+            });
 
         } catch (error) {
             console.error("upload error =", error);
-            alert("圖片上傳失敗");
+            showToast("error", "圖片上傳失敗，請稍後再試");
         } finally {
             $confirmBtn.prop("disabled", false).text("確認裁切");
         }
