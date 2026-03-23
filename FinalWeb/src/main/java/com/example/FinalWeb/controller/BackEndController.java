@@ -219,4 +219,12 @@ public class BackEndController {
 
         return "redirect:/backend/contentmanagement/work/edit" + "?workId=" + wDto.workId();
     }
+
+    @GetMapping("/contentmanagement/work/delete")
+    public String workDelete(Integer workId, RedirectAttributes redirectAttributes){
+        service.deleteWork(workId);
+        redirectAttributes.addFlashAttribute("message", "刪除成功");
+
+        return "redirect:/backend/contentmanagement";
+    }
 }

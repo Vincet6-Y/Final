@@ -117,7 +117,7 @@ public class WorkService {
         return results.isEmpty() ? null : results.get(0);
     }
 
-    // 後台功能
+    // -------------------------------------MARK:後台功能
     public void addwork(WorkDTO wDto) {
         WorkDetailEntity wEntity = new WorkDetailEntity();
         wEntity.setWorkName(wDto.workName());
@@ -174,5 +174,9 @@ public class WorkService {
         }
 
         repo.save(wEntity);
+    }
+
+    public void deleteWork(Integer workID){
+        repo.deleteById(workID);
     }
 }
