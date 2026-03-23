@@ -308,8 +308,8 @@ function initCheckoutValidation() {
         $(".dynamic-addon-input").remove(); // 先清空舊的，避免重複塞入
 
         checkoutState.addedTickets.forEach(t => {
-            $(this).append(`<input type="hidden" name="addonTicketName" value="${t.name}" class="dynamic-addon-input">`);
-            $(this).append(`<input type="hidden" name="addonTicketPrice" value="${t.price}" class="dynamic-addon-input">`);
+            $(this).append(`<input type="hidden" name="addonTicketNames" value="${t.name}" class="dynamic-addon-input">`);
+            $(this).append(`<input type="hidden" name="addonTicketPrices" value="${t.price}" class="dynamic-addon-input">`);
         });
 
         checkoutState.addedTransports.forEach(t => {
