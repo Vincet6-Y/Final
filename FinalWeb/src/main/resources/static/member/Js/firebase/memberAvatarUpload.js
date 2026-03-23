@@ -167,6 +167,11 @@ $(function () {
             $fileInput.val("");
             return;
         }
+        if (file.size > 5 * 1024 * 1024) {
+            showToast("error", "圖片大小不能超過 5MB");
+            $fileInput.val("");
+            return;
+        }
         const reader = new FileReader();
         reader.onload = (ev) => {
             pendingOriginalBlob = file;

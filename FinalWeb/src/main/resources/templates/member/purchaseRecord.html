@@ -1,6 +1,7 @@
 <div th:fragment="purchaseRecord" class="w-full flex flex-col gap-4">
     <div class="flex items-center justify-between mb-2">
-        <h2 class="flex items-center gap-2 text-xl font-bold text-white">
+        <!-- 標題文字 -->
+        <h2 class="flex items-center gap-2 text-xl font-bold text-slate-800 dark:text-white">
             <span class="material-symbols-outlined text-primary">receipt_long</span> 購買紀錄
         </h2>
         <a href="javascript:void(0)" id="btn-view-all-orders" th:if="${orders != null && orders.size() > 2}"
@@ -8,10 +9,10 @@
     </div>
 
     <div th:if="${orders != null && !orders.isEmpty()}" class="space-y-4">
-
+        <!-- 訂單卡片 -->
         <div th:each="order, iterStat : ${orders}"
             th:classappend="${iterStat.index >= 2 ? 'hidden extra-order-card' : ''}"
-            class="order-card bg-white/5 dark:bg-[#251d15] border border-slate-200 dark:border-white/10 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center gap-5 hover:border-orange-500/30 transition-colors shadow-sm">
+            class="order-card bg-white dark:bg-[#251d15] border border-slate-200 dark:border-white/10 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center gap-5 hover:border-orange-500/30 transition-colors shadow-sm">
 
             <div class="w-full md:w-40 h-28 rounded-xl overflow-hidden shrink-0 bg-black/20">
                 <img alt="行程圖片" class="w-full h-full object-cover"
@@ -74,9 +75,9 @@
             </div>
         </div>
     </div>
-
+    <!-- 空狀態 -->
     <div th:if="${orders == null || orders.isEmpty()}"
-        class="bg-white/5 border border-white/10 rounded-2xl p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
+        class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center gap-3">
         <span class="material-symbols-outlined text-4xl opacity-50">receipt_long</span>
         <p>目前還沒有購買紀錄喔！趕快去探索聖地吧！</p>
     </div>

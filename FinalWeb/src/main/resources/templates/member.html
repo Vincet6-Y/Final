@@ -8,13 +8,12 @@
 
         <header th:replace="~{ fragments/header :: myHeader}"></header>
 
-        <main class="flex-1 w-full max-w-7xl mx-auto p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
-
+        <main class="flex-1 w-full max-w-7xl mx-auto p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 bg-slate-50 dark:bg-transparent">
             <!-- 側邊欄 -->
             <aside class="lg:col-span-4 flex flex-col gap-6">
 
                 <!-- 會員資料卡 -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
+                <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
 
                     <!-- 大頭照 -->
                     <div class="relative mb-4">
@@ -36,7 +35,7 @@
                     </div>
 
                     <!-- 會員名稱 -->
-                    <h1 class="text-2xl font-bold text-slate-100"
+                    <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100"
                         th:text="'聖地旅者 · ' + ${session.loginMember.name}">
                     </h1>
 
@@ -84,19 +83,19 @@
                 </div>
 
                 <!-- 側邊導覽列 -->
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-2 hidden lg:flex flex-col">
+                <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-2 hidden lg:flex flex-col">
                     <a id="nav-home"
                         class="cursor-pointer flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 rounded-lg">
                         <span class="material-symbols-outlined">person</span>
                         <span class="font-medium">會員首頁</span>
                     </a>
                     <a id="nav-orders"
-                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 transition-colors">
+                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-slate-100 transition-colors">
                         <span class="material-symbols-outlined">map</span>
                         <span class="font-medium">購買紀錄</span>
                     </a>
                     <a id="nav-favs"
-                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-slate-100 transition-colors">
+                        class="cursor-pointer flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-slate-100 transition-colors">
                         <span class="material-symbols-outlined">history</span>
                         <span class="font-medium">收藏行程</span>
                     </a>
