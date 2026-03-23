@@ -70,8 +70,11 @@ public class MemberAuthController {
             return Map.of("success", false, "message", toast.message());
         }
 
+        MemberEntity member = memberService.findByEmail(register.email());
+        memberService.saveLoginSession(member, request);
+
         linkPendingSocialOauth(register.email(), session, request);
-        return Map.of("success", true, "redirectUrl", "/home");
+        return Map.of("success", true, "redirectUrl", "/home", "message", "註冊成功，歡迎加入！");
     }
 
     // ==================== Google ====================

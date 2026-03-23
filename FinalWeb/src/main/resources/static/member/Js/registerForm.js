@@ -1,11 +1,12 @@
 $(function () {
     $('#registerForm').on('submit', function (e) {
         e.preventDefault();
+        console.log('submit intercepted');
 
-        const name = $('input[name="name"]').val();
-        const email = $('input[name="email"]').val();
-        const phone = $('input[name="phone"]').val();
-        const birthday = $('input[name="birthday"]').val();
+        const name = $('#registerForm input[name="name"]').val();
+        const email = $('#registerForm input[name="email"]').val();
+        const phone = $('#registerForm input[name="phone"]').val();
+        const birthday = $('#registerForm input[name="birthday"]').val();
         const passwd = $('#registerPasswd').val();
         const confirmPasswd = $('#registerConfirmPasswd').val();
 
@@ -15,8 +16,28 @@ $(function () {
             return;
         }
 
+        // 同意條款檢查
+        if (!$('#agreeTerms').is(':checked')) {
+            showToast('error', '請先閱讀並同意服務條款與隱私政策');
+            return;
+        }
+
         if (!/^09\d{8}$/.test(phone)) {
             showToast('error', '手機號碼格式不正確');
+            return;
+        }
+
+        const birthdayDate = new Date(birthday);
+        const today = new Date();
+        const minDate = new Date('1900-01-01');
+
+        if (birthdayDate > today) {
+            showToast('error', '生日不能是未來日期');
+            return;
+        }
+
+        if (birthdayDate < minDate) {
+            showToast('error', '請輸入正確的生日');
             return;
         }
 
@@ -49,6 +70,8 @@ $(function () {
             }),
             success: function (response) {
                 if (response.success) {
+                    sessionStorage.setItem('toastType', 'success');
+                    sessionStorage.setItem('toastMessage', response.message);
                     window.location.href = response.redirectUrl;
                 } else {
                     showToast('error', response.message);
