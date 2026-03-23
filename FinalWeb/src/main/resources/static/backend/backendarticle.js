@@ -222,8 +222,13 @@ $(document).ready(function () {
             editId: currentArticleId || null,
             isAdminPreview: true
         };
-        sessionStorage.setItem("articlePreview", JSON.stringify(previewData));
-        window.open("/admin/articles/preview", "_blank");
+        // 文章內容很長或有 base64 圖片時會顯示失敗
+        try {
+            sessionStorage.setItem("articlePreview", JSON.stringify(previewData));
+            window.open("/admin/articles/preview", "_blank");
+        } catch (e) {
+            showToast("error", "內容過長，無法預覽，請先儲存後至前台查看");
+        }
     });
 
     // ==========================================
