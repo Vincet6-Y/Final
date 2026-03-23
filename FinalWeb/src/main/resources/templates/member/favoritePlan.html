@@ -48,9 +48,9 @@
             </div>
 
         </div>
-
+        <!-- 空狀態 -->
         <div id="empty-fav-state" th:if="${favorites == null || favorites.isEmpty()}"
-            class="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center gap-3">
+            class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-600 dark:text-slate-400 flex flex-col items-center justify-center gap-3">
             <span class="material-symbols-outlined text-4xl opacity-50">favorite_border</span>
             <p>目前還沒有收藏任何行程喔！去發掘喜歡的聖地吧！</p>
         </div>

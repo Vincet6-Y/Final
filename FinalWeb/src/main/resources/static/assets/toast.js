@@ -48,4 +48,11 @@ $(document).ready(function () {
     if ($("#toast").length > 0) {
         runToastAnimation();
     }
+    const toastType = sessionStorage.getItem('toastType');
+    const toastMessage = sessionStorage.getItem('toastMessage');
+    if (toastType && toastMessage) {
+        sessionStorage.removeItem('toastType');
+        sessionStorage.removeItem('toastMessage');
+        showToast(toastType, toastMessage);
+    }
 });
