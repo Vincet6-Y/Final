@@ -1,12 +1,10 @@
 <div th:fragment="registerForm" id="registerFormFace" class="card-face" th:classappend="${openPanel == 'register'} ? ' active' : ''">
     <div class="form-content">
-
         <div class="mb-10">
             <h2 class="text-3xl font-bold text-white mb-2">註冊新會員</h2>
             <p class="text-white/80">請填寫以下資訊以完成您的帳戶註冊</p>
         </div>
-
-        <form class="space-y-6" action="/auth/register" method="post">
+        <form class="space-y-6" id="registerForm" novalidate>
             <!-- 名字 -->
             <div class="space-y-2">
                 <label class="text-sm font-medium text-white/80 ml-1">名字</label>
@@ -14,7 +12,6 @@
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
                         badge
                     </span>
-
                     <input
                         name="name"
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
@@ -24,7 +21,6 @@
                         th:value="${registerData != null ? registerData.name() : (socialName != null ? socialName : '')}" />
                 </div>
             </div>
-
             <!-- Email -->
             <div class="space-y-2">
                 <label class="text-sm font-medium text-white/80 ml-1">Email</label>
@@ -32,7 +28,6 @@
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
                         mail
                     </span>
-
                     <input
                         name="email"
                         class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
@@ -42,34 +37,30 @@
                         th:value="${registerData != null ? registerData.email() : (socialEmail != null ? socialEmail : '')}" />
                 </div>
             </div>
-
             <!-- 電話 + 生日 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-
                 <div class="space-y-2">
                     <label class="text-sm font-medium text-white/80 ml-1">電話</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
                             phone
                         </span>
-
                         <input
                             name="phone"
                             class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                            placeholder="0900-000-000"
                             type="tel"
+                            pattern="^09\d{8}$"
+                            placeholder="ex: 0912345678"
                             required
                             th:value="${registerData != null ? registerData.phone() : ''}" />
                     </div>
                 </div>
-
                 <div class="space-y-2">
                     <label class="text-sm font-medium text-white/80 ml-1">出生日期</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
                             calendar_today
                         </span>
-
                         <input
                             name="birthday"
                             class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
@@ -78,18 +69,14 @@
                             th:value="${registerData != null ? registerData.birthday() : ''}" />
                     </div>
                 </div>
-
             </div>
-
             <!-- 密碼 -->
             <div class="space-y-2">
                 <label class="text-sm font-medium text-white/80 ml-1">密碼</label>
                 <div class="relative group">
-
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
                         lock
                     </span>
-
                     <input
                         id="registerPasswd"
                         name="passwd"
@@ -97,27 +84,22 @@
                         placeholder="請輸入密碼"
                         type="password"
                         required />
-
                     <button 
                         id="toggleRegisterPasswd"
                         class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-muted hover:text-primary"
                         type="button">
                         <span id="registerEyeIcon" class="material-symbols-outlined">visibility_off</span>
                     </button>
-
                 </div>
             </div>
 
             <!-- 確認密碼 -->
             <div class="space-y-2">
                 <label class="text-sm font-medium text-white/80 ml-1">確認密碼</label>
-
                 <div class="relative group">
-
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary">
                         verified_user
                     </span>
-
                     <input
                         id="registerConfirmPasswd"
                         name="confirmPasswd"
@@ -125,23 +107,32 @@
                         placeholder="請再次輸入密碼"
                         type="password"
                         required />
-
                     <button 
                         id="toggleRegisterConfirmPasswd"
                         class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-muted hover:text-primary"
                         type="button">
                         <span id="registerConfirmEyeIcon" class="material-symbols-outlined">visibility_off</span>
                     </button>
-
                 </div>
             </div>
-
+            <!-- 同意條款 -->
+            <div class="flex items-start gap-3">
+                <input
+                    type="checkbox"
+                    id="agreeTerms"
+                    required
+                    class="mt-1 w-4 h-4 rounded accent-primary cursor-pointer shrink-0" />
+                <label for="agreeTerms" class="text-sm text-white/70 leading-relaxed cursor-pointer">
+                    我已閱讀並同意
+                    <a href="/member/terms" target="_blank" rel="noopener noreferrer"
+                        class="text-primary hover:underline font-medium">服務條款與隱私政策</a>
+                </label>
+            </div>
             <button 
                 class="w-full bg-primary hover:bg-primary/90 text-white dark:text-background-dark font-bold py-4 rounded-lg shadow-lg shadow-primary/20 transition-all"
                 type="submit">
                 註冊帳號
             </button>
-
         </form>
         
     </div>

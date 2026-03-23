@@ -64,7 +64,8 @@
                         <img class="w-full h-full object-cover"
                             th:src="${session.loginMember.memberImgUrl != null and !#strings.isEmpty(session.loginMember.memberImgUrl)
                                     ? session.loginMember.memberImgUrl
-                                    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc'}"
+                                    : '/images/defaultAvatar.webp'}"
+                            onerror="this.onerror=null; this.src='/images/defaultAvatar.webp';"
                             alt="會員頭像">
                     </div>
 

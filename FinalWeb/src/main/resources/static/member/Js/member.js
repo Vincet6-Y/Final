@@ -28,7 +28,8 @@ $(function () {
 
     function resetNav() {
         [$navHome, $navOrders, $navFavs].forEach($el => {
-            $el.removeClass("text-primary bg-primary/10").addClass("text-slate-400 hover:text-slate-100");
+            $el.removeClass("text-primary bg-primary/10")
+            .addClass("text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-slate-100");
         });
     }
 
