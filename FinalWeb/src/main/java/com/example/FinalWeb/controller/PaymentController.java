@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 import java.time.*;
 import java.util.*;
@@ -87,6 +88,7 @@ public class PaymentController {
     // 執行結帳核心邏輯
     @PostMapping(value = "/checkout", produces = "text/html;charset=UTF-8")
     @ResponseBody
+    @Transactional
     public String checkout(
             @RequestParam Integer orderId,
             @RequestParam(required = false) String newPlanName,

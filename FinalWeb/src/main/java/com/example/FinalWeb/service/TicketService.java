@@ -55,27 +55,25 @@ public class TicketService {
         // ─────────────────────────────────────────────
 
         // 東京
-        addSpotTicket("ChIJ8VLVBuTsGGARfIDGqQDmC0Q", "你的名字 須賀神社參拜套票", 500, Region.TOKYO);
-        addSpotTicket("ChIJP-vO9nuLGGARGJ2q8uryJUA", "你的名字 國立新美術館門票", 400, Region.TOKYO);
+        addSpotTicket("ChIJd0dv2flfImAReSRXjnCvRVg", "你的名字 須賀神社參拜套票", 500, Region.TOKYO);
+        addSpotTicket("ChIJmSYwCwCLGGARSzqhfSUeVks", "你的名字 國立新美術館門票", 400, Region.TOKYO);
         addSpotTicket("ChIJscIAGGrzGGAROoW9kySUQYQ", "孤獨搖滾！下北澤 Live House 體驗券", 800, Region.TOKYO);
         addSpotTicket("ChIJQSDrYJu4GGARD_broFBjNUM", "幸運☆星 鷲宮神社參拜套票", 500, Region.TOKYO);
-        addSpotTicket("ChIJCcRjTTnKGGARLtY-7WEX5aI", "幸運☆星 久喜市立鷲宮圖書館門票", 300, Region.TOKYO);
+        addSpotTicket("ChIJl6oO1zzKGGARJMJIYFN0Afk", "幸運☆星 久喜市立鷲宮圖書館門票", 300, Region.TOKYO);
 
         // 神奈川
         addSpotTicket("ChIJr6UTdvlOGGART30L2LcRlmc", "鏈鋸人 新江之島水族館門票", 500, Region.KANAGAWA);
-        addSpotTicket("ChIJvVsEzuVOGGARs99YuxNfbDU", "孤獨搖滾！江之島 展望燈塔門票", 500, Region.KANAGAWA);
+        addSpotTicket("ChIJvVsEzuVOGGARs99YuxNfbDU", "孤獨搖滾！江之島 Sea Candle (展望燈塔)門票", 500, Region.KANAGAWA);
         addSpotTicket("ChIJIRZ85hZPGGARffzavFo4QRk", "灌籃高手 平交道拍照觀景台門票", 200, Region.KANAGAWA);
-        addSpotTicket("ChIJX36g4vZFGGARGocG2lY-Gko", "海街日記 成就院門票", 300, Region.KANAGAWA);
+        addSpotTicket("ChIJX36g4vZFGGARGocG2lY-Gko", "海街日記 成就院（般若寺跡）門票", 300, Region.KANAGAWA);
 
         // 關西
         addSpotTicket("ChIJW_hH73EMAWAR3DLfYrSpmdA", "神劍闖江湖 園城寺門票", 300, Region.KANSAI);
         addSpotTicket("ChIJceHc0AmoAWARLsqeCrglA1o", "神劍闖江湖 上賀茂神社門票", 300, Region.KANSAI);
-        addSpotTicket(
-                "EiJRODNSKzQyLCBOaXNoaW5vbWl5YSwgSHlvZ28sIEphcGFuIiY6JAoKDb3bthQVMUGrUBAKGhQKEgmLym3lqPQAYBFwWl1yeC2MwQ",
-                "涼宮春日的憂鬱 廣田神社門票", 400, Region.KANSAI);
+        addSpotTicket("ChIJY3kcPavzAGARZpbYdZ1CIX0", "涼宮春日的憂鬱 廣田神社門票", 400, Region.KANSAI);
 
         // 北海道
-        addSpotTicket("ChIJ___DnVrgCl8RruTc290c3p8", "情書 北一硝子三號館門票", 200, Region.HOKKAIDO);
+        addSpotTicket("ChIJ___DnVrgCl8RruTc290c3p8", "情書 星空咖啡廳門票", 200, Region.HOKKAIDO);
         addSpotTicket("ChIJNZSPr8LgCl8R_ro2ttgpg7U", "情書 小樽天狗山滑雪場門票", 300, Region.HOKKAIDO);
 
         // 九州
@@ -83,12 +81,8 @@ public class TicketService {
         addSpotTicket("ChIJa52KgsWBEzURhgFh5S2SZVg", "惡人 大瀨崎燈塔門票", 300, Region.KYUSHU);
 
         // 富士山 / 靜岡
-        addSpotTicket(
-                "EhlQTTQzK0MzLCBZYW1hbmFzaGksIEphcGFuIiY6JAoKDRFQSBUVm7ikUhAKGhQKEgn1beWlPgAcYBHDJMaulw_CFw",
-                "搖曳露營 Hottarakashi 溫泉門票", 800, Region.MT_FUJI);
-        addSpotTicket(
-                "EiNNSlg0K0hDLCBIYW1hbWF0c3UsIFNoaXp1b2thLCBKYXBhbiImOiQKCg0_o64UFdEEBVIQChoUChIJkZcH5S0WG2ARI_bt4jmbpGc",
-                "搖曳露營 渚園露營場門票", 1200, Region.MT_FUJI);
+        addSpotTicket("ChIJ57S8bif_G2AREga3oC82f2M", "搖曳露營 Hottarakashi 溫泉門票", 800, Region.MT_FUJI);
+        addSpotTicket("ChIJBV-GeYrXGmARVQS_T1SlMLk", "搖曳露營 渚園露營場門票", 1200, Region.MT_FUJI);
 
         // ─────────────────────────────────────────────
         // 🚆 交通票券

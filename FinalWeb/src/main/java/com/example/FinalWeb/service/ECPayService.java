@@ -1,6 +1,7 @@
 package com.example.FinalWeb.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.example.FinalWeb.entity.OrdersEntity;
@@ -19,6 +20,10 @@ import java.util.stream.Collectors;
 public class ECPayService {
 
     private final static String ECPAY_URL = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
+
+    // 從application.properties 讀取
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     @Autowired
     private OrdersRepo ordersRepo;
@@ -72,9 +77,9 @@ public class ECPayService {
             }
         }
         params.put("ItemName", itemName);
-        params.put("ReturnURL", "http://localhost:8080/payment/callback"); // 綠界 Server-to-Server 背景回傳
-        params.put("ClientBackURL", "http://localhost:8080/"); // 綠界付款畫面上的「返回商店」會導回首頁
-        params.put("OrderResultURL", "http://localhost:8080/payment/success"); // 綠界付款完成後轉跳頁面
+        params.put("ReturnURL", baseUrl + "/payment/callback"); // 綠界 Server-to-Server 背景回傳
+        params.put("ClientBackURL", baseUrl + "/"); // 綠界付款畫面上的「返回商店」會導回首頁
+        params.put("OrderResultURL", baseUrl + "/payment/success"); // 綠界付款完成後轉跳頁面
         params.put("ChoosePayment", "Credit");
         params.put("EncryptType", "1");
 

@@ -37,6 +37,12 @@
                                         class="p-1 hover:bg-primary/20 rounded transition-colors">
                                         <span class="material-symbols-outlined text-sm">edit</span>
                                     </a>
+                                    <a 
+                                    th:href="@{/backend/contentmanagement/work/delete(workId=${newWrok.workId})}"
+                                    class="p-1 hover:bg-primary/20 rounded transition-colors"
+                                    onclick="return confirm('確定要刪除嗎?');">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>

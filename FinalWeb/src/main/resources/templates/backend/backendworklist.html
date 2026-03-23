@@ -21,7 +21,7 @@
                 </div>
             </header>
 
-            <div class="flex flex-col gap-8">
+            <div class="flex-1 overflow-y-auto flex flex-col gap-8">
                 <div class="p-6">
                     <div class="space-y-4">
 
@@ -46,7 +46,11 @@
                                     class="p-1 hover:bg-primary/20 rounded transition-colors text-slate-500 hover:text-primary">
                                     <span class="material-symbols-outlined text-sm">edit</span>
                                 </a>
-
+                                <a th:href="@{/backend/contentmanagement/work/delete(workId=${work.workId})}"
+                                    class="p-1 hover:bg-primary/20 rounded transition-colors text-slate-500 hover:text-primary"
+                                    onclick="return confirm('確定要刪除嗎?');">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -55,9 +59,8 @@
                     <nav class="flex items-center gap-2">
                         <a th:if="${page > 0}"
                             th:href="@{/backend/contentmanagement/work/list(page=${page - 1}, size=10)}"
-                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
-                            >
-                            <span class="material-symbols-outlined" >chevron_left</span>
+                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">chevron_left</span>
                         </a>
 
                         <th:block th:each="i : ${#numbers.sequence(0, works.totalPages - 1)}">
@@ -67,8 +70,7 @@
                             </div>
 
                             <a th:unless="${i == works.number}"
-                                th:href="@{/backend/contentmanagement/work/list(page=${i}, size=10)}"
-                                th:text="${i + 1}"
+                                th:href="@{/backend/contentmanagement/work/list(page=${i}, size=10)}" th:text="${i + 1}"
                                 class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
                             </a>
 
@@ -77,9 +79,8 @@
 
                         <a th:if="${page + 1 < works.totalPages}"
                             th:href="@{/backend/contentmanagement/work/list(page=${page + 1}, size=10)}"
-                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
-                            >
-                            <span class="material-symbols-outlined" >chevron_right</span>
+                            class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">chevron_right</span>
                         </a>
                     </nav>
                 </div>

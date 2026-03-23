@@ -1,6 +1,6 @@
 package com.example.FinalWeb.service;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,9 @@ public class AdminOrderService {
         long pendingCount = ordersRepo.countByPayStatus("待處理");
         long refundCount = ordersRepo.countByPayStatus("退款中");
 
-        long todayIssued = ordersRepo.findAll().stream()
-                .filter(o -> "已付款".equals(o.getPayStatus()) &&
-                        o.getOrderTime().toLocalDate().equals(java.time.LocalDate.now()))
-                .count();
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        long todayIssued = ordersRepo.countByPayStatusAndOrderTimeBetween("已付款", startOfDay, endOfDay);
 
         stats.put("pendingOrders", pendingCount);
         stats.put("refundRequests", refundCount);
