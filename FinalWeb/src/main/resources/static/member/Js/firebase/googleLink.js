@@ -14,21 +14,23 @@ $(function () {
                         data: JSON.stringify({ idToken }),
                         success: function (data) {
                             if (!data.success) {
-                                alert(data.message || "Google 綁定失敗");
+                                showToast('error', data.message || "Google 綁定失敗");
                                 return;
                             }
-                            alert(data.message || "Google 綁定成功");
-                            location.reload();
+                            showToast('success', data.message || "Google 綁定成功");
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
                         },
                         error: function () {
-                            alert("綁定請求失敗");
+                            showToast('error', "綁定請求失敗");
                         }
                     });
                 });
             })
             .catch(function (e) {
                 console.error("google link error =", e);
-                alert("Google 綁定失敗");
+                showToast('error', "Google 綁定失敗");
             });
     });
 
@@ -39,16 +41,18 @@ $(function () {
             xhrFields: { withCredentials: true },
             success: function (data) {
                 if (!data.success) {
-                    alert(data.message || "Google 解除綁定失敗");
+                    showToast('error', data.message || "Google 解除綁定失敗");
                     return;
                 }
                 signOut(auth).then(function () {
-                    alert(data.message || "Google 已解除綁定");
-                    location.reload();
+                    showToast('success', data.message || "Google 已解除綁定");
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500);
                 });
             },
             error: function () {
-                alert("解除綁定請求失敗");
+                showToast('error', "解除綁定請求失敗");
             }
         });
     });
