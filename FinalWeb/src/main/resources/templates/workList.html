@@ -4,8 +4,8 @@
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
 <body
-    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
-    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
+    <div class="relative flex min-h-screen w-full flex-col">
         <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
@@ -35,46 +35,47 @@
             <div class="flex flex-col lg:flex-row items-center justify-between gap-4 mb-10">
 
                 <form th:action="@{/workList}" method="get"
-                    class="flex items-center gap-3 bg-white dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 w-fit">
+                    class="flex flex-wrap items-center gap-2 bg-white dark:bg-white/5 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-fit">
 
                     <input type="hidden" name="workClass" th:value="${classNow}" />
                     <input type="hidden" name="sortDir" th:value="${sortNow}" />
 
-                    <label class="text-sm font-bold text-slate-600 dark:text-slate-300">年份區間：</label>
+                    <label class="text-sm font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">年份區間：</label>
 
-                    <select name="minYear"
-                        class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
-                        <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
-                            th:selected="${year.toString() == minYearNow}"> </option>
-                    </select>
+                    <div class="flex items-center gap-2">
+                        <select name="minYear"
+                            class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
+                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
+                                th:selected="${year.toString() == minYearNow}"></option>
+                        </select>
 
-                    <span class="text-slate-400 font-bold">-</span>
+                        <span class="text-slate-400 font-bold">-</span>
 
-                    <select name="maxYear"
-                        class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
-                        <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
-                            th:selected="${year.toString() == maxYearNow}">
-                        </option>
-                    </select>
+                        <select name="maxYear"
+                            class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
+                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
+                                th:selected="${year.toString() == maxYearNow}"></option>
+                        </select>
 
-                    <button type="submit"
-                        class="ml-2 px-4 py-1.5 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 transition-all">
-                        篩選
-                    </button>
+                        <button type="submit"
+                            class="px-4 py-1.5 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 transition-all whitespace-nowrap">
+                            篩選
+                        </button>
+                    </div>
                 </form>
 
-                <div class="flex gap-3">
+                <div class="flex gap-2 w-full lg:w-auto">
                     <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
-                        class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
+                        class="flex-1 lg:flex-none text-center px-4 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white"
                         th:classappend="${sortNow == 'DESC'} 
-                            ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                            ? 'bg-primary text-white border-primary' 
                             : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                         上映日期 - 近
                     </a>
                     <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
-                        class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
+                        class="flex-1 lg:flex-none text-center px-4 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white"
                         th:classappend="${sortNow == 'ASC'} 
-                            ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                            ? 'bg-primary text-white border-primary' 
                             : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                         上映日期 - 遠
                     </a>
