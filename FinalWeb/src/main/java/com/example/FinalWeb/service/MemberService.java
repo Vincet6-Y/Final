@@ -1,8 +1,16 @@
 package com.example.FinalWeb.service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +20,9 @@ import com.example.FinalWeb.dto.PasswdChangeDto;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.util.BCrypt;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class MemberService {
@@ -32,16 +43,55 @@ public class MemberService {
         return member;
     }
 
+    // 建立登入後的 Session 與 Spring Security 驗證資訊
+    public void saveLoginSession(MemberEntity member, HttpServletRequest request) {
+        // 1. 準備權限清單 (資料庫已是 ROLE_ADMIN，直接取用)
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole());
+        // 2. 建立一個官方認可的身份憑證 (Authentication)
+        Authentication auth = new UsernamePasswordAuthenticationToken(member.getEmail(), null, authorities);
+        // 3. 正式把這張憑證塞進 Spring Security 的核心口袋 (SecurityContext)
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        // 4. 將狀態綁定到 Session 中 (最關鍵的一步！)
+        HttpSession session = request.getSession(true);
+        // 這是你原本存放使用者資料的地方，保留著完全沒問題，方便你前端畫面使用
+        session.setAttribute("loginMember", member);
+        // 🌟 新增這行：把安管中心的安全狀態，用 Spring Security 指定的專屬名稱存進 Session 裡！
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext()
+        );
+    }
+
     public String register(MemberRegisterDTO register) {
         // 1 檢查 email 是否已存在
         if (memberRepo.existsByEmail(register.email())) {
             return "Email已註冊";
         }
-        // 2 檢查密碼是否一致
+        // 2. 電話格式
+        if (!register.phone().matches("^09\\d{8}$")) {
+            return "手機號碼格式不正確";
+        }
+        // 3. 生日範圍
+        if (register.birthday().isAfter(LocalDate.now())) {
+            return "生日不能是未來日期";
+        }
+        if (register.birthday().isBefore(LocalDate.of(1900, 1, 1))) {
+            return "請輸入正確的生日";
+        }
+        // 4. 密碼一致性
         if (!register.passwd().equals(register.confirmPasswd())) {
             return "密碼不一致";
         }
-        // 3 建立 entity
+        // 5. 密碼長度
+        if (register.passwd().length() < 8) {
+            return "密碼長度至少需要 8 個字元";
+        }
+        // 6. 密碼複雜度
+        if (!register.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            return "密碼需包含大小寫英文及數字";
+        }
+
+        // 建立 entity
         MemberEntity member = new MemberEntity();
         member.setName(register.name());
         member.setEmail(register.email());
@@ -52,7 +102,7 @@ public class MemberService {
         member.setPasswd(hashedPasswd);
         // 預設為一般會員
         member.setRole("USER");
-        // 5 存入資料庫
+        // 存入資料庫
         memberRepo.save(member);
         return "註冊成功";
     }
@@ -63,6 +113,13 @@ public class MemberService {
         if (!dto.getNewPasswd().equals(dto.getConfirmPasswd())) {
             return "新密碼與確認密碼不一致";
         }
+        if (dto.getNewPasswd().length() < 8) {
+            return "密碼長度至少需要 8 個字元";
+        }
+        if (!dto.getNewPasswd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
+            return "密碼需包含大小寫英文及數字";
+        }
+
         // 2. 資料庫查詢
         MemberEntity member = memberRepo.findByEmail(email).orElse(null);
         if (member == null) {
@@ -88,11 +145,14 @@ public class MemberService {
         return memberRepo.findById(memberId).orElse(null);
     }
 
+    public MemberEntity findByEmail(String email) {
+        return memberRepo.findByEmail(email).orElse(null);
+    }
+
     @Transactional
     public void updateMemberProfile(Integer memberId, MemberProfileDTO dto) {
 
-        MemberEntity member = memberRepo.findById(memberId)
-            .orElseThrow();
+        MemberEntity member = memberRepo.findById(memberId).orElseThrow();
 
         member.setName(dto.name());
         member.setPhone(dto.phone());
@@ -106,9 +166,7 @@ public class MemberService {
 
     @Transactional
     public void updateMemberAvatar(Integer memberId, String avatarUrl) {
-
         MemberEntity member = memberRepo.findById(memberId).orElseThrow();
-
         member.setMemberImgUrl(avatarUrl);
     }
     

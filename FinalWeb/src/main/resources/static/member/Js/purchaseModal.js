@@ -8,17 +8,20 @@ $(function () {
     function openPurchaseDetailModal(data) {
         $("#purchaseDetailTitle").text(data.title);
         $("#purchaseDetailDate").text(data.date);
-        $("#purchaseDetailStatus").text(data.status);
         $("#purchaseDetailPrice").text(data.price);
         $("#purchaseDetailImage").attr("src", data.image);
 
+        const $status = $("#purchaseDetailStatus");
+        $status.text(data.status);
         // 🌟 判斷狀態改變按鈕行為
         if (data.status === '未付款') {
+            $status.removeClass("bg-green-500/10 text-green-400").addClass("bg-red-500/10 text-red-400");
             $modalActionBtn.text("前往結帳付款");
             $modalActionBtn.off('click').on('click', function () {
                 window.location.href = '/payment?orderId=' + data.orderId;
             });
         } else {
+            $status.removeClass("bg-red-500/10 text-red-400").addClass("bg-green-500/10 text-green-400");
             $modalActionBtn.text("查看票券與行程");
             $modalActionBtn.off('click').on('click', function () {
                 window.location.href = '/payment/paymentsuccess?orderId=' + data.orderId;

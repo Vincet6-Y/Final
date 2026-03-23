@@ -1,6 +1,7 @@
 ﻿package com.example.FinalWeb.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +31,12 @@ public class MapEntity {
     @Column(name = "latitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal latitude;
     private String GooglePlaceID;
+
+    private Integer stayTime;
+    private LocalDateTime visitTime;
+    private Integer distance;
+    private Integer transitTime;
+    private String transitMode;
 
     // 拉關連線到 journeyPlan
     @ManyToOne(fetch = FetchType.LAZY)

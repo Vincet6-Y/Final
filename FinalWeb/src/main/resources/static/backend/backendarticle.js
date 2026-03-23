@@ -3,10 +3,53 @@ import { storage } from "/member/Js/firebase/firebase.js";
 import { ref, uploadBytes, getDownloadURL }
     from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
+//  壓縮圖片工具
+function compressImage(file, maxSize, quality) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = function () {
+            URL.revokeObjectURL(url);
+            let { width, height } = img;
+            if (width > maxSize || height > maxSize) {
+                if (width > height) {
+                    height = Math.round(height * maxSize / width);
+                    width = maxSize;
+                } else {
+                    width = Math.round(width * maxSize / height);
+                    height = maxSize;
+                }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+                (blob) => blob ? resolve(blob) : reject(new Error("壓縮失敗")),
+                "image/webp",
+                quality
+            );
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
 window.firebaseUploadCover = async function (file, articleClass) {
-    const storagePath = `articles/${articleClass}/${Date.now()}_cover`;
+    // ✅ 檔案類型檢查
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        throw new Error("只支援 JPG、PNG、WebP 格式");
+    }
+    // ✅ 檔案大小檢查
+    if (file.size > 5 * 1024 * 1024) {
+        throw new Error("圖片大小不能超過 5MB");
+    }
+    // ✅ 壓縮：最大 1280px，品質 0.85，輸出 webp
+    const compressed = await compressImage(file, 1280, 0.85);
+    // 副檔名改成 .webp
+    const storagePath = `articles/${articleClass}/${Date.now()}_cover.webp`;
     const storageRef = ref(storage, storagePath);
-    await uploadBytes(storageRef, file);
+    await uploadBytes(storageRef, compressed);
     return await getDownloadURL(storageRef);
 };
 
@@ -187,13 +230,20 @@ $(document).ready(function () {
     }
 
     // ==========================================
-    // 8. 每 30 秒自動儲存草稿
+    // 8. 每 30 秒有修改就自動儲存草稿
     // ==========================================
+    let lastSnapshot = "";
     setInterval(function () {
-        if (!$("#titleInput").val() && !getContent()) return;
+        const title = $("#titleInput").val();
+        const content = getContent();
+        // 完全空白就不儲存
+        if (!title && !content) return;
+        // title + content 組合成快照，任一改變都觸發
+        const snapshot = title + "||" + content;
+        if (snapshot === lastSnapshot) return;
+        lastSnapshot = snapshot;
         saveArticle("draft");
     }, 30000);
-
     // ==========================================
     // 9. 手動存草稿
     // ==========================================
@@ -215,8 +265,13 @@ $(document).ready(function () {
             editId: currentArticleId || null,
             isAdminPreview: true
         };
-        sessionStorage.setItem("articlePreview", JSON.stringify(previewData));
-        window.open("/admin/articles/preview", "_blank");
+        // 文章內容很長或有 base64 圖片時會顯示失敗
+        try {
+            sessionStorage.setItem("articlePreview", JSON.stringify(previewData));
+            window.open("/admin/articles/preview", "_blank");
+        } catch (e) {
+            showToast("error", "內容過長，無法預覽，請先儲存後至前台查看");
+        }
     });
 
     // ==========================================

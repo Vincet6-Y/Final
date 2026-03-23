@@ -3,11 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const classEl = document.getElementById('article-class');
     const contentEl = document.getElementById('markdown-content');
 
+    //前台 / 後台共用頁面設計
     const isPreviewMode = window.location.pathname.includes("/admin/articles/preview");
 
     if (isPreviewMode) {
         // ==========================================
-        // 後台預覽模式 — 從 sessionStorage 讀取資料
+        // 後台預覽模式 — 從 sessionStorage 讀取預覽資料
         // ==========================================
         const previewDataStr = sessionStorage.getItem('articlePreview');
         if (previewDataStr) {
@@ -16,13 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (classEl) classEl.innerText = data.articleClass || "未分類";
             if (contentEl) contentEl.innerHTML = renderMarkdown(data.content || "");
 
-            // 設定 Hero Banner 背景圖
+            // 設定封面圖片
             if (data.articleImageUrl) {
-                const fallbackBg = document.getElementById('hero-bg-fallback');
-                if (fallbackBg) {
-                    fallbackBg.style.backgroundImage = `url(${data.articleImageUrl})`;
-                    fallbackBg.style.backgroundSize = 'cover';
-                    fallbackBg.style.backgroundPosition = 'center';
+                const heroBg = document.getElementById('hero-bg')
+                    || document.getElementById('hero-bg-fallback');
+                if (heroBg) {
+                    heroBg.style.backgroundImage = `url(${data.articleImageUrl})`;
                 }
             }
 

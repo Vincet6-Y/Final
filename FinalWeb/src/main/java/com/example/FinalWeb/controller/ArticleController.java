@@ -54,7 +54,6 @@ public class ArticleController {
         // 1. 查詢文章
         ArticleEntity article = articleService.findEntityById(id);
         if (article == null) {
-            // 找不到就轉回首頁或 404 頁
             return "redirect:/news";
         }
         // 2. 瀏覽數 + 1 並存回資料庫
