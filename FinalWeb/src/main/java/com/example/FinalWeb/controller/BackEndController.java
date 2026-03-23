@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -167,6 +168,40 @@ public class BackEndController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("{\"success\": false, \"message\": \"儲存失敗\"}");
+        }
+    }
+
+    // ==========================================
+    // 編輯行程套裝 (GET: 顯示編輯表單頁面)
+    // ==========================================
+    @GetMapping("/contentmanagement/plan/edit")
+    public String editPlanForm(@RequestParam("planId") Integer planId, Model model) {
+        // 1. 準備下拉選單的作品與 API Key
+        List<WorkDetailEntity> allWorks = service.getWork();
+        model.addAttribute("works", allWorks);
+        model.addAttribute("apiKey", googleMapsApiKey);
+
+        // 2. 撈出這筆行程的舊資料，傳給前端 Thymeleaf
+        JourneyPlanEntity plan = journeyPlanService.getPlanById(planId);
+        model.addAttribute("plan", plan);
+
+        // backendplanedit.html 來處理編輯邏輯
+        return "/backend/backendplanedit";
+    }
+
+    // ==========================================
+    // 編輯行程套裝 (POST: 接收更新資料)
+    // ==========================================
+    @PostMapping("/contentmanagement/plan/update/{planId}")
+    @ResponseBody
+    public ResponseEntity<?> updatePlanSubmit(@PathVariable Integer planId,
+            @RequestBody PlanCreateRequestDTO requestDto) {
+        try {
+            journeyPlanService.updatePlanWithSpots(planId, requestDto);
+            return ResponseEntity.ok().body("{\"success\": true}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("{\"success\": false, \"message\": \"更新失敗\"}");
         }
     }
 

@@ -34,7 +34,7 @@
                                         <h4 class="text-sm font-bold" th:text="${newWrok.workName}">作品名稱</h4>
                                     </div>
                                     <a th:href="@{/backend/contentmanagement/work/edit(workId=${newWrok.workId})}"
-                                    class="p-1 hover:bg-primary/20 rounded transition-colors">
+                                        class="p-1 hover:bg-primary/20 rounded transition-colors">
                                         <span class="material-symbols-outlined text-sm">edit</span>
                                     </a>
                                 </div>
@@ -81,6 +81,10 @@
                                                 th:classappend="${plan.status == true} ? 'right-0.5 bg-primary' : 'left-0.5 bg-slate-400'">
                                             </div>
                                         </div>
+                                        <a th:href="@{/backend/contentmanagement/plan/edit(planId=${plan.planId})}"
+                                            class="p-1 hover:bg-primary/20 rounded transition-colors text-slate-400 hover:text-primary" title="編輯行程">
+                                            <span class="material-symbols-outlined text-sm">edit</span>
+                                        </a>
                                     </div>
                                 </div>
                                 <div th:if="${#lists.isEmpty(journeyPlans)}"
@@ -280,6 +284,10 @@
                                     th:classappend="${plan.status == true} ? 'right-0.5 bg-primary' : 'left-0.5 bg-slate-400'">
                                 </div>
                             </div>
+                            <a th:href="@{/backend/contentmanagement/plan/edit(planId=${plan.planId})}"
+                                class="p-1 hover:bg-primary/20 rounded transition-colors text-slate-400 hover:text-primary" title="編輯行程">
+                                <span class="material-symbols-outlined text-sm">edit</span>
+                            </a>
                         </div>
                     </div>
                 </div>

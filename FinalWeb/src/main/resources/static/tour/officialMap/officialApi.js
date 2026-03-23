@@ -1,9 +1,7 @@
 // ==========================================
 // 🌟 1. 載入官方行程資料 (用於 packageTourDetail)
 // ==========================================
-
-
-     async function loadPlanData(planId) {
+async function loadPlanData(planId) {
     try {
         const res = await fetch(`/api/plan/officialPlanNodes/${planId}`);
         if (!res.ok) throw new Error(`API 請求失敗：${res.status}`);
@@ -12,43 +10,44 @@
         let nodes = Array.isArray(data) ? data : (data.data || []);
         if (nodes.length === 0) return;
 
-        // 🌟 1. 自動計算這筆資料中最大的天數
         const maxDay = nodes.reduce((max, node) => Math.max(max, node.dayNumber || 1), 1);
 
-        // 🌟 2. 動態初始化 itineraryData，不再寫死 1~10
         itineraryData = {};
         for (let d = 1; d <= maxDay; d++) {
             itineraryData[d] = [];
         }
 
         for (const node of nodes) {
-            let safePlaceId = (node.GooglePlaceID || node.googlePlaceID || "").replace(/["']/g, "").trim();
-
-            if (!safePlaceId || safePlaceId.length < 5) {
-                const freshId = await findPlaceIdByCoords(node.latitude, node.longitude);
-                if (freshId) {
-                    safePlaceId = freshId;
-                    await updateDatabasePlaceId(node.spotId, freshId);
-                }
+            // 🌟 參考 myMapApi.js：全方位攔截各種大小寫，若無效則設為 undefined 交給後續處理
+            let safePlaceId = (node.GooglePlaceId || node.googlePlaceId || node.googlePlaceID || node.GooglePlaceID || "").toString().trim();
+            if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5 || safePlaceId.includes("UNKNOWN")) {
+                safePlaceId = "undefined";
             }
 
             const day = node.dayNumber || 1;
-            // 防呆：確保該天的陣列存在
             if (!itineraryData[day]) itineraryData[day] = [];
-            
+
+            let timeString = "08:00";
+            if (node.visitTime) {
+                timeString = node.visitTime.length > 11 ? node.visitTime.substring(11, 16) : "08:00";
+            }
+
+            let stayHours = 1;
+            if (node.stayTime) {
+                stayHours = Math.round((node.stayTime / 60) * 10) / 10;
+            }
+
             itineraryData[day].push({
                 spotId: node.spotId,
                 place_id: safePlaceId,
                 lat: parseFloat(node.latitude),
                 lng: parseFloat(node.longitude),
                 name: node.locationName,
-                arrivals: "08:00",
-                duration: "1"
+                arrivals: timeString,
+                duration: stayHours
             });
         }
 
-        // 🌟 3. 重點：通知 UI 根據實際天數重新產生日數按鈕
-        // 確保 tourUi.js 裡有這個 updateDayButtonsAndLists 函式
         if (typeof updateDayButtonsAndLists === 'function') {
             updateDayButtonsAndLists(maxDay);
         }
@@ -60,7 +59,7 @@
                 map.setCenter({ lat: firstLat, lng: firstLng });
             }
         }
-        
+
         calculateAndDisplayRoute(1);
         selectDay(1);
 
@@ -78,7 +77,6 @@ function copyToMyPlan(event, officialPlanId) {
     let btn = null;
     let originalText = '';
 
-    // 如果是手動點擊（有 event），才顯示轉圈圈動畫
     if (event && event.currentTarget) {
         btn = event.currentTarget;
         originalText = btn.innerHTML;
@@ -133,7 +131,7 @@ function copyToMyPlan(event, officialPlanId) {
 }
 
 // ==========================================
-// 🌟 3. 輔助函式
+// 🌟 3. 輔助函式：使用 Geocoder 進行座標反查 (與 myMapApi.js 完全一致)
 // ==========================================
 function findPlaceIdByCoords(lat, lng) {
     return new Promise((resolve) => {
@@ -146,6 +144,7 @@ function findPlaceIdByCoords(lat, lng) {
 }
 
 async function updateDatabasePlaceId(spotId, newPlaceId) {
+    if (!newPlaceId || newPlaceId === "UNKNOWN" || newPlaceId === "undefined") return;
     try {
         await fetch(`/api/plan/updateNodePlaceId/${spotId}`, {
             method: 'PUT',
