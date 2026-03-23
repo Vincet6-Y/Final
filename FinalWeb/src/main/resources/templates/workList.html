@@ -93,9 +93,9 @@
                     <div class="flex flex-col justify-between py-2 flex-1">
                         <div>
                             <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded" style=""
+                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded"
                                     th:text="${work.workClass}">動畫 / 電影</span>
-                                <span class="text-slate-400 text-xs" style=""
+                                <span class="text-slate-400 text-xs"
                                     th:text="${work.onDate} + ' ' + 上映">2016-08-26 上映</span>
                             </div>
                             <h3 class="text-primary text-3xl font-black mb-4" th:text="${work.workName}">你的名字 (君の名は。)
@@ -116,9 +116,8 @@
                 <nav class="flex items-center gap-2">
                     <a th:if="${page > 0}"
                         th:href="@{/workList(page=${page - 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
-                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
-                        style="">
-                        <span class="material-symbols-outlined" style="">chevron_left</span>
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">chevron_left</span>
                     </a>
 
                     <th:block th:each="i : ${#numbers.sequence(0, works.totalPages - 1)}">
@@ -138,9 +137,8 @@
 
                     <a th:if="${page + 1 < works.totalPages}"
                         th:href="@{/workList(page=${page + 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
-                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
-                        style="">
-                        <span class="material-symbols-outlined" style="">chevron_right</span>
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">chevron_right</span>
                     </a>
                 </nav>
             </div>
