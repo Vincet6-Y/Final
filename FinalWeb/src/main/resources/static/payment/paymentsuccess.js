@@ -117,6 +117,9 @@ $(document).ready(function () {
                         if (place.photos && place.photos.length > 0) {
                             const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
                             $('#modal-photo').html('<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />');
+                        } else {
+                            // ✅ 有找到地點但沒有照片，顯示預設圖
+                            showDefaultPhoto(spotName);
                         }
 
                         const desc = place.editorialSummary ? place.editorialSummary.text : '';
@@ -125,6 +128,8 @@ $(document).ready(function () {
                     })
                     .catch((error) => {
                         console.error("載入照片或地點細節失敗：", error);
+                        // ✅ Place ID 失效，用座標反查新 ID
+                        rescueByCoords(placeId, spotName, day, visitOrder);
                         $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
                         $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
                     });
@@ -137,6 +142,54 @@ $(document).ready(function () {
             $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
         }
     });
+
+    // 顯示預設無照片畫面
+    function showDefaultPhoto(spotName) {
+        $('#modal-photo').html(
+            '<div class="w-full h-full flex flex-col items-center justify-center bg-slate-800 text-slate-400">' +
+            '<span class="material-symbols-outlined text-6xl mb-2">landscape</span>' +
+            '<span class="text-sm">' + spotName + '</span>' +
+            '</div>'
+        );
+    }
+
+    // Place ID 失效時，用座標反查新 ID 並重試
+    async function rescueByCoords(oldPlaceId, spotName, day, visitOrder) {
+        // 從 allTickets 或 ticketDataMap 找到這個景點的座標
+        const ticket = Object.values(ticketDataMap).find(t => t.googlePlaceId === oldPlaceId);
+
+        if (!ticket || !ticket.lat || !ticket.lng) {
+            showDefaultPhoto(spotName);
+            return;
+        }
+
+        try {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode(
+                { location: { lat: parseFloat(ticket.lat), lng: parseFloat(ticket.lng) } },
+                async (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        const newPlaceId = results[0].place_id;
+                        const { Place } = await google.maps.importLibrary("places");
+                        const newPlace = new Place({ id: newPlaceId });
+
+                        await newPlace.fetchFields({ fields: ['photos', 'editorialSummary', 'formattedAddress'] });
+
+                        if (newPlace.photos && newPlace.photos.length > 0) {
+                            const photoUrl = newPlace.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
+                            $('#modal-photo').html('<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />');
+                        } else {
+                            showDefaultPhoto(spotName);
+                        }
+                    } else {
+                        showDefaultPhoto(spotName);
+                    }
+                }
+            );
+        } catch (e) {
+            showDefaultPhoto(spotName);
+        }
+    }
 
     // ==========================================
     // 🎫 交通票券 Modal — 點擊交通票卡片
