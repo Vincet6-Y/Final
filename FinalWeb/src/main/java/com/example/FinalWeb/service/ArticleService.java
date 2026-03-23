@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -88,18 +89,18 @@ public class ArticleService {
         return articleRepo.findByArticleClassOrderByArticleIdDesc(category);
     }
 
-    /** 新增文章 */
+    /** 新增文章(自動補建立及更新時間) */
     public ArticleEntity createArticle(ArticleEntity article) {
         if (article.getViewCount() == null)
             article.setViewCount(0);
-        article.setCreatedTime(java.time.LocalDateTime.now());
-        article.setUpdatedTime(java.time.LocalDateTime.now());
+        article.setCreatedTime(LocalDateTime.now());
+        article.setUpdatedTime(LocalDateTime.now());
         return articleRepo.save(article);
     }
 
     /** 修改文章 (加上防呆與商業邏輯) */
     public ArticleEntity updateArticle(Integer articleId, ArticleEntity article) {
-        // 先確認文章存在，確保不會改到幽靈資料
+        // 先確認文章存在
         ArticleEntity old = articleRepo.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("文章不存在"));
 
@@ -130,9 +131,7 @@ public class ArticleService {
                 .orElse(null);
     }
 
-    /**
-     * 取得全部文章（DTO）
-     */
+    /** 取得全部文章（DTO） */
     public List<ArticleDTO> getAllArticles() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
                 .stream()
@@ -141,9 +140,7 @@ public class ArticleService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 依分類分組
-     */
+    /** 依文章分類分組 */
     public Map<String, List<ArticleDTO>> getAllArticlesGrouped() {
         return articleRepo.findAll(Sort.by(Sort.Direction.DESC, "articleId"))
                 .stream()
@@ -154,9 +151,7 @@ public class ArticleService {
                 dto.getArticleClass() != null ? dto.getArticleClass() : "未分類"));
     }
 
-    /**
-     * 只更新瀏覽數，不改動其他欄位
-     */
+    /** 只更新瀏覽數，不改動其他欄位 */
     public void updateViewCount(ArticleEntity article) {
         articleRepo.save(article);
     }

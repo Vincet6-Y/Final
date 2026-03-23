@@ -11,17 +11,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.FinalWeb.dto.MemberProfileDTO;
-import com.example.FinalWeb.dto.PasswdChangeDto;
-import com.example.FinalWeb.dto.ToastInfoDTO;
+import com.example.FinalWeb.dto.*;
+import com.example.FinalWeb.service.*;
 import com.example.FinalWeb.entity.FavoritesEntity;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.enums.AuthProvider;
-import com.example.FinalWeb.repo.MemberOauthRepo;
-import com.example.FinalWeb.service.FavoritesService;
-import com.example.FinalWeb.service.MemberService;
-import com.example.FinalWeb.service.OrderService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -34,9 +29,10 @@ public class MemberCenterController {
     private OrderService orderService;
     @Autowired
     private MemberService memberService;
-
     @Autowired
-    private MemberOauthRepo memberOauthRepo;
+    private SocialAuthService socialAuthService;
+
+    private static final String DEFAULT_MEMBER_IMG_URL = "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc";
 
     // 處理登出
     @GetMapping("/logout")
@@ -70,8 +66,8 @@ public class MemberCenterController {
         // 4. 撈出這個會員的收藏清單 (交給 FavoritesService)
         List<FavoritesEntity> myFavorites = favoritesService.getMemberFavorites(memberId);
 
-        boolean lineBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.LINE);
-        boolean googleBound = memberOauthRepo.existsByMember_MemberIdAndProvider(memberId, AuthProvider.GOOGLE);
+        boolean lineBound = socialAuthService.isBound(memberId, AuthProvider.LINE);
+        boolean googleBound = socialAuthService.isBound(memberId, AuthProvider.GOOGLE);
         
         // 5. 把資料丟給前端 (讓前端的 HTML 可以跑迴圈)
         model.addAttribute("orders", myOrders);
@@ -79,7 +75,7 @@ public class MemberCenterController {
         model.addAttribute("favorites", myFavorites);
         model.addAttribute("lineBound", lineBound);
         model.addAttribute("googleBound", googleBound);
-        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc");
+        model.addAttribute("defaultMemberImgUrl", DEFAULT_MEMBER_IMG_URL);
 
         return "member";
     }
@@ -119,7 +115,7 @@ public class MemberCenterController {
         MemberEntity member = memberService.findById(loginMember.getMemberId());
 
         model.addAttribute("member", member);
-        model.addAttribute("defaultMemberImgUrl", "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc");
+        model.addAttribute("defaultMemberImgUrl", DEFAULT_MEMBER_IMG_URL);
 
         return "memberProfile";
     }

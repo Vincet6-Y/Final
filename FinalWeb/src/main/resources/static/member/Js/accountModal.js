@@ -91,11 +91,31 @@ $(document).ready(function () {
         const currentPasswd = $('#currentPasswd').val();
         const newPasswd = $('#newPasswd').val();
         const confirmPasswd = $('#confirmPasswd').val();
-        // 2. 簡單的前端防呆 (避免空值發送)
+        // 2. 空值檢查
         if (!currentPasswd || !newPasswd || !confirmPasswd) {
-            alert('請填寫所有密碼欄位！');
+            showToast('error', '請填寫所有密碼欄位！');
             return;
         }
+
+        // 長度檢查
+        if (newPasswd.length < 8) {
+            showToast('error', '新密碼至少需要 8 個字元');
+            return;
+        }
+
+        // 複雜度檢查
+        const passwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwdRegex.test(newPasswd)) {
+            showToast('error', '密碼需包含大小寫英文及數字');
+            return;
+        }
+
+        // 確認密碼是否一致
+        if (newPasswd !== confirmPasswd) {
+            showToast('error', '新密碼與確認密碼不一致');
+            return;
+        }
+
         // 3. 準備送給後端的 DTO 資料
         const data = {
             currentPasswd: currentPasswd,
@@ -111,9 +131,9 @@ $(document).ready(function () {
             success: function (response) {
                 // Controller 回傳 200 OK 會進來這裡
                 // 1. 這裡的 response 已經是一個 JSON 物件：{ type: "success", message: "密碼修改成功" }
-                showToast(response.type, response.message);
-                $('#currentPasswd, #newPasswd, #confirmPasswd').val('');
                 $('#closeAccountModal').click();
+                $('#currentPasswd, #newPasswd, #confirmPasswd').val('');
+                showToast(response.type, response.message);
             },
             error: function (xhr) {
                 // Controller 回傳 400 或 401 會進來這裡

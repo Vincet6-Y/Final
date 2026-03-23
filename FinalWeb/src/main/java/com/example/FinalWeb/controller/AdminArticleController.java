@@ -18,7 +18,7 @@ public class AdminArticleController {
     private ArticleService articleService;
 
     // ------------------------------------------------
-    // 取得所有文章 (Read - 支援分頁)
+    // 取得所有文章 (分頁查全部)
     // ------------------------------------------------
     @GetMapping
     public ResponseEntity<Page<ArticleEntity>> getAll(
@@ -40,7 +40,7 @@ public class AdminArticleController {
     }
 
     // ------------------------------------------------
-    // 新增文章 (Create)
+    // 新增文章 (Create)（預設 status=draft）
     // ------------------------------------------------
     @PostMapping
     public ResponseEntity<ArticleEntity> create(@RequestBody ArticleEntity article) {
