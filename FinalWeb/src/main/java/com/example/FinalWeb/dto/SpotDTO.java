@@ -13,5 +13,9 @@ public class SpotDTO {
     private BigDecimal latitude;      // 緯度
     private String googlePlaceId; // Google Place ID
     
-    // 如果未來還有 stayTime (停留時間) 等欄位，也可以加在這裡
+    private Integer stayTime;
+    private String visitTime; // 前端傳 "HH:mm"
+    private Integer distance;
+    private Integer transitTime;
+    private String transitMode;
 }

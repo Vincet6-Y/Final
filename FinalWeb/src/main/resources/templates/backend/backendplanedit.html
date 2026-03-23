@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-Hant">
+
+<head th:replace="~{ fragments/backendhead :: backHead}"></head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+
+    <div class="flex flex-1 h-screen overflow-hidden">
+        <aside th:replace="~{ fragments/backendaside :: backaside('content')}"></aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header th:replace="~{ fragments/backendheader :: backendheader('編輯行程', '在地圖上自由探索，編排專屬的聖地巡禮路線。')}"></header>
+
+            <div class="flex-1 overflow-hidden flex flex-col xl:flex-row p-6 gap-6">
+
+                <div class="w-full xl:w-[450px] flex flex-col gap-4 overflow-y-auto no-scrollbar pb-10 pr-2">
+
+                    <a th:href="@{/backend/contentmanagement}" class="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-bold text-sm">
+                        <span class="material-symbols-outlined text-base">arrow_back</span> 返回管理列表
+                    </a>
+
+                    <div class="bg-primary/5 border border-primary/10 rounded-xl p-5 shadow-lg shrink-0">
+                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-primary">
+                            <span class="material-symbols-outlined">edit_document</span> 編輯基本資料
+                        </h2>
+                        <div class="space-y-4">
+                            <input type="hidden" id="editPlanId" th:value="${plan.planId}">
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">關聯作品</label>
+                                <select id="planWorkId" class="w-full bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                    <option value="">-- 不指定 (純景點行程) --</option>
+                                    <option th:each="work : ${works}"
+                                        th:value="${work.workId}"
+                                        th:text="${work.workName}"
+                                        th:selected="${plan.workDetail != null && plan.workDetail.workId == work.workId}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">行程名稱 <span class="text-red-500">*</span></label>
+                                <input type="text" id="planName" th:value="${plan.planName}" required class="w-full bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">主要城市 <span class="text-red-500">*</span></label>
+                                    <input type="text" id="planCity" th:value="${plan.planCity}" required class="w-full bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">總天數 <span class="text-red-500">*</span></label>
+                                    <input type="number" id="daysCount" th:value="${plan.daysCount}" min="1" max="15" class="w-full bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary/5 border border-primary/10 rounded-xl p-5 shadow-lg flex-1 flex flex-col min-h-[400px]">
+                        <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-primary">
+                            <span class="material-symbols-outlined">map</span> 景點編排
+                        </h2>
+                        <div id="dayTabsContainer" class="flex gap-2 overflow-x-auto no-scrollbar border-b border-primary/10 pb-2 mb-4 shrink-0"></div>
+                        <div id="spotsListContainer" class="flex-1 overflow-y-auto space-y-3"></div>
+                    </div>
+
+                    <button id="submitPlanBtn" class="w-full py-3 bg-primary text-background-dark text-sm font-bold rounded-lg hover:brightness-110 shadow-lg shadow-primary/20 transition-all shrink-0">
+                        確認儲存修改
+                    </button>
+                </div>
+
+                <div class="flex-1 bg-slate-800 rounded-xl overflow-hidden relative border border-primary/10 shadow-lg min-h-[400px]">
+                    <div class="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-11/12 max-w-md">
+                        <div class="relative bg-white dark:bg-background-dark rounded-full shadow-2xl flex items-center px-4 py-2 border border-slate-200 dark:border-white/10">
+                            <span class="material-symbols-outlined text-slate-400">search</span>
+                            <input type="text" id="mapSearchInput" placeholder="搜尋地標或景點..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm ml-2 text-slate-900 dark:text-white outline-none">
+                        </div>
+                    </div>
+
+                    <div id="placeActionPanel" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-white dark:bg-background-dark p-4 rounded-xl shadow-2xl border border-primary/20 hidden flex-col gap-3 w-11/12 max-w-sm transition-all duration-300 transform translate-y-4 opacity-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 id="panelPlaceName" class="font-bold text-slate-900 dark:text-white text-base leading-tight">景點名稱</h3>
+                                <p id="panelPlaceAddress" class="text-xs text-slate-500 mt-1 line-clamp-1">詳細地址...</p>
+                            </div>
+                            <button id="closePanelBtn" class="text-slate-400 hover:text-red-400"><span class="material-symbols-outlined text-sm">close</span></button>
+                        </div>
+                        <button id="addSpotBtn" class="w-full py-2 bg-primary text-background-dark font-bold text-sm rounded-lg hover:brightness-110 transition-colors flex justify-center items-center gap-1">
+                            <span class="material-symbols-outlined text-base">add</span> 加入至 <span id="targetDayText" class="underline underline-offset-2">Day 1</span>
+                        </button>
+                    </div>
+
+                    <div id="map" class="w-full h-full"></div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script th:src="@{/assets/toast.js}"></script>
+    <script th:src="@{/backend/backendplanedit.js}"></script>
+    <script th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&libraries=places&v=weekly&callback=initMap'" defer></script>
+</body>
+
+</html>

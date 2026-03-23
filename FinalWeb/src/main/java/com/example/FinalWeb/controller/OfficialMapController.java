@@ -77,16 +77,15 @@ public class OfficialMapController {
             MyPlanEntity myPlan = new MyPlanEntity();
             myPlan.setJourneyPlan(official);
             myPlan.setMyPlanName(official.getPlanName() + " (我的自訂)");
-            java.time.LocalDate startDate = java.time.LocalDate.now().plusDays(7);
+            java.time.LocalDate startDate = java.time.LocalDate.now().plusDays(7); // 預設7天後出發
             myPlan.setStartDate(startDate);
             myPlan.setMember((MemberEntity) member);
 
             myPlan = myPlanRepo.save(myPlan);
 
-            java.time.LocalDateTime startDateTime = startDate.atTime(8, 0);
             List<MapEntity> nodes = mapRepo.findByJourneyPlan_PlanIdOrderByDayNumberAscVisitOrderAsc(officialPlanId);
             List<MyMapEntity> newMyMapNodes = new ArrayList<>();
-            
+
             for (MapEntity n : nodes) {
                 MyMapEntity myMap = new MyMapEntity();
                 myMap.setMyPlan(myPlan);
@@ -96,12 +95,21 @@ public class OfficialMapController {
                 myMap.setLatitude(n.getLatitude());
                 myMap.setLongitude(n.getLongitude());
                 myMap.setGooglePlaceId(n.getGooglePlaceID());
-                myMap.setVisitTime(startDateTime.plusDays(n.getDayNumber() - 1));
-                myMap.setStayTime(60); 
+
+                // 🌟 處理時間拷貝：保留官方設定的時、分，若無則給 08:00
+                if (n.getVisitTime() != null) {
+                    java.time.LocalTime time = n.getVisitTime().toLocalTime();
+                    myMap.setVisitTime(startDate.plusDays(n.getDayNumber() - 1).atTime(time));
+                } else {
+                    myMap.setVisitTime(startDate.plusDays(n.getDayNumber() - 1).atTime(8, 0));
+                }
+
+                // 🌟 處理停留時間拷貝：保留官方設定的分鐘，若無則給 60 分鐘
+                myMap.setStayTime(n.getStayTime() != null ? n.getStayTime() : 60);
+
                 newMyMapNodes.add(myMap);
-                // System.out.println("正在複製第 " + n.getDayNumber() + " 天的景點");
             }
-            
+
             myMapRepo.saveAll(newMyMapNodes);
 
             return ResponseEntity.ok(java.util.Map.of("success", true, "newMyPlanId", myPlan.getMyPlanId()));
