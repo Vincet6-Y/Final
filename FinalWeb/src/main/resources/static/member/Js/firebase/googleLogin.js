@@ -12,8 +12,9 @@ $(function () {
                         xhrFields: { withCredentials: true },
                         data: JSON.stringify({ idToken }),
                         success: function (data) {
-                            console.log("google login response =", data);
                             if (data.success) {
+                                sessionStorage.setItem('toastType', 'success');
+                                sessionStorage.setItem('toastMessage', 'Google 登入成功');
                                 window.location.href = data.redirectUrl || "/home";
                             } else {
                                 alert(data.message || "登入失敗");
