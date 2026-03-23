@@ -22,31 +22,41 @@ $(function () {
     const $navHome = $("#nav-home");
     const $navOrders = $("#nav-orders");
     const $navFavs = $("#nav-favs");
-
+    const $tabHome   = $("#tab-home");
+    const $tabOrders = $("#tab-orders");
+    const $tabFavs   = $("#tab-favs");
     const $sectionOrders = $("#section-orders");
     const $sectionFavs = $("#section-favs");
 
     function resetNav() {
+        // 桌機版
         [$navHome, $navOrders, $navFavs].forEach($el => {
             $el.removeClass("text-primary bg-primary/10")
-            .addClass("text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-slate-100");
+            .addClass("text-slate-500 dark:text-slate-400");
+        });
+        // 手機版
+        [$tabHome, $tabOrders, $tabFavs].forEach($el => {
+            $el.removeClass("text-primary border-primary")
+            .addClass("text-slate-400 border-transparent");
         });
     }
 
-    // --- 1. 處理【會員首頁】 ---
-    $navHome.on("click", function () {
+    // 會員首頁
+    function showHome() {
         resetNav();
-        $(this).removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+        $navHome.addClass("text-primary bg-primary/10");
+        $tabHome.addClass("text-primary border-primary").removeClass("text-slate-400 border-transparent");
         $sectionOrders.fadeIn(200);
         $sectionFavs.fadeIn(200);
         $(".extra-order-card, .extra-fav-card").addClass("hidden");
         $("#btn-view-all-orders, #btn-view-all-favs").show();
-    });
+    }
 
-    // --- 2. 處理【購買紀錄】 ---
+    // 購買紀錄
     function showAllOrders() {
         resetNav();
-        $navOrders.removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+        $navOrders.addClass("text-primary");
+        $tabOrders.addClass("text-primary border-primary").removeClass("text-slate-400 border-transparent");
         $sectionFavs.hide();
         $sectionOrders.fadeIn(200);
         $(".extra-order-card").removeClass("hidden").hide().fadeIn(300);
@@ -56,17 +66,26 @@ $(function () {
     $navOrders.on("click", showAllOrders);
     $(document).on("click", "#btn-view-all-orders", showAllOrders);
 
-    // --- 3. 處理【收藏行程】 ---
+    // 收藏行程
     function showAllFavs() {
         resetNav();
-        $navFavs.removeClass("text-slate-400 hover:text-slate-100").addClass("text-primary bg-primary/10");
+        $navFavs.addClass("text-primary bg-primary/10");
+        $tabFavs.addClass("text-primary border-primary").removeClass("text-slate-400 border-transparent");
         $sectionOrders.hide();
         $sectionFavs.fadeIn(200);
         $(".extra-fav-card").removeClass("hidden").hide().fadeIn(300);
         $("#btn-view-all-favs").hide();
     }
 
+    $navHome.on("click", showHome);
+    $tabHome.on("click", showHome);
+
+    $navOrders.on("click", showAllOrders);
+    $tabOrders.on("click", showAllOrders);
+    $(document).on("click", "#btn-view-all-orders", showAllOrders);
+
     $navFavs.on("click", showAllFavs);
+    $tabFavs.on("click", showAllFavs);
     $(document).on("click", "#btn-view-all-favs", showAllFavs);
     $("#btn-stats-favs").on("click", showAllFavs);
 

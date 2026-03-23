@@ -4,8 +4,8 @@
 <head th:replace="~{ fragments/head :: myHead}"></head>
 
 <body
-    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300">
-    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
+    <div class="relative flex min-h-screen w-full flex-col">
         <header th:replace="~{ fragments/header :: myHeader}"> </header>
 
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
@@ -35,46 +35,47 @@
             <div class="flex flex-col lg:flex-row items-center justify-between gap-4 mb-10">
 
                 <form th:action="@{/workList}" method="get"
-                    class="flex items-center gap-3 bg-white dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 w-fit">
+                    class="flex flex-wrap items-center gap-2 bg-white dark:bg-white/5 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-fit">
 
                     <input type="hidden" name="workClass" th:value="${classNow}" />
                     <input type="hidden" name="sortDir" th:value="${sortNow}" />
 
-                    <label class="text-sm font-bold text-slate-600 dark:text-slate-300">年份區間：</label>
+                    <label class="text-sm font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">年份區間：</label>
 
-                    <select name="minYear"
-                        class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
-                        <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
-                            th:selected="${year.toString() == minYearNow}"> </option>
-                    </select>
+                    <div class="flex items-center gap-2">
+                        <select name="minYear"
+                            class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
+                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
+                                th:selected="${year.toString() == minYearNow}"></option>
+                        </select>
 
-                    <span class="text-slate-400 font-bold">-</span>
+                        <span class="text-slate-400 font-bold">-</span>
 
-                    <select name="maxYear"
-                        class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
-                        <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
-                            th:selected="${year.toString() == maxYearNow}">
-                        </option>
-                    </select>
+                        <select name="maxYear"
+                            class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
+                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
+                                th:selected="${year.toString() == maxYearNow}"></option>
+                        </select>
 
-                    <button type="submit"
-                        class="ml-2 px-4 py-1.5 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 transition-all">
-                        篩選
-                    </button>
+                        <button type="submit"
+                            class="px-4 py-1.5 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 transition-all whitespace-nowrap">
+                            篩選
+                        </button>
+                    </div>
                 </form>
 
-                <div class="flex gap-3">
+                <div class="flex gap-2 w-full lg:w-auto">
                     <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
-                        class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
+                        class="flex-1 lg:flex-none text-center px-4 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white"
                         th:classappend="${sortNow == 'DESC'} 
-                            ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                            ? 'bg-primary text-white border-primary' 
                             : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                         上映日期 - 近
                     </a>
                     <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
-                        class="px-6 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white"
+                        class="flex-1 lg:flex-none text-center px-4 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white"
                         th:classappend="${sortNow == 'ASC'} 
-                            ? 'bg-primary text-white border-primary dark:bg-primary dark:text-white dark:border-primary' 
+                            ? 'bg-primary text-white border-primary' 
                             : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                         上映日期 - 遠
                     </a>
@@ -92,9 +93,9 @@
                     <div class="flex flex-col justify-between py-2 flex-1">
                         <div>
                             <div class="flex items-center gap-3 mb-4">
-                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded" style=""
+                                <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded"
                                     th:text="${work.workClass}">動畫 / 電影</span>
-                                <span class="text-slate-400 text-xs" style=""
+                                <span class="text-slate-400 text-xs"
                                     th:text="${work.onDate} + ' ' + 上映">2016-08-26 上映</span>
                             </div>
                             <h3 class="text-primary text-3xl font-black mb-4" th:text="${work.workName}">你的名字 (君の名は。)
@@ -115,9 +116,8 @@
                 <nav class="flex items-center gap-2">
                     <a th:if="${page > 0}"
                         th:href="@{/workList(page=${page - 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
-                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
-                        style="">
-                        <span class="material-symbols-outlined" style="">chevron_left</span>
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">chevron_left</span>
                     </a>
 
                     <th:block th:each="i : ${#numbers.sequence(0, works.totalPages - 1)}">
@@ -137,9 +137,8 @@
 
                     <a th:if="${page + 1 < works.totalPages}"
                         th:href="@{/workList(page=${page + 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
-                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors"
-                        style="">
-                        <span class="material-symbols-outlined" style="">chevron_right</span>
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">chevron_right</span>
                     </a>
                 </nav>
             </div>
