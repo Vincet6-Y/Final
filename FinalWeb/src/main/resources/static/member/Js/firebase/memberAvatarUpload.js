@@ -3,12 +3,10 @@ import {ref, uploadBytes, deleteObject} from "https://www.gstatic.com/firebasejs
 
 // Firebase Storage bucket 名稱
 const BUCKET = "anime-travel-website.firebasestorage.app";
-
 let cropper = null;
 let previousTempUrl = "";
 
 // ==================== Firebase 路徑 / URL 工具 ====================
-
 /** 取得指定路徑的 Firebase Storage 下載 URL */
 function getDownloadURL(path) {
     return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encodeURIComponent(path)}?alt=media`;
@@ -83,7 +81,6 @@ function canvasToRoundBlob(canvas) {
 }
 
 // ==================== 主邏輯 ====================
-
 $(function () {
     const $fileInput   = $("#avatarFileInput");
     const $uploadBtn   = $("#uploadAvatarBtn");
@@ -104,7 +101,6 @@ $(function () {
     previousTempUrl = $("#originalMemberImgUrl").val();
 
     // ==================== 裁切器 ====================
-
     /** 開啟裁切 Modal，並初始化 Cropper */
     function openCropper(src) {
         $cropperImg.attr("src", src);
@@ -128,7 +124,6 @@ $(function () {
     }
 
     // ==================== 上傳流程 ====================
-
     //  上傳裁切後的圖片到 Firebase
     //  若有新的原始圖（pendingOriginalBlob），同步上傳壓縮後的原始圖
     //  回傳裁切圖的下載 URL
@@ -158,7 +153,6 @@ $(function () {
     }
 
     // ==================== 事件綁定 ====================
-
     // 點擊上傳按鈕，觸發檔案選擇
     $uploadBtn.on("click", function () {
         $fileInput.trigger("click");
