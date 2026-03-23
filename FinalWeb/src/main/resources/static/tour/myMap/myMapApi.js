@@ -52,6 +52,10 @@ async function fetchAndShowDetails(placeId) {
 // ==========================================
 async function loadMyPlanData(myPlanId, targetDay = null) {
     try {
+        // 🌟 1. 一開始載入就先「鎖定付款按鈕」
+        window.isRouteSyncing = true;
+        if (typeof updatePaymentButtonState === 'function') updatePaymentButtonState(true);
+
         const res = await fetch(`/api/plan/myPlanNodes/${myPlanId}`);
         if (!res.ok) throw new Error(`API 請求失敗：${res.status}`);
         const data = await res.json();
@@ -59,19 +63,19 @@ async function loadMyPlanData(myPlanId, targetDay = null) {
         let nodes = Array.isArray(data) ? data : (data.data || []);
         if (nodes.length === 0) {
             console.log("此行程尚無景點資料");
+            // 沒資料就直接解鎖
+            window.isRouteSyncing = false;
+            if (typeof updatePaymentButtonState === 'function') updatePaymentButtonState(false);
             return;
         }
 
-        // 🌟 1. 自動計算這筆資料中「實際的最大天數」(解決只有 5 天的問題)
         const maxDay = nodes.reduce((max, node) => Math.max(max, node.dayNumber || 1), 1);
 
-        // 初始化 itineraryData，確保 1 到 maxDay 都有空陣列可以裝資料
         itineraryData = {};
         for (let d = 1; d <= maxDay; d++) {
             itineraryData[d] = [];
         }
 
-        // 將資料塞入對應的天數陣列中
         for (const node of nodes) {
             let safePlaceId = (node.GooglePlaceId || node.googlePlaceId || node.googlePlaceID || node.GooglePlaceID || "").toString().trim();
             if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5) safePlaceId = "undefined"
@@ -87,21 +91,17 @@ async function loadMyPlanData(myPlanId, targetDay = null) {
                 name: node.locationName,
                 arrivals: node.visitTime ? node.visitTime.substring(11, 16) : "08:00",
                 duration: "1",
-                // 🌟 新增：讀取資料庫的交通數據狀態，用來判斷是否需要自動補全
                 transitTime: node.transitTime || null
             });
         }
 
-        // 🌟 2. 核心修復：通知 UI 根據「實際天數」重新產生日數按鈕與列表容器
         if (typeof updateDayButtonsAndLists === 'function') {
             updateDayButtonsAndLists(maxDay);
         }
 
-        // 🌟 3. 核心修復：自動選取 Day 1 並畫出路線 (解決需要手動點擊的問題)
         const dayToSelect = targetDay ? targetDay : 1;
         selectDay(dayToSelect);
 
-        // 如果 Day 1 有景點，自動將地圖中心移動到第一個景點
         if (itineraryData[dayToSelect] && itineraryData[dayToSelect].length > 0) {
             const firstNode = itineraryData[dayToSelect][0];
             if (firstNode.lat && firstNode.lng) {
@@ -109,14 +109,24 @@ async function loadMyPlanData(myPlanId, targetDay = null) {
             }
         }
 
+        // 🌟 2. 延遲 1 秒後，開始背景飆速同步
+        setTimeout(() => {
+            if (typeof backgroundSyncMissingTransit === 'function') {
+                backgroundSyncMissingTransit(dayToSelect);
+            }
+        }, 1000);
+
     } catch (error) {
         console.error("🔥 載入個人行程錯誤：", error);
         showToast('error', '載入行程失敗');
+        // 發生錯誤也要解鎖，避免卡死
+        window.isRouteSyncing = false;
+        if (typeof updatePaymentButtonState === 'function') updatePaymentButtonState(false);
     }
 }
 
 // ==========================================
-// 🌟 方案 A：背景默默計算與同步 (不影響地圖與畫面)
+// 🌟 方案 A：背景默默計算與同步 (5 倍速升級版)
 // ==========================================
 async function backgroundSyncMissingTransit(currentActiveDay) {
     for (let d in itineraryData) {
@@ -129,19 +139,18 @@ async function backgroundSyncMissingTransit(currentActiveDay) {
         const needsSync = places.some((p, index) => index > 0 && p.transitTime === null);
         if (!needsSync) continue;
 
-        console.log(`🔍 偵測到 Day ${d} 缺少交通數據，啟動背景自動補全 (方案 A)...`);
+        console.log(`🔍 偵測到 Day ${d} 缺少交通數據，啟動飆速背景同步...`);
 
         const results = [];
         for (let i = 0; i < places.length - 1; i++) {
             const origin = { lat: places[i].lat, lng: places[i].lng };
             const destination = { lat: places[i + 1].lat, lng: places[i + 1].lng };
 
-            // 保證時間是未來
             const transitTime = new Date();
             transitTime.setDate(transitTime.getDate() + 7);
             transitTime.setHours(8, 0, 0, 0);
 
-            // 背景同步更需要慢慢來，間隔 500 毫秒
+            // 🌟 提速關鍵：從 500ms 降為 100ms
             const res = await new Promise((resolve) => {
                 setTimeout(() => {
                     directionsService.route({
@@ -157,7 +166,6 @@ async function backgroundSyncMissingTransit(currentActiveDay) {
                                         if (statusW === "OK") {
                                             resW._mode = 'WALKING'; resolve(resW);
                                         } else {
-                                            // 🌟 終極保底：強制給 0
                                             resolve({
                                                 routes: [{ legs: [{ duration: { value: 0, text: '0 分鐘' }, distance: { value: 0, text: '0 公尺' } }] }],
                                                 _mode: 'WALKING'
@@ -168,7 +176,7 @@ async function backgroundSyncMissingTransit(currentActiveDay) {
                             });
                         }
                     });
-                }, 500); // 延遲 0.5 秒
+                }, 100); 
             });
             results.push(res);
         }
@@ -187,6 +195,11 @@ async function backgroundSyncMissingTransit(currentActiveDay) {
             await syncOrderToDatabase(d);
         }
     }
+
+    // 🌟 3. 全部天數同步完畢，正式解鎖付款按鈕！
+    window.isRouteSyncing = false;
+    if (typeof updatePaymentButtonState === 'function') updatePaymentButtonState(false);
+    console.log("✅ 所有天數交通資料背景同步完成，付款按鈕已解鎖！");
 }
 
 // ==========================================

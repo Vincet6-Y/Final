@@ -1,5 +1,5 @@
 // ==========================================
-// 🌟 1. 載入官方行程資料 (用於 packageTourDetail)
+// 🌟 1. 載入官方行程資料
 // ==========================================
 async function loadPlanData(planId) {
     try {
@@ -18,9 +18,9 @@ async function loadPlanData(planId) {
         }
 
         for (const node of nodes) {
-            // 🌟 參考 myMapApi.js：全方位攔截各種大小寫，若無效則設為 undefined 交給後續處理
+            // 🌟 全方位攔截各種大小寫，若無效則設為 undefined 交給後續處理
             let safePlaceId = (node.GooglePlaceId || node.googlePlaceId || node.googlePlaceID || node.GooglePlaceID || "").toString().trim();
-            if (!safePlaceId || safePlaceId === "null" || safePlaceId.length < 5 || safePlaceId.includes("UNKNOWN")) {
+            if (!safePlaceId || safePlaceId === "null" || safePlaceId.includes("UNKNOWN")) {
                 safePlaceId = "undefined";
             }
 
@@ -131,7 +131,7 @@ function copyToMyPlan(event, officialPlanId) {
 }
 
 // ==========================================
-// 🌟 3. 輔助函式：使用 Geocoder 進行座標反查 (與 myMapApi.js 完全一致)
+// 🌟 3. 輔助函式：使用 Geocoder 進行座標反查
 // ==========================================
 function findPlaceIdByCoords(lat, lng) {
     return new Promise((resolve) => {

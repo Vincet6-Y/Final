@@ -1,16 +1,21 @@
+// Google 地圖核心物件
 let map, directionsService, directionsRenderer, placesService;
-let markers = [];
+
+// 狀態管理變數
 let currentDay = 1;
-let tempSelectedPlace = null;
 let isMapView = false;
-let dayRouteRenderers = [];
+let tempSelectedPlace = null;
 
-const WALK_THRESHOLD_KM = 1.0;
-
+// 行程數據中心
 let itineraryData = {};
-let routeLegs = {};
-let draggedItemInfo = null;
-
 let routeMarkers = [];
 
+// 標記與渲染器
+let markers = [];
+let routeLegs = {};
+let dayRouteRenderers = [];
+
+// 其他參數
+const WALK_THRESHOLD_KM = 1.0;
+let draggedItemInfo = null;
 window.currentSearchMarkers = [];

@@ -31,7 +31,8 @@ function loadInitialSpots() {
                     }
 
                     let dbPlaceId = (spot.GooglePlaceID || spot.googlePlaceID || spot.googlePlaceId || "").toString().trim();
-                    if (!dbPlaceId || dbPlaceId.includes("UNKNOWN") || dbPlaceId === "null" || dbPlaceId.length < 5) {
+                    // 🌟 核心修正：只在「完全沒有值」或明確標示為「未知」時才判定為無效
+                    if (!dbPlaceId || dbPlaceId === "" || dbPlaceId === "null" || dbPlaceId === "UNKNOWN") {
                         dbPlaceId = "undefined";
                     }
 
@@ -410,7 +411,10 @@ $('#submitPlanBtn').on('click', function () {
             spotsByDay[d].forEach((spot, index) => {
                 // 🌟 將前端的安全 "undefined" 轉回資料庫好識別的 "UNKNOWN"
                 let finalPlaceId = spot.googlePlaceId;
-                if (!finalPlaceId || finalPlaceId === "undefined" || finalPlaceId.length < 5) finalPlaceId = "UNKNOWN";
+                // 🌟 只有在真的被標記為 undefined 時，才傳 UNKNOWN 給後端
+                if (finalPlaceId === "undefined" || !finalPlaceId) {
+                    finalPlaceId = "UNKNOWN";
+                }
 
                 finalSpots.push({
                     dayNumber: d,
