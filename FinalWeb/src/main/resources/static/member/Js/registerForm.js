@@ -41,13 +41,8 @@ $(function () {
             return;
         }
 
-        if (passwd.length < 8) {
-            showToast('error', '密碼至少需要 8 個字元');
-            return;
-        }
-
         if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(passwd)) {
-            showToast('error', '密碼需包含大小寫英文及數字');
+            showToast('error', '密碼需包含大小寫英文及數字（至少 8 個字元）');
             return;
         }
 

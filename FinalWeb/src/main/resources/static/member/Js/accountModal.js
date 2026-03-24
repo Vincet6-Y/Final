@@ -150,6 +150,42 @@ $(document).ready(function () {
     });
 });
 
+// 修改 Email
+$('#sendEmailChangeBtn').on('click', function () {
+    const newEmail = $('#newEmailInput').val().trim();
+
+    if (!newEmail) {
+        showToast('error', '請輸入新 Email');
+        return;
+    }
+
+    // 簡單格式檢查
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+        showToast('error', 'Email 格式不正確');
+        return;
+    }
+
+    $.ajax({
+        url: '/member/change-email',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ newEmail }),
+        success: function (response) {
+            showToast(response.type, response.message);
+            $('#newEmailInput').val('');
+        },
+        error: function (xhr) {
+            const errorData = xhr.responseJSON;
+            if (errorData && errorData.message) {
+                showToast(errorData.type, errorData.message);
+            } else {
+                showToast('error', '系統發生錯誤，請稍後再試');
+            }
+        }
+    });
+});
+
 // 刪除帳號
 $(document).on('click', '#deleteAccountBtn', function () {
     if (!confirm('確定要刪除帳號嗎？此操作無法復原，您的會員資料將無法恢復。')) {

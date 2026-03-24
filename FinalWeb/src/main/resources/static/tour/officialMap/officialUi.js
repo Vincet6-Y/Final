@@ -1,3 +1,8 @@
+// ==========================================
+// 建立 Day 按鈕與對應的行程列表容器
+// 用於初始化行程頁面 UI
+// totalDays 來自行程總天數
+// ==========================================
 function updateDayButtonsAndLists(totalDays) {
     const buttonContainer = document.getElementById('day-buttons-container');
     const listContainer = document.getElementById('itinerary-lists-container');
@@ -19,7 +24,6 @@ function updateDayButtonsAndLists(totalDays) {
             </button>
             `
         );
-
         listContainer.insertAdjacentHTML(
             'beforeend',
             `
@@ -29,10 +33,11 @@ function updateDayButtonsAndLists(totalDays) {
     }
 }
 
-// 切換目前顯示的行程 Day
+// ==========================================
 // 1. 更新按鈕樣式
 // 2. 顯示對應 Day 的行程列表
 // 3. 呼叫路線計算與列表渲染
+// ==========================================
 function selectDay(day) {
     currentDay = day;
     document.querySelectorAll('[id^="btn-day-"]').forEach(btn => {
@@ -51,7 +56,7 @@ function selectDay(day) {
     const modalBtn = document.getElementById('modal-btn-text');
     if (modalBtn) modalBtn.innerText = `加入 Day ${day} 行程`;
 
-    // 🌟 關鍵修復：先強制畫出目前的景點列表，讓使用者不用等 Google 算路線！
+    // 🌟 先強制畫出目前的景點列表，讓使用者不用等 Google 算路線！
     renderItineraryPanel(day);
 
     // 背景去算路線
@@ -60,7 +65,6 @@ function selectDay(day) {
 
 // ==========================================
 // 🌟 取得景點詳細資訊並顯示彈窗 (升級為 Places API New)
-// 從 Google Places API 取得景點詳細資訊，並開啟資訊 Modal
 // ==========================================
 async function fetchAndShowDetails(placeId) {
     if (!placeId || placeId === 'undefined' || placeId === 'null') {
@@ -91,7 +95,7 @@ async function fetchAndShowDetails(placeId) {
     } catch (error) {
         console.warn("❌ Google API 查詢失敗或 ID 失效，嘗試救援...", error);
 
-        // 保持原有的救援機制 (針對 tourUi.js 的失效 ID 修復)
+        // 保持原有的救援機制
         let targetNode = null;
         Object.values(itineraryData).flat().forEach(node => {
             if (node.place_id === placeId) targetNode = node;
@@ -115,7 +119,6 @@ async function fetchAndShowDetails(placeId) {
 }
 
 // 顯示景點詳細資訊的 Modal 視窗
-// 將 Google Places API 回傳資料填入 UI
 function showRichModal(place) {
     tempSelectedPlace = place;
 
@@ -187,7 +190,7 @@ function showRichModal(place) {
         if (place.photos[2]) document.getElementById('modal-img-sub2').src = place.photos[2].getURI({ maxWidth: 400 });
     }
 
-    // 🌟 修改：處理營業時間 (改為條列式展開，捨棄原本單純的「營業中/休息中」)
+    // 🌟 處理營業時間 (改為條列式展開，捨棄原本單純的「營業中/休息中」)
     const hoursEl = document.getElementById('modal-place-hours');
     if (hoursEl) {
         if (place.regularOpeningHours && place.regularOpeningHours.weekdayDescriptions) {
@@ -221,7 +224,8 @@ async function openPlaceDetails(day, index) {
 
     const placeId = placeNode.place_id;
 
-    // 🌟 嚴格防呆：真正的 Google ID 超過 20 字元。如果太短 (例如不小心存到資料庫 ID "510123")，直接判定無效並啟動救援！
+    // 🌟 嚴格防呆：真正的 Google ID 超過 20 字元。
+    // 如果太短 (例如不小心存到資料庫 ID "510123")，直接判定無效並啟動救援！
     if (placeId && placeId !== 'undefined' && placeId !== 'null' && String(placeId).length > 10) {
         fetchAndShowDetails(placeId);
     } else {
@@ -246,7 +250,7 @@ async function openPlaceDetails(day, index) {
                 const foundPlaceId = places[0].id;
                 console.log(`✨ 即時搜尋成功！找到 [${placeNode.name}] 的真實 ID:`, foundPlaceId);
 
-                // 偷偷補回記憶體裡，這樣下次點擊就不用重查了
+                // 補回記憶體裡，這樣下次點擊就不用重查了
                 placeNode.place_id = foundPlaceId;
 
                 // 呼叫 API 顯示彈窗
@@ -264,33 +268,6 @@ async function openPlaceDetails(day, index) {
 function closeRichModal() {
     document.getElementById('rich-place-modal').classList.add('hidden');
 }
-
-// 將使用者在地圖選取的景點加入行程
-function confirmAddToItinerary() {
-    if (!tempSelectedPlace) return;
-
-    itineraryData[currentDay].push({
-        place_id: tempSelectedPlace.place_id, // 🌟 關鍵新增：沒有 place_id，就無法去跟 Google 重新要這個景點的照片和詳細資料
-        lat: tempSelectedPlace.geometry.location.lat(),
-        lng: tempSelectedPlace.geometry.location.lng(),
-        name: tempSelectedPlace.name,
-        arrivals: "8:00",
-        duration: "1", // 預設停留 1 小時
-        hasTicketOffer: Math.random() > 0.5
-    });
-
-    calculateAndDisplayRoute(currentDay);
-
-    const scrollArea = document.getElementById('itinerary-scroll-area');
-    scrollArea.scrollTop = scrollArea.scrollHeight;
-
-    closeRichModal();
-
-    if (window.innerWidth <= 768 && isMapView) {
-        toggleMobileView();
-    }
-}
-
 
 // ==========================================
 // 🌟時間自動推算引擎
@@ -330,83 +307,6 @@ function recalculateTimes(day) {
     }
 }
 
-// 🌟使用者編輯時間的觸發事件
-// 使用者修改停留時間
-function updateDuration(day, index, newDuration) {
-    itineraryData[day][index].duration = parseFloat(newDuration) || 1;
-    recalculateTimes(day); // 重新推算下方所有行程
-    renderItineraryPanel(day); // 重新渲染畫面
-}
-
-// 使用者手動修改抵達時間
-function updateArrivalTime(day, index, newTime) {
-    itineraryData[day][index].arrivals = newTime;
-    recalculateTimes(day); // 重新推算下方所有行程
-    renderItineraryPanel(day); // 重新渲染畫面
-}
-
-// ==========================================
-// 🌟 拖曳事件處理函數 (Drag and Drop Logic)
-// 拖曳開始
-// ==========================================
-function handleDragStart(e, day, index) {
-    draggedItemInfo = { day, index };
-    e.dataTransfer.effectAllowed = 'move';
-    // 加上半透明與縮小效果，提升視覺回饋
-    setTimeout(() => e.target.classList.add('opacity-50', 'scale-95', 'z-50'), 0);
-}
-
-function handleDragOver(e) {
-    e.preventDefault(); // 必須阻止預設行為才能允許放置 (Drop)
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-}
-
-function handleDragEnter(e) {
-    e.preventDefault();
-    // 拖曳經過時，目標卡片顯示橘色虛線邊框提示
-    const target = e.currentTarget;
-    target.classList.remove('border-slate-200', 'dark:border-white/10');
-    target.classList.add('border-primary', 'border-2', 'border-dashed');
-}
-
-function handleDragLeave(e) {
-    const target = e.currentTarget;
-    // 離開時恢復原狀
-    target.classList.add('border-slate-200', 'dark:border-white/10');
-    target.classList.remove('border-primary', 'border-2', 'border-dashed');
-}
-
-function handleDrop(e, day, dropIndex) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const target = e.currentTarget;
-    target.classList.add('border-slate-200', 'dark:border-white/10');
-    target.classList.remove('border-primary', 'border-2', 'border-dashed');
-
-    // 確保在同一天內拖曳，且不是拖回原位
-    if (!draggedItemInfo || draggedItemInfo.day !== day || draggedItemInfo.index === dropIndex) {
-        return false;
-    }
-
-    const dragIndex = draggedItemInfo.index;
-
-    // 核心：在資料陣列中交換元素位置
-    const list = itineraryData[day];
-    const draggedItem = list.splice(dragIndex, 1)[0];
-    list.splice(dropIndex, 0, draggedItem);
-
-    // 重新計算路線與渲染列表
-    calculateAndDisplayRoute(day);
-    draggedItemInfo = null;
-    return false;
-}
-
-function handleDragEnd(e) {
-    e.target.classList.remove('opacity-50', 'scale-95', 'z-50');
-}
-
 // ==========================================
 // 🌟 渲染整個行程面板 (加入 Input 編輯時間功能)
 // ==========================================
@@ -434,9 +334,6 @@ function renderItineraryPanel(day) {
     const isDay1 = day === 1;
     const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
 
-    // 🌟 修改：起點加入 <input type="time"> 讓使用者改出發時間
-    // 🌟 修改：起點加入 onclick 事件
-    // 🌟 唯讀版：拔除 draggable, ondragstart, 以及 <input type="time">
     const dayStartHTML = `
           <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md">
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
@@ -561,11 +458,6 @@ function renderItineraryPanel(day) {
     }
 }
 
-function removeItineraryItem(day, index) {
-    itineraryData[day].splice(index, 1);
-    calculateAndDisplayRoute(day);
-}
-
 // 手機版切換地圖 / 行程
 function toggleMobileView() {
     const panel = document.getElementById('itinerary-panel');
@@ -600,40 +492,6 @@ function getTotalDaysFromPage(defaultDays = 10) {
     if (!Number.isNaN(urlDays) && urlDays > 0) return urlDays;
 
     return defaultDays;
-}
-
-// 建立 Day 按鈕與對應的行程列表容器
-// 用於初始化行程頁面 UI
-// totalDays 來自行程總天數
-function updateDayButtonsAndLists(totalDays) {
-    const buttonContainer = document.getElementById('day-buttons-container');
-    const listContainer = document.getElementById('itinerary-lists-container');
-
-    if (!buttonContainer || !listContainer) return;
-
-    buttonContainer.innerHTML = '';
-    listContainer.innerHTML = '';
-
-    for (let day = 1; day <= totalDays; day++) {
-        buttonContainer.insertAdjacentHTML(
-            'beforeend',
-            `
-            <button
-                id="btn-day-${day}"
-                onclick="selectDay(${day})"
-                class="px-5 py-2 rounded-full bg-slate-100 dark:bg-surface-dark text-slate-500 dark:text-slate-400 hover:text-primary font-bold text-sm whitespace-nowrap transition shrink-0">
-                Day ${day}
-            </button>
-            `
-        );
-
-        listContainer.insertAdjacentHTML(
-            'beforeend',
-            `
-            <div id="list-day-${day}" class="day-list hidden p-4 space-y-3"></div>
-            `
-        );
-    }
 }
 
 // 初始化 Day Tab 滑動

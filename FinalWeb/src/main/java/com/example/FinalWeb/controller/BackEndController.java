@@ -30,7 +30,11 @@ import com.example.FinalWeb.service.WorkService;
 import com.example.FinalWeb.service.AdminOrderService;
 import com.example.FinalWeb.service.ArticleService;
 import com.example.FinalWeb.entity.ArticleEntity;
+import com.example.FinalWeb.repo.MemberRepo;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -49,6 +53,9 @@ public class BackEndController {
 
     @Autowired
     private AdminOrderService adminOrderService;
+
+    @Autowired
+    private MemberRepo memberRepo;
 
     @Value("${google.maps.api.key}")
     private String googleMapsApiKey;
@@ -76,7 +83,21 @@ public class BackEndController {
     }
 
     @RequestMapping("/operation")
-    public String backendoperation() {
+    public String backendoperation(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size,
+            Model model, HttpSession session) {
+
+        // 1. 取得會員分頁資料，交給 Thymeleaf 渲染
+        Pageable pageable = PageRequest.of(page, size, Sort.by("memberId").ascending());
+        Page<MemberEntity> membersPage = memberRepo.findAll(pageable);
+        model.addAttribute("membersPage", membersPage);
+        model.addAttribute("currentPage", page);
+
+        // 2. 傳入當前登入管理員的 ID，用於 Thymeleaf 判斷是否隱藏按鈕
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        model.addAttribute("currentAdminId", loginMember != null ? loginMember.getMemberId() : null);
+
         return "/backend/backendoperation";
     }
 

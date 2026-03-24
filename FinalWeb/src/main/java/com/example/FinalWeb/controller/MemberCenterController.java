@@ -31,6 +31,9 @@ public class MemberCenterController {
     private MemberService memberService;
     @Autowired
     private SocialAuthService socialAuthService;
+    
+    @Autowired
+    private EmailVerifyService emailVerifyService;
 
     private static final String DEFAULT_MEMBER_IMG_URL = "https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc";
 
@@ -84,7 +87,7 @@ public class MemberCenterController {
     @PostMapping("/change-passwd")
     @ResponseBody
     // 1. 將泛型從 String 改為 ToastInfoDTO
-    public ResponseEntity<ToastInfoDTO> changePasswd(@RequestBody PasswdChangeDto dto, HttpSession session) {
+    public ResponseEntity<ToastInfoDTO> changePasswd(@RequestBody PasswdChangeDTO dto, HttpSession session) {
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
 
         if (loginMember == null) {
@@ -187,6 +190,52 @@ public class MemberCenterController {
         session.invalidate();
 
         return ResponseEntity.ok(ToastInfoDTO.success("帳號已刪除"));
+    }
+
+    // 使用者送出新 email，觸發寄信
+    @PostMapping("/change-email")
+    @ResponseBody
+    public ResponseEntity<ToastInfoDTO> changeEmail(@RequestBody Map<String, String> body,
+                                                    HttpSession session) {
+
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        if (loginMember == null) {
+            return ResponseEntity.status(401).body(ToastInfoDTO.error("請先登入"));
+        }
+
+        String newEmail = body.get("newEmail");
+        if (newEmail == null || newEmail.isBlank()) {
+            return ResponseEntity.badRequest().body(ToastInfoDTO.error("請輸入新 Email"));
+        }
+
+        // 不能跟目前 email 一樣
+        if (newEmail.equalsIgnoreCase(loginMember.getEmail())) {
+            return ResponseEntity.badRequest().body(ToastInfoDTO.error("新 Email 與目前相同"));
+        }
+
+        try {
+            emailVerifyService.sendEmailChangeVerification(loginMember, newEmail);
+            return ResponseEntity.ok(ToastInfoDTO.info("驗證信已寄出，請至新信箱點擊確認連結"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(ToastInfoDTO.error(e.getMessage()));
+        }
+    }
+
+    // 使用者點擊驗證連結後進入這裡
+    @GetMapping("/confirm-email-change")
+    public String confirmEmailChange(@RequestParam String token,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttr) {
+
+        String result = emailVerifyService.confirmEmailChange(token, session);
+
+        if ("success".equals(result)) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("Email 已成功更新"));
+            return "redirect:/member";
+        }
+
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(result));
+        return "redirect:/member";
     }
 
 }

@@ -33,6 +33,9 @@ public class MemberAuthController {
     @Autowired
     private SocialAuthService socialAuthService;
 
+    @Autowired
+    private EmailVerifyService emailVerifyService;
+
     // ==================== 一般登入 / 註冊 ====================
     // 處理登入
     @PostMapping("/login")
@@ -62,7 +65,14 @@ public class MemberAuthController {
     public Map<String, Object> register(@RequestBody MemberRegisterDTO register,
                                         HttpSession session,
                                         HttpServletRequest request) {
-
+        
+        // 若 session 有社群 email，強制使用 session 的值，防止前端竄改
+        String socialEmail = (String) session.getAttribute("socialEmail");
+        if (socialEmail != null && !socialEmail.isBlank()) {
+            if (!socialEmail.equals(register.email())) {
+                return Map.of("success", false, "message", "Email 不符合");
+            }
+        }
         String result = memberService.register(register);
 
         if (!"註冊成功".equals(result)) {
@@ -202,6 +212,11 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
         }
+        // 補上密碼檢查，避免純 LINE 登入的帳號解除後無法登入
+        if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先設定密碼後再解除 LINE 綁定"));
+            return "redirect:/member";
+        }
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.LINE);
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
@@ -209,6 +224,48 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(e.getMessage()));
         }
         return "redirect:/member";
+    }
+
+    // 忘記密碼頁面
+    @GetMapping("/forgot-password")
+    public String forgotPasswordPage() {
+        return "login/forgotPassword";
+    }
+
+    // 處理送出 email
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@RequestParam String email,
+                                RedirectAttributes redirectAttr) {
+        emailVerifyService.sendResetEmail(email);
+        redirectAttr.addFlashAttribute("toast",
+            ToastInfoDTO.info("若此 Email 已註冊，重設連結已寄出，請查收信件"));
+        return "redirect:/auth/forgot-password";
+    }
+
+    // 顯示重設密碼頁面
+    @GetMapping("/reset-password")
+    public String resetPasswordPage(@RequestParam String token, Model model) {
+        var resetToken = emailVerifyService.validateToken(token);
+        if (resetToken == null) {
+            model.addAttribute("error", "連結已失效或已使用，請重新申請");
+        }
+        model.addAttribute("token", token);
+        return "login/resetPassword";
+    }
+
+    // 處理重設密碼表單
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam String token,
+                                @RequestParam String newPasswd,
+                                @RequestParam String confirmPasswd,
+                                RedirectAttributes redirectAttr) {
+        String result = emailVerifyService.resetPassword(token, newPasswd, confirmPasswd);
+        if ("success".equals(result)) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("密碼重設成功，請重新登入"));
+            return "redirect:/auth";
+        }
+        redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(result));
+        return "redirect:/auth/reset-password?token=" + token;
     }
 
 
@@ -244,15 +301,20 @@ public class MemberAuthController {
     private void linkPendingSocialOauth(String email, HttpSession session, HttpServletRequest request) {
         String socialId = (String) session.getAttribute("socialId");
         AuthProvider socialProvider = (AuthProvider) session.getAttribute("socialProvider");
+        String socialEmail = (String) session.getAttribute("socialEmail");
  
         if (socialId == null || socialProvider == null) return;
  
         MemberEntity member = memberService.findByEmail(email);
         if (member != null) {
-            try {
-                socialAuthService.link(member, socialProvider, socialId);
-            } catch (IllegalStateException ignored) {
-                // 已綁定則略過
+            // 只有 socialEmail 有值且與註冊 email 相同時才綁定
+            // LINE 沒有 email 的情況不自動綁定，讓使用者之後手動綁定
+            if (socialEmail != null && !socialEmail.isBlank() && socialEmail.equals(email)) {
+                try {
+                    socialAuthService.link(member, socialProvider, socialId);
+                } catch (IllegalStateException ignored) {
+                    // 已綁定則略過
+                }
             }
             memberService.saveLoginSession(member, request);
         }
@@ -271,8 +333,7 @@ public class MemberAuthController {
         case "手機號碼格式不正確" -> ToastInfoDTO.error("手機號碼格式不正確");    
         case "生日不能是未來日期" -> ToastInfoDTO.error("生日不能是未來日期");    
         case "請輸入正確的生日" -> ToastInfoDTO.error("請輸入正確的生日");        
-        case "密碼長度至少需要 8 個字元" -> ToastInfoDTO.error("密碼長度至少需要 8 個字元");
-        case "密碼需包含大小寫英文及數字" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字");
+        case "密碼需包含大小寫英文及數字（至少 8 個字元）" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字（至少 8 個字元）");
         default -> ToastInfoDTO.error("註冊失敗，請稍後再試");
         };
     }
