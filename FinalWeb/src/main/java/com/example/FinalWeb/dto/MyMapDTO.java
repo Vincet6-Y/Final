@@ -11,6 +11,8 @@ public class MyMapDTO {
     private Integer dayNumber;
     private Integer visitOrder;
     private String googlePlaceId;
+    private Double latitude;
+    private Double longitude;
 
     // 2. 新增「為前端量身打造」的顯示字串 (全部預先處理好)
     private String orderItemsName; // 行程名稱 (例如："自訂行程" 或 "東京五日遊")

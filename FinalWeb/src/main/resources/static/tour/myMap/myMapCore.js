@@ -26,7 +26,7 @@ async function initMap() {
 }
 
 // ==========================================
-// 🌟 終極版：支援 大眾運輸 + 飛機 + 走路 自動判斷 (精準起終點防飄移版) + 自動對焦
+// 🌟 支援"大眾運輸 + 飛機 + 走路"自動判斷、精準起終點防飄移版 + 自動對焦
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
@@ -42,9 +42,9 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         places.forEach((place, index) => {
             const isFirst = index === 0;
             const isLast = index === places.length - 1;
-            let bgColor = "#ea4335";
-            if (isFirst) bgColor = "#ff8c00";
-            else if (isLast) bgColor = "#008ccf";
+            let bgColor = "#ff8c00";
+            if (isFirst) bgColor = "#008ccf";
+            else if (isLast) bgColor = "#ea4335";
 
             const markerLat = parseFloat(place.latitude || place.lat);
             const markerLng = parseFloat(place.longitude || place.lng);
