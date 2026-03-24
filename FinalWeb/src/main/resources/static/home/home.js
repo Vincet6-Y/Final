@@ -175,6 +175,23 @@ function scrollJapan(direction) {
     const scrollAmount = 250;
     container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
 }
+/**
+ * 新增：精選作品區域水平捲動
+ */
+/**
+ * 精選作品區域水平捲動
+ */
+function scrollFeatured(direction) {
+    const container = document.getElementById('featured-container');
+    if (!container) return;
+
+    // 捲動一個卡片的寬度（320px 卡片 + 24px 間距）
+    const scrollAmount = 344; 
+    container.scrollBy({ 
+        left: direction === 'left' ? -scrollAmount : scrollAmount, 
+        behavior: 'smooth' 
+    });
+}
 
 /**
  * 6. 頁面初始化
@@ -196,17 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const keyword = searchInput.value.trim();
             if (!keyword) return;
 
-            fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('找不到作品');
-                    return response.json();
-                })
-                .then(work => {
-                    window.location.href = `/workListDetail?workId=${work.workId}`;
-                })
-                .catch(() => {
-                    window.location.href = `/workList?keyword=${encodeURIComponent(keyword)}`;
-                });
+            window.location.href = `/workList?keyword=${encodeURIComponent(keyword)}`;
         });
     }
 });

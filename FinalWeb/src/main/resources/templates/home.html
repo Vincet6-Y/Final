@@ -39,12 +39,12 @@
             </button>
           </div>
           <div class="flex flex-wrap justify-center gap-4">
-            <a th:href="@{/workList(page=0, size=4, workClass='電影')}"
+            <a th:href="@{/workList(page=0, size=6, workClass='電影')}"
               class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
               <span class="material-symbols-outlined text-sm">movie</span>
               電影場景巡禮
             </a>
-            <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
+            <a th:href="@{/workList(page=0, size=6, workClass='動畫')}"
               class="flex items-center gap-2 border border-white/30 bg-white/5 backdrop-blur-sm text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors no-underline">
               <span class="material-symbols-outlined text-sm">animation</span>
               動畫場景巡禮
@@ -54,39 +54,47 @@
       </section>
 
       <!-- 精選作品 -->
-      <section class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors">
-        <div class="flex items-center justify-between mb-10">
-          <h3 class="text-slate-900 dark:text-white text-3xl font-bold border-l-4 border-primary pl-4">
-            精選作品
-          </h3>
-          <a th:href="@{/workList}"
-            class="text-[#FF9D1C] hover:text-[#FFB34D] hover:underline text-sm font-medium transition-colors">
-            查看更多作品
-          </a>
-        </div>
-        <div class="flex overflow-x-auto gap-6 pb-8 no-scrollbar">
-          <div th:each="work : ${featuredList}" class="flex-shrink-0 w-80 group">
-            <div class="relative h-48 rounded-xl overflow-hidden mb-4">
-              <img th:alt="${work.workName}"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                th:src="${work.workImg}" />
-              <span
-                class="absolute top-3 left-3 bg-primary text-white dark:text-background-dark text-[10px] font-bold px-2 py-1 rounded uppercase"
-                th:text="${work.workClass}">分類</span>
-            </div>
-            <h4 class="text-slate-900 dark:text-white text-xl font-bold mb-1" th:text="${work.workName}">
-              作品名稱
-            </h4>
-            <p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2" th:text="${work.description}">
-              作品簡介...
-            </p>
-            <a th:href="@{/workListDetail(workId=${work.workId})}"
-              class="block w-full py-2 text-center border border-primary/40 rounded-lg text-primary text-sm font-semibold hover:bg-primary hover:text-white dark:hover:text-background-dark transition-all no-underline">
-              查看詳情
-            </a>
+    <section class="py-16 px-6 lg:px-20 bg-white dark:bg-background-dark transition-colors">
+  <div class="flex items-center justify-between mb-10">
+    <h3 class="text-slate-900 dark:text-white text-3xl font-bold border-l-4 border-primary pl-4">
+      精選作品
+    </h3>
+    <a th:href="@{/workList}" class="text-[#FF9D1C] hover:text-[#FFB34D] hover:underline text-sm font-medium transition-colors">
+      查看更多作品
+    </a>
+  </div>
+
+  <div class="relative group">
+    <button onclick="scrollFeatured('left')" 
+            class="absolute left-[-20px] top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg border border-primary/20 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 hidden md:flex">
+      <span class="material-symbols-outlined">chevron_left</span>
+    </button>
+
+    <div id="featured-container" class="flex overflow-x-auto gap-6 pb-8 no-scrollbar scroll-smooth">
+      <div th:each="work : ${featuredList}" class="flex-shrink-0 w-80 group/item">
+        <a th:href="@{/workListDetail(workId=${work.workId})}" class="block no-underline">
+          <div class="relative h-48 w-full overflow-hidden rounded-2xl mb-4 border border-white/10 shadow-lg">
+            <img th:src="${work.workImg}" th:alt="${work.workName}" 
+                 class="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
           </div>
-        </div>
-      </section>
+          <div>
+            <h4 class="text-slate-900 dark:text-white text-xl font-bold group-hover/item:text-primary transition-colors mb-2" 
+                th:text="${work.workName}">作品名稱</h4>
+            <p class="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 leading-relaxed" 
+               th:text="${work.description}">故事背景介紹...</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <button onclick="scrollFeatured('right')" 
+            class="absolute right-[-20px] top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 shadow-lg border border-primary/20 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100 hidden md:flex">
+      <span class="material-symbols-outlined">chevron_right</span>
+    </button>
+  </div>
+</section>
+     
 
       <!-- 日本資訊 / 外交部資訊 -->
       <section class="py-16 px-6 lg:px-20 bg-slate-50 dark:bg-background-dark transition-colors">
