@@ -75,9 +75,19 @@
                         <div th:each="entry : ${groupedByDay}" th:data-day-panel="${entry.key}"
                             th:classappend="${entry.key != 1} ? 'hidden' : ''" class="day-panel">
 
-                            <div class="flex items-center gap-2 mb-6">
-                                <span class="material-symbols-outlined text-primary">calendar_today</span>
-                                <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200">當日行程總覽</h3>
+                            <div class="flex items-center justify-between mb-6">
+
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                    <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200">當日行程總覽</h3>
+                                </div>
+
+                                <button
+                                    class="view-day-route-btn flex items-center gap-2 bg-primary hover:bg-primary/90 text-white dark:text-background-dark px-4 py-2 rounded-lg text-sm font-bold shadow-md transition-colors hover:scale-105 active:scale-95"
+                                    th:data-day="${entry.key}">
+                                    <span class="material-symbols-outlined text-base">map</span>
+                                    顯示當日路線
+                                </button>
                             </div>
 
                             <div class="relative border-l-2 border-primary/40 ml-4 lg:ml-6 pb-8">
@@ -132,11 +142,11 @@
                                                     <div
                                                         class="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
                                                         <span
-                                                            class="flex items-center gap-1 bg-slate-100 dark:bg-black/30 px-2 py-1 rounded"
+                                                            class="flex items-center gap-1 bg-slate-100 dark:bg-black/30 px-2 py-1 rounded whitespace-nowrap shrink-0"
                                                             th:if="${spot.stayTime != null}">
                                                             <span
                                                                 class="material-symbols-outlined text-[13px]">hourglass_empty</span>
-                                                            停留 <span th:text="${spot.stayTime}">60</span> 分鐘
+                                                            <span th:text="'停留' + ${spot.stayTime} + '分鐘'">停留60分鐘</span>
                                                         </span>
                                                     </div>
                                                 </div>

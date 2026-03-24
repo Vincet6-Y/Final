@@ -1,17 +1,13 @@
 // ==========================================
 // 🎫 jQuery 驅動的 QR Code & 行程互動邏輯
 // ==========================================
-
 $(document).ready(function () {
-
-    // 1. 【關鍵修改】直接從 HTML body 的 data 屬性把 orderId 抓出來
+    // ==========================================
+    // 1. 變數初始化 & 資料載入
+    // ==========================================
     const orderId = $('body').data('order-id');
-
-    // ==========================================
-    // 📦 頁面載入時，從後端撈取所有票券資料
-    // ==========================================
     let ticketDataMap = {};
-    window.allTickets = []; // 先初始化，避免後面 length 報錯
+    window.allTickets = [];
 
     if (orderId > 0) {
         $.ajax({
@@ -33,9 +29,8 @@ $(document).ready(function () {
             }
         });
     }
-
     // ==========================================
-    // 📅 Day 分頁切換 
+    // 2. 頁面 UI 互動：Day 分頁切換與滑動
     // ==========================================
     $('.day-tab').on('click', function () {
         const day = $(this).data('day');
@@ -54,12 +49,59 @@ $(document).ready(function () {
     $('#day-scroll-left').on('click', function () {
         $('#day-tabs').animate({ scrollLeft: '-=150' }, 300);
     });
+
     $('#day-scroll-right').on('click', function () {
         $('#day-tabs').animate({ scrollLeft: '+=150' }, 300);
     });
+    // ==========================================
+    // 3. 頁面 UI 互動：動態產生當日完整路線 (Google Maps)
+    // ==========================================
+    $('.view-day-route-btn').on('click', function () {
+        const day = $(this).data('day');
+        const spotCards = $('[data-day-panel="' + day + '"] .spot-card');
+
+        if (spotCards.length > 0) {
+            const spots = [];
+            spotCards.each(function () {
+                const pid = $(this).data('place-id');
+                const name = $(this).data('spot-name');
+
+                if (pid && pid.length > 10) {
+                    spots.push({ name: name, placeId: pid });
+                }
+            });
+
+            if (spots.length >= 2) {
+                const first = spots[0];
+                const last = spots[spots.length - 1];
+
+                const origin = encodeURIComponent(first.name);
+                const originId = first.placeId;
+                const dest = encodeURIComponent(last.name);
+                const destId = last.placeId;
+
+                let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&origin_place_id=${originId}&destination=${dest}&destination_place_id=${destId}&travelmode=transit`;
+
+                if (spots.length > 2) {
+                    const midSpots = spots.slice(1, -1);
+                    const waypoints = midSpots.map(s => encodeURIComponent(s.name)).join('|');
+                    const waypointIds = midSpots.map(s => s.placeId).join('|');
+                    url += `&waypoints=${waypoints}&waypoint_place_ids=${waypointIds}`;
+                }
+
+                window.open(url, '_blank');
+
+            } else if (spots.length === 1) {
+                const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spots[0].name)}&query_place_id=${spots[0].placeId}`;
+                window.open(url, '_blank');
+            } else {
+                alert('很抱歉，找不到該日景點的地圖資訊！');
+            }
+        }
+    });
 
     // ==========================================
-    // 🏛️ 景點 Modal — 點擊景點卡片
+    // 4. Modal 彈窗控制：開啟景點詳情
     // ==========================================
     $(document).on('click', '.spot-card', function () {
         const $card = $(this);
@@ -75,7 +117,7 @@ $(document).ready(function () {
         $('#modal-detail').text('');
         $('#modal-photo').html('<span class="material-symbols-outlined text-4xl text-slate-300 animate-pulse">photo_camera</span>');
 
-        // 🎫 QR Code 區塊
+        // 🎫 處理 QR Code 區塊
         if (hasTicket && ticketDataMap[spotId]) {
             const ticket = ticketDataMap[spotId];
             $('#modal-ticket-section').removeClass('hidden');
@@ -107,7 +149,7 @@ $(document).ready(function () {
 
         $('#spotModal').removeClass('hidden').addClass('flex');
 
-        // 📸 Google Places API 載入照片
+        // 📸 Google Places API 載入照片與地點資訊
         if (placeId && typeof google !== 'undefined' && google.maps && google.maps.places) {
             if (google.maps.places.Place) {
                 const place = new google.maps.places.Place({ id: placeId });
@@ -118,7 +160,6 @@ $(document).ready(function () {
                             const photoUrl = place.photos[0].getURI({ maxWidth: 800, maxHeight: 400 });
                             $('#modal-photo').html('<img src="' + photoUrl + '" class="w-full h-full object-cover" alt="' + spotName + '" />');
                         } else {
-                            // ✅ 有找到地點但沒有照片，顯示預設圖
                             showDefaultPhoto(spotName);
                         }
 
@@ -128,7 +169,6 @@ $(document).ready(function () {
                     })
                     .catch((error) => {
                         console.error("載入照片或地點細節失敗：", error);
-                        // ✅ Place ID 失效，用座標反查新 ID
                         rescueByCoords(placeId, spotName, day, visitOrder);
                         $('#modal-description').text(spotName + ' — 聖地巡禮必訪景點！');
                         $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
@@ -142,6 +182,57 @@ $(document).ready(function () {
             $('#modal-detail').text('Day ' + day + ' 第 ' + visitOrder + ' 站');
         }
     });
+    // ==========================================
+    // 5. Modal 彈窗控制：開啟交通票券
+    // ==========================================
+    $(document).on('click', '.transport-card', function () {
+        const $card = $(this);
+        const ticketName = $card.data('ticket-name');
+        const ticketId = $card.data('ticket-id');
+
+        $('#modal-name').text(ticketName);
+        $('#modal-description').text('交通票券 & 附加項目');
+        $('#modal-detail').text('請妥善保存您的電子票券。');
+        $('#modal-photo').html(
+            '<div class="w-full h-full flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-900/10 text-orange-400">' +
+            '<span class="material-symbols-outlined text-6xl mb-2">train</span>' +
+            '<span class="font-bold text-lg px-6 w-full text-center truncate">' + ticketName + '</span>' +
+            '</div>'
+        );
+
+        $('#modal-ticket-section').removeClass('hidden');
+        $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticketId);
+
+        const ticketKey = 'detail_' + ticketId;
+        if (ticketDataMap[ticketKey] && ticketDataMap[ticketKey].ticketUsed) {
+            $('#modal-ticket-status').text('⚠️ 此票券已使用過').removeClass('text-primary/70').addClass('text-red-400');
+        } else {
+            $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。').removeClass('text-red-400').addClass('text-primary/70');
+        }
+
+        $('#spotModal').removeClass('hidden').addClass('flex');
+    });
+    // ==========================================
+    // 6. Modal 彈窗控制：關閉邏輯
+    // ==========================================
+    $('#closeModalBtn').on('click', function () {
+        $('#spotModal').addClass('hidden').removeClass('flex');
+    });
+
+    $('#spotModal').on('click', function (e) {
+        if (e.target === this) {
+            $(this).addClass('hidden').removeClass('flex');
+        }
+    });
+
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape') {
+            $('#spotModal').addClass('hidden').removeClass('flex');
+        }
+    });
+    // ==========================================
+    // 7. 輔助函式 (Helper Functions)
+    // ==========================================
 
     // 顯示預設無照片畫面
     function showDefaultPhoto(spotName) {
@@ -155,7 +246,6 @@ $(document).ready(function () {
 
     // Place ID 失效時，用座標反查新 ID 並重試
     async function rescueByCoords(oldPlaceId, spotName, day, visitOrder) {
-        // 從 allTickets 或 ticketDataMap 找到這個景點的座標
         const ticket = Object.values(ticketDataMap).find(t => t.googlePlaceId === oldPlaceId);
 
         if (!ticket || !ticket.lat || !ticket.lng) {
@@ -190,76 +280,4 @@ $(document).ready(function () {
             showDefaultPhoto(spotName);
         }
     }
-
-    // ==========================================
-    // 🎫 交通票券 Modal — 點擊交通票卡片
-    // ==========================================
-    $(document).on('click', '.transport-card', function () {
-        const $card = $(this);
-        const ticketName = $card.data('ticket-name');
-        const ticketId = $card.data('ticket-id');
-
-        $('#modal-name').text(ticketName);
-        $('#modal-description').text('交通票券 & 附加項目');
-        $('#modal-detail').text('請妥善保存您的電子票券。');
-        $('#modal-photo').html(
-            '<div class="w-full h-full flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-900/10 text-orange-400">' +
-            '<span class="material-symbols-outlined text-6xl mb-2">train</span>' +
-            '<span class="font-bold text-lg px-6 w-full text-center truncate">' + ticketName + '</span>' +
-            '</div>'
-        );
-
-        $('#modal-ticket-section').removeClass('hidden');
-        $('#modal-qrcode').attr('src', '/api/ticket/qrcode/' + ticketId);
-
-        const ticketKey = 'detail_' + ticketId;
-        if (ticketDataMap[ticketKey] && ticketDataMap[ticketKey].ticketUsed) {
-            $('#modal-ticket-status').text('⚠️ 此票券已使用過').removeClass('text-primary/70').addClass('text-red-400');
-        } else {
-            $('#modal-ticket-status').text('請在入口處出示此 QR Code 進行掃描驗證。').removeClass('text-red-400').addClass('text-primary/70');
-        }
-
-        $('#spotModal').removeClass('hidden').addClass('flex');
-    });
-
-    // 動態產生 Day 1 完整路線連結
-    const mapBtn = document.getElementById('viewFullRouteBtn');
-    if (mapBtn) {
-        const spotCards = document.querySelectorAll('[data-day-panel="1"] .spot-card');
-        if (spotCards.length > 0) {
-            // 因為 spot-card 沒有座標，改用 place-id 讓 Google Maps 自己查
-            const placeIds = [...spotCards]
-                .map(c => c.dataset.placeId)
-                .filter(id => id && id.length > 10);
-
-            if (placeIds.length >= 2) {
-                // Google Maps 多點路線格式
-                const origin = `place_id:${placeIds[0]}`;
-                const dest = `place_id:${placeIds[placeIds.length - 1]}`;
-                const waypoints = placeIds.slice(1, -1).map(id => `place_id:${id}`).join('|');
-                const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=transit`;
-                mapBtn.href = url;
-                mapBtn.style.display = 'flex';
-            }
-        }
-    }
-    // ==========================================
-    // ❌ 關閉 Modal
-    // ==========================================
-    $('#closeModalBtn').on('click', function () {
-        $('#spotModal').addClass('hidden').removeClass('flex');
-    });
-
-    $('#spotModal').on('click', function (e) {
-        if (e.target === this) {
-            $(this).addClass('hidden').removeClass('flex');
-        }
-    });
-
-    $(document).on('keydown', function (e) {
-        if (e.key === 'Escape') {
-            $('#spotModal').addClass('hidden').removeClass('flex');
-        }
-    });
-
-}); 
+});
