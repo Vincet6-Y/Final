@@ -240,6 +240,67 @@ async function confirmAddToItinerary() {
 }
 
 // ==========================================
+// 🌟 拖曳事件處理函數 (Drag and Drop Logic) - 全域綁定升級版
+// ==========================================
+window.handleDragStart = function (e, day, index) {
+    draggedItemInfo = { day, index };
+    e.dataTransfer.effectAllowed = 'move';
+    // 加上半透明與縮小效果，提升視覺回饋
+    setTimeout(() => e.target.classList.add('opacity-50', 'scale-95', 'z-50'), 0);
+};
+
+window.handleDragOver = function (e) {
+    e.preventDefault(); // 必須阻止預設行為才能允許放置 (Drop)
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+};
+
+window.handleDragEnter = function (e) {
+    e.preventDefault();
+    // 拖曳經過時，目標卡片顯示橘色虛線邊框提示
+    const target = e.currentTarget;
+    target.classList.remove('border-slate-200', 'dark:border-white/10');
+    target.classList.add('border-primary', 'border-2', 'border-dashed');
+};
+
+window.handleDragLeave = function (e) {
+    const target = e.currentTarget;
+    // 離開時恢復原狀
+    target.classList.add('border-slate-200', 'dark:border-white/10');
+    target.classList.remove('border-primary', 'border-2', 'border-dashed');
+};
+
+window.handleDrop = function (e, day, dropIndex) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const target = e.currentTarget;
+    target.classList.add('border-slate-200', 'dark:border-white/10');
+    target.classList.remove('border-primary', 'border-2', 'border-dashed');
+
+    // 確保在同一天內拖曳，且不是拖回原位
+    if (!draggedItemInfo || draggedItemInfo.day !== day || draggedItemInfo.index === dropIndex) {
+        return false;
+    }
+
+    const dragIndex = draggedItemInfo.index;
+
+    // 核心：在資料陣列中交換元素位置
+    const list = itineraryData[day];
+    const draggedItem = list.splice(dragIndex, 1)[0];
+    list.splice(dropIndex, 0, draggedItem);
+
+    // 重新計算路線、渲染列表並自動同步至資料庫
+    calculateAndDisplayRoute(day);
+    draggedItemInfo = null;
+    return false;
+};
+
+window.handleDragEnd = function (e) {
+    e.target.classList.remove('opacity-50', 'scale-95', 'z-50');
+};
+
+// ==========================================
 // 時間自動推算引擎與輸入框事件
 // ==========================================
 function recalculateTimes(day) {
@@ -397,8 +458,7 @@ function renderItineraryPanel(day) {
     const isDay1 = day === 1;
     const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
 
-    // 🌟 修改：起點加入 <input type="time"> 讓使用者改出發時間
-    // 🌟 修改：起點加入 onclick 事件
+    // 🌟 恢復編輯版：加入 draggable, ondragstart 拖曳事件，以及 <input type="time"> 編輯時間功能
     const dayStartHTML = `
           <div draggable="true" ondragstart="handleDragStart(event, ${day}, 0)" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, 0)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm cursor-move transition-all duration-200 hover:shadow-md">
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
@@ -493,7 +553,7 @@ function renderItineraryPanel(day) {
               </a>
             `;
 
-        // 🌟 修改：目的地加入停留時間的 <input type="number">
+        // 🌟 恢復編輯版：加入 draggable, 垃圾桶按鈕, 以及 <input type="number"> 停留時間編輯
         const destinationHTML = `
               <div draggable="true" ondragstart="handleDragStart(event, ${day}, ${i})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, ${i})" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm animate-fade-in-up cursor-move transition-all duration-200 hover:shadow-md">
                 <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
@@ -752,10 +812,10 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 // 🌟 UI 控制：鎖定/解鎖前往付款按鈕
 // ==========================================
-window.updatePaymentButtonState = function(isSyncing) {
+window.updatePaymentButtonState = function (isSyncing) {
     const btn = document.getElementById('goToPaymentBtn');
     if (!btn) return;
-    
+
     if (isSyncing) {
         // 鎖定狀態
         btn.innerHTML = `<span class="material-symbols-outlined text-base animate-spin">sync</span>計算路線中`;
