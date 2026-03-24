@@ -21,9 +21,8 @@ public Map<String, String> getWikiInfo(@RequestParam String title) {
     Map<String, String> result = new HashMap<>();
     try {
         // 加入 pageimages 與 pithumbsize 參數獲取主圖（寬度設為 800px）
-        String url = "https://zh.wikivoyage.org/w/api.php?action=query&prop=extracts%7Cpageimages&format=json&exintro=&pithumbsize=800&titles=" 
-                     + java.net.URLEncoder.encode(title, "UTF-8");
-
+      String url = "https://zh.wikivoyage.org/w/api.php?action=query&prop=extracts%7Cpageimages&format=json&exintro=&pithumbsize=800&variant=zh-tw&titles=" 
+             + java.net.URLEncoder.encode(title, "UTF-8");
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))

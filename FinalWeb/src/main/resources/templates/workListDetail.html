@@ -12,38 +12,47 @@
             <section class="mb-20">
                 <!-- 桌機版：原本的 aspect-[21/9] 疊圖設計 -->
                 <div class="relative rounded-3xl overflow-hidden mb-10 shadow-2xl lg:aspect-[21/9] group">
-                    
-                    <img alt="Background Image" 
+
+                    <img alt="Background Image"
                         class="w-full h-[250px] lg:h-full lg:absolute lg:inset-0 object-cover opacity-80"
                         th:src="${idNow.workImg}" />
 
                     <!-- 導演資訊卡：手機版正常流，桌機版 absolute 右上角 -->
                     <div class="relative lg:absolute lg:top-8 lg:right-12 bg-black/50 backdrop-blur-lg border border-white/10 p-5 lg:p-6 rounded-2xl shadow-2xl mx-4 lg:mx-0 -mt-4 lg:mt-0 z-10
                                 flex flex-row flex-wrap lg:flex-col gap-3 lg:gap-4 lg:min-w-[220px]">
-                        <div class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6 lg:border-b border-white/10 lg:pb-2">
+                        <div
+                            class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6 lg:border-b border-white/10 lg:pb-2">
                             <span class="text-primary font-bold text-sm tracking-widest">導演</span>
-                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.director}">新海誠</span>
+                            <span class="text-white font-medium text-right text-sm"
+                                th:text="${idNow.director}">新海誠</span>
                         </div>
-                        <div class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6 lg:border-b border-white/10 lg:pb-2">
+                        <div
+                            class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6 lg:border-b border-white/10 lg:pb-2">
                             <span class="text-primary font-bold text-sm tracking-widest">編劇</span>
                             <span class="text-white font-medium text-right text-sm" th:text="${idNow.writer}">新海誠</span>
                         </div>
-                        <div th:if="${idNow.workClass == '電影'}" class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6">
+                        <div th:if="${idNow.workClass == '電影'}"
+                            class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6">
                             <span class="text-primary font-bold text-sm tracking-widest">片長</span>
-                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
+                            <span class="text-white font-medium text-right text-sm"
+                                th:text="${idNow.movielength} + ' 分鐘'">107 分鐘</span>
                         </div>
-                        <div th:if="${idNow.workClass == '動畫'}" class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6">
+                        <div th:if="${idNow.workClass == '動畫'}"
+                            class="flex flex-1 min-w-[120px] lg:flex-none items-center justify-between gap-4 lg:gap-6">
                             <span class="text-primary font-bold text-sm tracking-widest">總集數</span>
-                            <span class="text-white font-medium text-right text-sm" th:text="${idNow.episodes} + ' 集'">12 集</span>
+                            <span class="text-white font-medium text-right text-sm"
+                                th:text="${idNow.episodes} + ' 集'">12 集</span>
                         </div>
                     </div>
 
                     <!-- 標題描述：手機版正常流，桌機版 absolute 底部漸層 -->
-                    <div class="px-4 py-6 lg:absolute lg:bottom-0 lg:left-0 lg:p-12 lg:w-full lg:bg-gradient-to-t lg:from-background-dark lg:via-background-dark/80 lg:to-transparent">
+                    <div
+                        class="px-4 py-6 lg:absolute lg:bottom-0 lg:left-0 lg:p-12 lg:w-full lg:bg-gradient-to-t lg:from-background-dark lg:via-background-dark/80 lg:to-transparent">
                         <div class="flex items-center gap-4 mb-4">
                             <span th:text="${idNow.workClass}"
                                 class="bg-primary text-white dark:text-background-dark text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">電影</span>
-                            <span class="text-slate-600 dark:text-slate-200 text-sm font-medium" th:text="${idNow.onDate}">2016-08-26</span>
+                            <span class="text-slate-600 dark:text-slate-200 text-sm font-medium"
+                                th:text="${idNow.onDate}">2016-08-26</span>
                         </div>
                         <h2 class="text-3xl lg:text-6xl font-black text-slate-900 dark:text-white mb-4 lg:mb-6 drop-shadow-lg"
                             th:text="${idNow.workName}">你的名字</h2>
@@ -89,10 +98,25 @@
                         </div>
                         <div class="space-y-6 mb-10 flex-1">
                             <div th:each="dayEntry : ${plan.groupedDays}" class="flex gap-4">
+
                                 <div th:text="'Day ' + ${dayEntry.key}"
                                     class="text-primary font-bold whitespace-nowrap">Day 1</div>
-                                <div th:text="${dayEntry.value}" class="text-slate-600 dark:text-slate-400">抵達東京、入住新宿區
+
+                                <div class="w-[100px] h-[100px] flex-shrink-0">
+                                    <img th:if="${plan.groupedImages[dayEntry.key] != null and plan.groupedImages[dayEntry.key] != ''}"
+                                        th:src="${plan.groupedImages[dayEntry.key]}"
+                                        class="w-full h-full object-cover rounded-lg shadow-sm" alt="當日首站圖片" />
+
+                                    <div th:unless="${plan.groupedImages[dayEntry.key] != null and plan.groupedImages[dayEntry.key] != ''}"
+                                        class="w-full h-full bg-slate-100 dark:bg-white/10 rounded-lg flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-slate-400">image</span>
+                                    </div>
                                 </div>
+
+                                <div th:text="${dayEntry.value}" class="text-slate-600 dark:text-slate-400">
+                                    抵達東京、入住新宿區
+                                </div>
+
                             </div>
                         </div>
                         <a th:href="@{/officialMap(planId=${plan.planId})}"
@@ -103,7 +127,7 @@
                 </div>
             </section>
         </main>
-    <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
+        <footer th:replace="~{ fragments/footer :: myFooter}"></footer>
 </body>
 
 </html>

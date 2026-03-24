@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TravelAlert {
+public class TravelAlertDTO {
     private String title;
     private String description;
     @JsonProperty("pubDate")
