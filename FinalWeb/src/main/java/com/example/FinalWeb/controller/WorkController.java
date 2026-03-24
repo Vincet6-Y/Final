@@ -26,7 +26,7 @@ public class WorkController {
         System.out.println("=== 偵測到訪問首頁 ===");
 
         // 抓取資料
-        List<WorkDetailEntity> featuredList = service.getWorkList(0, 4, "DESC", null, "1980", "2026").getContent();
+        List<WorkDetailEntity> featuredList = service.getWorkList(0, 6, "DESC", null, "1980", "2026").getContent();
 
         model.addAttribute("featuredList", featuredList);
         return "home";
@@ -39,14 +39,25 @@ public class WorkController {
     // }
 
     @GetMapping("/workList")
-    public String getWorkPage(Model model, @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size,
-            @RequestParam(defaultValue = "DESC") String sortDir,
-            @RequestParam(required = false) String workClass,
-            @RequestParam(defaultValue = "1980") String minYear,
-            @RequestParam(defaultValue = "2026") String maxYear) {
+    public String getWorkPage(Model model, 
+        @RequestParam(required = false) String keyword, // 新增此參數接收搜尋字
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "4") int size,
+        @RequestParam(defaultValue = "DESC") String sortDir,
+        @RequestParam(required = false) String workClass,
+        @RequestParam(defaultValue = "1980") String minYear,
+        @RequestParam(defaultValue = "2026") String maxYear) {
 
-        Page<WorkDetailEntity> workPage = service.getWorkList(page, size, sortDir, workClass, minYear, maxYear);
+        Page<WorkDetailEntity> workPage;
+
+    // 如果有帶關鍵字，就執行您在 Service 寫好的模糊搜尋
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            workPage = service.searchWorks(keyword, page, size);
+            model.addAttribute("keywordNow", keyword); 
+        } else {
+        // 原本的預設邏輯
+        workPage = service.getWorkList(page, size, sortDir, workClass, minYear, maxYear);
+        }
 
         model.addAttribute("works", workPage);
         model.addAttribute("page", page);
