@@ -328,8 +328,7 @@ public class MemberAuthController {
         case "手機號碼格式不正確" -> ToastInfoDTO.error("手機號碼格式不正確");    
         case "生日不能是未來日期" -> ToastInfoDTO.error("生日不能是未來日期");    
         case "請輸入正確的生日" -> ToastInfoDTO.error("請輸入正確的生日");        
-        case "密碼長度至少需要 8 個字元" -> ToastInfoDTO.error("密碼長度至少需要 8 個字元");
-        case "密碼需包含大小寫英文及數字" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字");
+        case "密碼需包含大小寫英文及數字（至少 8 個字元）" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字（至少 8 個字元）");
         default -> ToastInfoDTO.error("註冊失敗，請稍後再試");
         };
     }
