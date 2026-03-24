@@ -64,42 +64,91 @@
                     <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
                         <span class="material-symbols-outlined">person_search</span> 帳號維護管理
                     </h3>
-
                 </div>
                 <div class="overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800/30">
                     <table class="w-full text-left">
                         <thead>
                             <tr class="bg-neutral-800">
-                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶 ID
-                                </th>
-                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶名稱
-                                </th>
-                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">電子郵件
-                                </th>
-                                <th
-                                    class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-center">
-                                    狀態</th>
-                                <th
-                                    class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-right">
-                                    操作</th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶 ID</th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">用戶名稱</th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider">電子郵件</th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-center">狀態</th>
+                                <th class="px-6 py-4 text-xs font-bold text-neutral-400 uppercase tracking-wider text-right">操作</th>
                             </tr>
                         </thead>
                         <tbody id="member-table-body" class="divide-y divide-neutral-700">
-
+                            <!-- Thymeleaf 伺服器端渲染 -->
+                            <tr th:each="member : ${membersPage.content}"
+                                class="hover:bg-neutral-700/30 transition-colors">
+                                <td class="px-6 py-4 text-sm text-neutral-400 font-mono"
+                                    th:text="'UID-' + ${member.memberId}"></td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="size-8 rounded-full bg-neutral-700 overflow-hidden"
+                                             th:style="'background-image: url(' + (${member.memberImgUrl} ?: 'https://ui-avatars.com/api/?name=' + (${member.name} ?: 'User')) + '); background-size: cover; background-position: center;'">
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-100"
+                                              th:text="${member.name} ?: '未填寫姓名'"></span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-neutral-400" th:text="${member.email}"></td>
+                                <td class="px-6 py-4 text-center">
+                                    <span th:classappend="${member.role == 'ROLE_ADMIN'} ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'"
+                                          class="px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider"
+                                          th:text="${member.role == 'ROLE_ADMIN'} ? '管理員' : '一般會員'"></span>
+                                    <span th:if="${member.deleted}"
+                                          class="ml-1 px-2 py-1 text-[10px] font-bold bg-red-500/20 text-red-400 rounded uppercase">已停權</span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-row items-center justify-end gap-3">
+                                        <!-- 查看詳情：所有人都顯示 -->
+                                        <button th:onclick="'viewMemberDetails(' + ${member.memberId} + ')'"
+                                                class="text-blue-400 hover:text-blue-300 text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap">
+                                            👁️ 查看詳情
+                                        </button>
+                                        <!-- 權限設定 & 停權：當自己時隱藏 -->
+                                        <th:block th:unless="${member.memberId == currentAdminId}">
+                                            <button th:onclick="'toggleMemberRole(' + ${member.memberId} + ')'"
+                                                    class="text-purple-400 hover:text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap">
+                                                🛡️ 權限設定
+                                            </button>
+                                            <button th:onclick="'toggleMemberStatus(' + ${member.memberId} + ')'"
+                                                    th:classappend="${member.deleted} ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'"
+                                                    class="text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap"
+                                                    th:text="${member.deleted} ? '✅ 啟用帳號' : '🚫 停權此帳號'">
+                                            </button>
+                                        </th:block>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- 無資料時顯示 -->
+                            <tr th:if="${membersPage.totalElements == 0}">
+                                <td colspan="5" class="px-6 py-4 text-center text-neutral-500">目前沒有會員資料</td>
+                            </tr>
                         </tbody>
                     </table>
+                    <!-- 分頁列：用 Thymeleaf 渲染，翻頁改變 URL ?page=N -->
                     <div class="px-6 py-4 bg-neutral-800/50 flex items-center justify-between">
-                        <p id="pagination-info" class="text-xs text-neutral-400">載入中...</p>
-
+                        <p class="text-xs text-neutral-400">
+                            顯示第
+                            <span th:text="${membersPage.number * membersPage.size + 1}"></span>
+                            到
+                            <span th:text="${membersPage.number * membersPage.size + membersPage.numberOfElements}"></span>
+                            之
+                            <span th:text="${membersPage.totalElements}"></span>
+                            位用戶
+                        </p>
                         <div class="flex gap-2">
-                            <button id="prev-page"
-                                class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                            <a th:href="@{/backend/operation(page=${membersPage.number - 1})}"
+                               th:classappend="${membersPage.first} ? 'pointer-events-none opacity-50' : 'hover:text-white'"
+                               class="p-1 rounded bg-neutral-700 text-neutral-400 transition-colors">
                                 <span class="material-symbols-outlined text-sm">chevron_left</span>
-                            </button>
-                            <button id="next-page"
-                                class="p-1 rounded bg-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50">
+                            </a>
+                            <a th:href="@{/backend/operation(page=${membersPage.number + 1})}"
+                               th:classappend="${membersPage.last} ? 'pointer-events-none opacity-50' : 'hover:text-white'"
+                               class="p-1 rounded bg-neutral-700 text-neutral-400 transition-colors">
                                 <span class="material-symbols-outlined text-sm">chevron_right</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
