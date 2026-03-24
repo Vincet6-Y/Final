@@ -222,6 +222,27 @@ $(document).ready(function () {
         $('#spotModal').removeClass('hidden').addClass('flex');
     });
 
+    // 動態產生 Day 1 完整路線連結
+    const mapBtn = document.getElementById('viewFullRouteBtn');
+    if (mapBtn) {
+        const spotCards = document.querySelectorAll('[data-day-panel="1"] .spot-card');
+        if (spotCards.length > 0) {
+            // 因為 spot-card 沒有座標，改用 place-id 讓 Google Maps 自己查
+            const placeIds = [...spotCards]
+                .map(c => c.dataset.placeId)
+                .filter(id => id && id.length > 10);
+
+            if (placeIds.length >= 2) {
+                // Google Maps 多點路線格式
+                const origin = `place_id:${placeIds[0]}`;
+                const dest = `place_id:${placeIds[placeIds.length - 1]}`;
+                const waypoints = placeIds.slice(1, -1).map(id => `place_id:${id}`).join('|');
+                const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=transit`;
+                mapBtn.href = url;
+                mapBtn.style.display = 'flex';
+            }
+        }
+    }
     // ==========================================
     // ❌ 關閉 Modal
     // ==========================================
@@ -241,4 +262,4 @@ $(document).ready(function () {
         }
     });
 
-}); // end $(document).ready
+}); 
