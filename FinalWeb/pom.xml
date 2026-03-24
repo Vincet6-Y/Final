@@ -163,11 +163,16 @@
 			<artifactId>firebase-admin</artifactId>
 			<version>9.4.3</version>
 		</dependency>
-		<!-- firebase的依賴：-->
+		<!-- firebase的依賴 -->
 		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
 			<version>9.4.3</version>
+		</dependency>
+		<!-- Gmail SMTP 寄驗證信 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 	</dependencies>
 

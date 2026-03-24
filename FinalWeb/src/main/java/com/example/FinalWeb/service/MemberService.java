@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.FinalWeb.dto.MemberProfileDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
-import com.example.FinalWeb.dto.PasswdChangeDto;
+import com.example.FinalWeb.dto.PasswdChangeDTO;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.util.BCrypt;
@@ -86,13 +86,9 @@ public class MemberService {
         if (!register.passwd().equals(register.confirmPasswd())) {
             return "密碼不一致";
         }
-        // 5. 密碼長度
-        if (register.passwd().length() < 8) {
-            return "密碼長度至少需要 8 個字元";
-        }
-        // 6. 密碼複雜度
+        // 5. 密碼複雜度
         if (!register.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")) {
-            return "密碼需包含大小寫英文及數字";
+            return "密碼需包含大小寫英文及數字（至少 8 個字元）";
         }
 
         // 建立 entity
@@ -112,7 +108,7 @@ public class MemberService {
     }
 
     // ========== 新增：修改密碼邏輯 ==========
-    public String changePasswd(String email, PasswdChangeDto dto) {
+    public String changePasswd(String email, PasswdChangeDTO dto) {
         // 1. 基礎格式驗證
         if (!dto.getNewPasswd().equals(dto.getConfirmPasswd())) {
             return "新密碼與確認密碼不一致";

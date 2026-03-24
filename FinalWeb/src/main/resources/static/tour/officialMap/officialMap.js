@@ -23,7 +23,7 @@ async function searchNearby(type) {
         fields: ['id', 'displayName', 'location'],
         locationRestriction: { center: map.getCenter(), radius: 3000 },
         includedTypes: [type],
-        maxResultCount: 20,
+        maxResultCount: 20
     };
 
     try {
@@ -69,32 +69,37 @@ function createMarker(place) {
 function clearMarkers() { markers.forEach(m => m.setMap(null)); markers = []; }
 
 // ==========================================
-// 🌟 終極版：支援 大眾運輸 + 飛機 + 走路 自動判斷 (精準起終點防飄移版) + 自動對焦
+// 🌟 支援"大眾運輸 + 飛機 + 走路"自動判斷、精準起終點防飄移版 + 自動對焦
 // ==========================================
 async function calculateAndDisplayRoute(dayToCalculate) {
+    // 抓取該天景點
     const places = itineraryData[dayToCalculate];
 
-    dayRouteRenderers.forEach(renderer => renderer.setMap(null));
+    // 移除舊路線、移除舊編號圖釘
+    dayRouteRenderers.forEach(renderer => renderer.setMap(null)); 
     dayRouteRenderers = [];
-    if (routeMarkers) { routeMarkers.forEach(m => m.setMap(null)); routeMarkers = []; }
+    if (routeMarkers) { routeMarkers.forEach(m => m.setMap(null));
+        routeMarkers = []; 
+    }
 
     // 🌟 1. 在最外層宣告 bounds，準備裝載所有座標
-    const bounds = new google.maps.LatLngBounds();
+    const bounds = new google.maps.LatLngBounds(); // 初始化自動對焦容器
 
     if (places && places.length > 0) {
         places.forEach((place, index) => {
+            // 判斷顏色：起點藍、終點紅、中間橘
             const isFirst = index === 0;
             const isLast = index === places.length - 1;
-            let bgColor = "#ea4335";
-            if (isFirst) bgColor = "#ff8c00";
-            else if (isLast) bgColor = "#008ccf";
+            let bgColor = "#ff8c00";
+            if (isFirst) bgColor = "#008ccf";
+            else if (isLast) bgColor = "#ea4335";
 
             const markerLat = parseFloat(place.latitude || place.lat);
             const markerLng = parseFloat(place.longitude || place.lng);
 
             // 🌟 2. 將景點標記座標加入 bounds
             bounds.extend({ lat: markerLat, lng: markerLng });
-
+            // 建立 Marker 並加上數字標籤 label
             const stopMarker = new google.maps.Marker({
                 position: { lat: markerLat, lng: markerLng },
                 map: map,
@@ -167,16 +172,19 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                         }, (resW, statusW) => {
                             if (statusW === "OK" && resW.routes[0].legs[0].distance.value <= 1000) {
                                 resW._mode = 'WALKING'; resolve(resW);
+                                //「補救機制」的起點
                             } else {
                                 const distKm = getDistanceFromLatLonInKm(markerLatOrigin, markerLngOrigin, markerLatDest, markerLngDest);
                                 let estimatedMinutes = 0, finalMode = 'TRANSIT', lineColor = '#ff8c00';
-
                                 if (distKm > 500) {
+                                    // ✈️ 飛行航程模式：時速 800 + 2 小時緩衝
                                     finalMode = 'FLIGHT'; lineColor = '#9c27b0';
                                     estimatedMinutes = Math.ceil((distKm / 800) * 60) + 120;
                                 } else if (distKm > 80) {
+                                    // 🚄 長途交通模式：時速 150 + 30 分鐘緩衝    
                                     estimatedMinutes = Math.ceil((distKm / 150) * 60) + 30;
                                 } else {
+                                    // 🚗 一般市區交通模擬 + 12 分鐘緩衝
                                     estimatedMinutes = Math.ceil(distKm * 2.4) + 12;
                                 }
 
@@ -188,7 +196,7 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                                     const m = estimatedMinutes % 60;
                                     timeText = m > 0 ? `${h} 小時 ${m} 分鐘` : `${h} 小時`;
                                 }
-
+                                // 🌟 將算出的結果封裝成「假路線」回傳，讓地圖可以畫出虛線
                                 resolve({
                                     _mode: finalMode, _isFake: true, _color: lineColor,
                                     _path: [{ lat: markerLatOrigin, lng: markerLngOrigin }, { lat: markerLatDest, lng: markerLngDest }],
@@ -222,9 +230,16 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         if (res) {
             if (res._isFake) {
                 const polyline = new google.maps.Polyline({
-                    path: res._path, strokeOpacity: 0,
-                    icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, offset: '0', repeat: '15px' }],
-                    strokeColor: res._color, strokeWeight: 4, map: map
+                    path: res._path, 
+                    strokeOpacity: 0, // 實體線透明
+                    icons: [{ 
+                        icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, 
+                        offset: '0', 
+                        repeat: '15px' // 🌟 這裡設定虛線的重複點
+                    }],
+                    strokeColor: res._color, 
+                    strokeWeight: 4, 
+                    map: map
                 });
                 dayRouteRenderers.push(polyline);
                 
@@ -236,7 +251,11 @@ async function calculateAndDisplayRoute(dayToCalculate) {
             } else {
                 let routeColor = res._mode === 'WALKING' ? "#008ccf" : (res._mode === 'DRIVING' ? "#ea4335" : "#ff8c00");
                 const renderer = new google.maps.DirectionsRenderer({
-                    map: map, suppressMarkers: true, polylineOptions: { strokeColor: routeColor, strokeWeight: 5, strokeOpacity: 0.8 }
+                    map: map, 
+                    suppressMarkers: true, 
+                    polylineOptions: { strokeColor: routeColor, 
+                                        strokeWeight: 5, strokeOpacity: 0.8 
+                                    }
                 });
                 renderer.setDirections(res);
                 dayRouteRenderers.push(renderer);
@@ -275,14 +294,19 @@ async function calculateAndDisplayRoute(dayToCalculate) {
 }
 
 // ==========================================
-// 🌟 輔助函式：計算直線距離
+// 🌟 輔助函式：幾何距離計算 (哈維斯公式)
 // ==========================================
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
-    const R = 6371;
+    // 🌍 地球平均半徑 (公里)
+    const R = 6371; 
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    // 這裡進行複雜的球面三角函數運算
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + 
+              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+    // 最後得出弧長公里數
+    return R * c; 
 }
