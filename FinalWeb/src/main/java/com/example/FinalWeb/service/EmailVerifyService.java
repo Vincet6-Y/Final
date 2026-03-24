@@ -46,7 +46,6 @@ public class EmailVerifyService {
         resetToken.setToken(token);
         resetToken.setMember(member);
         resetToken.setTokenDeadline(LocalDateTime.now().plusMinutes(15));
-        resetToken.setUsed(false);
         emailVerificationRepo.save(resetToken);
 
         // 寄信
@@ -64,10 +63,10 @@ public class EmailVerifyService {
         mailSender.send(message);
     }
 
-    // 2. 驗證 token 是否有效
+    // 2. 驗證 token 存不存在 + 有沒有過期
     public EmailVerificationEntity validateToken(String token) {
         return emailVerificationRepo.findByToken(token).filter(t ->
-            !t.isUsed() && t.getTokenDeadline().isAfter(LocalDateTime.now())
+            t.getTokenDeadline().isAfter(LocalDateTime.now())
         ).orElse(null);
     }
 
@@ -88,9 +87,7 @@ public class EmailVerifyService {
         member.setPasswd(BCrypt.hashpw(newPasswd, BCrypt.gensalt()));
         memberRepo.save(member);
 
-        // 標記 token 已使用
-        resetToken.setUsed(true);
-        emailVerificationRepo.save(resetToken);
+        emailVerificationRepo.delete(resetToken);
 
         return "success";
     }

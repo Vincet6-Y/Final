@@ -18,8 +18,6 @@ public class EmailVerificationEntity {
 
     @Column(nullable = false)
     private LocalDateTime tokenDeadline;
-    
-    private boolean used;
 
     @ManyToOne
     @JoinColumn(name = "memberId", nullable = false)
