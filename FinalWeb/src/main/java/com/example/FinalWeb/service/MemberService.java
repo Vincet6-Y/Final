@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.FinalWeb.dto.MemberProfileDTO;
 import com.example.FinalWeb.dto.MemberRegisterDTO;
-import com.example.FinalWeb.dto.PasswdChangeDTO;
+import com.example.FinalWeb.dto.PasswdChangesDTO;
 import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.util.BCrypt;
@@ -108,7 +108,7 @@ public class MemberService {
     }
 
     // ========== 新增：修改密碼邏輯 ==========
-    public String changePasswd(String email, PasswdChangeDTO dto) {
+    public String changePasswd(String email, PasswdChangesDTO dto) {
         // 1. 基礎格式驗證
         if (!dto.getNewPasswd().equals(dto.getConfirmPasswd())) {
             return "新密碼與確認密碼不一致";
