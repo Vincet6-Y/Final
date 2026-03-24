@@ -23,6 +23,8 @@ import com.example.FinalWeb.entity.MemberEntity;
 import com.example.FinalWeb.repo.MemberRepo;
 import com.example.FinalWeb.service.AdminOrderService;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("/api/admin")
 public class AdminRevenueController {
@@ -62,7 +64,12 @@ public class AdminRevenueController {
 
     // 切換會員權限
     @PutMapping("/members/{id}/role")
-    public ResponseEntity<?> toggleMemberRole(@PathVariable Integer id) {
+    public ResponseEntity<?> toggleMemberRole(@PathVariable Integer id, HttpSession session) {
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        if (loginMember != null && loginMember.getMemberId().equals(id)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "不可更改自己的權限"));
+        }
+
         MemberEntity member = memberRepo.findById(id).orElse(null);
         if (member == null) return ResponseEntity.notFound().build();
         
@@ -77,7 +84,12 @@ public class AdminRevenueController {
 
     // 切換帳號啟用/停權狀態 (使用 deleted 欄位假象停權)
     @PutMapping("/members/{id}/status")
-    public ResponseEntity<?> toggleMemberStatus(@PathVariable Integer id) {
+    public ResponseEntity<?> toggleMemberStatus(@PathVariable Integer id, HttpSession session) {
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+        if (loginMember != null && loginMember.getMemberId().equals(id)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "不可更改自己帳號的啟用狀態"));
+        }
+
         MemberEntity member = memberRepo.findById(id).orElse(null);
         if (member == null) return ResponseEntity.notFound().build();
         

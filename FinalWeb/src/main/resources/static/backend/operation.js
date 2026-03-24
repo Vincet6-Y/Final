@@ -70,8 +70,12 @@ function fetchMembers(page) {
                 return;
             }
 
+            // 取得當前登入管理員的 ID
+            const currentAdminId = document.getElementById('currentAdminId')?.value;
+
             // 迭代會員資料並生成 HTML
             members.forEach(member => {
+                const isSelf = currentAdminId && String(member.memberId) === String(currentAdminId);
                 const row = `
                     <tr class="hover:bg-neutral-700/30 transition-colors">
                         <td class="px-6 py-4 text-sm text-neutral-400 font-mono">UID-${member.memberId}</td>
@@ -91,16 +95,16 @@ function fetchMembers(page) {
                             ${member.deleted ? '<span class="ml-1 px-2 py-1 text-[10px] font-bold bg-red-500/20 text-red-400 rounded uppercase">已停權</span>' : ''}
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex flex-col items-end gap-2">
-                                <button onclick="viewMemberDetails(${member.memberId})" class="text-blue-400 hover:text-blue-300 text-xs font-bold flex items-center gap-1 transition-colors">
+                            <div class="flex flex-row items-center justify-end gap-3">
+                                <button onclick="viewMemberDetails(${member.memberId})" class="text-blue-400 hover:text-blue-300 text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap">
                                     👁️ 查看詳情
                                 </button>
-                                <button onclick="toggleMemberRole(${member.memberId})" class="text-purple-400 hover:text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors">
+                                ${isSelf ? '' : `<button onclick="toggleMemberRole(${member.memberId})" class="text-purple-400 hover:text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap">
                                     🛡️ 權限設定
-                                </button>
-                                <button onclick="toggleMemberStatus(${member.memberId})" class="${member.deleted ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'} text-xs font-bold flex items-center gap-1 transition-colors">
+                                </button>`}
+                                ${isSelf ? '' : `<button onclick="toggleMemberStatus(${member.memberId})" class="${member.deleted ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'} text-xs font-bold flex items-center gap-1 transition-colors whitespace-nowrap">
                                     ${member.deleted ? '✅ 啟用帳號' : '🚫 停權此帳號'}
-                                </button>
+                                </button>`}
                             </div>
                         </td>
                     </tr>
@@ -316,35 +320,35 @@ window.viewMemberDetails = function(id) {
 };
 
 window.toggleMemberRole = function(id) {
-    if(!confirm('確定要切換此會員的權限嗎？')) return;
-    
     fetch(`/api/admin/members/${id}/role`, { method: 'PUT' })
-        .then(res => {
-            if(!res.ok) throw new Error("伺服器錯誤");
-            return res.json();
-        })
-        .then(data => {
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok) {
+                showToast('error', data.message || '切換權限失敗');
+                return;
+            }
+            showToast('success', data.message || '權限更新成功');
             fetchMembers(currentPage);
         })
         .catch(err => {
             console.error(err);
-            alert('切換權限失敗');
+            showToast('error', '切換權限失敗，請稍後再試');
         });
 };
 
 window.toggleMemberStatus = function(id) {
-    if(!confirm('確定要切換此會員的帳號狀態嗎？ (停權/啟用)')) return;
-    
     fetch(`/api/admin/members/${id}/status`, { method: 'PUT' })
-        .then(res => {
-            if(!res.ok) throw new Error("伺服器錯誤");
-            return res.json();
-        })
-        .then(data => {
+        .then(res => res.json().then(data => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok) {
+                showToast('error', data.message || '切換狀態失敗');
+                return;
+            }
+            showToast('success', data.message || '狀態更新成功');
             fetchMembers(currentPage);
         })
         .catch(err => {
             console.error(err);
-            alert('切換狀態失敗');
+            showToast('error', '切換狀態失敗，請稍後再試');
         });
 };
