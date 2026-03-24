@@ -240,37 +240,37 @@ async function confirmAddToItinerary() {
 }
 
 // ==========================================
-// 🌟 拖曳事件處理函數 (Drag and Drop Logic) - 全域綁定升級版
+// 🌟 拖曳事件處理函數 (Drag and Drop Logic)
 // ==========================================
-window.handleDragStart = function (e, day, index) {
+function handleDragStart(e, day, index) {
     draggedItemInfo = { day, index };
     e.dataTransfer.effectAllowed = 'move';
     // 加上半透明與縮小效果，提升視覺回饋
     setTimeout(() => e.target.classList.add('opacity-50', 'scale-95', 'z-50'), 0);
-};
+}
 
-window.handleDragOver = function (e) {
+function handleDragOver(e) {
     e.preventDefault(); // 必須阻止預設行為才能允許放置 (Drop)
     e.dataTransfer.dropEffect = 'move';
     return false;
-};
+}
 
-window.handleDragEnter = function (e) {
+function handleDragEnter(e) {
     e.preventDefault();
     // 拖曳經過時，目標卡片顯示橘色虛線邊框提示
     const target = e.currentTarget;
     target.classList.remove('border-slate-200', 'dark:border-white/10');
     target.classList.add('border-primary', 'border-2', 'border-dashed');
-};
+}
 
-window.handleDragLeave = function (e) {
+function handleDragLeave(e) {
     const target = e.currentTarget;
     // 離開時恢復原狀
     target.classList.add('border-slate-200', 'dark:border-white/10');
     target.classList.remove('border-primary', 'border-2', 'border-dashed');
-};
+}
 
-window.handleDrop = function (e, day, dropIndex) {
+function handleDrop(e, day, dropIndex) {
     e.stopPropagation();
     e.preventDefault();
 
@@ -290,15 +290,15 @@ window.handleDrop = function (e, day, dropIndex) {
     const draggedItem = list.splice(dragIndex, 1)[0];
     list.splice(dropIndex, 0, draggedItem);
 
-    // 重新計算路線、渲染列表並自動同步至資料庫
+    // 重新計算路線與渲染列表
     calculateAndDisplayRoute(day);
     draggedItemInfo = null;
     return false;
-};
+}
 
-window.handleDragEnd = function (e) {
+function handleDragEnd(e) {
     e.target.classList.remove('opacity-50', 'scale-95', 'z-50');
-};
+}
 
 // ==========================================
 // 時間自動推算引擎與輸入框事件

@@ -1,6 +1,6 @@
 package com.example.FinalWeb.controller;
 
-import com.example.FinalWeb.dto.TravelAlert;
+import com.example.FinalWeb.dto.TravelAlertDTO;
 import com.example.FinalWeb.service.TravelAlertService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +24,7 @@ public class JapanTravelController {
     }
 
     @GetMapping("/japan")
-    public List<TravelAlert> getJapanAlerts() {
+    public List<TravelAlertDTO> getJapanAlerts() {
         try {
             // 1. 取得原始資料
             // 呼叫 Service 中正確的方法名稱 getTravelAlert()
@@ -37,8 +37,8 @@ public class JapanTravelController {
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             // 將 JSON 陣列轉換為 List<TravelAlert>
-            List<TravelAlert> allAlerts = objectMapper.readValue(jsonData, 
-                new TypeReference<List<TravelAlert>>(){});
+            List<TravelAlertDTO> allAlerts = objectMapper.readValue(jsonData, 
+                new TypeReference<List<TravelAlertDTO>>(){});
 
             // 3. 篩選包含「日本」關鍵字的資料
             return allAlerts.stream()
