@@ -88,9 +88,20 @@ function fetchMembers(page) {
                             <span class="px-2 py-1 text-[10px] font-bold ${member.role === 'ROLE_ADMIN' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'} rounded uppercase tracking-wider">
                                 ${member.role === 'ROLE_ADMIN' ? '管理員' : '一般會員'}
                             </span>
+                            ${member.deleted ? '<span class="ml-1 px-2 py-1 text-[10px] font-bold bg-red-500/20 text-red-400 rounded uppercase">已停權</span>' : ''}
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <button class="text-primary hover:text-orange-400 text-sm font-bold">編輯詳情</button>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col items-end gap-2">
+                                <button onclick="viewMemberDetails(${member.memberId})" class="text-blue-400 hover:text-blue-300 text-xs font-bold flex items-center gap-1 transition-colors">
+                                    👁️ 查看詳情
+                                </button>
+                                <button onclick="toggleMemberRole(${member.memberId})" class="text-purple-400 hover:text-purple-300 text-xs font-bold flex items-center gap-1 transition-colors">
+                                    🛡️ 權限設定
+                                </button>
+                                <button onclick="toggleMemberStatus(${member.memberId})" class="${member.deleted ? 'text-green-400 hover:text-green-300' : 'text-red-400 hover:text-red-300'} text-xs font-bold flex items-center gap-1 transition-colors">
+                                    ${member.deleted ? '✅ 啟用帳號' : '🚫 停權此帳號'}
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -226,3 +237,114 @@ document.getElementById('btn-monthly').addEventListener('click', () => {
 document.getElementById('btn-quarterly').addEventListener('click', () => {
     if (currentChartMode !== 'quarterly') initRevenueChart('quarterly');
 });
+
+// 定義全域 Modal 操控與按鈕功能
+window.closeModal = function() {
+    document.getElementById('orderModal').classList.add('hidden');
+};
+
+window.viewMemberDetails = function(id) {
+    const modal = document.getElementById('orderModal');
+    const modalContent = document.getElementById('modalContent');
+    modal.classList.remove('hidden');
+    
+    // 顯示載入動畫
+    modalContent.innerHTML = '<div class="flex justify-center py-10"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>';
+    
+    fetch(`/api/admin/members/${id}/details`)
+        .then(res => {
+            if(!res.ok) throw new Error("取得資料失敗");
+            return res.json();
+        })
+        .then(data => {
+            let html = `
+                <div class="grid grid-cols-2 gap-4 mb-6 text-slate-100">
+                    <div class="bg-neutral-800/80 p-4 rounded-xl border border-neutral-700">
+                        <p class="text-xs text-neutral-400 mb-1">用戶名稱</p>
+                        <p class="text-lg font-bold">${data.name || '未提供'}</p>
+                    </div>
+                    <div class="bg-neutral-800/80 p-4 rounded-xl border border-neutral-700">
+                        <p class="text-xs text-neutral-400 mb-1">電子郵件</p>
+                        <p class="text-lg font-bold truncate" title="${data.email}">${data.email}</p>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h4 class="text-lg font-bold border-b border-neutral-700 pb-2 mb-3 text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">event_note</span> 活動紀錄
+                    </h4>
+                    <div class="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700">
+                        <p class="text-sm text-slate-300">建立的行程數量: <span class="text-primary font-bold text-lg">${data.myPlanCount}</span> 個</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold border-b border-neutral-700 pb-2 mb-3 text-slate-100 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">receipt_long</span> 近期訂單
+                    </h4>
+            `;
+            
+            if (data.orders && data.orders.length > 0) {
+                html += '<div class="space-y-3">';
+                data.orders.forEach(order => {
+                    const d = new Date(order.orderTime);
+                    const timeStr = isNaN(d) ? order.orderTime : d.toLocaleString();
+                    html += `
+                        <div class="bg-neutral-800/80 p-4 rounded-xl border border-neutral-700 flex justify-between items-center hover:bg-neutral-700/80 transition-colors">
+                            <div class="flex flex-col gap-1">
+                                <span class="font-bold text-slate-200">訂單 #${order.orderId}</span>
+                                <span class="text-xs text-neutral-400">${timeStr}</span>
+                            </div>
+                            <div>
+                                <span class="text-xs px-3 py-1 rounded-full font-bold ${order.payStatus === '已付款' || order.payStatus === 'PAID' ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400'}">${order.payStatus}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            } else {
+                html += '<div class="text-center py-6 bg-neutral-800/30 rounded-xl border border-neutral-700 border-dashed"><p class="text-sm text-neutral-500">尚無訂單紀錄</p></div>';
+            }
+            
+            html += '</div>';
+            modalContent.innerHTML = html;
+        })
+        .catch(err => {
+            modalContent.innerHTML = '<div class="text-center py-6 bg-red-500/10 rounded-xl border border-red-500/30"><p class="text-red-400 font-bold">無法載入會員詳細資料，或伺服器發生錯誤</p></div>';
+            console.error(err);
+        });
+};
+
+window.toggleMemberRole = function(id) {
+    if(!confirm('確定要切換此會員的權限嗎？')) return;
+    
+    fetch(`/api/admin/members/${id}/role`, { method: 'PUT' })
+        .then(res => {
+            if(!res.ok) throw new Error("伺服器錯誤");
+            return res.json();
+        })
+        .then(data => {
+            fetchMembers(currentPage);
+        })
+        .catch(err => {
+            console.error(err);
+            alert('切換權限失敗');
+        });
+};
+
+window.toggleMemberStatus = function(id) {
+    if(!confirm('確定要切換此會員的帳號狀態嗎？ (停權/啟用)')) return;
+    
+    fetch(`/api/admin/members/${id}/status`, { method: 'PUT' })
+        .then(res => {
+            if(!res.ok) throw new Error("伺服器錯誤");
+            return res.json();
+        })
+        .then(data => {
+            fetchMembers(currentPage);
+        })
+        .catch(err => {
+            console.error(err);
+            alert('切換狀態失敗');
+        });
+};
