@@ -34,7 +34,9 @@
                         placeholder="example@mail.com"
                         type="email"
                         required
-                        th:value="${registerData != null ? registerData.email() : (socialEmail != null ? socialEmail : '')}" />
+                        th:value="${registerData != null ? registerData.email() : (socialEmail != null ? socialEmail : '')}"
+                        th:readonly="${socialEmail != null and !#strings.isEmpty(socialEmail)}"
+                        th:classappend="${socialEmail != null and !#strings.isEmpty(socialEmail)} ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 cursor-not-allowed' : ''" />
                 </div>
             </div>
             <!-- 電話 + 生日 -->
