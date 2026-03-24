@@ -154,6 +154,29 @@
                         </div>
                     </div>
                 </div>
+                <!-- accordion：修改 Email -->
+                <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+                    <button type="button"
+                        class="accordion-btn w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-background-dark text-left">
+                        <span class="font-bold text-slate-900 dark:text-slate-100">修改 Email</span>
+                        <span class="material-symbols-outlined accordion-icon">expand_more</span>
+                    </button>
+                    <div class="accordion-content px-5 py-4 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-white/10">
+                        <div class="space-y-3">
+                            <!-- 目前 email 唯讀顯示 -->
+                            <div class="px-4 py-3 rounded-lg bg-slate-100 dark:bg-white/5 text-sm text-slate-500 dark:text-slate-400">
+                                目前 Email：<span id="currentEmailDisplay" th:text="${session.loginMember.email}"></span>
+                            </div>
+                            <input type="email" id="newEmailInput" placeholder="請輸入新 Email"
+                                class="w-full rounded-lg border border-slate-300 dark:border-white/10 bg-transparent px-4 py-3 text-sm outline-none">
+                            <p class="text-xs text-slate-400">驗證信將寄送至新 Email，點擊確認後才會生效</p>
+                            <button type="button" id="sendEmailChangeBtn"
+                                class="px-5 py-2.5 bg-primary text-background-dark font-bold rounded-lg hover:opacity-90 transition mt-2">
+                                寄送驗證信
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- accordion 3 -->
                 <div class="rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">

@@ -19,6 +19,9 @@ public class EmailVerificationEntity {
     @Column(nullable = false)
     private LocalDateTime tokenDeadline;
 
+    @Column(length = 255)
+    private String pendingEmail; // null = 重設密碼用途，有值 = 修改 email 用途
+
     @ManyToOne
     @JoinColumn(name = "memberId", nullable = false)
     private MemberEntity member;

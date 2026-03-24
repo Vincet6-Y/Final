@@ -212,6 +212,11 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
         }
+        // 補上密碼檢查，避免純 LINE 登入的帳號解除後無法登入
+        if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
+            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先設定密碼後再解除 LINE 綁定"));
+            return "redirect:/member";
+        }
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.LINE);
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
