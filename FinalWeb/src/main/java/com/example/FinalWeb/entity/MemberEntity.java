@@ -34,6 +34,9 @@ public class MemberEntity {
     @Column(length = 500)
     private String memberImgUrl;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean deleted = false;
+
     // 一對多關聯
     // 會員擁有多個收藏
     @OneToMany(mappedBy = "member")

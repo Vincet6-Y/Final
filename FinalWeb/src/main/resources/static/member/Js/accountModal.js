@@ -149,3 +149,30 @@ $(document).ready(function () {
         });
     });
 });
+
+// 刪除帳號
+$(document).on('click', '#deleteAccountBtn', function () {
+    if (!confirm('確定要刪除帳號嗎？此操作無法復原，您的會員資料將無法恢復。')) {
+        return;
+    }
+
+    $.ajax({
+        url: '/member/delete-account',
+        type: 'POST',
+        success: function (response) {
+            $('#closeAccountModal').click();
+            showToast(response.type, response.message);
+            setTimeout(function () {
+                window.location.href = '/home';
+            }, 1500);
+        },
+        error: function (xhr) {
+            const errorData = xhr.responseJSON;
+            if (errorData && errorData.message) {
+                showToast(errorData.type, errorData.message);
+            } else {
+                showToast('error', '系統發生錯誤，請稍後再試');
+            }
+        }
+    });
+});

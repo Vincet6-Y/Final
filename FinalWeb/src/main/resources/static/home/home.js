@@ -181,6 +181,7 @@ function scrollJapan(direction) {
  */
 document.addEventListener('DOMContentLoaded', function () {
     loadJapanWikiInfo();
+    showContent('japan');
 
     const searchBtn   = document.getElementById('searchBtn');
     const searchInput = document.getElementById('searchInput');

@@ -36,6 +36,10 @@ public class MemberService {
             return null;
         }
         MemberEntity member = memberEntity.get();
+        // 已刪除帳號不允許登入
+        if (member.isDeleted()) {
+            return null;
+        }
         // 用 BCrypt 比對輸入密碼與資料庫雜湊密碼
         if (!BCrypt.checkpw(passwd, member.getPasswd())) {
             return null;
@@ -168,6 +172,23 @@ public class MemberService {
     public void updateMemberAvatar(Integer memberId, String avatarUrl) {
         MemberEntity member = memberRepo.findById(memberId).orElseThrow();
         member.setMemberImgUrl(avatarUrl);
+    }
+
+    @Transactional
+    public void softDeleteMember(Integer memberId) {
+        MemberEntity member = memberRepo.findById(memberId).orElseThrow();
+
+        String anonymousId = "deleted_" + memberId;
+
+        member.setEmail(anonymousId + "@deleted.invalid");
+        member.setName("已刪除會員");
+        member.setPhone(null);
+        member.setBirthday(LocalDate.of(1900, 1, 1));
+        member.setPasswd(null);
+        member.setMemberImgUrl(null);
+        member.setDeleted(true);
+
+        memberRepo.save(member);
     }
     
 }

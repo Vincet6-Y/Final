@@ -173,4 +173,20 @@ public class MemberCenterController {
         return ResponseEntity.ok().build();
     }
 
+    // 刪除帳號
+    @PostMapping("/delete-account")
+    @ResponseBody
+    public ResponseEntity<ToastInfoDTO> deleteAccount(HttpSession session) {
+        MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
+
+        if (loginMember == null) {
+            return ResponseEntity.status(401).body(ToastInfoDTO.error("請先登入"));
+        }
+
+        memberService.softDeleteMember(loginMember.getMemberId());
+        session.invalidate();
+
+        return ResponseEntity.ok(ToastInfoDTO.success("帳號已刪除"));
+    }
+
 }
