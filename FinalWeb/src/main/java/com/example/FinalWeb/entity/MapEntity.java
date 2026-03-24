@@ -37,6 +37,7 @@ public class MapEntity {
     private Integer distance;
     private Integer transitTime;
     private String transitMode;
+    private String locationImage;
 
     // 拉關連線到 journeyPlan
     @ManyToOne(fetch = FetchType.LAZY)
