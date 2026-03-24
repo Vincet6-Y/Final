@@ -101,21 +101,10 @@ public class WorkService {
     }
 
     // 新增：根據關鍵字搜尋作品（支援分頁與排序）
-    public Page<WorkDetailEntity> searchWorkList(String keyword, int page, int size, String sortDir) {
-        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(direction, "onDate");
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // 呼叫 Repo 層的模糊查詢方法
+      public Page<WorkDetailEntity> searchWorks(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return repo.findByWorkNameContaining(keyword, pageable);
-    }
-
-    // 在 WorkService.java 新增
-    public WorkDetailEntity findSingleWorkByName(String keyword) {
-        // 這裡可以使用 repo 搜尋，並取結果的第一筆
-        List<WorkDetailEntity> results = repo.findByWorkNameContaining(keyword, PageRequest.of(0, 1)).getContent();
-        return results.isEmpty() ? null : results.get(0);
-    }
+     }
 
     // -------------------------------------MARK:後台功能
     public void addwork(WorkDTO wDto) {
