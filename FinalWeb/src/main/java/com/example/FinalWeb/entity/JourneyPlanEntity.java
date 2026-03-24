@@ -33,6 +33,9 @@ public class JourneyPlanEntity {
 
     @Transient
     private Map<Integer, String> groupedDays; // Key 是第幾天 (1, 2, 3...)，Value 是串好的字串 ("地點A、地點B")
+    
+    @Transient
+    private Map<Integer, String> groupedImages; 
 
     private Boolean status = false;
 

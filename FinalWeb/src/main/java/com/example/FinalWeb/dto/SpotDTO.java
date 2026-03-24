@@ -18,4 +18,5 @@ public class SpotDTO {
     private Integer distance;
     private Integer transitTime;
     private String transitMode;
+    private String locationImage;
 }

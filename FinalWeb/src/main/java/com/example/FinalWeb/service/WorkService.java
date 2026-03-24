@@ -76,11 +76,14 @@ public class WorkService {
             // 準備一個會「自動從小排到大」的分類盒，準備裝這個行程的景點
             Map<Integer, String> dayMap = new TreeMap<>();
 
+            Map<Integer, String> imageMap = new TreeMap<>();
+
             // 3. 第二層迴圈：把這個行程底下的「所有散落景點」拿出來
             for (MapEntity map : plan.getMaps()) {
 
                 Integer day = map.getDayNumber(); // 取得這是第幾天 (例如 1)
                 String loc = map.getLocationName(); // 取得景點名稱 (例如 "抵達東京")
+                String img = map.getLocationImage();
 
                 // 🌟 核心邏輯：判斷盒子裡有沒有這天的紀錄了？
                 if (dayMap.containsKey(day)) {
@@ -88,11 +91,13 @@ public class WorkService {
                     String oldString = dayMap.get(day);
                     dayMap.put(day, oldString + "、" + loc);
                 } else {
+                    imageMap.put(day, img);
                     // 如果沒有：代表這是這天的第一個景點，直接放進去
                     dayMap.put(day, loc);
                 }
             }
 
+            plan.setGroupedImages(imageMap);
             // 4. 這個行程的景點都分類串好後，把整個分類盒塞進我們剛剛做的「隱形口袋」裡
             plan.setGroupedDays(dayMap);
         }
