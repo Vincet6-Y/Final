@@ -54,9 +54,8 @@ public class PaymentService {
         model.addAttribute("order", order);
         model.addAttribute("totalAmount", orderService.calculateTotalAmount(order));
 
-        Map<String, Object> classified = orderService.classifyTickets(order);
-        Set<Integer> ticketSpotIds = (Set<Integer>) classified.get("ticketSpotIds");
-        List<OrdersDetailEntity> transportTickets = (List<OrdersDetailEntity>) classified.get("transportTickets");
+        Set<Integer> ticketSpotIds = orderService.getTicketSpotIds(order);
+        List<OrdersDetailEntity> transportTickets = orderService.getTransportTickets(order);
 
         model.addAttribute("ticketSpotIds", ticketSpotIds);
         model.addAttribute("transportTickets", transportTickets);

@@ -135,40 +135,79 @@ public class OrderService {
     }
 
     // 分類票券
-    public Map<String, Object> classifyTickets(OrdersEntity order) {
+    // =====================================================
+    // 方法 1：專門用來取得「景點門票的 SpotId 集合」
+    // =====================================================
+    public Set<Integer> getTicketSpotIds(OrdersEntity order) {
+        // 1. 建立一個空的 HashSet 來存放結果。使用 Set 可以確保 ID 不會重複。
         Set<Integer> ticketSpotIds = new HashSet<>();
-        List<OrdersDetailEntity> transportTickets = new ArrayList<>();
 
+        // 2. 檢查訂單明細是否為空，避免 NullPointerException (空指標異常)
         if (order.getOrderDetails() != null) {
+            // 3. 走訪這筆訂單裡的每一個明細項目
             for (OrdersDetailEntity detail : order.getOrderDetails()) {
-                boolean isSpotTicket = false;
 
+                // 4. 判斷 A：如果明細本身就帶有 MyMap 關聯，且有 spotId，直接加入
                 if (detail.getMyMap() != null && detail.getMyMap().getSpotId() != null) {
                     ticketSpotIds.add(detail.getMyMap().getSpotId());
-                    isSpotTicket = true;
+                }
+                // 5. 判斷 B：如果沒有直接關聯，但有票券名稱，則去行程(MyPlan)裡比對
+                else if (detail.getTicketType() != null && order.getMyPlan() != null
+                        && order.getMyPlan().getMyMaps() != null) {
+                    // 6. 走訪行程裡的所有景點
+                    for (MyMapEntity m : order.getMyPlan().getMyMaps()) {
+                        // 7. 透過 Google Place ID 查詢該景點對應的票券資訊
+                        TicketDto tInfo = ticketService.getTicketByPlaceId(m.getGooglePlaceId());
+
+                        // 8. 如果票券存在，且名稱與訂單明細的名稱相同，代表這是一張景點票
+                        if (tInfo != null && detail.getTicketType().equals(tInfo.getTicketName())) {
+                            ticketSpotIds.add(m.getSpotId()); // 將該景點的 SpotId 加入集合
+                            break; // 已經找到了，提早結束這個小迴圈以節省效能
+                        }
+                    }
+                }
+            }
+        }
+        // 9. 回傳明確型別為 Set<Integer> 的結果
+        return ticketSpotIds;
+    }
+
+    // =====================================================
+    // 方法 2：專門用來取得「交通票的實體清單」
+    // =====================================================
+    public List<OrdersDetailEntity> getTransportTickets(OrdersEntity order) {
+        // 1. 建立一個空的 ArrayList 來存放交通票
+        List<OrdersDetailEntity> transportTickets = new ArrayList<>();
+
+        // 2. 一樣先防呆，確保訂單明細不是空的
+        if (order.getOrderDetails() != null) {
+            // 3. 走訪這筆訂單裡的每一個明細項目
+            for (OrdersDetailEntity detail : order.getOrderDetails()) {
+                // 4. 預設這張票「不是」景點票 (標記變數)
+                boolean isSpotTicket = false;
+
+                // 5. 判斷邏輯與上面相同：檢查它是不是景點票
+                if (detail.getMyMap() != null && detail.getMyMap().getSpotId() != null) {
+                    isSpotTicket = true; // 確認為景點票
                 } else if (detail.getTicketType() != null && order.getMyPlan() != null
                         && order.getMyPlan().getMyMaps() != null) {
                     for (MyMapEntity m : order.getMyPlan().getMyMaps()) {
                         TicketDto tInfo = ticketService.getTicketByPlaceId(m.getGooglePlaceId());
                         if (tInfo != null && detail.getTicketType().equals(tInfo.getTicketName())) {
-                            ticketSpotIds.add(m.getSpotId());
-                            isSpotTicket = true;
+                            isSpotTicket = true; // 確認為景點票
                             break;
                         }
                     }
                 }
 
-                // 如果找不到對應景點，它就會乖乖被分類到交通票的清單裡
+                // 6. 核心邏輯：如果它「不是」景點票，那就把它歸類為交通票
                 if (!isSpotTicket) {
-                    transportTickets.add(detail);
+                    transportTickets.add(detail); // 加入交通票清單
                 }
             }
         }
-
-        Map<String, Object> result = new HashMap<>();
-        result.put("ticketSpotIds", ticketSpotIds);
-        result.put("transportTickets", transportTickets);
-        return result;
+        // 7. 回傳明確型別為 List<OrdersDetailEntity> 的結果
+        return transportTickets;
     }
 
     // 處理修改行程名稱與日期
