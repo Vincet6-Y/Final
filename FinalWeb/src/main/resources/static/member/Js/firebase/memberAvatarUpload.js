@@ -15,22 +15,28 @@ function getPathFromURL(url) {
 
 // ==================== 圖片處理工具 ====================
 
-/** 將裁切後的 canvas 輸出成圓形 webp Blob（400x400） */
+/** 將裁切後的 canvas 輸出成圓形 jpeg Blob（400x400） */
 function canvasToRoundBlob(canvas) {
     const roundCanvas = document.createElement("canvas");
     roundCanvas.width = 400;
     roundCanvas.height = 400;
     const ctx = roundCanvas.getContext("2d");
+
+    // jpeg 不支援透明背景，先填白色底
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 400, 400);
+
     ctx.beginPath();
     ctx.arc(200, 200, 200, 0, Math.PI * 2);
     ctx.closePath();
     ctx.clip();
     ctx.drawImage(canvas, 0, 0, 400, 400);
+
     return new Promise((resolve, reject) =>
         roundCanvas.toBlob(
             (b) => b ? resolve(b) : reject(new Error("轉換失敗")),
-            "image/webp",
-            0.75
+            "image/jpeg",
+            0.8  // 品質 0~1，0.8 為畫質與檔案大小的平衡點
         )
     );
 }
@@ -78,7 +84,7 @@ $(function () {
     // ==================== 上傳流程 ====================
     /** 上傳裁切後的圖片到 Firebase，回傳下載 URL */
     async function uploadCroppedBlob(croppedBlob) {
-        const tempPath = `avatars/${memberId}/profile_${Date.now()}.webp`;
+        const tempPath = `avatars/${memberId}/profile_${Date.now()}.jpg`;
         await uploadBytes(ref(storage, tempPath), croppedBlob);
         return getDownloadURL(tempPath);
     }
@@ -90,6 +96,13 @@ $(function () {
                 await deleteObject(ref(storage, getPathFromURL(previousTempUrl)));
             } catch (_) {}
         }
+    }
+
+    /** 刪除 Firebase 上的原始圖（若存在則刪，不存在略過） */
+    async function deleteOriginalFile() {
+        try {
+            await deleteObject(ref(storage, `avatars/${memberId}/original.webp`));
+        } catch (_) {}
     }
 
     // ==================== 事件綁定 ====================
@@ -146,10 +159,11 @@ $(function () {
             showToast("info", "圖片上傳中，請稍候...");
 
             const croppedBlob = await canvasToRoundBlob(canvas);
-
-            // 上傳新圖片後，刪除舊圖片
             const downloadURL = await uploadCroppedBlob(croppedBlob);
+
+            // 刪除舊的裁切圖與原始圖
             await deletePreviousTempFile();
+            await deleteOriginalFile();
 
             previousTempUrl = downloadURL;
             isAvatarRemoved = false;
@@ -183,6 +197,7 @@ $(function () {
 
         try {
             await deletePreviousTempFile();
+            await deleteOriginalFile();
         } catch (error) {
             if (error.code !== "storage/object-not-found") {
                 alert("Firebase 圖片刪除失敗：" + error.message);
