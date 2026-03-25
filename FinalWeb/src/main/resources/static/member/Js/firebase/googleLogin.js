@@ -24,6 +24,11 @@ $(function () {
 
     // 正常環境的 Google 登入流程
     $("#googleLoginBtn").on("click", function () {
+
+        // 取得網址列中的 redirect 參數
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || "";
+
         signInWithPopup(auth, provider)
             .then(function (result) {
                 return result.user.getIdToken().then(function (idToken) {
@@ -32,7 +37,8 @@ $(function () {
                         method: "POST",
                         contentType: "application/json",
                         xhrFields: { withCredentials: true },
-                        data: JSON.stringify({ idToken }),
+                        // 將 redirect 一起傳給後端
+                        data: JSON.stringify({ idToken: idToken, redirect: redirect }),
                         success: function (data) {
                             if (data.success) {
                                 sessionStorage.setItem('toastType', 'success');

@@ -150,86 +150,97 @@
     </div>
 
     <header th:fragment="myHeader"
-        class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 px-6 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-50">
-        <a th:href="@{/home}">
-            <div class="flex items-center gap-3">
-                <div
-                    class="w-12 h-12 rounded-full overflow-hidden  flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
+        class="grid grid-cols-[1fr_auto_1fr] items-center border-b border-slate-200 dark:border-white/10 px-4 lg:px-20 py-4 bg-white dark:bg-background-dark sticky top-0 z-[100]">
+        <!-- 左欄：漢堡（手機）/ Logo（桌機） -->
+        <div class="flex items-center">
+            <button id="mobileMenuBtn" type="button"
+                class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <a th:href="@{/home}" class="hidden md:flex items-center gap-2">
+                <div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
                     <img alt="Seichi Junrei Logo" class="w-full h-full object-contain" th:src="@{/images/LOGO.png}" />
                 </div>
                 <h1 class="text-primary text-2xl font-bold tracking-tight"
                     style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</h1>
-            </div>
-        </a>
-        <nav class="hidden md:flex flex-1 justify-center items-center gap-10">
-            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/news}">最新消息</a>
-            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/info}">旅遊情報</a>
-            <div class="relative group">
-                <a class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
-                    th:href="@{/workList}">
-                    聖地作品巡禮
-                    <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
-                </a>
-                <div
-                    class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
-                        th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='電影')}">電影作品</a>
-                    <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
-                        th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='動畫')}">動畫作品</a>
+            </a>
+        </div>
+        <!-- 中欄 -->
+        <div class="flex justify-center items-center min-w-0">
+            <a th:href="@{/home}" class="md:hidden flex items-center gap-1 min-w-0">
+                <div class="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center p-0.5 shadow-lg shadow-primary/20">
+                    <img alt="Seichi Junrei Logo" class="w-full h-full object-contain" th:src="@{/images/LOGO.png}" />
                 </div>
-            </div>
-            <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                th:href="@{/officialTour}">行程規劃</a>
-        </nav>
-        <div class="flex items-center gap-4">
+                <h1 class="text-primary text-lg font-bold tracking-tight whitespace-nowrap"
+                    style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</h1>
+            </a>
+            <!-- 桌機版 Nav -->
+            <nav class="hidden md:flex items-center gap-10">
+                <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                    th:href="@{/news}">最新消息</a>
+                <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                    th:href="@{/info}">旅遊情報</a>
+                <div class="relative group">
+                    <a class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
+                        th:href="@{/workList}">
+                        聖地作品巡禮
+                        <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+                    </a>
+                    <div class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
+                            th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='電影')}">電影作品</a>
+                        <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
+                            th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='動畫')}">動畫作品</a>
+                    </div>
+                </div>
+                <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
+                    th:href="@{/officialTour}">行程規劃</a>
+            </nav>
+        </div>
+        <!-- 右欄：主題切換 + 會員按鈕 -->
+        <div class="flex items-center justify-end gap-2">
             <button aria-label="Toggle theme"
                 class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-primary transition-all"
                 onclick="toggleTheme()">
                 <span class="material-symbols-outlined theme-toggle-sun">light_mode</span>
                 <span class="material-symbols-outlined theme-toggle-moon">dark_mode</span>
             </button>
+
             <div th:if="${session.loginMember == null}">
                 <a th:href="@{/auth}"
-                    class="inline-block bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-6 py-2 rounded-lg text-sm font-bold transition-all">
+                    class="inline-block bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-3 md:px-6 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap">
                     會員登入
                 </a>
             </div>
-
             <div th:if="${session.loginMember != null}" class="relative">
                 <button id="memberDropdownBtn"
-                    class="flex items-center gap-2 bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-4 h-9 rounded-lg text-sm font-bold transition-all">
-
-                    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/30">
+                    class="flex items-center gap-2 bg-primary hover:bg-orange-600 text-white dark:text-background-dark px-2 md:px-4 h-9 rounded-lg text-sm font-bold transition-all">
+                    <div class="w-7 h-7 rounded-full overflow-hidden border border-white/30 shrink-0">
                         <img class="w-full h-full object-cover"
                             th:src="${session.loginMember.memberImgUrl != null and !#strings.isEmpty(session.loginMember.memberImgUrl)
                                     ? session.loginMember.memberImgUrl
-                                    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCZn0hF5odiTpTSvLLJlYC3FAJl-mVbD9Q7ubYgm7DvAcUSyRp43TqfRb1mZLIN8sapDa0aGJm2xOrg0H78C8c6Ses7XzltLJOwoCUFFWG5hoYHppigEM5D-4zzee5STn_MPefGID3DCWCLXW13xuVOfu07C0ndadqD3Qa_l7ffs4lkF_ohFVipsBhgCTJeVbPq7P5EMXQF12StVLfHdDXXWP1cy4kZooAXFCOPx9P2xizu0ZqgMNT3kIgFqhRlsKEvZuGJXQ-2gpc'}"
+                                    : '/images/defaultAvatar.webp'}"
+                            onerror="this.onerror=null; this.src='/images/defaultAvatar.webp';"
                             alt="會員頭像">
                     </div>
-
-                    <span th:text="${session.loginMember.name}"></span>
-
+                    <span th:text="${session.loginMember.name}"
+                        class="hidden md:inline whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]"></span>
                     <span id="memberDropdownArrow"
-                        class="material-symbols-outlined text-[18px] leading-none transition-transform duration-200">
+                        class="material-symbols-outlined text-[18px] leading-none transition-transform duration-200 shrink-0">
                         keyboard_arrow_down
                     </span>
                 </button>
 
                 <div id="memberDropdownMenu"
                     class="absolute right-0 top-full mt-2 w-40 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-800 shadow-xl z-50 opacity-0 -translate-y-2 pointer-events-none transition-all duration-200">
-
                     <a th:href="@{/member}"
                         class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-t-xl">
                         會員中心
                     </a>
-
                     <a th:href="@{/backend/home}" sec:authorize="hasRole('ADMIN')"
-                        class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-t-xl">
+                        class="block px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition">
                         管理後台
                     </a>
-
                     <a th:href="@{/member/logout}"
                         class="block w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition rounded-b-xl">
                         登出
@@ -237,10 +248,136 @@
                 </div>
             </div>
         </div>
+        <!-- 手機版抽屜選單（header 外面、body 裡面） -->
+        <div id="mobileMenu"
+            class="fixed inset-0 z-[60] hidden">
+            <!-- 背景遮罩 -->
+            <div id="mobileMenuBackdrop"
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <!-- 側邊抽屜 -->
+            <div id="mobileMenuDrawer"
+                class="absolute left-0 top-0 h-full w-64 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-white/10 flex flex-col p-6 gap-2 -translate-x-full transition-transform duration-300">
+
+                <!-- 關閉按鈕 -->
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-primary font-bold text-lg"
+                        style='font-family: "Noto Sans TC", "PingFang TC", sans-serif;'>聖地巡禮</span>
+                    <button id="mobileMenuClose" type="button"
+                        class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- 導覽連結 -->
+                <a th:href="@{/news}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors font-medium">
+                    <span class="material-symbols-outlined text-[20px]">newspaper</span>
+                    最新消息
+                </a>
+                <a th:href="@{/info}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors font-medium">
+                    <span class="material-symbols-outlined text-[20px]">travel_explore</span>
+                    旅遊情報
+                </a>
+                <!-- 聖地作品巡禮（可展開） -->
+                <div>
+                    <button type="button" id="mobileWorkToggle"
+                        class="w-full flex items-center justify-between px-4 py-3 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors font-medium">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-[20px]">auto_stories</span>
+                            聖地作品巡禮
+                        </div>
+                        <span id="mobileWorkArrow" class="material-symbols-outlined text-[20px] transition-transform duration-200">
+                            keyboard_arrow_down
+                        </span>
+                    </button>
+
+                    <!-- 子項目（預設收起） -->
+                    <div id="mobileWorkSubmenu" class="hidden flex-col pl-4">
+                        <a th:href="@{/workList(page=0, size=4, workClass='電影')}"
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors text-sm">
+                            <span class="material-symbols-outlined text-[18px]">movie</span>
+                            電影作品
+                        </a>
+                        <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors text-sm">
+                            <span class="material-symbols-outlined text-[18px]">animation</span>
+                            動畫作品
+                        </a>
+                    </div>
+                </div>
+                <a th:href="@{/officialTour}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors font-medium">
+                    <span class="material-symbols-outlined text-[20px]">map</span>
+                    行程規劃
+                </a>
+            </div>
+        </div>
         <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
+        <script>
+            function toggleTheme() {
+                // 1. 執行切換
+                const isDark = document.documentElement.classList.toggle('dark');
+
+                // 2. 存入瀏覽器記憶體 (LocalStorage)
+                // 如果現在是 dark 模式，就存 'dark'，否則存 'light'
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+        </script>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script th:src="@{/member/js/headerMemberDropdown.js}"></script>
         <script th:src="@{/assets/toast.js}"></script>
+        <script>
+            // 漢堡選單
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenuClose = document.getElementById('mobileMenuClose');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuDrawer = document.getElementById('mobileMenuDrawer');
+            const mobileMenuBackdrop = document.getElementById('mobileMenuBackdrop');
+            const mobileWorkToggle = document.getElementById('mobileWorkToggle');
+            const mobileWorkSubmenu = document.getElementById('mobileWorkSubmenu');
+            const mobileWorkArrow = document.getElementById('mobileWorkArrow');
+
+            function openMobileMenu() {
+                mobileMenu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    mobileMenuDrawer.classList.remove('-translate-x-full');
+                });
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function closeMobileMenu() {
+                mobileMenuDrawer.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }, 300);
+            }
+
+            // 初始化：設定 overflow hidden 讓高度動畫生效
+            mobileWorkSubmenu.style.overflow = 'hidden';
+            mobileWorkSubmenu.style.maxHeight = '0';
+            mobileWorkSubmenu.style.transition = 'max-height 0.3s ease';
+            mobileWorkSubmenu.classList.remove('hidden');
+            mobileWorkSubmenu.classList.add('flex');
+
+            mobileWorkToggle.addEventListener('click', function () {
+                const isCollapsed = mobileWorkSubmenu.style.maxHeight === '0px' || mobileWorkSubmenu.style.maxHeight === '0';
+                if (isCollapsed) {
+                    mobileWorkSubmenu.style.maxHeight = mobileWorkSubmenu.scrollHeight + 'px';
+                    mobileWorkArrow.style.transform = 'rotate(180deg)';
+                    mobileWorkArrow.style.transition = 'transform 0.3s ease';
+                } else {
+                    mobileWorkSubmenu.style.maxHeight = '0';
+                    mobileWorkArrow.style.transform = 'rotate(0deg)';
+                    mobileWorkArrow.style.transition = 'transform 0.3s ease';
+                }
+            });
+
+            mobileMenuBtn.addEventListener('click', openMobileMenu);
+            mobileMenuClose.addEventListener('click', closeMobileMenu);
+            mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
+        </script>
     </header>
 
     <main class="flex-1 relative flex w-full h-full overflow-hidden">
