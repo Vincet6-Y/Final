@@ -19,7 +19,12 @@ import java.util.stream.Collectors;
 @Service
 public class ECPayService {
 
-    private final static String ECPAY_URL = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
+    // 讀取綠界環境與商家代號
+    @Value("${ecpay.url:https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5}")
+    private String ecpayUrl;
+
+    @Value("${ecpay.merchant-id}")
+    private String merchantId;
 
     // 從application.properties 讀取
     @Value("${app.base-url}")
@@ -55,7 +60,7 @@ public class ECPayService {
             totalAmount = 1;
 
         // 綠界參數-綠界商店編號、商家交易編號、交易時間、交易金額、交易描述
-        params.put("MerchantID", "3002607");
+        params.put("MerchantID", merchantId);
         params.put("MerchantTradeNo", merchantTradeNo);
         params.put("MerchantTradeDate", time);
         params.put("PaymentType", "aio");
@@ -89,7 +94,7 @@ public class ECPayService {
 
         // 產生自定 HTML Form，直接帶有 JavaScript 自動送出
         StringBuilder form = new StringBuilder();
-        form.append("<form id='ecpay-form' action='").append(ECPAY_URL).append("' method='POST'>");
+        form.append("<form id='ecpay-form' action='").append(ecpayUrl).append("' method='POST'>");
         for (Map.Entry<String, String> entry : params.entrySet()) {
             form.append("<input type='hidden' name='").append(entry.getKey()).append("' value='")
                     .append(entry.getValue()).append("' />");
