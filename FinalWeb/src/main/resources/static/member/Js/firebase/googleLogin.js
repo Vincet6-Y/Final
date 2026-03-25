@@ -1,12 +1,15 @@
-import { auth, provider, signInWithPopup } from "./firebase.js";
+import { auth, provider, signInWithPopup, signOut } from "./firebase.js";
 
 function isLineApp() {
     return /Line/i.test(navigator.userAgent);
 }
 
+function isIGApp() {
+    return /Instagram/i.test(navigator.userAgent);
+}
+
 $(function () {
 
-    // 頁面載入時清掉 openExternalBrowser 參數
     const url = new URL(window.location.href);
     if (url.searchParams.has('openExternalBrowser')) {
         url.searchParams.delete('openExternalBrowser');
@@ -18,6 +21,18 @@ $(function () {
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.set('openExternalBrowser', '1');
             window.location.href = currentUrl.toString();
+        });
+        return;
+    }
+
+    if (isIGApp()) {
+        $("#googleLoginBtn").off("click").on("click", function () {
+            const isIOS = /iPhone|iPad/i.test(navigator.userAgent);
+            if (isIOS) {
+                showToast('info', '請點右上角 ⋯ 選單，選擇「使用外部瀏覽器開啟」');
+            } else {
+                showToast('info', '請點右上角 ⋮ 選單，選擇「在瀏覽器中開啟」');
+            }
         });
         return;
     }
@@ -50,7 +65,7 @@ $(function () {
             })
             .catch(function (e) {
                 console.error("google popup error =", e);
-                showToast('error', "Google 登入失敗");
+                showToast('error', e.code || e.message || "Google 登入失敗");
             });
     });
 });
