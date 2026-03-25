@@ -49,7 +49,7 @@ public class PaymentController {
                 ? ordersRepo.findById(orderId).orElse(new OrdersEntity())
                 : new OrdersEntity();
         paymentService.populatePaymentModel(model, order);
-        return "payment";
+        return "payMent";
     }
 
     // 建立未付款訂單
