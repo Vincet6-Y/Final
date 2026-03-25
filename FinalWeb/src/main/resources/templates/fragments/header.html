@@ -41,19 +41,19 @@
                     th:href="@{/info}">旅遊情報</a>
                 <div class="relative group">
                     <a class="flex items-center gap-1 text-slate-600 dark:text-slate-100 group-hover:text-primary transition-colors text-sm font-medium py-2"
-                        th:href="@{/workList}">
+                        th:href="@{/worklist}">
                         聖地作品巡禮
                         <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
                     </a>
                     <div class="absolute left-0 mt-0 w-40 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-slate-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary first:rounded-t-lg"
-                            th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='電影')}">電影作品</a>
+                            th:href="@{/worklist(page=0, size=4, sortDir=${sortNow}, workClass='電影')}">電影作品</a>
                         <a class="block px-4 py-3 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary dark:hover:text-primary last:rounded-b-lg"
-                            th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='動畫')}">動畫作品</a>
+                            th:href="@{/worklist(page=0, size=4, sortDir=${sortNow}, workClass='動畫')}">動畫作品</a>
                     </div>
                 </div>
                 <a class="text-slate-600 dark:text-slate-100 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                    th:href="@{/officialTour}">行程規劃</a>
+                    th:href="@{/officialtour}">行程規劃</a>
             </nav>
         </div>
          <!-- 右欄：主題切換 + 會員按鈕 -->
@@ -153,19 +153,19 @@
 
                     <!-- 子項目（預設收起） -->
                     <div id="mobileWorkSubmenu" class="hidden flex-col pl-4">
-                        <a th:href="@{/workList(page=0, size=4, workClass='電影')}"
+                        <a th:href="@{/worklist(page=0, size=4, workClass='電影')}"
                             class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors text-sm">
                             <span class="material-symbols-outlined text-[18px]">movie</span>
                             電影作品
                         </a>
-                        <a th:href="@{/workList(page=0, size=4, workClass='動畫')}"
+                        <a th:href="@{/worklist(page=0, size=4, workClass='動畫')}"
                             class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors text-sm">
                             <span class="material-symbols-outlined text-[18px]">animation</span>
                             動畫作品
                         </a>
                     </div>
                 </div>
-                <a th:href="@{/officialTour}"
+                <a th:href="@{/officialtour}"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors font-medium">
                     <span class="material-symbols-outlined text-[20px]">map</span>
                     行程規劃
