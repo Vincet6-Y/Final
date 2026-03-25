@@ -62,7 +62,7 @@ public class BackEndController {
 
     @RequestMapping("/home")
     public String backendhome() {
-        return "/backend/backendhome";
+        return "backend/backendhome";
     }
 
     @RequestMapping("/order")
@@ -79,7 +79,7 @@ public class BackEndController {
         Map<String, Object> stats = adminOrderService.getAdminDashboardStats();
         model.addAttribute("stats", stats);
 
-        return "/backend/backendorder";
+        return "backend/backendorder";
     }
 
     @RequestMapping("/operation")
@@ -98,7 +98,7 @@ public class BackEndController {
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
         model.addAttribute("currentAdminId", loginMember != null ? loginMember.getMemberId() : null);
 
-        return "/backend/backendoperation";
+        return "backend/backendoperation";
     }
 
     @RequestMapping("/contentmanagement")
@@ -130,7 +130,7 @@ public class BackEndController {
             model.addAttribute("loginMemberName", "管理員");
         }
 
-        return "/backend/backendcontentmanagement";
+        return "backend/backendcontentmanagement";
     }
 
     // 【新增】處理切換上下架狀態的 AJAX 請求
@@ -173,7 +173,7 @@ public class BackEndController {
         // 【新增】將 API Key 傳給前端 Thymeleaf 模板
         model.addAttribute("apiKey", googleMapsApiKey);
 
-        return "/backend/backendplancreate";
+        return "backend/backendplancreate";
     }
 
     // ==========================================
@@ -207,7 +207,7 @@ public class BackEndController {
         model.addAttribute("plan", plan);
 
         // backendplanedit.html 來處理編輯邏輯
-        return "/backend/backendplanedit";
+        return "backend/backendplanedit";
     }
 
     // ==========================================
@@ -228,14 +228,14 @@ public class BackEndController {
 
     @RequestMapping("/backendarticle")
     public String backendarticle() {
-        return "/backend/backendarticle";
+        return "backend/backendarticle";
     }
 
     // 作品列表相關
     @RequestMapping("/contentmanagement/work")
     public String backendwork() {
 
-        return "/backend/backendworkmanagement";
+        return "backend/backendworkmanagement";
     }
 
     @PostMapping("/contentmanagement/work/add")
@@ -255,7 +255,7 @@ public class BackEndController {
         model.addAttribute("works", workPage);
         model.addAttribute("page", page);
 
-        return "/backend/backendworklist";
+        return "backend/backendworklist";
     }
 
     @GetMapping("/contentmanagement/work/edit")
@@ -265,7 +265,7 @@ public class BackEndController {
         WorkDetailEntity getWork = getWorkBox.orElse(null);
         model.addAttribute("getWork", getWork);
 
-        return "/backend/backendworkedit";
+        return "backend/backendworkedit";
     }
 
     @PostMapping("/contentmanagement/work/update")
