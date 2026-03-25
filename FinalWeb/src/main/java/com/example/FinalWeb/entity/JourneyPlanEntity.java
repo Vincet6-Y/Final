@@ -1,4 +1,4 @@
-﻿package com.example.FinalWeb.entity;
+package com.example.FinalWeb.entity;
 
 import java.util.List;
 import java.util.Map;
