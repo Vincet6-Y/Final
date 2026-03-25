@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpSession;
 
 @Service
 public class LineLoginService {
-    
+
     @Value("${line.login.channel-id}")
     private String channelId;
 
@@ -49,7 +49,8 @@ public class LineLoginService {
         session.setAttribute("lineAction", "login");
 
         if (redirect != null && !redirect.isBlank()) {
-            session.setAttribute("lineLoginRedirect", redirect);
+            // 將 lineLoginRedirect 改為 socialRedirect
+            session.setAttribute("socialRedirect", redirect);
         }
 
         return "https://access.line.me/oauth2/v2.1/authorize"
@@ -78,7 +79,6 @@ public class LineLoginService {
                 + "&scope=profile%20openid%20email";
     }
 
-
     // 用 LINE callback 回傳的 code 取得使用者資料
     // 會回傳：userId、displayName、email（若 LINE 沒提供則為 null）
     public JsonNode getLineProfile(String code) throws Exception {
@@ -97,14 +97,12 @@ public class LineLoginService {
         tokenBody.add("client_id", channelId);
         tokenBody.add("client_secret", channelSecret);
 
-        HttpEntity<MultiValueMap<String, String>> tokenRequest =
-                new HttpEntity<>(tokenBody, tokenHeaders);
+        HttpEntity<MultiValueMap<String, String>> tokenRequest = new HttpEntity<>(tokenBody, tokenHeaders);
 
         ResponseEntity<String> tokenResponse = restTemplate.postForEntity(
                 tokenUrl,
                 tokenRequest,
-                String.class
-        );
+                String.class);
 
         JsonNode tokenJson = objectMapper.readTree(tokenResponse.getBody());
         String accessToken = tokenJson.get("access_token").asText();
@@ -121,13 +119,12 @@ public class LineLoginService {
                 profileUrl,
                 HttpMethod.GET,
                 profileRequest,
-                String.class
-        );
+                String.class);
 
         JsonNode profileJson = objectMapper.readTree(profileResponse.getBody());
 
         // 3. email 不在 /v2/profile，而是在 id_token 裡
-        //    先預設為 null，若 LINE 沒回傳 email 就保持 null
+        // 先預設為 null，若 LINE 沒回傳 email 就保持 null
         String email = null;
 
         if (tokenJson.has("id_token")) {
@@ -146,18 +143,16 @@ public class LineLoginService {
         }
 
         // 4. 把 email 補回 profileJson，讓 controller 可以統一用同一份資料取值
-        com.fasterxml.jackson.databind.node.ObjectNode result =
-                (com.fasterxml.jackson.databind.node.ObjectNode) profileJson;
+        com.fasterxml.jackson.databind.node.ObjectNode result = (com.fasterxml.jackson.databind.node.ObjectNode) profileJson;
         result.put("email", email);
 
         return result;
     }
 
-
     // 依 LINE userId 查詢是否已綁定本站會員
     public MemberEntity findLinkedMember(String lineUserId) {
-        Optional<MemberOauthEntity> oauthOpt =
-                memberOauthRepo.findByProviderAndProviderId(AuthProvider.LINE, lineUserId);
+        Optional<MemberOauthEntity> oauthOpt = memberOauthRepo.findByProviderAndProviderId(AuthProvider.LINE,
+                lineUserId);
 
         if (oauthOpt.isPresent()) {
             return oauthOpt.get().getMember();

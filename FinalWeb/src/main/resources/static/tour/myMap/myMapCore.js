@@ -1,12 +1,19 @@
 async function initMap() {
+    // 🌟 1. 偵測目前網頁是否為深色模式
+    const isDarkMode = document.documentElement.classList.contains('dark');
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 34.6937, lng: 135.5023 },
         zoom: 11,
         mapId: "2fd53a2f051832ea485534f4",
+        // 🌟 2. 核心：告訴 Google Map 目前要用什麼配色 ('DARK' 或 'LIGHT')
+        colorScheme: isDarkMode ? 'DARK' : 'LIGHT',
         disableDefaultUI: true,
         zoomControl: true,
         zoomControlOptions: { position: google.maps.ControlPosition.LEFT_BOTTOM }
     });
+
+    // 🌟 2. 關鍵防呆：強制將 map 綁定到 window 變數，保證 HTML 絕對抓得到！
+    window.map = map;
 
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
@@ -23,6 +30,28 @@ async function initMap() {
             fetchAndShowDetails(event.placeId);
         }
     });
+}
+
+function toggleTheme() {
+    // 1. 執行網頁 HTML 切換深淺色
+    const isDark = document.documentElement.classList.toggle('dark');
+
+    // 2. 存入瀏覽器記憶體，確保重整後維持該模式
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    // 使用您現有的 showToast 函式，顯示對應的模式名稱
+    if (typeof showToast === 'function') {
+        const modeName = isDark ? '深色' : '淺色';
+        showToast('success', `正在切換至${modeName}模式，請稍候...`);
+    }
+
+    console.log("正在切換主題並存入記憶體：", isDark ? "深色" : "淺色");
+
+    // 🌟 核心：使用「平滑重整」解決地圖不變色的問題
+    // 延遲 200 毫秒，讓使用者先看到背景顏色變動，再進行無感的重整來更換地圖 ID 樣式
+    setTimeout(() => {
+        window.location.reload();
+    }, 200);
 }
 
 // ==========================================
