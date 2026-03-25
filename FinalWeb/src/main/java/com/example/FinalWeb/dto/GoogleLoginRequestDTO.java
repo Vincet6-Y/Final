@@ -1,5 +1,5 @@
 package com.example.FinalWeb.dto;
 
-public record GoogleLoginRequestDTO(String idToken) {
-
+// 新增 String redirect 屬性
+public record GoogleLoginRequestDTO(String idToken, String redirect) {
 }

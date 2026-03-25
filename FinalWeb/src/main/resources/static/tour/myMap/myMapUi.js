@@ -641,18 +641,22 @@ function toggleMobileView() {
 // 🌟 新增功能：動態加入「出發日期選擇器」+ Day 按鈕左右滑動箭頭
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-    const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
+
+    // 🌟 修正 1：將搜尋範圍嚴格限制在 itinerary-panel 內，避免抓到 Header 的手機版標題！
+    const panel = document.getElementById('itinerary-panel');
+    if (!panel) return;
+    const titleContainer = panel.querySelector('.text-lg.font-bold.text-primary').parentElement;
 
     // 🌟 安全讀取 HTML 中的資料庫隱藏欄位
     const dbStartDateInput = document.getElementById('db-startDate');
     const dbTotalDaysInput = document.getElementById('db-totalDays');
 
-    // 🌟 1. 改為全域變數 window.myMapTotalDays，讓 API 也能修改它
+    // 🌟 改為全域變數 window.myMapTotalDays，讓 API 也能修改它
     const today = new Date();
     let defaultStart = (dbStartDateInput && dbStartDateInput.value) ? new Date(dbStartDateInput.value) : today;
     window.myMapTotalDays = (dbTotalDaysInput && dbTotalDaysInput.value) ? parseInt(dbTotalDaysInput.value) : 5;
 
-    // 預設加上按鈕日期的函式 (後續會在 window.updateDayButtonsAndLists 覆蓋)
+    // 預設加上按鈕日期的函式
     let daysToAdd = window.myMapTotalDays - 1;
     let defaultEnd = new Date(defaultStart);
     defaultEnd.setDate(defaultStart.getDate() + daysToAdd);
@@ -703,7 +707,7 @@ document.addEventListener("DOMContentLoaded", () => {
     buttonContainer.classList.remove('border-b', 'border-slate-200', 'dark:border-white/10', 'shrink-0');
     buttonContainer.classList.add('w-full', 'scroll-smooth');
 
-    // 建立左邊箭頭 (有漂亮陰影的圓形按鈕)
+    // 建立左邊箭頭
     const leftBtn = document.createElement('button');
     leftBtn.className = "absolute left-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
     leftBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_left</span>';
@@ -716,11 +720,10 @@ document.addEventListener("DOMContentLoaded", () => {
     tabsWrapper.appendChild(leftBtn);
     tabsWrapper.appendChild(rightBtn);
 
-    // 點擊箭頭滑動事件 (每次滑動約 200px)
+    // 點擊箭頭滑動事件
     leftBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: -200, behavior: 'smooth' }));
     rightBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: 200, behavior: 'smooth' }));
 
-    // 判斷箭頭是否該顯示 (如果滑到最左邊就隱藏左箭頭，最右邊就隱藏右箭頭)
     const checkArrows = () => {
         if (buttonContainer.scrollWidth > buttonContainer.clientWidth) {
             leftBtn.classList.toggle('hidden', buttonContainer.scrollLeft <= 0);
@@ -735,18 +738,15 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('resize', checkArrows);
 
     // ==========================================
-    // ✨ 動態生成 Day 按鈕與列表 (🌟 2. 改寫為全域函數 window.updateDayButtonsAndLists)
+    // ✨ 動態生成 Day 按鈕與列表
     // ==========================================
     window.updateDayButtonsAndLists = function (param) {
 
-        // 🌟 3. 智慧判斷：如果傳進來的是「數字」(代表 API 發現了更多天數)
         if (typeof param === 'number') {
             if (param > window.myMapTotalDays) {
-                window.myMapTotalDays = param; // 擴充總天數
+                window.myMapTotalDays = param;
             }
-        }
-        // 🌟 4. 如果傳進來的是「日期」(代表使用者從日曆重新選擇了出發日)
-        else if (param instanceof Date) {
+        } else if (param instanceof Date) {
             defaultStart = param;
         }
 
@@ -754,13 +754,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentEnd = new Date(defaultStart);
         currentEnd.setDate(defaultStart.getDate() + daysToAdd);
 
-        // 更新日期顯示文字
         if (dateDisplay) {
             dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(currentEnd)}`;
         }
 
         const scrollArea = document.getElementById('itinerary-scroll-area');
         if (!scrollArea) return;
+
+        // 抓取 AI 排序按鈕的外層容器，用來定位插入點
+        const aiSortContainer = document.getElementById('ai-sort-btn') ? document.getElementById('ai-sort-btn').parentElement : null;
+
         buttonContainer.innerHTML = '';
 
         for (let i = 1; i <= window.myMapTotalDays; i++) {
@@ -781,7 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!listContainer) {
                 listContainer = document.createElement('div');
                 listContainer.id = `list-day-${i}`;
-                listContainer.className = "day-list p-4 flex flex-col pb-24 pt-0 hidden";
+                listContainer.className = "day-list p-4 flex flex-col pb-6 pt-0 hidden";
                 listContainer.innerHTML = `
                         <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
                             <div class="w-1.5 h-full bg-slate-300 dark:bg-slate-600 absolute left-0 top-0"></div>
@@ -790,19 +793,22 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">請從地圖點擊景點加入</p>
                             </div>
                         </div>`;
-                scrollArea.appendChild(listContainer);
+
+                // 🌟 修正 2：將新產生的行程容器「插隊」到 AI 按鈕的上方！
+                if (aiSortContainer && aiSortContainer.parentNode === scrollArea) {
+                    scrollArea.insertBefore(listContainer, aiSortContainer);
+                } else {
+                    scrollArea.appendChild(listContainer);
+                }
             }
             if (!itineraryData[i]) itineraryData[i] = [];
         }
-        // 每次重新產生按鈕後，等畫面算好寬度，重新檢查要不要出現箭頭
         setTimeout(checkArrows, 100);
     };
 
-    // 初始化第一次呼叫
     window.updateDayButtonsAndLists(defaultStart);
     selectDay(1);
 
-    // 監聽使用者更改日期
     dateInput.addEventListener('change', (e) => {
         if (!e.target.value) return;
         window.updateDayButtonsAndLists(new Date(e.target.value));
