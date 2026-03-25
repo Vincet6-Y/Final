@@ -25,13 +25,13 @@
                     <button type="button" id="mobileShowRegisterBtn" class="auth-switch-btn"
                         th:classappend="${openPanel == 'register'} ? ' active' : ''">註冊</button>
                 </div>
-                <div th:replace="~{login/loginForm :: loginForm}"></div>
-                <div th:replace="~{login/registerForm :: registerForm}"></div>
+                <div th:replace="~{login/loginform :: loginForm}"></div>
+                <div th:replace="~{login/registerform :: registerForm}"></div>
             </div>
             <!-- 左邊/右邊會互換位置的 圖片卡 -->
             <div class="auth-card hero-card">
-                <div th:replace="~{login/loginHero :: loginHero}"></div>
-                <div th:replace="~{login/registerHero :: registerHero}"></div>
+                <div th:replace="~{login/loginhero :: loginHero}"></div>
+                <div th:replace="~{login/registerhero :: registerHero}"></div>
             </div>
         </div>
     </main>
