@@ -268,27 +268,27 @@
 
     <!-- ==================== 景點詳情 Modal ==================== -->
     <div id="spotModal"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 lg:p-10">
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 lg:p-10">
         <div
-            class="relative bg-[#1e1e1e] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-white/10">
+            class="relative bg-[#1e1e1e] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden border border-white/10">
 
             <!-- 頂部標題與關閉按鈕 -->
-            <div class="flex items-center justify-between p-5 border-b border-white/5 shrink-0 bg-[#251d15]/50">
+            <div class="flex items-center justify-between px-4 py-3 sm:p-5 border-b border-white/5 shrink-0 bg-[#251d15]/50">
                 <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-orange-500 text-xl">directions_transit</span>
-                    <h3 class="text-lg font-bold text-white">景點詳情</h3>
+                    <h3 class="text-base sm:text-lg font-bold text-white">景點詳情</h3>
                 </div>
                 <button id="closeModalBtn"
-                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-orange-500 text-white flex items-center justify-center transition-colors">
+                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-orange-500 text-white flex items-center justify-center transition-colors shrink-0">
                     <span class="material-symbols-outlined text-lg">close</span>
                 </button>
             </div>
 
-            <!-- 內容區 (左邊照片，右邊文字與 QR Code) -->
-            <div class="flex flex-col md:flex-row flex-1 overflow-y-auto min-h-[400px]">
+            <!-- 內容區：手機垂直，桌機左右 -->
+            <div class="flex flex-col md:flex-row flex-1 overflow-y-auto">
 
-                <!-- 左側：景點照片 -->
-                <div class="w-full md:w-1/2 bg-black flex items-center justify-center relative min-h-[300px] shrink-0">
+                <!-- 照片區：手機固定較小高度，桌機佔一半寬 -->
+                <div class="w-full md:w-1/2 bg-black flex items-center justify-center relative h-44 sm:h-56 md:h-auto md:min-h-[400px] shrink-0">
                     <div id="modal-photo"
                         class="absolute inset-0 w-full h-full flex items-center justify-center text-slate-500">
                         <span class="material-symbols-outlined text-4xl animate-pulse">photo_camera</span>
@@ -296,29 +296,29 @@
                 </div>
 
                 <!-- 右側：文字說明與 QRCode -->
-                <div class="w-full md:w-1/2 p-6 lg:p-10 flex flex-col overflow-y-auto custom-scrollbar bg-[#1c140d]">
-                    <h2 id="modal-name" class="text-3xl font-black text-white mb-4">景點名稱</h2>
-                    <p id="modal-description" class="text-orange-500 font-bold mb-4 leading-relaxed tracking-wide"></p>
-                    <p id="modal-detail" class="text-sm text-slate-400 leading-relaxed mb-8 flex-1"></p>
+                <div class="w-full md:w-1/2 p-4 sm:p-6 lg:p-10 flex flex-col overflow-y-auto custom-scrollbar bg-[#1c140d]">
+                    <h2 id="modal-name" class="text-xl sm:text-3xl font-black text-white mb-2 sm:mb-4">景點名稱</h2>
+                    <p id="modal-description" class="text-orange-500 font-bold mb-2 sm:mb-4 leading-relaxed tracking-wide text-sm sm:text-base"></p>
+                    <p id="modal-detail" class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-4 sm:mb-8 flex-1"></p>
 
                     <!-- 付費景點通證 + QR Code -->
                     <div id="modal-ticket-section" class="hidden shrink-0 mt-auto">
                         <div
-                            class="bg-gradient-to-b from-[#332211] to-[#1a1005] rounded-xl p-6 text-center border border-orange-500/20 shadow-lg relative overflow-hidden">
+                            class="bg-gradient-to-b from-[#332211] to-[#1a1005] rounded-xl p-4 sm:p-6 text-center border border-orange-500/20 shadow-lg relative overflow-hidden">
                             <!-- 背景裝飾 -->
                             <div
                                 class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-orange-600/0 via-orange-500 to-orange-600/0">
                             </div>
 
-                            <div class="flex items-center justify-center gap-2 mb-6">
+                            <div class="flex items-center justify-center gap-2 mb-3 sm:mb-6">
                                 <span class="material-symbols-outlined text-orange-500">confirmation_number</span>
-                                <h4 class="text-orange-500 font-bold text-lg tracking-wider">付費景點憑證</h4>
+                                <h4 class="text-orange-500 font-bold text-base sm:text-lg tracking-wider">付費景點憑證</h4>
                             </div>
 
                             <!-- QR Code 圖片 -->
                             <div
-                                class="bg-white rounded-xl p-3 inline-block shadow-2xl mx-auto mb-4 relative z-10 transition-transform hover:scale-105 duration-300">
-                                <img id="modal-qrcode" class="w-32 h-32 md:w-40 md:h-40 object-contain"
+                                class="bg-white rounded-xl p-2 sm:p-3 inline-block shadow-2xl mx-auto mb-3 sm:mb-4 relative z-10 transition-transform hover:scale-105 duration-300">
+                                <img id="modal-qrcode" class="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 object-contain"
                                     src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                                     alt="QR Code" />
                             </div>
