@@ -399,6 +399,25 @@ public class MemberAuthController {
             return redirectOrHome(consumeSocialRedirect(session, null));
         }
 
+        // ✅ 新增：LINE userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
+        if (profile.email() != null && !profile.email().isBlank()) {
+            MemberEntity existingMember = memberService.findByEmail(profile.email());
+            if (existingMember != null) {
+                try {
+                    socialAuthService.link(existingMember, provider, profile.providerId());
+                    memberService.saveLoginSession(existingMember, request);
+                    session.removeAttribute("lineAction");
+                    redirectAttr.addFlashAttribute("toast",
+                        ToastInfoDTO.success("已自動綁定 " + provider.name() + " 並登入，下次可直接使用快速登入"));
+                    return redirectOrHome(consumeSocialRedirect(session, null));
+                } catch (IllegalStateException e) {
+                    // 萬一綁定失敗（理論上不會走到這，但保險起見）
+                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(e.getMessage()));
+                    return "redirect:/auth";
+                }
+            }
+        }
+
         // 未綁定 → 導到註冊頁補資料
         storePendingSocial(session, provider, profile);
         session.removeAttribute("lineAction");
