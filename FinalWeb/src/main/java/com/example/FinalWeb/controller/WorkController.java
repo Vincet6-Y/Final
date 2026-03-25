@@ -38,7 +38,7 @@ public class WorkController {
     // return service.getWork();
     // }
 
-    @GetMapping("/workList")
+    @GetMapping("/worklist")
     public String getWorkPage(Model model, 
         @RequestParam(required = false) String keyword, // 新增此參數接收搜尋字
         @RequestParam(defaultValue = "0") int page,
@@ -66,10 +66,10 @@ public class WorkController {
         model.addAttribute("minYearNow", minYear);
         model.addAttribute("maxYearNow", maxYear);
 
-        return "workList";
+        return "worklist";
     }
 
-    @RequestMapping("/workListDetail")
+    @RequestMapping("/worklistdetail")
     public String workListDetail(Model model,
             @RequestParam(value = "workId") int workId) {
 
@@ -81,6 +81,6 @@ public class WorkController {
         model.addAttribute("idNow", gEntity);
         model.addAttribute("plans", getPlan);
 
-        return "workListDetail";
+        return "worklistdetail";
     }
 }
