@@ -1,4 +1,4 @@
-﻿package com.example.FinalWeb.entity;
+package com.example.FinalWeb.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

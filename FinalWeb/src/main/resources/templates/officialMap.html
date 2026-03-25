@@ -1,6 +1,16 @@
 <!doctype html>
 <html class="dark" lang="zh-Hant">
 
+<script>
+    // 網頁一載入，立刻檢查記憶體裡的佈景主題，防止畫面閃爍
+    if (localStorage.getItem('theme') === 'dark' ||
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+</script>
+
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -152,16 +162,6 @@
             </div>
         </div>
         <th:block th:replace="~{login/toastInfo :: toast}"></th:block>
-        <script>
-            function toggleTheme() {
-                // 1. 執行切換
-                const isDark = document.documentElement.classList.toggle('dark');
-
-                // 2. 存入瀏覽器記憶體 (LocalStorage)
-                // 如果現在是 dark 模式，就存 'dark'，否則存 'light'
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            }
-        </script>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script th:src="@{/member/js/headerMemberDropdown.js}"></script>
         <script th:src="@{/assets/toast.js}"></script>
