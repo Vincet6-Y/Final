@@ -458,7 +458,7 @@ function renderItineraryPanel(day) {
     const isDay1 = day === 1;
     const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
 
-    // 🌟 恢復編輯版：加入 draggable, ondragstart 拖曳事件，以及 <input type="time"> 編輯時間功能
+    // 🌟 第一個行程（起點）的卡片，加入手機版箭頭與刪除按鈕
     const dayStartHTML = `
           <div draggable="true" ondragstart="handleDragStart(event, ${day}, 0)" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, 0)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm cursor-move transition-all duration-200 hover:shadow-md">
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
@@ -470,7 +470,23 @@ function renderItineraryPanel(day) {
                           <input type="time" value="${dayStartPlace.arrivals}" onchange="updateArrivalTime(${day}, 0, this.value)" class="text-xs font-bold text-primary bg-transparent border-b border-dashed border-primary/50 outline-none cursor-pointer p-0 focus:ring-0">
                       </div>
                   </div>
-                  <span class="material-symbols-outlined text-slate-300 dark:text-slate-600 shrink-0">drag_indicator</span>
+                  
+                  <div class="flex flex-col items-end gap-1 shrink-0">
+                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600 hidden md:block cursor-grab">drag_indicator</span>
+                    <div class="flex gap-1 md:hidden">
+                        <button onclick="moveItineraryItem(${day}, 0, 'up')"
+                            class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                            <span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+                        </button>
+                        <button onclick="moveItineraryItem(${day}, 0, 'down')"
+                            class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                            <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+                        </button>
+                    </div>
+                    <button onclick="removeItineraryItem(${day}, 0)" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  </div>
               </div>
           </div>
         `;
@@ -576,14 +592,24 @@ function renderItineraryPanel(day) {
                         小時
                       </span>
                     </div>
+                  </div>
 
-                  </div>
-                  <div class="flex flex-col items-end gap-2 shrink-0">
-                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600">drag_indicator</span>
-                    <button onclick="removeItineraryItem(${day}, ${i})" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
-                      <span class="material-symbols-outlined text-lg">delete</span>
-                    </button>
-                  </div>
+                  <div class="flex flex-col items-end gap-1 shrink-0">
+                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600 hidden md:block cursor-grab">drag_indicator</span>
+                        <div class="flex gap-1 md:hidden">
+                            <button onclick="moveItineraryItem(${day}, ${i}, 'up')"
+                                class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                                <span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+                            </button>
+                            <button onclick="moveItineraryItem(${day}, ${i}, 'down')"
+                                class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                                <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+                            </button>
+                        </div>
+                        <button onclick="removeItineraryItem(${day}, ${i})" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
+                            <span class="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                    </div>
                 </div>
               </div>
             `;
@@ -895,3 +921,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 100);
     }
 });
+
+// 手機版改成「上移/下移箭頭按鈕」
+async function moveItineraryItem(day, index, direction) {
+    const list = itineraryData[day];
+    if (!list || list.length < 2) return;
+
+    // 💡 移除原本擋住 index === 0 的限制
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+    // 💡 確保目標位置沒有超出陣列範圍 (0 到 list.length - 1 都可以)
+    if (targetIndex < 0 || targetIndex >= list.length) return;
+
+    // 交換位置
+    const temp = list[index];
+    list[index] = list[targetIndex];
+    list[targetIndex] = temp;
+
+    // 重新計算路線並更新畫面
+    calculateAndDisplayRoute(day);
+}

@@ -304,25 +304,50 @@
         </script>
     </header>
 
+    <!-- 彈窗景點資訊 -->
     <div id="rich-place-modal"
-        class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-        <div
-            class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10">
+        class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
 
+        <div
+            class="bg-[#1e1e1e] text-slate-200 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden relative flex flex-col animate-slide-up border border-white/10"
+            style="max-height: 90vh;">
+
+            <!-- 關閉按鈕：固定在彈窗右上角 -->
             <button onclick="closeRichModal()"
-                class="absolute top-4 right-4 z-[70] w-9 h-9 flex items-center justify-center bg-black/50 hover:bg-black/80 text-white rounded-full transition">
+                type="button"
+                class="absolute top-3 right-3 z-20 w-10 h-10 flex items-center justify-center bg-black/70 hover:bg-red-600 text-white rounded-full transition-colors shadow-lg border border-white/20">
                 <span class="material-symbols-outlined text-xl">close</span>
             </button>
 
-            <div class="h-56 sm:h-72 flex gap-1 bg-black shrink-0 overflow-x-auto no-scrollbar relative">
-                <img id="modal-img-main" src="" class="h-full w-2/3 md:w-1/2 object-cover flex-shrink-0">
-                <img id="modal-img-sub1" src="" class="h-full w-1/3 md:w-1/4 object-cover flex-shrink-0">
-                <img id="modal-img-sub2" src="" class="h-full w-1/3 md:w-1/4 object-cover flex-shrink-0">
+            <!-- 照片區：三圖並排，固定高度，overflow hidden 避免跑版 -->
+            <div class="h-64 sm:h-80 flex gap-1 bg-black shrink-0 overflow-hidden">
+                <img id="modal-img-main"
+                    src="https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80"
+                    class="h-full flex-1 object-cover min-w-0"
+                    alt="景點主圖">
+                <div class="flex flex-col gap-1 w-1/3 shrink-0">
+                    <img id="modal-img-sub1"
+                        src="https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80"
+                        class="h-1/2 w-full object-cover"
+                        alt="景點縮圖1">
+                    <img id="modal-img-sub2"
+                        src="https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&q=80"
+                        class="h-1/2 w-full object-cover"
+                        alt="景點縮圖2">
+                </div>
             </div>
 
-            <div class="p-6 md:p-8 overflow-y-auto no-scrollbar flex-1 relative">
-                <h1 id="modal-place-name" class="text-3xl md:text-4xl font-bold text-white mb-3 pr-36">載入中...</h1>
-                <div class="flex items-center gap-3 text-sm text-slate-400 mb-8 border-b border-white/10 pb-6">
+            <!-- 內容區：可滾動 -->
+            <div class="p-6 md:p-8 overflow-y-auto flex-1 relative">
+                
+                <!-- 景點名稱 -->
+                <h1 id="modal-place-name"
+                    class="text-2xl md:text-3xl font-bold text-white mb-3 pr-40 leading-tight">
+                    載入中...
+                </h1>
+
+                <!-- 評分列 -->
+                <div class="flex flex-wrap items-center gap-3 text-sm text-slate-400 mb-6 border-b border-white/10 pb-4">
                     <span class="flex items-center gap-1 text-yellow-500 font-bold">
                         <span class="material-symbols-outlined text-base">star</span>
                         <span id="modal-place-rating">0.0</span>
@@ -332,17 +357,20 @@
                     <span id="modal-place-type" class="hidden md:block">景點</span>
                 </div>
 
+                <!-- 主內容：說明 + 資訊卡 -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- 左：簡介 -->
                     <div class="lg:col-span-2">
                         <p id="modal-place-desc" class="text-base text-slate-300 leading-relaxed">
-                            此地點暫無詳細簡介...
+                            此地點暫無詳細的官方簡介。這是一處值得您親自探索的地方！
                         </p>
                     </div>
 
+                    <!-- 右：資訊 -->
                     <div class="bg-white/5 p-5 rounded-xl border border-white/10 h-fit">
                         <ul class="space-y-4 text-sm">
                             <li class="flex items-start gap-3 text-slate-300">
-                                <span class="material-symbols-outlined text-yellow-500 shrink-0">location_on</span>
+                                <span class="material-symbols-outlined text-yellow-500 shrink-0 mt-0.5">location_on</span>
                                 <span id="modal-place-address" class="leading-relaxed">載入中...</span>
                             </li>
                             <li class="flex items-center gap-3 text-slate-300">
