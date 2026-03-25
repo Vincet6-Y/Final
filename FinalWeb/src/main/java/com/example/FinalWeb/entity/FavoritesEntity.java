@@ -1,4 +1,4 @@
-﻿package com.example.FinalWeb.entity;
+package com.example.FinalWeb.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
