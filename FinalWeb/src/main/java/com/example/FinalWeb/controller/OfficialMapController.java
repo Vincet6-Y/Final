@@ -53,7 +53,7 @@ public class OfficialMapController {
                 model.addAttribute("plan", plan);
             });
         }
-        return "officialmap";
+        return "officialMap";
     }
 
     // ==========================================

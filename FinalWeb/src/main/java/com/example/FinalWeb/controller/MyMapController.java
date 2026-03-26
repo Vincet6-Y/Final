@@ -57,7 +57,7 @@ public class MyMapController {
         model.addAttribute("apiKey", googleMapsApiKey);
 
         // 3. 回傳 myMap.html 頁面
-        return "mymap";
+        return "myMap";
     }
 
     // ==========================================
