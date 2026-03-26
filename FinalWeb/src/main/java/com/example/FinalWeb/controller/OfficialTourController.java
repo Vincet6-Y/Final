@@ -47,6 +47,6 @@ public class OfficialTourController {
         }
         
         // 6. 導向至 officialTour.html
-        return "officialtour";
+        return "officialTour";
     }
 }

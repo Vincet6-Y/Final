@@ -66,7 +66,7 @@ public class WorkController {
         model.addAttribute("minYearNow", minYear);
         model.addAttribute("maxYearNow", maxYear);
 
-        return "worklist";
+        return "workList";
     }
 
     @RequestMapping("/worklistdetail")
@@ -81,6 +81,6 @@ public class WorkController {
         model.addAttribute("idNow", gEntity);
         model.addAttribute("plans", getPlan);
 
-        return "worklistdetail";
+        return "workListDetail";
     }
 }
