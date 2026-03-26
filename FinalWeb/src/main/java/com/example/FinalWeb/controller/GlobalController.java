@@ -96,7 +96,7 @@ public class GlobalController {
 
     @RequestMapping("/payment")
     public String payment() {
-        return "payment";
+        return "payMent";
     }
 
     // 已寫在PaymentController

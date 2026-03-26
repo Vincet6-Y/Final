@@ -24,4 +24,6 @@ WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
 # 告訴 Render，當這個小貨櫃啟動時，請執行這行指令來開門營業
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# ENTRYPOINT ["java", "-jar", "app.jar"]
+# 加上 -Xmx 限制記憶體，並優化啟動速度
+ENTRYPOINT ["java", "-Xmx350m", "-Xss512k", "-XX:+UseSerialGC", "-jar", "app.jar"]

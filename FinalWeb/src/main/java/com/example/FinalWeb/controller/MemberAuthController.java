@@ -105,6 +105,23 @@ public class MemberAuthController {
                 return Map.of("success", true, "redirectUrl", redirectUrl);
             }
 
+            // ✅ 新增：Google userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
+            if (profile.email() != null && !profile.email().isBlank()) {
+                MemberEntity existingMember = memberService.findByEmail(profile.email());
+                if (existingMember != null) {
+                    try {
+                        socialAuthService.link(existingMember, AuthProvider.GOOGLE, profile.providerId());
+                        memberService.saveLoginSession(existingMember, request);
+                        String redirectUrl = (req.redirect() != null && !req.redirect().isBlank()) ?
+                            req.redirect() : "/home";
+                        return Map.of("success", true, "redirectUrl", redirectUrl,
+                            "message", "已自動綁定 Google 並登入，下次可直接使用快速登入");
+                    } catch (IllegalStateException e) {
+                        return Map.of("success", false, "message", e.getMessage());
+                    }
+                }
+            }
+
             // 未綁定 → 暫存資料，導到註冊頁補資料
             storePendingSocial(session, AuthProvider.GOOGLE, profile);
 
@@ -397,6 +414,25 @@ public class MemberAuthController {
             session.removeAttribute("lineAction");
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success(provider.name() + " 登入成功"));
             return redirectOrHome(consumeSocialRedirect(session, null));
+        }
+
+        // ✅ 新增：LINE userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
+        if (profile.email() != null && !profile.email().isBlank()) {
+            MemberEntity existingMember = memberService.findByEmail(profile.email());
+            if (existingMember != null) {
+                try {
+                    socialAuthService.link(existingMember, provider, profile.providerId());
+                    memberService.saveLoginSession(existingMember, request);
+                    session.removeAttribute("lineAction");
+                    redirectAttr.addFlashAttribute("toast",
+                        ToastInfoDTO.success( provider.name() + " 登入成功"));
+                    return redirectOrHome(consumeSocialRedirect(session, null));
+                } catch (IllegalStateException e) {
+                    // 萬一綁定失敗（理論上不會走到這，但保險起見）
+                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(e.getMessage()));
+                    return "redirect:/auth";
+                }
+            }
         }
 
         // 未綁定 → 導到註冊頁補資料
