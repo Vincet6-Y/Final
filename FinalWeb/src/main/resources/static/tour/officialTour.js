@@ -5,14 +5,21 @@ async function toggleFavorite(btn, planId) {
             headers: { 'Content-Type': 'application/json' }
         });
 
+        // 🌟 處理未登入狀態
         if (response.status === 401) {
-            alert('需登入才能收藏行程唷！');
-            window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`;
+            showToast('error', '需登入才能收藏行程唷！');
+
+            // 加入 1.5 秒的延遲，讓使用者看完 Toast 再跳轉
+            setTimeout(() => {
+                window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`;
+            }, 1500);
+
             return;
         }
 
         const data = await response.json();
 
+        // 🌟 處理成功收藏/取消收藏的畫面變換
         if (data.success) {
             const icon = btn.querySelector('span');
 
@@ -26,10 +33,12 @@ async function toggleFavorite(btn, planId) {
                 btn.classList.add('text-slate-400', 'dark:text-slate-300');
             }
         } else {
-            alert('操作失敗：' + data.message);
+            // 修正了重複的文字
+            showToast('error', '操作失敗：' + data.message);
         }
     } catch (error) {
         console.error("收藏操作發生錯誤:", error);
+        showToast('error', '系統連線發生錯誤，請稍後再試');
     }
 }
 
