@@ -1,0 +1,28 @@
+steps:
+# 步驟 1：進入 FinalWeb 資料夾，根據 Dockerfile 打包映像檔 (Build)
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'FinalWeb' # 🌟 關鍵新增：告訴雲端機器人切換到 FinalWeb 目錄
+  args: 
+  - 'build'
+  - '-t'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/junrei/atlas-image'
+  - '.'
+
+# 步驟 2：將打包好的映像檔推送到 GCP 的存放庫 (Push)
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+  - 'push'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/junrei/atlas-image'
+
+# 步驟 3：通知 Cloud Run 使用最新映像檔進行部署 (Deploy)
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+  - 'run'
+  - 'deploy'
+  - 'atlas-website'
+  - '--image'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/junrei/atlas-image'
+  - '--region'
+  - 'us-central1'
+  - '--allow-unauthenticated'
