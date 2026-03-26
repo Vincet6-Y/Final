@@ -14,8 +14,8 @@ RUN mvn clean package -DskipTests
 
 
 # ========== 第二階段：輕量化出餐期 (執行環境) ==========
-# 呼叫一個只有 Java 17 執行環境的輕量級小貨櫃
-FROM eclipse-temurin:17-jre-alpine
+# 呼叫一個只有 Java 17 執行環境
+FROM eclipse-temurin:17-jre
 
 # 走進小貨櫃裡，一樣建立一個 /app 的工作區域
 WORKDIR /app
