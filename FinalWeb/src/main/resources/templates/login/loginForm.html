@@ -1,0 +1,95 @@
+<div th:fragment="loginForm" id="loginFormFace" class="card-face" th:classappend="${openPanel != 'register'} ? ' active' : ''">
+    <div class="form-content">
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold text-white mb-2">會員登入</h2>
+            <p class="text-white/80">歡迎回來，開啟您的聖地探索之旅</p>
+        </div>
+
+        <!-- <form class="space-y-6" action="/auth/login" method="post"> -->
+        <form class="space-y-6" th:action="@{/auth/login}" method="post">
+
+            <input type="hidden" name="redirect" th:value="${redirect != null ? redirect : param.redirect}">
+
+            <div th:if="${param.error}" class="mb-4 rounded-lg bg-red-500/15 border border-red-400/30 px-4 py-3 text-sm text-red-200">
+                帳號或密碼錯誤
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-white/80 ml-1">Email</label>
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary transition-colors">
+                        mail
+                    </span>
+
+                    <input
+                        name="email"
+                        class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-muted/50"
+                        placeholder="請輸入 Email"
+                        type="email"
+                        required
+                        th:value="${loginData != null} ? ${loginData.email()} : ''" />
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-medium text-white/80 ml-1">密碼</label>
+                <div class="relative group">
+                    <span
+                        class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neutral-muted group-focus-within:text-primary transition-colors">
+                        lock
+                    </span>
+
+                    <input
+                        id="passwd"
+                        name="passwd"
+                        class="w-full bg-white dark:bg-background-dark border border-slate-300 dark:border-neutral-border rounded-lg py-4 pl-12 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-muted/50"
+                        placeholder="請輸入您的密碼"
+                        type="password"
+                        required />
+
+                    <button
+                        id="togglePasswdBtn"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-muted hover:text-primary"
+                        type="button">
+                        <span id="eyeIcon" class="material-symbols-outlined">visibility_off</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <a th:href="@{/auth/forgot-password}"
+                class="text-xs text-white/60 hover:text-primary transition-colors">
+                    忘記密碼？
+                </a>
+            </div>
+            <button
+                class="w-full bg-primary hover:bg-primary/90 text-white dark:text-background-dark font-bold py-4 rounded-lg shadow-lg shadow-primary/20 transition-all transform hover:translate-y-[-2px] active:translate-y-0"
+                type="submit">
+                登入
+            </button>
+
+            <div class="relative py-4 flex items-center">
+                <div class="flex-grow border-t border-neutral-border"></div>
+                <span class="px-4 text-xs text-white/80 uppercase tracking-widest">其他登入方式</span>
+                <div class="flex-grow border-t border-neutral-border"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <button
+                    type="button"
+                    id="googleLoginBtn"
+                    class="flex items-center justify-center gap-3 bg-white text-black border border-neutral-border rounded-lg py-3 hover:bg-gray-100 transition-colors w-full">
+                    <img th:src="@{/images/google/web_light_sq_na.svg}" class="w-6 h-6" alt="Google">
+                    <span class="text-sm font-medium"> Google 登入</span>
+                </button>
+
+                <a
+                    th:href="@{/auth/line/login(redirect=${redirect != null ? redirect : param.redirect})}"
+                    class="flex items-center justify-center gap-2 rounded-lg py-3 bg-[#06C755] hover:brightness-110 text-white font-semibold">
+                    <img th:src="@{/images/line/LINE_icon.png}" class="w-6 h-6" alt="LINE">
+                    <span> LINE 登入</span>
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
