@@ -1,0 +1,27 @@
+<div th:fragment="registerHero" id="registerHeroFace" class="card-face" th:classappend="${openPanel == 'register'} ? ' active' : ''">
+    <img
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm9U7zHmVNhrqRKbW6_wG6XsmT5iJN2-nUld3yooX7EvAJp6UCsZLRhTqdDG2sm3KczM1RyfO8xWumhKXYBMl0cTrC1t8WMcQlT-xn_NlW7FM_8abbkx3floDMsJ9PfhRP6czybj_H9vhsm5QOuTcLeTth4_sfdmbbOzOTgxvOqM13RP9-zq4HdKjbkalKJ27iWoUYvTXfJSf0-iy8Ly_viqlAAnkvQvqMyeSwGA2EHJcTkc5uQP9c_WwRaPBwhfrhs-JnzIZ6qN4"
+        class="hero-bg"
+        alt="Japanese shrine background">
+    <div class="hero-overlay"></div>
+    <div class="hero-content space-y-8">
+        <div
+            class="size-20 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto border border-primary/30">
+            <span class="material-symbols-outlined text-primary text-4xl">
+                auto_awesome
+            </span>
+        </div>
+        <div>
+            <h3 class="text-2xl font-bold text-white mb-4">
+                已經是會員了嗎？
+            </h3>
+            <p class="text-white dark:text-neutral-muted max-w-xs mx-auto">
+                回到登入頁面，開啟您的聖地探索之旅，繼續記錄每一次感動。
+            </p>
+        </div>
+        <button id="showLoginBtn" type="button"
+            class="bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md text-white px-10 py-4 rounded-lg font-bold transition-all hover:scale-105 active:scale-95">
+            點我登入會員
+        </button>
+    </div>
+</div>
