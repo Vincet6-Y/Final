@@ -43,7 +43,7 @@ public class OfficialMapController {
     // ==========================================
     // 🌟 網頁跳轉區塊 (回傳 HTML)
     // ==========================================
-    @GetMapping("/officialmap")
+    @GetMapping("/officialMap")
     public String officialMapPage(@RequestParam(name = "planId", required = false) Integer planId, Model model) {
         model.addAttribute("apiKey", googleMapsApiKey);
 
@@ -53,7 +53,7 @@ public class OfficialMapController {
                 model.addAttribute("plan", plan);
             });
         }
-        return "officialmap";
+        return "officialMap";
     }
 
     // ==========================================
