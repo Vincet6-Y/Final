@@ -118,6 +118,8 @@ public class JourneyPlanService {
                 mapEntity.setLocationName(spotDto.getLocationName());
                 mapEntity.setLongitude(spotDto.getLongitude());
                 mapEntity.setLatitude(spotDto.getLatitude());
+                mapEntity.setLocationImage(spotDto.getLocationImage());
+
 
                 // 🌟 防呆：GooglePlaceID 絕對不能為 null
                 String placeId = spotDto.getGooglePlaceId();

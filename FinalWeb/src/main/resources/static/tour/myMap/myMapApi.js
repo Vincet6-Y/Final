@@ -91,7 +91,8 @@ async function loadMyPlanData(myPlanId, targetDay = null) {
                 name: node.locationName,
                 arrivals: node.visitTime ? node.visitTime.substring(11, 16) : "08:00",
                 duration: "1",
-                transitTime: node.transitTime || null
+                transitTime: node.transitTime || null,
+                locationImage: node.locationImage || ''
             });
         }
 
