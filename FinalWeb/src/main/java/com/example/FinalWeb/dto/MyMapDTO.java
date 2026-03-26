@@ -22,4 +22,5 @@ public class MyMapDTO {
     private String displayTransitTime; // 顯示交通時間 (例如："約 1 小時 20 分鐘")
     private String displayDistance; // 顯示距離 (例如："(1.5 km)")
     private boolean hasTicket; // 是否有門票 (true/false)
+    private String locationImage; // 景點圖片路徑
 }

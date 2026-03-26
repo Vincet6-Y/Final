@@ -44,7 +44,8 @@ async function loadPlanData(planId) {
                 lng: parseFloat(node.longitude),
                 name: node.locationName,
                 arrivals: timeString,
-                duration: stayHours
+                duration: stayHours,
+                locationImage: node.locationImage || ''
             });
         }
 

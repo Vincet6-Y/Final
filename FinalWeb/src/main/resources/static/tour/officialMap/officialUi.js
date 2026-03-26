@@ -334,20 +334,27 @@ function renderItineraryPanel(day) {
     const isDay1 = day === 1;
     const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
 
+    // 1. 替換 dayStartHTML (第一站)
+    const startImgSrc = dayStartPlace.locationImage || 'https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&w=150&q=80';
+
     const dayStartHTML = `
-          <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md">
-              <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
-              <div class="ml-2 flex justify-between items-center w-full">
-                  <div class="flex-1">
-                      <h3 onclick="openPlaceDetails(${day}, 0)" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${dayStartPlace.name}</h3>
-                      <div class="flex items-center gap-2 mt-2">
-                          <span class="text-xs text-slate-500 dark:text-slate-400">出發時間：</span>
-                          <span class="text-xs font-bold text-primary">${dayStartPlace.arrivals}</span>
-                      </div>
+      <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md">
+          <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
+          <div class="ml-2 flex items-center gap-3 w-full">
+              <div class="w-[60px] h-[60px] md:w-[72px] md:h-[72px] shrink-0 rounded-lg overflow-hidden border border-slate-200 dark:border-white/10">
+                  <img src="${startImgSrc}" alt="${dayStartPlace.name}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&w=150&q=80'">
+              </div>
+              
+              <div class="flex-1 min-w-0">
+                  <h3 onclick="openPlaceDetails(${day}, 0)" class="font-bold text-slate-800 dark:text-slate-100 text-base pr-4 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline truncate">${dayStartPlace.name}</h3>
+                  <div class="flex items-center gap-2 mt-2">
+                      <span class="text-xs text-slate-500 dark:text-slate-400">出發時間：</span>
+                      <span class="text-xs font-bold text-primary">${dayStartPlace.arrivals}</span>
                   </div>
               </div>
           </div>
-        `;
+      </div>
+    `;
     listContainer.insertAdjacentHTML('beforeend', dayStartHTML);
 
     for (let i = 1; i < places.length; i++) {
@@ -375,23 +382,23 @@ function renderItineraryPanel(day) {
                 switch (leg._mode) {
                     case 'TRANSIT':
                         travelMode = '大眾運輸';
-                        travelIcon = 'directions_subway'; 
+                        travelIcon = 'directions_subway';
                         mapMode = 'transit'; // 對應 Google 網址的導航方式
                         break;
                     case 'FLIGHT':
                         travelMode = '飛機航程';
-                        travelIcon = 'flight';            
-                        mapMode = 'transit'; 
+                        travelIcon = 'flight';
+                        mapMode = 'transit';
                         break;
                     case 'WALKING':
                         travelMode = '步行大約';
-                        travelIcon = 'directions_walk';   
+                        travelIcon = 'directions_walk';
                         mapMode = 'walking';
                         break;
                     case 'DRIVING':
                     default:
                         travelMode = '車程估算';
-                        travelIcon = 'directions_car';    
+                        travelIcon = 'directions_car';
                         mapMode = 'driving';
                         break;
                 }
@@ -407,7 +414,7 @@ function renderItineraryPanel(day) {
                     mapMode = 'walking';
                 }
             }
-            
+
             durationText = `約 ${timeString}`;
         }
 
@@ -427,31 +434,37 @@ function renderItineraryPanel(day) {
               </a>
             `;
 
-        // 🌟 唯讀版：拔除 draggable, 垃圾桶按鈕, 以及 <input type="number">
+        // 🌟 2. 在 for 迴圈內，替換 destinationHTML (後續站點)
+        const destImgSrc = destinationPlace.locationImage || 'https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&w=150&q=80';
+
         const destinationHTML = `
-          <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm animate-fade-in-up transition-all duration-200 hover:shadow-md">
+        <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm animate-fade-in-up transition-all duration-200 hover:shadow-md">
             <div class="w-1.5 h-full bg-primary absolute left-0 top-0"></div>
-            <div class="flex justify-between items-start ml-2">
-              <div class="flex-1">
+            <div class="flex justify-between items-center ml-2 gap-3">
+            
+            <div class="w-[60px] h-[60px] md:w-[72px] md:h-[72px] shrink-0 rounded-lg overflow-hidden border border-slate-200 dark:border-white/10">
+                <img src="${destImgSrc}" alt="${destinationPlace.name}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1542931287-023b922fa89b?auto=format&fit=crop&w=150&q=80'">
+            </div>
+
+            <div class="flex-1 min-w-0">
                 <h3 onclick="openPlaceDetails(${day}, ${i})" 
-                    class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer 
-                    hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">${destinationPlace.name}
+                    class="font-bold text-slate-800 dark:text-slate-100 text-base pr-2 cursor-pointer hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline truncate">${destinationPlace.name}
                 </h3>
                 
-                <div class="flex items-center gap-3 mt-3 text-xs text-slate-500 dark:text-slate-400">
-                  <span class="flex items-center gap-1">
+                <div class="flex flex-wrap items-center gap-2 md:gap-3 mt-2 md:mt-3 text-xs text-slate-500 dark:text-slate-400">
+                <span class="flex items-center gap-1 shrink-0">
                     <span class="material-symbols-outlined text-[14px]">schedule</span>抵達 
                     <span class="font-medium text-slate-700 dark:text-slate-200">${destinationPlace.arrivals}</span>
-                  </span>
-                  
-                  <span class="flex items-center gap-1 bg-white/50 dark:bg-black/20 px-2 py-0.5 rounded border border-slate-200 dark:border-white/5">
+                </span>
+                
+                <span class="flex items-center gap-1 bg-white/50 dark:bg-black/20 px-2 py-0.5 rounded border border-slate-200 dark:border-white/5 shrink-0">
                     <span class="material-symbols-outlined text-[14px]">hourglass_empty</span>停留 
                     <span class="font-bold text-primary">${destinationPlace.duration}</span> 小時
-                  </span>
+                </span>
                 </div>
-              </div>
             </div>
-          </div>
+            </div>
+        </div>
         `;
 
         listContainer.insertAdjacentHTML('beforeend', transportHTML + destinationHTML);

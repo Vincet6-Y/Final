@@ -35,7 +35,7 @@ public class MyMapController {
     @Value("${google.maps.api-key}")
     private String googleMapsApiKey;
 
-    @RequestMapping("/mymap")
+    @RequestMapping("/myMap")
     public String myMap(@RequestParam(required = false) Integer myPlanId, Model model) {
 
         // 1. 根據傳入的 ID 抓取會員行程資料

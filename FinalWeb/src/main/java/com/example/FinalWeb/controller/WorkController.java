@@ -38,7 +38,7 @@ public class WorkController {
     // return service.getWork();
     // }
 
-    @GetMapping("/worklist")
+    @GetMapping("/workList")
     public String getWorkPage(Model model, 
         @RequestParam(required = false) String keyword, // 新增此參數接收搜尋字
         @RequestParam(defaultValue = "0") int page,
@@ -69,7 +69,7 @@ public class WorkController {
         return "worklist";
     }
 
-    @RequestMapping("/worklistdetail")
+    @RequestMapping("/workListDetail")
     public String workListDetail(Model model,
             @RequestParam(value = "workId") int workId) {
 
