@@ -458,7 +458,7 @@ function renderItineraryPanel(day) {
     const isDay1 = day === 1;
     const markerColor = isDay1 ? 'bg-slate-400 dark:bg-slate-600' : 'bg-blue-400 dark:bg-blue-600';
 
-    // 🌟 恢復編輯版：加入 draggable, ondragstart 拖曳事件，以及 <input type="time"> 編輯時間功能
+    // 🌟 第一個行程（起點）的卡片，加入手機版箭頭與刪除按鈕
     const dayStartHTML = `
           <div draggable="true" ondragstart="handleDragStart(event, ${day}, 0)" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${day}, 0)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)" ondragend="handleDragEnd(event)" class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm cursor-move transition-all duration-200 hover:shadow-md">
               <div class="w-1.5 h-full ${markerColor} absolute left-0 top-0"></div>
@@ -470,7 +470,23 @@ function renderItineraryPanel(day) {
                           <input type="time" value="${dayStartPlace.arrivals}" onchange="updateArrivalTime(${day}, 0, this.value)" class="text-xs font-bold text-primary bg-transparent border-b border-dashed border-primary/50 outline-none cursor-pointer p-0 focus:ring-0">
                       </div>
                   </div>
-                  <span class="material-symbols-outlined text-slate-300 dark:text-slate-600 shrink-0">drag_indicator</span>
+                  
+                  <div class="flex flex-col items-end gap-1 shrink-0">
+                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600 hidden md:block cursor-grab">drag_indicator</span>
+                    <div class="flex gap-1 md:hidden">
+                        <button onclick="moveItineraryItem(${day}, 0, 'up')"
+                            class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                            <span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+                        </button>
+                        <button onclick="moveItineraryItem(${day}, 0, 'down')"
+                            class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                            <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+                        </button>
+                    </div>
+                    <button onclick="removeItineraryItem(${day}, 0)" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
+                        <span class="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  </div>
               </div>
           </div>
         `;
@@ -576,14 +592,24 @@ function renderItineraryPanel(day) {
                         小時
                       </span>
                     </div>
+                  </div>
 
-                  </div>
-                  <div class="flex flex-col items-end gap-2 shrink-0">
-                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600">drag_indicator</span>
-                    <button onclick="removeItineraryItem(${day}, ${i})" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
-                      <span class="material-symbols-outlined text-lg">delete</span>
-                    </button>
-                  </div>
+                  <div class="flex flex-col items-end gap-1 shrink-0">
+                    <span class="material-symbols-outlined text-slate-300 dark:text-slate-600 hidden md:block cursor-grab">drag_indicator</span>
+                        <div class="flex gap-1 md:hidden">
+                            <button onclick="moveItineraryItem(${day}, ${i}, 'up')"
+                                class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                                <span class="material-symbols-outlined text-[18px]">arrow_upward</span>
+                            </button>
+                            <button onclick="moveItineraryItem(${day}, ${i}, 'down')"
+                                class="w-7 h-7 flex items-center justify-center bg-slate-100 dark:bg-white/10 hover:bg-primary hover:text-white text-slate-500 dark:text-slate-400 rounded-lg transition active:scale-95">
+                                <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+                            </button>
+                        </div>
+                        <button onclick="removeItineraryItem(${day}, ${i})" class="text-slate-400 hover:text-red-500 transition p-1 cursor-pointer">
+                            <span class="material-symbols-outlined text-lg">delete</span>
+                        </button>
+                    </div>
                 </div>
               </div>
             `;
@@ -641,18 +667,22 @@ function toggleMobileView() {
 // 🌟 新增功能：動態加入「出發日期選擇器」+ Day 按鈕左右滑動箭頭
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-    const titleContainer = document.querySelector('.text-lg.font-bold.text-primary').parentElement;
+
+    // 🌟 修正 1：將搜尋範圍嚴格限制在 itinerary-panel 內，避免抓到 Header 的手機版標題！
+    const panel = document.getElementById('itinerary-panel');
+    if (!panel) return;
+    const titleContainer = panel.querySelector('.text-lg.font-bold.text-primary').parentElement;
 
     // 🌟 安全讀取 HTML 中的資料庫隱藏欄位
     const dbStartDateInput = document.getElementById('db-startDate');
     const dbTotalDaysInput = document.getElementById('db-totalDays');
 
-    // 🌟 1. 改為全域變數 window.myMapTotalDays，讓 API 也能修改它
+    // 🌟 改為全域變數 window.myMapTotalDays，讓 API 也能修改它
     const today = new Date();
     let defaultStart = (dbStartDateInput && dbStartDateInput.value) ? new Date(dbStartDateInput.value) : today;
     window.myMapTotalDays = (dbTotalDaysInput && dbTotalDaysInput.value) ? parseInt(dbTotalDaysInput.value) : 5;
 
-    // 預設加上按鈕日期的函式 (後續會在 window.updateDayButtonsAndLists 覆蓋)
+    // 預設加上按鈕日期的函式
     let daysToAdd = window.myMapTotalDays - 1;
     let defaultEnd = new Date(defaultStart);
     defaultEnd.setDate(defaultStart.getDate() + daysToAdd);
@@ -703,7 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
     buttonContainer.classList.remove('border-b', 'border-slate-200', 'dark:border-white/10', 'shrink-0');
     buttonContainer.classList.add('w-full', 'scroll-smooth');
 
-    // 建立左邊箭頭 (有漂亮陰影的圓形按鈕)
+    // 建立左邊箭頭
     const leftBtn = document.createElement('button');
     leftBtn.className = "absolute left-1 z-10 w-7 h-7 flex items-center justify-center bg-white/95 dark:bg-surface-dark/95 backdrop-blur-sm shadow-md rounded-full text-slate-500 hover:text-primary transition-colors hidden";
     leftBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">chevron_left</span>';
@@ -716,11 +746,10 @@ document.addEventListener("DOMContentLoaded", () => {
     tabsWrapper.appendChild(leftBtn);
     tabsWrapper.appendChild(rightBtn);
 
-    // 點擊箭頭滑動事件 (每次滑動約 200px)
+    // 點擊箭頭滑動事件
     leftBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: -200, behavior: 'smooth' }));
     rightBtn.addEventListener('click', () => buttonContainer.scrollBy({ left: 200, behavior: 'smooth' }));
 
-    // 判斷箭頭是否該顯示 (如果滑到最左邊就隱藏左箭頭，最右邊就隱藏右箭頭)
     const checkArrows = () => {
         if (buttonContainer.scrollWidth > buttonContainer.clientWidth) {
             leftBtn.classList.toggle('hidden', buttonContainer.scrollLeft <= 0);
@@ -735,18 +764,15 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('resize', checkArrows);
 
     // ==========================================
-    // ✨ 動態生成 Day 按鈕與列表 (🌟 2. 改寫為全域函數 window.updateDayButtonsAndLists)
+    // ✨ 動態生成 Day 按鈕與列表
     // ==========================================
     window.updateDayButtonsAndLists = function (param) {
 
-        // 🌟 3. 智慧判斷：如果傳進來的是「數字」(代表 API 發現了更多天數)
         if (typeof param === 'number') {
             if (param > window.myMapTotalDays) {
-                window.myMapTotalDays = param; // 擴充總天數
+                window.myMapTotalDays = param;
             }
-        }
-        // 🌟 4. 如果傳進來的是「日期」(代表使用者從日曆重新選擇了出發日)
-        else if (param instanceof Date) {
+        } else if (param instanceof Date) {
             defaultStart = param;
         }
 
@@ -754,13 +780,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const currentEnd = new Date(defaultStart);
         currentEnd.setDate(defaultStart.getDate() + daysToAdd);
 
-        // 更新日期顯示文字
         if (dateDisplay) {
             dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(currentEnd)}`;
         }
 
         const scrollArea = document.getElementById('itinerary-scroll-area');
         if (!scrollArea) return;
+
+        // 抓取 AI 排序按鈕的外層容器，用來定位插入點
+        const aiSortContainer = document.getElementById('ai-sort-btn') ? document.getElementById('ai-sort-btn').parentElement : null;
+
         buttonContainer.innerHTML = '';
 
         for (let i = 1; i <= window.myMapTotalDays; i++) {
@@ -781,7 +810,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!listContainer) {
                 listContainer = document.createElement('div');
                 listContainer.id = `list-day-${i}`;
-                listContainer.className = "day-list p-4 flex flex-col pb-24 pt-0 hidden";
+                listContainer.className = "day-list p-4 flex flex-col pb-6 pt-0 hidden";
                 listContainer.innerHTML = `
                         <div class="bg-slate-50 dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-white/10 p-4 relative overflow-hidden shadow-sm">
                             <div class="w-1.5 h-full bg-slate-300 dark:bg-slate-600 absolute left-0 top-0"></div>
@@ -790,19 +819,22 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">請從地圖點擊景點加入</p>
                             </div>
                         </div>`;
-                scrollArea.appendChild(listContainer);
+
+                // 🌟 修正 2：將新產生的行程容器「插隊」到 AI 按鈕的上方！
+                if (aiSortContainer && aiSortContainer.parentNode === scrollArea) {
+                    scrollArea.insertBefore(listContainer, aiSortContainer);
+                } else {
+                    scrollArea.appendChild(listContainer);
+                }
             }
             if (!itineraryData[i]) itineraryData[i] = [];
         }
-        // 每次重新產生按鈕後，等畫面算好寬度，重新檢查要不要出現箭頭
         setTimeout(checkArrows, 100);
     };
 
-    // 初始化第一次呼叫
     window.updateDayButtonsAndLists(defaultStart);
     selectDay(1);
 
-    // 監聽使用者更改日期
     dateInput.addEventListener('change', (e) => {
         if (!e.target.value) return;
         window.updateDayButtonsAndLists(new Date(e.target.value));
@@ -889,3 +921,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 100);
     }
 });
+
+// 手機版改成「上移/下移箭頭按鈕」
+async function moveItineraryItem(day, index, direction) {
+    const list = itineraryData[day];
+    if (!list || list.length < 2) return;
+
+    // 💡 移除原本擋住 index === 0 的限制
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+
+    // 💡 確保目標位置沒有超出陣列範圍 (0 到 list.length - 1 都可以)
+    if (targetIndex < 0 || targetIndex >= list.length) return;
+
+    // 交換位置
+    const temp = list[index];
+    list[index] = list[targetIndex];
+    list[targetIndex] = temp;
+
+    // 重新計算路線並更新畫面
+    calculateAndDisplayRoute(day);
+}

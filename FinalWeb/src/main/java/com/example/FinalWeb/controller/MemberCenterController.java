@@ -87,7 +87,7 @@ public class MemberCenterController {
     @PostMapping("/change-passwd")
     @ResponseBody
     // 1. 將泛型從 String 改為 ToastInfoDTO
-    public ResponseEntity<ToastInfoDTO> changePasswd(@RequestBody PasswdChangesDTO dto, HttpSession session) {
+    public ResponseEntity<ToastInfoDTO> changePasswd(@RequestBody PasswdChangeDTO dto, HttpSession session) {
         MemberEntity loginMember = (MemberEntity) session.getAttribute("loginMember");
 
         if (loginMember == null) {

@@ -1,12 +1,15 @@
-import { auth, provider, signInWithPopup } from "./firebase.js";
+import { auth, provider, signInWithPopup, signOut } from "./firebase.js";
 
 function isLineApp() {
     return /Line/i.test(navigator.userAgent);
 }
 
+function isIGApp() {
+    return /Instagram/i.test(navigator.userAgent);
+}
+
 $(function () {
 
-    // 頁面載入時清掉 openExternalBrowser 參數
     const url = new URL(window.location.href);
     if (url.searchParams.has('openExternalBrowser')) {
         url.searchParams.delete('openExternalBrowser');
@@ -22,8 +25,25 @@ $(function () {
         return;
     }
 
+    if (isIGApp()) {
+        $("#googleLoginBtn").off("click").on("click", function () {
+            const isIOS = /iPhone|iPad/i.test(navigator.userAgent);
+            if (isIOS) {
+                showToast('info', '請點右上角 ⋯ 選單，選擇「使用外部瀏覽器開啟」');
+            } else {
+                showToast('info', '請點右上角 ⋮ 選單，選擇「在瀏覽器中開啟」');
+            }
+        });
+        return;
+    }
+
     // 正常環境的 Google 登入流程
     $("#googleLoginBtn").on("click", function () {
+
+        // 取得網址列中的 redirect 參數
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || "";
+
         signInWithPopup(auth, provider)
             .then(function (result) {
                 return result.user.getIdToken().then(function (idToken) {
@@ -32,7 +52,8 @@ $(function () {
                         method: "POST",
                         contentType: "application/json",
                         xhrFields: { withCredentials: true },
-                        data: JSON.stringify({ idToken }),
+                        // 將 redirect 一起傳給後端
+                        data: JSON.stringify({ idToken: idToken, redirect: redirect }),
                         success: function (data) {
                             if (data.success) {
                                 sessionStorage.setItem('toastType', 'success');
@@ -50,7 +71,7 @@ $(function () {
             })
             .catch(function (e) {
                 console.error("google popup error =", e);
-                showToast('error', "Google 登入失敗");
+                showToast('error', e.code || e.message || "Google 登入失敗");
             });
     });
 });

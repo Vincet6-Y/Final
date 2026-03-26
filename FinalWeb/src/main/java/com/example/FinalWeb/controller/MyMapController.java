@@ -32,7 +32,7 @@ public class MyMapController {
     private MyMapRepo myMapRepo;
 
     // 🌟 從 application.properties 中讀取你的 Google Maps API Key
-    @Value("${google.maps.api.key}")
+    @Value("${google.maps.api-key}")
     private String googleMapsApiKey;
 
     @RequestMapping("/mymap")

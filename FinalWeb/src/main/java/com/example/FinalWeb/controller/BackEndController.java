@@ -57,7 +57,7 @@ public class BackEndController {
     @Autowired
     private MemberRepo memberRepo;
 
-    @Value("${google.maps.api.key}")
+    @Value("${google.maps.api-key}")
     private String googleMapsApiKey;
 
     @RequestMapping("/home")

@@ -33,8 +33,8 @@ window.showToast = function (type, message) {
     let icon = type === 'success' ? 'check_circle' : (type === 'error' ? 'error' : 'info');
 
     const toastHtml = `
-        <div id="toast" class="fixed top-40 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-5 py-3 rounded-lg shadow-lg text-white opacity-0 -translate-y-6 scale-95 ${bgColor}">
-            <span class="material-symbols-outlined text-lg">${icon}</span>
+        <div id="toast" class="fixed top-40 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-5 py-3 rounded-lg shadow-lg text-white opacity-0 -translate-y-6 scale-95 w-max max-w-[90vw] ${bgColor}">
+            <span class="material-symbols-outlined text-lg shrink-0">${icon}</span>
             <span class="font-medium">${message}</span>
         </div>
     `;
