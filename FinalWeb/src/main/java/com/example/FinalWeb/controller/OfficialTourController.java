@@ -23,7 +23,7 @@ public class OfficialTourController {
     @Autowired
     private FavoritesRepo favoritesRepo;
 
-    @GetMapping("/officialtour")
+    @GetMapping("/officialTour")
     public String officialTourPage(Model model, HttpSession session) {
         
         // 1. 撈取資料庫中所有的官方行程
