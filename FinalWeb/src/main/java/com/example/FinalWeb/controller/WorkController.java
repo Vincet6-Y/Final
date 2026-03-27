@@ -39,24 +39,24 @@ public class WorkController {
     // }
 
     @GetMapping("/workList")
-    public String getWorkPage(Model model, 
-        @RequestParam(required = false) String keyword, // 新增此參數接收搜尋字
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "4") int size,
-        @RequestParam(defaultValue = "DESC") String sortDir,
-        @RequestParam(required = false) String workClass,
-        @RequestParam(defaultValue = "1980") String minYear,
-        @RequestParam(defaultValue = "2026") String maxYear) {
+    public String getWorkPage(Model model,
+            @RequestParam(required = false) String keyword, // 新增此參數接收搜尋字
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "DESC") String sortDir,
+            @RequestParam(required = false) String workClass,
+            @RequestParam(defaultValue = "1980") String minYear,
+            @RequestParam(defaultValue = "2026") String maxYear) {
 
         Page<WorkDetailEntity> workPage;
 
-    // 如果有帶關鍵字，就執行您在 Service 寫好的模糊搜尋
+        // 如果有帶關鍵字，就執行您在 Service 寫好的模糊搜尋
         if (keyword != null && !keyword.trim().isEmpty()) {
             workPage = service.searchWorks(keyword, page, size);
-            model.addAttribute("keywordNow", keyword); 
+            model.addAttribute("keywordNow", keyword);
         } else {
-        // 原本的預設邏輯
-        workPage = service.getWorkList(page, size, sortDir, workClass, minYear, maxYear);
+            // 原本的預設邏輯
+            workPage = service.getWorkList(page, size, sortDir, workClass, minYear, maxYear);
         }
 
         model.addAttribute("works", workPage);
@@ -66,6 +66,16 @@ public class WorkController {
         model.addAttribute("minYearNow", minYear);
         model.addAttribute("maxYearNow", maxYear);
 
+        // 確保年份大小順序正確
+        int minYearInt = Integer.parseInt(minYear);
+        int maxYearInt = Integer.parseInt(maxYear);
+        if (minYearInt > maxYearInt) {
+            // 如果 min 大於 max，就把兩者交換
+            String temp = minYear;
+            minYear = maxYear;
+            maxYear = temp;
+        }
+
         return "workList";
     }
 
@@ -74,10 +84,9 @@ public class WorkController {
             @RequestParam(value = "workId") int workId) {
 
         WorkDetailEntity gEntity = service.getWorkId(workId);
-        
+
         List<JourneyPlanEntity> getPlan = service.getPlan(workId);
-        
-        
+
         model.addAttribute("idNow", gEntity);
         model.addAttribute("plans", getPlan);
 

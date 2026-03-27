@@ -10,11 +10,7 @@
 
         <main class="flex-1 py-12 px-6 lg:px-20 max-w-7xl mx-auto w-full">
             <div class="flex gap-4 mb-8">
-                <!-- <button  有一個是被選擇的高亮樣式
-                    class="flex-1 py-6 text-xl font-bold rounded-xl bg-primary text-white dark:text-background-dark shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
-                    style="">
-                    電影作品
-                </button> -->
+
                 <a th:href="@{/workList(page=0, size=4, sortDir=${sortNow}, workClass='電影')}"
                     class="flex flex-1 items-center justify-center py-6 text-xl font-bold rounded-xl"
                     th:classappend="${classNow == '電影'}
@@ -35,44 +31,54 @@
             <div class="flex flex-col lg:flex-row items-center justify-between gap-4 mb-10">
 
                 <form th:action="@{/workList}" method="get"
-                    class="flex flex-wrap items-center gap-2 bg-white dark:bg-white/5 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-fit">
+                    class="flex flex-col lg:flex-row flex-wrap items-center gap-4 w-full lg:w-auto">
 
                     <input type="hidden" name="workClass" th:value="${classNow}" />
                     <input type="hidden" name="sortDir" th:value="${sortNow}" />
 
-                    <label class="text-sm font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">年份區間：</label>
+                    <div
+                        class="flex items-center px-4 py-3 gap-3 bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-64 focus-within:border-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-primary">search</span>
+                        <input name="keyword" th:value="${keywordNow}"
+                            class="bg-transparent border-none focus:ring-0 text-slate-700 dark:text-white w-full placeholder-slate-400 outline-none"
+                            placeholder="搜尋作品名稱..." type="text" />
+                    </div>
 
-                    <div class="flex items-center gap-2">
+                    <div
+                        class="flex items-center gap-2 bg-white dark:bg-white/5 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-fit">
+                        <label
+                            class="text-sm font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">年份區間：</label>
+
                         <select name="minYear"
                             class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
-                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
-                                th:selected="${year.toString() == minYearNow}"></option>
+                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}"
+                                th:text="${year}" th:selected="${year.toString() == minYearNow}"></option>
                         </select>
 
                         <span class="text-slate-400 font-bold">-</span>
 
                         <select name="maxYear"
                             class="bg-transparent border border-slate-300 dark:border-white/20 rounded-md px-2 py-1 text-sm dark:text-white outline-none focus:border-primary">
-                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}" th:text="${year}"
-                                th:selected="${year.toString() == maxYearNow}"></option>
+                            <option th:each="year : ${#numbers.sequence(1980, 2026)}" th:value="${year}"
+                                th:text="${year}" th:selected="${year.toString() == maxYearNow}"></option>
                         </select>
 
                         <button type="submit"
                             class="px-4 py-1.5 bg-primary text-white text-sm font-bold rounded-md hover:bg-primary/90 transition-all whitespace-nowrap">
-                            篩選
+                            搜尋與篩選
                         </button>
                     </div>
                 </form>
 
                 <div class="flex gap-2 w-full lg:w-auto">
-                    <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
+                    <a th:href="@{/workList(page=0, size=4, sortDir='DESC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow}, keyword=${keywordNow})}"
                         class="flex-1 lg:flex-none text-center px-4 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white"
                         th:classappend="${sortNow == 'DESC'} 
                             ? 'bg-primary text-white border-primary' 
                             : 'bg-white dark:bg-white/5 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/10'">
                         上映日期 - 近
                     </a>
-                    <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow})}"
+                    <a th:href="@{/workList(page=0, size=4, sortDir='ASC', workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow}, keyword=${keywordNow})}"
                         class="flex-1 lg:flex-none text-center px-4 py-2 rounded-full border text-sm font-bold transition-all hover:bg-primary hover:text-white"
                         th:classappend="${sortNow == 'ASC'} 
                             ? 'bg-primary text-white border-primary' 
@@ -95,8 +101,8 @@
                             <div class="flex items-center gap-3 mb-4">
                                 <span class="bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded"
                                     th:text="${work.workClass}">動畫 / 電影</span>
-                                <span class="text-slate-400 text-xs"
-                                    th:text="${work.onDate} + ' ' + 上映">2016-08-26 上映</span>
+                                <span class="text-slate-400 text-xs" th:text="${work.onDate} + ' ' + 上映">2016-08-26
+                                    上映</span>
                             </div>
                             <h3 class="text-primary text-3xl font-black mb-4" th:text="${work.workName}">你的名字 (君の名は。)
                             </h3>
@@ -115,7 +121,7 @@
             <div class="mt-16 flex justify-center">
                 <nav class="flex items-center gap-2">
                     <a th:if="${page > 0}"
-                        th:href="@{/workList(page=${page - 1}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
+                        th:href="@{/workList(page=${page - 1}, size=4, sortDir=${sortNow}, workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow}, keyword=${keywordNow})}"
                         class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
                         <span class="material-symbols-outlined">chevron_left</span>
                     </a>
@@ -127,7 +133,7 @@
                         </div>
 
                         <a th:unless="${i == works.number}"
-                            th:href="@{/workList(page=${i}, size=4, sortDir=${sortNow}, workClass=${classNow})}"
+                            th:href="@{/workList(page=${i}, size=4, sortDir=${sortNow}, workClass=${classNow}, minYear=${minYearNow}, maxYear=${maxYearNow}, keyword=${keywordNow})}"
                             th:text="${i + 1}"
                             class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-primary transition-colors">
                         </a>
@@ -147,6 +153,46 @@
 
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const minYearSelect = document.querySelector('select[name="minYear"]');
+            const maxYearSelect = document.querySelector('select[name="maxYear"]');
+
+            function syncYears() {
+                if (!minYearSelect || !maxYearSelect) return;
+
+                const minVal = parseInt(minYearSelect.value);
+                const maxVal = parseInt(maxYearSelect.value);
+
+                // 1. 如果「最大年份」小於「最小年份」，自動將最大年份設為最小年份
+                if (maxVal < minVal) {
+                    maxYearSelect.value = minVal;
+                }
+
+                // 2. 處理 maxYear 下拉選單：禁用所有小於 minYear 的選項
+                Array.from(maxYearSelect.options).forEach(option => {
+                    const optVal = parseInt(option.value);
+                    option.disabled = (optVal < minVal);
+                });
+
+                // 3. 處理 minYear 下拉選單：禁用所有大於 maxYear 的選項
+                Array.from(minYearSelect.options).forEach(option => {
+                    const optVal = parseInt(option.value);
+                    option.disabled = (optVal > parseInt(maxYearSelect.value));
+                });
+            }
+
+            // 綁定事件：當選單改變時執行同步
+            if (minYearSelect && maxYearSelect) {
+                minYearSelect.addEventListener('change', syncYears);
+                maxYearSelect.addEventListener('change', syncYears);
+
+                // 網頁剛載入時，先執行一次初始化狀態
+                syncYears();
+            }
+        });
+    </script>
 </body>
 
 </html>
