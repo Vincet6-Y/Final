@@ -373,12 +373,11 @@ function getFullDateTimeStr(day, timeStr) {
     return `${yyyy}-${mm}-${dd}T${timeStr}:00`;
 }
 
-// 🌟 同步「單一景點時間」至資料庫
+// 🌟 同步「單一景點時間」至資料庫 (加上圖片防洗掉機制)
 async function syncTimeToDatabase(day, index) {
     const item = itineraryData[day][index];
     if (!item.spotId) return;
 
-    // 將小時轉換為分鐘存入資料庫
     const stayMins = Math.round(parseFloat(item.duration) * 60);
     const fullDateTime = getFullDateTimeStr(day, item.arrivals);
 
@@ -389,13 +388,16 @@ async function syncTimeToDatabase(day, index) {
             body: JSON.stringify({
                 spotId: item.spotId,
                 visitTime: fullDateTime,
-                stayTime: stayMins
+                stayTime: stayMins,
+
+                // 👇 關鍵新增：保護圖片！
+                locationImage: item.locationImage
             })
         });
     } catch (err) { console.error("時間同步失敗:", err); }
 }
 
-// 🌟 升級版：將順序、時間、車程、距離一起批次同步
+// 🌟 升級版：將順序、時間、車程、距離一起批次同步 (加上圖片防洗掉機制)
 async function syncOrderToDatabase(day) {
     const list = itineraryData[day];
     const legs = routeLegs[day] || [];
@@ -403,13 +405,10 @@ async function syncOrderToDatabase(day) {
     const payload = list.map((item, index) => {
         let tTime = null, dist = null, tMode = 'WALKING';
 
-        // 抓取上一站到這一站的 Google 車程與距離
         if (index > 0 && legs[index - 1]) {
             const leg = legs[index - 1];
-            // 🌟 加上安全判斷，如果有值就取 value，沒有就給 0
             tTime = leg.duration ? leg.duration.value : 0;
             dist = leg.distance ? leg.distance.value : 0;
-
             tMode = leg._mode || ((dist > 1000) ? 'DRIVING' : 'WALKING');
         }
 
@@ -419,7 +418,10 @@ async function syncOrderToDatabase(day) {
             visitTime: getFullDateTimeStr(day, item.arrivals),
             transitTime: tTime,
             distance: dist,
-            transitMode: tMode
+            transitMode: tMode,
+
+            // 👇 關鍵新增：把圖片當護身符一起傳回去，防止被後端 null 洗掉！
+            locationImage: item.locationImage
         };
     }).filter(i => i.spotId);
 

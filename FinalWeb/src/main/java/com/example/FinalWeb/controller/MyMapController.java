@@ -144,6 +144,9 @@ public class MyMapController {
             Double lat = Double.valueOf(payload.get("lat").toString());
             Double lng = Double.valueOf(payload.get("lng").toString());
 
+            // 👇 關鍵新增 1：接住前端傳來的圖片網址！
+            String locationImage = (String) payload.get("locationImage");
+
             MyPlanEntity myPlan = myPlanRepo.findById(myPlanId).orElseThrow();
 
             // 找出現有該天景點數量，決定這個新景點的排序數字 (接在最後面)
@@ -161,10 +164,14 @@ public class MyMapController {
             newSpot.setLatitude(BigDecimal.valueOf(lat));
             newSpot.setLongitude(BigDecimal.valueOf(lng));
 
+            // 👇 關鍵新增 2：把它存進實體中，讓資料庫有紀錄！
+            newSpot.setLocationImage(locationImage);
+
             // ==========================================
             // 🌟 補強：確保手動加入的景點，也有預設的時間，避免產生 NULL
             // ==========================================
-            java.time.LocalDate startDate = (myPlan.getStartDate() != null) ? myPlan.getStartDate() : java.time.LocalDate.now();
+            java.time.LocalDate startDate = (myPlan.getStartDate() != null) ? myPlan.getStartDate()
+                    : java.time.LocalDate.now();
             newSpot.setVisitTime(startDate.atTime(8, 0).plusDays(dayNumber - 1));
             newSpot.setStayTime(60); // 預設 60 分鐘
 
@@ -233,32 +240,32 @@ public class MyMapController {
             for (Map<String, Object> item : nodeOrders) {
                 Integer spotId = Integer.valueOf(item.get("spotId").toString());
                 Integer newOrder = Integer.valueOf(item.get("visitOrder").toString());
-                
+
                 myMapRepo.findById(spotId).ifPresent(node -> {
                     node.setVisitOrder(newOrder);
-                    
+
                     // 寫入精確的出發/抵達時間
                     if (item.get("visitTime") != null) {
                         node.setVisitTime(LocalDateTime.parse((String) item.get("visitTime")));
                     }
-                    
+
                     // 寫入 Google 算出的車程 (秒) 與距離 (公尺)
                     if (item.get("transitTime") != null) {
                         node.setTransitTime(Integer.valueOf(item.get("transitTime").toString()));
                     } else {
                         node.setTransitTime(null);
                     }
-                    
+
                     if (item.get("distance") != null) {
                         node.setDistance(Integer.valueOf(item.get("distance").toString()));
                     } else {
                         node.setDistance(null);
                     }
-                    
+
                     if (item.get("transitMode") != null) {
                         node.setTransitMode((String) item.get("transitMode"));
                     }
-                    
+
                     myMapRepo.save(node);
                 });
             }

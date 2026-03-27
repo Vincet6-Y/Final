@@ -75,6 +75,8 @@ public class TicketService {
         // 北海道
         addSpotTicket("ChIJ___DnVrgCl8RruTc290c3p8", "情書 星空咖啡廳門票", 200, Region.HOKKAIDO);
         addSpotTicket("ChIJNZSPr8LgCl8R_ro2ttgpg7U", "情書 小樽天狗山滑雪場門票", 300, Region.HOKKAIDO);
+        addSpotTicket("ChIJ6aQkRqLznl8R1DmP_3dWsX0", "名偵探柯南 函館市青函連絡船記念館摩周丸門票", 100, Region.HOKKAIDO);
+        addSpotTicket("ChIJeTIF-JL0nl8RLARltqS9BV8", "名偵探柯南 湯川溫泉門票", 1000, Region.HOKKAIDO);
 
         // 九州
         addSpotTicket("ChIJA-xD_h4ORDURYiAz8lXTUeo", "解憂雜貨店 昭和之町展示館門票", 300, Region.KYUSHU);
