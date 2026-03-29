@@ -1,0 +1,47 @@
+{"properties": [
+  {
+    "name": "ecpay.merchant-id",
+    "type": "java.lang.String",
+    "description": "A description for 'ecpay.merchant-id'"
+  },
+  {
+    "name": "google.maps.api-key",
+    "type": "java.lang.String",
+    "description": "A description for 'google.maps.api-key'"
+  },
+  {
+    "name": "ecpay.hash-key",
+    "type": "java.lang.String",
+    "description": "A description for 'ecpay.hash-key'"
+  },
+  {
+    "name": "ecpay.hash-iv",
+    "type": "java.lang.String",
+    "description": "A description for 'ecpay.hash-iv'"
+  },
+  {
+    "name": "ecpay.url",
+    "type": "java.lang.String",
+    "description": "A description for 'ecpay.url'"
+  },
+  {
+    "name": "line.login.callback-url",
+    "type": "java.lang.String",
+    "description": "A description for 'line.login.callback-url'"
+  },
+  {
+    "name": "line.login.channel-id",
+    "type": "java.lang.String",
+    "description": "A description for 'line.login.channel-id'"
+  },
+  {
+    "name": "line.login.channel-secret",
+    "type": "java.lang.String",
+    "description": "A description for 'line.login.channel-secret'"
+  },
+  {
+    "name": "app.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'app.base-url'"
+  }
+]}
