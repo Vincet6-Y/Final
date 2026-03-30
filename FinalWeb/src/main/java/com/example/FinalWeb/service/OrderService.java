@@ -16,7 +16,6 @@ import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.repo.OrdersRepo;
 import com.example.FinalWeb.repo.MyPlanRepo;
-import com.example.FinalWeb.repo.OrdersDetailRepo;
 import com.example.FinalWeb.dto.TicketDto;
 
 @Service
@@ -24,9 +23,6 @@ public class OrderService {
 
     @Autowired
     private OrdersRepo ordersRepo;
-
-    @Autowired
-    private OrdersDetailRepo ordersDetailRepo;
 
     @Autowired
     private TicketService ticketService;
@@ -78,6 +74,10 @@ public class OrderService {
     @Transactional
     public void processAddonTickets(OrdersEntity order, List<String> ticketNames, List<Integer> ticketPrices,
             List<String> transportIds) {
+        if (order.getOrderDetails() == null) {
+            order.setOrderDetails(new ArrayList<>());
+        }
+
         // --- 1. 處理多張景點門票 ---
         if (ticketNames != null && ticketPrices != null && ticketNames.size() == ticketPrices.size()) {
             for (int i = 0; i < ticketNames.size(); i++) {
@@ -85,7 +85,7 @@ public class OrderService {
                 Integer tPrice = ticketPrices.get(i);
                 if (tName != null && !tName.isEmpty() && tPrice != null && tPrice > 0) {
                     OrdersDetailEntity detail = createNewTicketDetail(order, tName, tPrice);
-                    ordersDetailRepo.save(detail);
+                    order.getOrderDetails().add(detail);
                 }
             }
         }
@@ -97,7 +97,7 @@ public class OrderService {
                 if (tInfo != null) {
                     OrdersDetailEntity transportDetail = createNewTicketDetail(order, tInfo.getTicketName(),
                             tInfo.getPrice());
-                    ordersDetailRepo.save(transportDetail);
+                    order.getOrderDetails().add(transportDetail);
                 }
             }
         }
@@ -105,9 +105,9 @@ public class OrderService {
 
     // 刪除使用者在結帳頁面取消的「舊票券」
     @Transactional
-    public void removeOrderDetails(List<Integer> detailIds) {
-        if (detailIds != null && !detailIds.isEmpty()) {
-            ordersDetailRepo.deleteAllById(detailIds);
+    public void removeOrderDetails(OrdersEntity order, List<Integer> detailIds) {
+        if (detailIds != null && !detailIds.isEmpty() && order.getOrderDetails() != null) {
+            order.getOrderDetails().removeIf(detail -> detailIds.contains(detail.getOrderDetailId()));
         }
     }
 
