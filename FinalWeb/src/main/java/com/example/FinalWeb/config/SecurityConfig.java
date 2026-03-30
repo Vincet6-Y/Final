@@ -21,7 +21,7 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .crossOriginOpenerPolicy(coop -> coop
                                 // 將政策放寬，允許同源網頁與彈出視窗進行通訊
-                                .policy(CrossOriginOpenerPolicy.SAME_ORIGIN_ALLOW_POPUPS)
+                                .policy(CrossOriginOpenerPolicy.UNSAFE_NONE)
                         )
                 )
                 // ==========================================

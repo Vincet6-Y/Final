@@ -22,7 +22,7 @@ public class CoopHeaderFilter implements Filter{
 
         // 第二步：強制貼上貼紙 (設定 Headers)
         // 🌟 這裡就是核心！不管使用者要的是 HTML、JS 還是圖片，通通強制加上允許彈出視窗的 COOP 政策
-        httpResponse.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+        httpResponse.setHeader("Cross-Origin-Opener-Policy", "unsafe-none");
 
         // 第三步：開門放行
         // 保全安檢完畢，這行程式碼代表「把資料交給下一個人處理」或是「送出給瀏覽器」
