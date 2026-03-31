@@ -39,9 +39,9 @@ public class MemberAuthController {
     // ==================== 一般登入 / 註冊 ====================
     // 處理登入
     @PostMapping("/login")
-    public String login(MemberLoginDTO login, HttpSession session, 
-                  @RequestParam(required = false) String redirect,
-                  RedirectAttributes redirectAttr, Model model, HttpServletRequest request) {
+    public String login(MemberLoginDTO login, HttpSession session,
+            @RequestParam(required = false) String redirect,
+            RedirectAttributes redirectAttr, Model model, HttpServletRequest request) {
 
         MemberEntity member = memberService.login(login.email(), login.passwd());
 
@@ -63,9 +63,9 @@ public class MemberAuthController {
     @PostMapping("/register")
     @ResponseBody
     public Map<String, Object> register(@RequestBody MemberRegisterDTO register,
-                                        HttpSession session,
-                                        HttpServletRequest request) {
-        
+            HttpSession session,
+            HttpServletRequest request) {
+
         // 若 session 有社群 email，強制使用 session 的值，防止前端竄改
         String socialEmail = (String) session.getAttribute("socialEmail");
         if (socialEmail != null && !socialEmail.isBlank()) {
@@ -92,19 +92,44 @@ public class MemberAuthController {
     @PostMapping("/google/login")
     @ResponseBody
     public Map<String, Object> googleLogin(@RequestBody GoogleLoginRequestDTO req,
-                                           HttpSession session, HttpServletRequest request) {
+            HttpSession session, HttpServletRequest request) {
 
         try {
             SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
-            MemberEntity member = socialAuthService.
-                                  findMemberByOauth(AuthProvider.GOOGLE, profile.providerId());
- 
+            MemberEntity member = socialAuthService.findMemberByOauth(AuthProvider.GOOGLE, profile.providerId());
+
             if (member != null) {
                 memberService.saveLoginSession(member, request);
-                return Map.of("success", true, "redirectUrl", consumeSocialRedirect(session, "/home"));
+                // 【修改這裡】判斷前端是否有傳 redirect 參數過來，有的話就使用它
+                String redirectUrl = (req.redirect() != null && !req.redirect().isBlank()) ? req.redirect() : "/home";
+                return Map.of("success", true, "redirectUrl", redirectUrl);
             }
+
+            // ✅ 新增：Google userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
+            if (profile.email() != null && !profile.email().isBlank()) {
+                MemberEntity existingMember = memberService.findByEmail(profile.email());
+                if (existingMember != null) {
+                    try {
+                        socialAuthService.link(existingMember, AuthProvider.GOOGLE, profile.providerId());
+                        memberService.saveLoginSession(existingMember, request);
+                        String redirectUrl = (req.redirect() != null && !req.redirect().isBlank()) ?
+                            req.redirect() : "/home";
+                        return Map.of("success", true, "redirectUrl", redirectUrl,
+                            "message", "已自動綁定 Google 並登入，下次可直接使用快速登入");
+                    } catch (IllegalStateException e) {
+                        return Map.of("success", false, "message", e.getMessage());
+                    }
+                }
+            }
+
             // 未綁定 → 暫存資料，導到註冊頁補資料
             storePendingSocial(session, AuthProvider.GOOGLE, profile);
+
+            // 【新增這裡】如果需要導向註冊，把 redirect 存進 session 中，以便註冊完後使用
+            if (req.redirect() != null && !req.redirect().isBlank()) {
+                session.setAttribute("socialRedirect", req.redirect());
+            }
+
             return Map.of("success", true, "redirectUrl", "/auth");
 
         } catch (Exception e) {
@@ -113,12 +138,11 @@ public class MemberAuthController {
         }
     }
 
-    
     @PostMapping("/google/link")
     @ResponseBody
     public Map<String, Object> googleLink(@RequestBody GoogleLoginRequestDTO req,
-                                          HttpSession session) {
-        
+            HttpSession session) {
+
         MemberEntity loginMember = getLoginMember(session);
         if (loginMember == null) {
             return Map.of("success", false, "message", "請先登入會員");
@@ -127,7 +151,7 @@ public class MemberAuthController {
             SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
             socialAuthService.link(loginMember, AuthProvider.GOOGLE, profile.providerId());
             return Map.of("success", true, "message", "Google 綁定成功");
- 
+
         } catch (IllegalStateException e) {
             return Map.of("success", false, "message", e.getMessage());
         } catch (Exception e) {
@@ -142,12 +166,13 @@ public class MemberAuthController {
 
         MemberEntity loginMember = getLoginMember(session);
 
-        if (loginMember == null) return Map.of("success", false, "message", "請先登入");
- 
+        if (loginMember == null)
+            return Map.of("success", false, "message", "請先登入");
+
         if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
             return Map.of("success", false, "message", "請先設定密碼後再解除 Google 綁定");
         }
- 
+
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.GOOGLE);
             return Map.of("success", true, "message", "已解除 Google 綁定");
@@ -176,9 +201,9 @@ public class MemberAuthController {
     }
 
     @GetMapping("/line/callback")
-    public String lineCallback(@RequestParam String code, @RequestParam String state, 
-                                HttpSession session, RedirectAttributes redirectAttr, 
-                                Model model, HttpServletRequest request) {
+    public String lineCallback(@RequestParam String code, @RequestParam String state,
+            HttpSession session, RedirectAttributes redirectAttr,
+            Model model, HttpServletRequest request) {
 
         if (!isValidLineState(session, state)) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("LINE 驗證失敗"));
@@ -235,10 +260,10 @@ public class MemberAuthController {
     // 處理送出 email
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestParam String email,
-                                RedirectAttributes redirectAttr) {
+            RedirectAttributes redirectAttr) {
         emailVerifyService.sendResetEmail(email);
         redirectAttr.addFlashAttribute("toast",
-            ToastInfoDTO.info("若此 Email 已註冊，重設連結已寄出，請查收信件"));
+                ToastInfoDTO.info("若此 Email 已註冊，重設連結已寄出，請查收信件"));
         return "redirect:/auth/forgot-password";
     }
 
@@ -256,9 +281,9 @@ public class MemberAuthController {
     // 處理重設密碼表單
     @PostMapping("/reset-password")
     public String resetPassword(@RequestParam String token,
-                                @RequestParam String newPasswd,
-                                @RequestParam String confirmPasswd,
-                                RedirectAttributes redirectAttr) {
+            @RequestParam String newPasswd,
+            @RequestParam String confirmPasswd,
+            RedirectAttributes redirectAttr) {
         String result = emailVerifyService.resetPassword(token, newPasswd, confirmPasswd);
         if ("success".equals(result)) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("密碼重設成功，請重新登入"));
@@ -268,12 +293,12 @@ public class MemberAuthController {
         return "redirect:/auth/reset-password?token=" + token;
     }
 
-
     // ==================== 以下是 helper 方法 ====================
 
     // 若有 redirect 參數則跳轉，否則回首頁
     private String redirectOrHome(String redirect) {
-        if (redirect != null && !redirect.isBlank()) return "redirect:" + redirect;
+        if (redirect != null && !redirect.isBlank())
+            return "redirect:" + redirect;
         return "redirect:/home";
     }
 
@@ -302,9 +327,10 @@ public class MemberAuthController {
         String socialId = (String) session.getAttribute("socialId");
         AuthProvider socialProvider = (AuthProvider) session.getAttribute("socialProvider");
         String socialEmail = (String) session.getAttribute("socialEmail");
- 
-        if (socialId == null || socialProvider == null) return;
- 
+
+        if (socialId == null || socialProvider == null)
+            return;
+
         MemberEntity member = memberService.findByEmail(email);
         if (member != null) {
             // 只有 socialEmail 有值且與註冊 email 相同時才綁定
@@ -328,13 +354,13 @@ public class MemberAuthController {
     /** 解析註冊失敗原因，轉成對應的 ToastInfoDTO */
     private ToastInfoDTO resolveRegisterError(String result) {
         return switch (result) {
-        case "Email已註冊" -> ToastInfoDTO.error("此 Email 已註冊");
-        case "密碼不一致" -> ToastInfoDTO.error("兩次輸入的密碼不一致");
-        case "手機號碼格式不正確" -> ToastInfoDTO.error("手機號碼格式不正確");    
-        case "生日不能是未來日期" -> ToastInfoDTO.error("生日不能是未來日期");    
-        case "請輸入正確的生日" -> ToastInfoDTO.error("請輸入正確的生日");        
-        case "密碼需包含大小寫英文及數字（至少 8 個字元）" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字（至少 8 個字元）");
-        default -> ToastInfoDTO.error("註冊失敗，請稍後再試");
+            case "Email已註冊" -> ToastInfoDTO.error("此 Email 已註冊");
+            case "密碼不一致" -> ToastInfoDTO.error("兩次輸入的密碼不一致");
+            case "手機號碼格式不正確" -> ToastInfoDTO.error("手機號碼格式不正確");
+            case "生日不能是未來日期" -> ToastInfoDTO.error("生日不能是未來日期");
+            case "請輸入正確的生日" -> ToastInfoDTO.error("請輸入正確的生日");
+            case "密碼需包含大小寫英文及數字（至少 8 個字元）" -> ToastInfoDTO.error("密碼需包含大小寫英文及數字（至少 8 個字元）");
+            default -> ToastInfoDTO.error("註冊失敗，請稍後再試");
         };
     }
 
@@ -343,25 +369,26 @@ public class MemberAuthController {
         String savedState = (String) session.getAttribute("lineLoginState");
         return savedState != null && savedState.equals(state);
     }
-    
+
     /** 向 LINE 取得使用者資料並轉成 SocialProfileDTO */
     private SocialProfileDTO getLineProfile(String code) throws Exception {
         JsonNode profile = lineLoginService.getLineProfile(code);
- 
+
         String providerId = profile.get("userId").asText();
         String name = profile.get("displayName").asText();
         String email = profile.has("email") && !profile.get("email").isNull()
-                ? profile.get("email").asText() : "";
- 
+                ? profile.get("email").asText()
+                : "";
+
         return new SocialProfileDTO(providerId, name, email);
     }
 
     /** LINE link callback 的處理邏輯 */
     private String handleLineLink(String providerId, HttpSession session, RedirectAttributes redirectAttr) {
- 
+
         session.removeAttribute("lineAction");
         MemberEntity loginMember = getLoginMember(session);
- 
+
         if (loginMember == null) {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
@@ -379,20 +406,39 @@ public class MemberAuthController {
     private String socialQuickLogin(
             AuthProvider provider, SocialProfileDTO profile, HttpSession session,
             RedirectAttributes redirectAttr, Model model, HttpServletRequest request) {
- 
+
         MemberEntity member = socialAuthService.findMemberByOauth(provider, profile.providerId());
- 
+
         if (member != null) {
             memberService.saveLoginSession(member, request);
             session.removeAttribute("lineAction");
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success(provider.name() + " 登入成功"));
             return redirectOrHome(consumeSocialRedirect(session, null));
         }
- 
+
+        // ✅ 新增：LINE userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
+        if (profile.email() != null && !profile.email().isBlank()) {
+            MemberEntity existingMember = memberService.findByEmail(profile.email());
+            if (existingMember != null) {
+                try {
+                    socialAuthService.link(existingMember, provider, profile.providerId());
+                    memberService.saveLoginSession(existingMember, request);
+                    session.removeAttribute("lineAction");
+                    redirectAttr.addFlashAttribute("toast",
+                        ToastInfoDTO.success( provider.name() + " 登入成功"));
+                    return redirectOrHome(consumeSocialRedirect(session, null));
+                } catch (IllegalStateException e) {
+                    // 萬一綁定失敗（理論上不會走到這，但保險起見）
+                    redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error(e.getMessage()));
+                    return "redirect:/auth";
+                }
+            }
+        }
+
         // 未綁定 → 導到註冊頁補資料
         storePendingSocial(session, provider, profile);
         session.removeAttribute("lineAction");
- 
+
         model.addAttribute("openPanel", "register");
         model.addAttribute("socialName", profile.name());
         model.addAttribute("socialEmail", profile.email());

@@ -16,7 +16,6 @@ import com.example.FinalWeb.entity.OrdersDetailEntity;
 import com.example.FinalWeb.entity.OrdersEntity;
 import com.example.FinalWeb.repo.OrdersRepo;
 import com.example.FinalWeb.repo.MyPlanRepo;
-import com.example.FinalWeb.repo.OrdersDetailRepo;
 import com.example.FinalWeb.dto.TicketDto;
 
 @Service
@@ -26,15 +25,13 @@ public class OrderService {
     private OrdersRepo ordersRepo;
 
     @Autowired
-    private OrdersDetailRepo ordersDetailRepo;
-
-    @Autowired
     private TicketService ticketService;
 
     @Autowired
     private MyPlanRepo myPlanRepo;
 
     // 建立新訂單
+    // 在同一個資料庫交易中執行，如果 全部成功，就存入資料庫，如果其中一個失敗，就全部取消
     @Transactional
     public OrdersEntity createOrder(MemberEntity member, MyPlanEntity myPlan, List<OrdersDetailEntity> ticketCart) {
         OrdersEntity newOrder = new OrdersEntity();
@@ -52,12 +49,13 @@ public class OrderService {
         return ordersRepo.save(newOrder);
     }
 
+    // 取得訂單
     public OrdersEntity getOrderById(Integer orderId) {
         return ordersRepo.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("找不到該筆訂單 ID: " + orderId));
     }
 
-    // 給會員首頁用的，負責把這個會員的訂單撈出來並排序
+    // 會員訂單列表
     public List<OrdersEntity> getMemberOrders(Integer memberId) {
         return ordersRepo.findByMember_MemberIdOrderByOrderTimeDesc(memberId);
     }
@@ -72,10 +70,14 @@ public class OrderService {
                 .sum();
     }
 
-    // 處理前端傳來的加購門票與交通票 (支援購物車多選！)
+    // 處理訂單的附加票券(加購門票與交通票)
     @Transactional
     public void processAddonTickets(OrdersEntity order, List<String> ticketNames, List<Integer> ticketPrices,
             List<String> transportIds) {
+        if (order.getOrderDetails() == null) {
+            order.setOrderDetails(new ArrayList<>());
+        }
+
         // --- 1. 處理多張景點門票 ---
         if (ticketNames != null && ticketPrices != null && ticketNames.size() == ticketPrices.size()) {
             for (int i = 0; i < ticketNames.size(); i++) {
@@ -83,19 +85,19 @@ public class OrderService {
                 Integer tPrice = ticketPrices.get(i);
                 if (tName != null && !tName.isEmpty() && tPrice != null && tPrice > 0) {
                     OrdersDetailEntity detail = createNewTicketDetail(order, tName, tPrice);
-                    ordersDetailRepo.save(detail);
+                    order.getOrderDetails().add(detail);
                 }
             }
         }
 
-        // --- 2. 安全地處理「多張」交通票 ---
+        // --- 2. 處理多張交通票 ---
         if (transportIds != null && !transportIds.isEmpty()) {
             for (String tId : transportIds) {
                 TicketDto tInfo = ticketService.getTicketById(tId);
                 if (tInfo != null) {
                     OrdersDetailEntity transportDetail = createNewTicketDetail(order, tInfo.getTicketName(),
                             tInfo.getPrice());
-                    ordersDetailRepo.save(transportDetail);
+                    order.getOrderDetails().add(transportDetail);
                 }
             }
         }
@@ -103,9 +105,9 @@ public class OrderService {
 
     // 刪除使用者在結帳頁面取消的「舊票券」
     @Transactional
-    public void removeOrderDetails(List<Integer> detailIds) {
-        if (detailIds != null && !detailIds.isEmpty()) {
-            ordersDetailRepo.deleteAllById(detailIds);
+    public void removeOrderDetails(OrdersEntity order, List<Integer> detailIds) {
+        if (detailIds != null && !detailIds.isEmpty() && order.getOrderDetails() != null) {
+            order.getOrderDetails().removeIf(detail -> detailIds.contains(detail.getOrderDetailId()));
         }
     }
 
@@ -120,7 +122,7 @@ public class OrderService {
         return detail;
     }
 
-    // 分組行程
+    // 把行程地點依照「第幾天」分組，並且先排序
     public Map<Integer, List<MyMapEntity>> groupMapsByDay(List<MyMapEntity> allMaps) {
         if (allMaps == null || allMaps.isEmpty()) {
             return new TreeMap<>();
@@ -135,14 +137,12 @@ public class OrderService {
     }
 
     // 分類票券
-    // =====================================================
-    // 方法 1：專門用來取得「景點門票的 SpotId 集合」
-    // =====================================================
+    // 專門用來取得「景點門票的 SpotId 集合」
     public Set<Integer> getTicketSpotIds(OrdersEntity order) {
-        // 1. 建立一個空的 HashSet 來存放結果。使用 Set 可以確保 ID 不會重複。
+        // 1. 建立一個空的 HashSet 來存放結果
         Set<Integer> ticketSpotIds = new HashSet<>();
 
-        // 2. 檢查訂單明細是否為空，避免 NullPointerException (空指標異常)
+        // 2. 檢查訂單明細是否為空
         if (order.getOrderDetails() != null) {
             // 3. 走訪這筆訂單裡的每一個明細項目
             for (OrdersDetailEntity detail : order.getOrderDetails()) {
@@ -168,13 +168,10 @@ public class OrderService {
                 }
             }
         }
-        // 9. 回傳明確型別為 Set<Integer> 的結果
         return ticketSpotIds;
     }
 
-    // =====================================================
-    // 方法 2：專門用來取得「交通票的實體清單」
-    // =====================================================
+    // 專門用來取得「交通票的實體清單」
     public List<OrdersDetailEntity> getTransportTickets(OrdersEntity order) {
         // 1. 建立一個空的 ArrayList 來存放交通票
         List<OrdersDetailEntity> transportTickets = new ArrayList<>();
@@ -206,7 +203,6 @@ public class OrderService {
                 }
             }
         }
-        // 7. 回傳明確型別為 List<OrdersDetailEntity> 的結果
         return transportTickets;
     }
 

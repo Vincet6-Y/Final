@@ -1,5 +1,5 @@
 // firebase 圖片上傳
-import { storage } from "/member/Js/firebase/firebase.js";
+import { storage } from "../member/js/firebase/firebase.js";
 import { ref, uploadBytes, getDownloadURL }
     from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 

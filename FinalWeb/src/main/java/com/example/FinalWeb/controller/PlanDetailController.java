@@ -58,7 +58,7 @@ public class PlanDetailController {
                 model.addAttribute("groupedByDay", groupedByDay);
                 // ... 加入其他 model 屬性 ...
 
-                return "planDetail"; // 對應你的 HTML 檔名
+                return "plandetail"; // 對應你的 HTML 檔名
         }
 
 }

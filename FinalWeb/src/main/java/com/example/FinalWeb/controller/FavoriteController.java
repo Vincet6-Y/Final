@@ -35,7 +35,7 @@ public class FavoriteController {
         MemberEntity member = (MemberEntity) session.getAttribute("loginMember");
         if (member == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("success", false, "message", "需登入才能收藏行程唷！"));
+                    .body(Map.of("success", false, "message", "需登入才能收藏行程唷！"));
         }
 
         try {
@@ -58,7 +58,7 @@ public class FavoriteController {
                 isFavorited = true;
             }
 
-            return ResponseEntity.ok(java.util.Map.of("success", true, "isFavorited", isFavorited));
+            return ResponseEntity.ok(Map.of("success", true, "isFavorited", isFavorited));
 
         } catch (Exception e) {
             System.out.println(e);

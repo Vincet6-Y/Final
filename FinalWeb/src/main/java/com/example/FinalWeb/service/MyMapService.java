@@ -29,8 +29,9 @@ public class MyMapService {
         dto.setGooglePlaceId(entity.getGooglePlaceId());
         dto.setLatitude(entity.getLatitude() != null ? entity.getLatitude().doubleValue() : null);
         dto.setLongitude(entity.getLongitude() != null ? entity.getLongitude().doubleValue() : null);
+        dto.setLocationImage(entity.getLocationImage());
 
-        // 2. 處理行程名稱 (原本寫在 @Transient 的邏輯移來這裡)
+        // 2. 處理行程名稱
         if (entity.getMyPlan() != null && entity.getMyPlan().getMyPlanName() != null) {
             dto.setOrderItemsName(entity.getMyPlan().getMyPlanName());
         } else {

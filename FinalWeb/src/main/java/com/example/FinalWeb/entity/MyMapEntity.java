@@ -28,6 +28,7 @@ public class MyMapEntity {
     private Integer dayNumber;
     private Integer visitOrder;
     private String locationName;
+    private String locationImage;
 
     @Column(name = "longitude", precision = 10, scale = 6, columnDefinition = "DECIMAL(10,6)")
     private BigDecimal longitude;

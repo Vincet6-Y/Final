@@ -95,6 +95,7 @@ public class OfficialMapController {
                 myMap.setLatitude(n.getLatitude());
                 myMap.setLongitude(n.getLongitude());
                 myMap.setGooglePlaceId(n.getGooglePlaceID());
+                myMap.setLocationImage(n.getLocationImage());
 
                 // 🌟 處理時間拷貝：保留官方設定的時、分，若無則給 08:00
                 if (n.getVisitTime() != null) {
@@ -142,7 +143,7 @@ public class OfficialMapController {
             return mapRepo.findById(spotId).map(node -> {
                 node.setGooglePlaceID(newPlaceId);
                 mapRepo.save(node);
-                return ResponseEntity.ok(java.util.Map.of("success", true));
+                return ResponseEntity.ok(Map.of("success", true));
             }).orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
@@ -169,16 +170,16 @@ public class OfficialMapController {
         try {
             String newName = body.get("name");
             if (newName == null || newName.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(java.util.Map.of("success", false, "message", "名稱不可為空"));
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "名稱不可為空"));
             }
             return myPlanRepo.findById(myPlanId).map(plan -> {
                 plan.setMyPlanName(newName);
                 myPlanRepo.save(plan);
-                return ResponseEntity.ok(java.util.Map.of("success", true, "newName", newName));
-            }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("success", false)));
+                return ResponseEntity.ok(Map.of("success", true, "newName", newName));
+            }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("success", false)));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body(java.util.Map.of("success", false, "message", e.getMessage()));
+                    .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 }

@@ -1,17 +1,47 @@
 function initMap() {
+    // 🌟 1. 偵測目前網頁是否為深色模式
+    const isDarkMode = document.documentElement.classList.contains('dark');
+
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 35.6895, lng: 139.6917 },
         zoom: 11,
         mapId: '2fd53a2f051832ea485534f4',
+        // 🌟 2. 核心：告訴 Google Map 目前要用什麼配色 ('DARK' 或 'LIGHT')
+        colorScheme: isDarkMode ? 'DARK' : 'LIGHT',
         disableDefaultUI: true,
         zoomControl: true
     });
+
+    // 🌟 2. 關鍵防呆：強制將 map 綁定到 window 變數，保證 HTML 絕對抓得到！
+    window.map = map;
 
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ map: map, suppressMarkers: false });
     placesService = new google.maps.places.PlacesService(map);
 
     map.addListener("click", (e) => { if (e.placeId) { e.stop(); fetchAndShowDetails(e.placeId); } });
+}
+
+function toggleTheme() {
+    // 1. 執行網頁 HTML 切換深淺色
+    const isDark = document.documentElement.classList.toggle('dark');
+
+    // 2. 存入瀏覽器記憶體，確保重整後維持該模式
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+    // 使用您現有的 showToast 函式，顯示對應的模式名稱
+    if (typeof showToast === 'function') {
+        const modeName = isDark ? '深色' : '淺色';
+        showToast('success', `正在切換至${modeName}模式，請稍候...`);
+    }
+
+    console.log("正在切換主題並存入記憶體：", isDark ? "深色" : "淺色");
+
+    // 🌟 核心：使用「平滑重整」解決地圖不變色的問題
+    // 延遲 200 毫秒，讓使用者先看到背景顏色變動，再進行無感的重整來更換地圖 ID 樣式
+    setTimeout(() => {
+        window.location.reload();
+    }, 200);
 }
 
 // ==========================================
@@ -76,10 +106,11 @@ async function calculateAndDisplayRoute(dayToCalculate) {
     const places = itineraryData[dayToCalculate];
 
     // 移除舊路線、移除舊編號圖釘
-    dayRouteRenderers.forEach(renderer => renderer.setMap(null)); 
+    dayRouteRenderers.forEach(renderer => renderer.setMap(null));
     dayRouteRenderers = [];
-    if (routeMarkers) { routeMarkers.forEach(m => m.setMap(null));
-        routeMarkers = []; 
+    if (routeMarkers) {
+        routeMarkers.forEach(m => m.setMap(null));
+        routeMarkers = [];
     }
 
     // 🌟 1. 在最外層宣告 bounds，準備裝載所有座標
@@ -147,7 +178,7 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         const markerLngDest = parseFloat(places[i + 1].longitude || places[i + 1].lng);
 
         const getPlaceId = (place) => place.GooglePlaceID || place.googlePlaceId || place.googlePlaceID || place.place_id;
-        
+
         const originId = getPlaceId(places[i]);
         const originTransit = originId ? { placeId: originId } : { lat: markerLatOrigin, lng: markerLngOrigin };
         const destId = getPlaceId(places[i + 1]);
@@ -230,19 +261,19 @@ async function calculateAndDisplayRoute(dayToCalculate) {
         if (res) {
             if (res._isFake) {
                 const polyline = new google.maps.Polyline({
-                    path: res._path, 
+                    path: res._path,
                     strokeOpacity: 0, // 實體線透明
-                    icons: [{ 
-                        icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, 
-                        offset: '0', 
+                    icons: [{
+                        icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 },
+                        offset: '0',
                         repeat: '15px' // 🌟 這裡設定虛線的重複點
                     }],
-                    strokeColor: res._color, 
-                    strokeWeight: 4, 
+                    strokeColor: res._color,
+                    strokeWeight: 4,
                     map: map
                 });
                 dayRouteRenderers.push(polyline);
-                
+
                 // 🌟 3. 將虛線 (Fake Route) 的路徑點也加入 bounds！
                 if (res._path) {
                     res._path.forEach(point => bounds.extend(point));
@@ -251,11 +282,12 @@ async function calculateAndDisplayRoute(dayToCalculate) {
             } else {
                 let routeColor = res._mode === 'WALKING' ? "#008ccf" : (res._mode === 'DRIVING' ? "#ea4335" : "#ff8c00");
                 const renderer = new google.maps.DirectionsRenderer({
-                    map: map, 
-                    suppressMarkers: true, 
-                    polylineOptions: { strokeColor: routeColor, 
-                                        strokeWeight: 5, strokeOpacity: 0.8 
-                                    }
+                    map: map,
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: routeColor,
+                        strokeWeight: 5, strokeOpacity: 0.8
+                    }
                 });
                 renderer.setDirections(res);
                 dayRouteRenderers.push(renderer);
@@ -269,7 +301,7 @@ async function calculateAndDisplayRoute(dayToCalculate) {
                     const markerEnd = { lat: parseFloat(places[index + 1].latitude || places[index + 1].lat), lng: parseFloat(places[index + 1].longitude || places[index + 1].lng) };
 
                     const dashedLineOptions = {
-                        strokeColor: routeColor, 
+                        strokeColor: routeColor,
                         strokeOpacity: 0,
                         strokeWeight: 4,
                         icons: [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 1, scale: 3 }, offset: '0', repeat: '10px' }],
@@ -299,14 +331,14 @@ async function calculateAndDisplayRoute(dayToCalculate) {
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
     // 🌍 地球平均半徑 (公里)
-    const R = 6371; 
+    const R = 6371;
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     // 這裡進行複雜的球面三角函數運算
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + 
-              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     // 最後得出弧長公里數
-    return R * c; 
+    return R * c;
 }
