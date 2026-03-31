@@ -719,7 +719,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 1. 日期選擇器 UI 建立
     const datePickerWrapper = document.createElement('div');
-    datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative group hover:border-primary/50 transition-colors shrink-0";
+    datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative overflow-hidden group hover:border-primary/50 transition-colors shrink-0";
 
     const calendarIcon = document.createElement('span');
     calendarIcon.className = "material-symbols-outlined text-[14px] text-slate-400 group-hover:text-primary transition-colors";
@@ -729,13 +729,47 @@ document.addEventListener("DOMContentLoaded", () => {
     dateDisplay.className = "text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors tracking-wider";
     dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(defaultEnd)}`;
 
+    // 🌟 終極修復：針對 Android Chrome 的原生行為進行 Hack
+    if (!document.getElementById('date-picker-hack-style')) {
+        const style = document.createElement('style');
+        style.id = 'date-picker-hack-style';
+        style.innerHTML = `
+            /* 隱藏輸入框內的文字，防止干擾 */
+            .date-picker-hack {
+                color: transparent !important;
+                background: transparent !important;
+            }
+            /* 強制將原生喚起日曆的按鈕 (indicator) 撐到最大，填滿整個外層區域 */
+            .date-picker-hack::-webkit-calendar-picker-indicator {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                cursor: pointer;
+                opacity: 0; /* 按鈕本身維持透明，但保留點擊判定 */
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     const dateInput = document.createElement('input');
     dateInput.type = "date";
     dateInput.value = formatYMD(defaultStart);
-    dateInput.className = "absolute top-full left-0 w-0 h-0 opacity-0 pointer-events-none";
+    // 加入 date-picker-hack 類別，並設定 z-20 確保它絕對在最上層
+    dateInput.className = "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 date-picker-hack";
 
-    datePickerWrapper.addEventListener('click', () => {
-        try { dateInput.showPicker(); } catch (error) { dateInput.focus(); }
+    // 🌟 雙重保險：對於支援 showPicker 的現代瀏覽器，主動強制喚起日曆
+    dateInput.addEventListener('click', function (e) {
+        try {
+            if (typeof this.showPicker === 'function') {
+                this.showPicker();
+            }
+        } catch (error) {
+            // 忽略錯誤，如果不支援，瀏覽器會自然觸發我們上面 CSS Hack 的原生點擊行為
+        }
     });
 
     datePickerWrapper.appendChild(calendarIcon);
