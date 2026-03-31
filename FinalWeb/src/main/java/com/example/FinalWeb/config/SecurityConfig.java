@@ -2,6 +2,7 @@ package com.example.FinalWeb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,10 +20,15 @@ public class SecurityConfig {
                 
                 // === 💡 這裡是新增的 COOP 標頭設定區塊 ===
                 .headers(headers -> headers
+                        .defaultsDisabled() // 先清除所有預設 header
                         .crossOriginOpenerPolicy(coop -> coop
                                 // 將政策放寬，允許同源網頁與彈出視窗進行通訊
                                 .policy(CrossOriginOpenerPolicy.UNSAFE_NONE)
                         )
+                            // 只保留你需要的安全 header
+                            .frameOptions(frame -> frame.sameOrigin())
+                            .contentTypeOptions(Customizer.withDefaults())
+
                 )
                 // ==========================================
 
