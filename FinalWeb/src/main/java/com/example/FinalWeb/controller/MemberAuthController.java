@@ -96,8 +96,9 @@ public class MemberAuthController {
 
         try {
             SocialProfileDTO profile = googleLoginService.verifyGoogleIdToken(req.idToken());
-            MemberEntity member = socialAuthService.findMemberByOauth(AuthProvider.GOOGLE, profile.providerId());
 
+            // 已綁定過，直接登入
+            MemberEntity member = socialAuthService.findMemberByOauth(AuthProvider.GOOGLE, profile.providerId());
             if (member != null) {
                 memberService.saveLoginSession(member, request);
                 // 【修改這裡】判斷前端是否有傳 redirect 參數過來，有的話就使用它
@@ -105,7 +106,7 @@ public class MemberAuthController {
                 return Map.of("success", true, "redirectUrl", redirectUrl);
             }
 
-            // ✅ 新增：Google userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
+            // Google userId 沒綁定，但 email 對得上本地帳號 → 自動綁定並直接登入
             if (profile.email() != null && !profile.email().isBlank()) {
                 MemberEntity existingMember = memberService.findByEmail(profile.email());
                 if (existingMember != null) {
@@ -122,14 +123,12 @@ public class MemberAuthController {
                 }
             }
 
-            // 未綁定 → 暫存資料，導到註冊頁補資料
+            // 未綁定(新使用者) → 暫存資料，導到註冊頁補資料
             storePendingSocial(session, AuthProvider.GOOGLE, profile);
-
             // 【新增這裡】如果需要導向註冊，把 redirect 存進 session 中，以便註冊完後使用
             if (req.redirect() != null && !req.redirect().isBlank()) {
                 session.setAttribute("socialRedirect", req.redirect());
             }
-
             return Map.of("success", true, "redirectUrl", "/auth");
 
         } catch (Exception e) {
@@ -140,8 +139,8 @@ public class MemberAuthController {
 
     @PostMapping("/google/link")
     @ResponseBody
-    public Map<String, Object> googleLink(@RequestBody GoogleLoginRequestDTO req,
-            HttpSession session) {
+    public Map<String, Object> googleLink(@RequestBody GoogleLoginRequestDTO req, 
+                                          HttpSession session) {
 
         MemberEntity loginMember = getLoginMember(session);
         if (loginMember == null) {
@@ -168,10 +167,6 @@ public class MemberAuthController {
 
         if (loginMember == null)
             return Map.of("success", false, "message", "請先登入");
-
-        if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
-            return Map.of("success", false, "message", "請先設定密碼後再解除 Google 綁定");
-        }
 
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.GOOGLE);
@@ -237,11 +232,7 @@ public class MemberAuthController {
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先登入會員"));
             return "redirect:/auth";
         }
-        // 補上密碼檢查，避免純 LINE 登入的帳號解除後無法登入
-        if (loginMember.getPasswd() == null || loginMember.getPasswd().isBlank()) {
-            redirectAttr.addFlashAttribute("toast", ToastInfoDTO.error("請先設定密碼後再解除 LINE 綁定"));
-            return "redirect:/member";
-        }
+
         try {
             socialAuthService.unlink(loginMember.getMemberId(), AuthProvider.LINE);
             redirectAttr.addFlashAttribute("toast", ToastInfoDTO.success("LINE 已解除綁定"));
@@ -263,7 +254,7 @@ public class MemberAuthController {
             RedirectAttributes redirectAttr) {
         emailVerifyService.sendResetEmail(email);
         redirectAttr.addFlashAttribute("toast",
-                ToastInfoDTO.info("若此 Email 已註冊，重設連結已寄出，請查收信件"));
+                ToastInfoDTO.info("重設連結已寄出，請查收信件"));
         return "redirect:/auth/forgot-password";
     }
 
@@ -272,7 +263,7 @@ public class MemberAuthController {
     public String resetPasswordPage(@RequestParam String token, Model model) {
         var resetToken = emailVerifyService.validateToken(token);
         if (resetToken == null) {
-            model.addAttribute("error", "連結已失效或已使用，請重新申請");
+            model.addAttribute("error", "連結已失效，請重新申請");
         }
         model.addAttribute("token", token);
         return "login/resetPassword";

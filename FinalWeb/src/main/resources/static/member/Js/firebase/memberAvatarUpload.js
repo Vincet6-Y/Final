@@ -98,13 +98,6 @@ $(function () {
         }
     }
 
-    /** 刪除 Firebase 上的原始圖（若存在則刪，不存在略過） */
-    async function deleteOriginalFile() {
-        try {
-            await deleteObject(ref(storage, `avatars/${memberId}/original.webp`));
-        } catch (_) {}
-    }
-
     // ==================== 事件綁定 ====================
 
     // 點擊上傳按鈕或相機 icon，觸發檔案選擇
@@ -161,9 +154,8 @@ $(function () {
             const croppedBlob = await canvasToRoundBlob(canvas);
             const downloadURL = await uploadCroppedBlob(croppedBlob);
 
-            // 刪除舊的裁切圖與原始圖
+            // 刪除舊的裁切圖
             await deletePreviousTempFile();
-            await deleteOriginalFile();
 
             previousTempUrl = downloadURL;
             isAvatarRemoved = false;
