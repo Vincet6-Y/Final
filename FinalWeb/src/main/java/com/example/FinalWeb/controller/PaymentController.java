@@ -100,7 +100,7 @@ public class PaymentController {
 
         OrdersEntity order = orderService.getOrderById(orderId);
         orderService.applyPlanChanges(order, newPlanName, newStartDate);
-        orderService.removeOrderDetails(removeDetailIds);
+        orderService.removeOrderDetails(order, removeDetailIds);
         orderService.processAddonTickets(order, addonTicketNames, addonTicketPrices, transportIds);
 
         OrdersEntity updated = orderService.getOrderById(orderId);
