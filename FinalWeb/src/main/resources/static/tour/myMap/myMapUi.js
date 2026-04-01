@@ -729,52 +729,36 @@ document.addEventListener("DOMContentLoaded", () => {
     dateDisplay.className = "text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors tracking-wider";
     dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(defaultEnd)}`;
 
-    // 🌟 終極修復：針對 Android Chrome 的原生行為進行 Hack
-    if (!document.getElementById('date-picker-hack-style')) {
-        const style = document.createElement('style');
-        style.id = 'date-picker-hack-style';
-        style.innerHTML = `
-            /* 隱藏輸入框內的文字，防止干擾 */
-            .date-picker-hack {
-                color: transparent !important;
-                background: transparent !important;
-            }
-            /* 強制將原生喚起日曆的按鈕 (indicator) 撐到最大，填滿整個外層區域 */
-            .date-picker-hack::-webkit-calendar-picker-indicator {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                cursor: pointer;
-                opacity: 0; /* 按鈕本身維持透明，但保留點擊判定 */
-            }
-        `;
-        document.head.appendChild(style);
-    }
+    // ==========================================
+    // 修改：捨棄原本的 CSS Hack，改用 JS 精準喚醒日曆
+    // ==========================================
 
+    // 建立一個完全隱藏的日期輸入框，僅用於喚醒原生選單
     const dateInput = document.createElement('input');
     dateInput.type = "date";
     dateInput.value = formatYMD(defaultStart);
-    // 加入 date-picker-hack 類別，並設定 z-20 確保它絕對在最上層
-    dateInput.className = "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20 date-picker-hack";
+    // 讓 input 隱藏但不消失，這樣 JS 才能對它觸發事件
+    dateInput.className = "absolute w-0 h-0 opacity-0 pointer-events-none";
 
-    // 🌟 雙重保險：對於支援 showPicker 的現代瀏覽器，主動強制喚起日曆
-    dateInput.addEventListener('click', function (e) {
+    // 將「點擊事件」直接綁定在整個按鈕外框 (datePickerWrapper) 上
+    datePickerWrapper.addEventListener('click', function (e) {
         try {
-            if (typeof this.showPicker === 'function') {
-                this.showPicker();
+            // 對於現代瀏覽器，直接呼叫原生的 showPicker() 喚醒日曆
+            if (typeof dateInput.showPicker === 'function') {
+                dateInput.showPicker();
+            } else {
+                // 針對舊版瀏覽器的 Fallback
+                dateInput.focus();
+                dateInput.click();
             }
         } catch (error) {
-            // 忽略錯誤，如果不支援，瀏覽器會自然觸發我們上面 CSS Hack 的原生點擊行為
+            console.error("無法喚起日期選擇器", error);
         }
     });
 
     datePickerWrapper.appendChild(calendarIcon);
     datePickerWrapper.appendChild(dateDisplay);
-    datePickerWrapper.appendChild(dateInput);
+    datePickerWrapper.appendChild(dateInput); // 把隱藏的 input 塞進去
     titleContainer.appendChild(datePickerWrapper);
 
     // ==========================================

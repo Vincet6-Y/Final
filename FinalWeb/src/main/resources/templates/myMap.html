@@ -13,7 +13,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
     <title>行程規劃 - 聖地巡禮</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -70,8 +70,7 @@
 </head>
 
 
-<body
-    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-screen w-full flex flex-col">
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-hidden h-[100dvh] w-full flex flex-col">
 
     <!-- 彈窗景點資訊 -->
     <div id="rich-place-modal"
@@ -525,7 +524,7 @@
         </div>
 
         <button id="mobile-toggle-btn" onclick="toggleMobileView()"
-            class="md:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
+            class="md:hidden fixed bottom-12 left-1/2 -translate-x-1/2 z-[60] bg-primary text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_-5px_rgba(255,140,0,0.5)] flex items-center gap-2 transition-transform active:scale-95 pointer-events-auto">
             <span class="material-symbols-outlined" id="toggle-icon">map</span>
             <span id="toggle-text">展開地圖</span>
         </button>
