@@ -80,7 +80,7 @@ public class AdminOrderService {
     public List<Integer> getMonthlyRevenueForCurrentYear() {
         List<Integer> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0));
         List<OrdersEntity> paidOrders = ordersRepo.findByPayStatusOrderByOrderTimeDesc("已付款");
-        int currentYear = java.time.LocalDate.now().getYear();
+        int currentYear = LocalDate.now().getYear();
 
         for (OrdersEntity order : paidOrders) {
             LocalDateTime timeToCheck = order.getPayTime() != null ? order.getPayTime() : order.getOrderTime();

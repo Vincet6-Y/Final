@@ -1,6 +1,7 @@
 package com.example.FinalWeb.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -68,7 +69,7 @@ public class MyMapController {
     @ResponseBody
     public Map<String, Object> aiSortItinerary(
             @RequestParam Integer myPlanId, @RequestParam Integer dayNumber) {
-        Map<String, Object> response = new java.util.HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         try {
             // 抓取該天景點
             List<MyMapEntity> spots = myMapRepo.findByMyPlan_MyPlanIdAndDayNumberOrderByVisitOrderAsc(myPlanId,
@@ -170,8 +171,8 @@ public class MyMapController {
             // ==========================================
             // 🌟 補強：確保手動加入的景點，也有預設的時間，避免產生 NULL
             // ==========================================
-            java.time.LocalDate startDate = (myPlan.getStartDate() != null) ? myPlan.getStartDate()
-                    : java.time.LocalDate.now();
+            LocalDate startDate = (myPlan.getStartDate() != null) ? myPlan.getStartDate()
+                    : LocalDate.now();
             newSpot.setVisitTime(startDate.atTime(8, 0).plusDays(dayNumber - 1));
             newSpot.setStayTime(60); // 預設 60 分鐘
 

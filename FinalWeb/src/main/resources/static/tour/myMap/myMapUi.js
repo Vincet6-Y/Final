@@ -719,7 +719,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 1. 日期選擇器 UI 建立
     const datePickerWrapper = document.createElement('div');
-    datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative group hover:border-primary/50 transition-colors shrink-0";
+    datePickerWrapper.className = "flex items-center gap-1.5 ml-3 bg-slate-100 dark:bg-surface-dark px-2.5 py-1 rounded-md border border-slate-200 dark:border-white/10 cursor-pointer relative overflow-hidden group hover:border-primary/50 transition-colors shrink-0";
 
     const calendarIcon = document.createElement('span');
     calendarIcon.className = "material-symbols-outlined text-[14px] text-slate-400 group-hover:text-primary transition-colors";
@@ -729,18 +729,36 @@ document.addEventListener("DOMContentLoaded", () => {
     dateDisplay.className = "text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors tracking-wider";
     dateDisplay.innerText = `${formatMD(defaultStart)} - ${formatMD(defaultEnd)}`;
 
+    // ==========================================
+    // 修改：捨棄原本的 CSS Hack，改用 JS 精準喚醒日曆
+    // ==========================================
+
+    // 建立一個完全隱藏的日期輸入框，僅用於喚醒原生選單
     const dateInput = document.createElement('input');
     dateInput.type = "date";
     dateInput.value = formatYMD(defaultStart);
-    dateInput.className = "absolute top-full left-0 w-0 h-0 opacity-0 pointer-events-none";
+    // 讓 input 隱藏但不消失，這樣 JS 才能對它觸發事件
+    dateInput.className = "absolute w-0 h-0 opacity-0 pointer-events-none";
 
-    datePickerWrapper.addEventListener('click', () => {
-        try { dateInput.showPicker(); } catch (error) { dateInput.focus(); }
+    // 將「點擊事件」直接綁定在整個按鈕外框 (datePickerWrapper) 上
+    datePickerWrapper.addEventListener('click', function (e) {
+        try {
+            // 對於現代瀏覽器，直接呼叫原生的 showPicker() 喚醒日曆
+            if (typeof dateInput.showPicker === 'function') {
+                dateInput.showPicker();
+            } else {
+                // 針對舊版瀏覽器的 Fallback
+                dateInput.focus();
+                dateInput.click();
+            }
+        } catch (error) {
+            console.error("無法喚起日期選擇器", error);
+        }
     });
 
     datePickerWrapper.appendChild(calendarIcon);
     datePickerWrapper.appendChild(dateDisplay);
-    datePickerWrapper.appendChild(dateInput);
+    datePickerWrapper.appendChild(dateInput); // 把隱藏的 input 塞進去
     titleContainer.appendChild(datePickerWrapper);
 
     // ==========================================

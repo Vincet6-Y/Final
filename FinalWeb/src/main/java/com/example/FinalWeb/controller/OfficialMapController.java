@@ -1,5 +1,7 @@
 package com.example.FinalWeb.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +70,7 @@ public class OfficialMapController {
         Object member = session.getAttribute("loginMember");
         if (member == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("success", false, "message", "請先登入"));
+                    .body(Map.of("success", false, "message", "請先登入"));
         }
 
         try {
@@ -77,7 +79,7 @@ public class OfficialMapController {
             MyPlanEntity myPlan = new MyPlanEntity();
             myPlan.setJourneyPlan(official);
             myPlan.setMyPlanName(official.getPlanName() + " (我的自訂)");
-            java.time.LocalDate startDate = java.time.LocalDate.now().plusDays(7); // 預設7天後出發
+            LocalDate startDate = LocalDate.now().plusDays(7); // 預設7天後出發
             myPlan.setStartDate(startDate);
             myPlan.setMember((MemberEntity) member);
 
@@ -99,7 +101,7 @@ public class OfficialMapController {
 
                 // 🌟 處理時間拷貝：保留官方設定的時、分，若無則給 08:00
                 if (n.getVisitTime() != null) {
-                    java.time.LocalTime time = n.getVisitTime().toLocalTime();
+                    LocalTime time = n.getVisitTime().toLocalTime();
                     myMap.setVisitTime(startDate.plusDays(n.getDayNumber() - 1).atTime(time));
                 } else {
                     myMap.setVisitTime(startDate.plusDays(n.getDayNumber() - 1).atTime(8, 0));
@@ -113,11 +115,11 @@ public class OfficialMapController {
 
             myMapRepo.saveAll(newMyMapNodes);
 
-            return ResponseEntity.ok(java.util.Map.of("success", true, "newMyPlanId", myPlan.getMyPlanId()));
+            return ResponseEntity.ok(Map.of("success", true, "newMyPlanId", myPlan.getMyPlanId()));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body(java.util.Map.of("success", false, "message", "複製失敗：" + e.getMessage()));
+                    .body(Map.of("success", false, "message", "複製失敗：" + e.getMessage()));
         }
     }
 
@@ -130,7 +132,7 @@ public class OfficialMapController {
             return ResponseEntity.ok(nodes);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(java.util.Map.of("success", false, "message", "獲取資料失敗：" + e.getMessage()));
+                    .body(Map.of("success", false, "message", "獲取資料失敗：" + e.getMessage()));
         }
     }
 
@@ -159,7 +161,7 @@ public class OfficialMapController {
             return ResponseEntity.ok(nodes);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(java.util.Map.of("success", false, "message", "獲取個人資料失敗：" + e.getMessage()));
+                    .body(Map.of("success", false, "message", "獲取個人資料失敗：" + e.getMessage()));
         }
     }
 
