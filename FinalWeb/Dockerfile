@@ -1,4 +1,3 @@
-# ========== 第一階段：大廚房烹飪期 (打包編譯) ==========
 # 呼叫一個內建 Maven 與 Java 17 工具的大型貨櫃
 FROM maven:3.8.5-openjdk-17 AS builder
 
@@ -13,7 +12,6 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 
-# ========== 第二階段：輕量化出餐期 (執行環境) ==========
 # 呼叫一個只有 Java 17 執行環境的輕量級小貨櫃
 FROM eclipse-temurin:17-jre-alpine
 
@@ -23,7 +21,5 @@ WORKDIR /app
 # 關鍵步驟：去剛剛的「大廚房 (builder)」裡，把 target 資料夾下煮好的 .jar 成品撈過來，並改名叫 app.jar
 COPY --from=builder /app/target/*.jar app.jar
 
-# 告訴 Render，當這個小貨櫃啟動時，請執行這行指令來開門營業
 # ENTRYPOINT ["java", "-jar", "app.jar"]
-# 加上 -Xmx 限制記憶體，並優化啟動速度
 ENTRYPOINT ["java", "-Xmx350m", "-Xss512k", "-XX:+UseSerialGC", "-jar", "app.jar"]
